@@ -1,0 +1,2 @@
+candidate,split,device,dtype,threads,torch_version,transformers_version,python,platform,arch,physical_ram_bytes,logical_cpus,load_seconds,warmup_seconds,training_seconds,rss_before_bytes,rss_loaded_bytes,peak_rss_bytes,disk_bytes,latency_p50_s,latency_p95_s,model_revision
+nli,dev,cpu,float32,4,2.8.0,4.57.1,3.13.7,macOS-26.6.2-arm64-arm-64bit-Mach-O,arm64,25769803776,10,0.6838655410028878,"[0.4472071669952129, 0.6213985419963137, 0.48257062500488246]",0,354697216,1779023872,2336604160,578288695,0.5418857084987394,0.6338814354505302,b5113eb38ab63efdd7f280f8c144ea8b13f978ce

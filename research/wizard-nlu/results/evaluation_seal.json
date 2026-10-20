@@ -1,0 +1,47 @@
+{
+  "sealed_utc": "2026-10-20T21:37:43Z",
+  "settings_sha256": {
+    "rubert-knn": "d38c1a94b0c90aa0cb7668279853d217106147febd8a2e1b0e35dd52e6991d91",
+    "e5-small": "5d7ef0b19b39a8f007ee81acd03c7346301b023079aa7af7ead7254ee912e7c0",
+    "e5-base": "684b05568e6d96b885c8f38042f71cc64e68f8a401679c57978e1b4b7c51a070",
+    "user-base": "d7b52a0a9e72380e6db58ebd0a568efe06e48e54dd12d64dada89ee7ef26d36b",
+    "laya": "81eed0fce9ebfa09dec6230e64ab0c2341dafd9ebf323171767f002465329acd",
+    "nli": "2dd8d27c6d2c0c96fc00f619f653e312ab00952d00c8501f1c1dc8c25532955e",
+    "bge-reranker": "422d247a6ddbbfc9a97878134be1fa66a6ee494d33c080bf0e2f76665b1a55e4",
+    "qwen3-0.6b": "57e231c0a032920698fd66b0baa1b1dc13be3e008cb0ba5f4c448e564153a667",
+    "qwen3-1.7b": "67a1da8c9f5ac854900cd8b327813d62eacda9f3009ccc88faaa28ce555febfc",
+    "rubert-finetuned": "3c4c8c6b79bec9bb16a0113bf2f02b92e0ffffcb48bdf30aa70b73e078752405",
+    "user2-small": "4c9de27b60f9862d9eb525ea8d647e06362716da69a03b8c3d36fdf6d1623902",
+    "user2-base": "1f9d5b50e519c19d044206336afc8e67f11d75345a84f37187f43ddccd0a7fc5",
+    "qwen3.5-0.8b": "9c1647c7646dec847ce7fcb2bde4621953bbbd58a4fb35a213b7a69f04286626",
+    "qwen3.5-2b": "6907b27656dce11284f3f90c617ff63680506e38db0c670ff640be8da9d7983a",
+    "gliner-decide": "50d7b1f17f932e506e77568a3e53d8b34134682f194403466a32d25d181fbb34"
+  },
+  "code_hashes": {
+    "scripts/common.py": "e813cc06ff361e72b1880410e40da1d16bbe243af980cb1f0975564007193a1e",
+    "scripts/models.py": "6fba69400eddad995ee71ca4a7bc2fc93588675fd4df667549414f440dfd230e",
+    "scripts/benchmark.py": "280b560c06378383e9dfa3046a042ba6b9d24aab79b41ec382421b6ec6099b93",
+    "scripts/metrics.py": "083f3e79ed127d5fd3d5cf2ce37d188351ad0f8db6244e9a2a96d4e144f96124",
+    "scripts/amount_parser.py": "1eb13c594012a24e41a27c368730e20e120fa81edce7c57d87467bff8ed92cd7",
+    "schema.json": "6889920bf89d7aae5130f1ea7a0c674cc448693dfad109b31f3fe14a1f59753a",
+    "candidates.json": "bb27184d3b47743c9abeced499510fcba32a0ad6fe7ca5fd3139aaa9bf6065c8",
+    "pyproject.toml": "cccda23616e99cc07ca8e32a47c2fd439ab319785adef5e452b34d05f56b098f",
+    "uv.lock": "10d91760fae26019f5ec5aebcb99bb314dee177760fd54a553671ee44620fcd5",
+    "modern/pyproject.toml": "5e2883b09e7031c6353ac16a9defb21de36905e4416a6b3d4a9adbb155bc10dd",
+    "modern/uv.lock": "242240567e4be244a6508a1d42eaaefa6550731060aecedb621a13db720bb1c6"
+  },
+  "dataset_manifest": {
+    "examples.jsonl": {
+      "count": 42,
+      "sha256": "07289e8705212885ce0065ef223eeb84c2849d6697247e5267019c8a29c136b6"
+    },
+    "dev.jsonl": {
+      "count": 60,
+      "sha256": "7e9fdfbd6083fee28b0ac9bf19f5f8ec9e840489de1a348e2294d00792ce28f9"
+    },
+    "test.jsonl": {
+      "count": 90,
+      "sha256": "12ef1c4aff02948b2ce0ae8aa4bdeb15d34cd37a46f312ae03ccf122037b28f8"
+    }
+  }
+}

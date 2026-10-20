@@ -17,7 +17,7 @@ def read_csv(path):
 def main():
     all_metrics, all_bins, all_runtime, summary, confusions, errors, thresholds = [], [], [], [], [], [], []
     artifacts = []
-    curves, pair_stats, baselines, parser_summaries, statuses = [], [], [], []
+    curves, pair_stats, baselines, parser_summaries = [], [], [], []
     manifest = json.loads((ROOT / "model_manifest.json").read_text())
     for c in CANDIDATES:
         ident = c["id"]
@@ -120,7 +120,9 @@ def main():
                                      stated_amount_accuracy=sum(r["correct"] == "True" for r in positive) / len(positive) if positive else None,
                                      filled_n=len(filled),
                                      extraction_precision=sum(r["correct"] == "True" for r in filled) / len(filled) if filled else None,
-                                     hallucinated_amount_n=sum(r["gold"] == "" and r["predicted"] != "" for r in rs)))
+                                     hallucinated_amount_n=sum(r["gold"] == "" and r["predicted"] != "" for r in rs),
+                                     latency_p50_s=float(np.percentile([float(r["seconds"]) for r in rs], 50)) if "seconds" in rs[0] else None,
+                                     latency_p95_s=float(np.percentile([float(r["seconds"]) for r in rs], 95)) if "seconds" in rs[0] else None))
     tables = {"summary.csv": summary, "slot_metrics.csv": all_metrics, "reliability.csv": all_bins,
               "runtime.csv": all_runtime, "confusion_all_slots.csv": confusions, "errors.csv": errors,
               "thresholds.csv": thresholds, "diagnostic_risk_coverage.csv": curves,
