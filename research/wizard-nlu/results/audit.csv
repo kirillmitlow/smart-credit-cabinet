@@ -6,11 +6,11 @@ user-base,probabilities_thresholds_and_split,passed,540
 laya,probabilities_thresholds_and_split,passed,540
 nli,probabilities_thresholds_and_split,passed,540
 bge-reranker,probabilities_thresholds_and_split,passed,540
-qwen3-0.6b,test_evidence,not_measured,0
-qwen3-1.7b,test_evidence,not_measured,0
+qwen3-0.6b,probabilities_thresholds_and_split,passed,540
+qwen3-1.7b,probabilities_thresholds_and_split,passed,540
 rubert-finetuned,probabilities_thresholds_and_split,passed,540
 user2-small,probabilities_thresholds_and_split,passed,540
 user2-base,probabilities_thresholds_and_split,passed,540
-qwen3.5-0.8b,test_evidence,not_measured,0
-qwen3.5-2b,test_evidence,not_measured,0
+qwen3.5-0.8b,probabilities_thresholds_and_split,passed,540
+qwen3.5-2b,probabilities_thresholds_and_split,passed,540
 gliner-decide,probabilities_thresholds_and_split,passed,540
