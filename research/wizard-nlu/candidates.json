@@ -1,0 +1,12 @@
+[
+  {"id":"rubert-knn","repo":"cointegrated/rubert-tiny2","kind":"embedding","pool":"cls","prefix":""},
+  {"id":"e5-small","repo":"intfloat/multilingual-e5-small","kind":"embedding","pool":"mean","prefix":"query: "},
+  {"id":"e5-base","repo":"intfloat/multilingual-e5-base","kind":"embedding","pool":"mean","prefix":"query: "},
+  {"id":"user-base","repo":"deepvk/USER-base","kind":"embedding","pool":"mean","prefix":"query: "},
+  {"id":"laya","repo":"convaiinnovations/laya-multilingual","kind":"laya"},
+  {"id":"nli","repo":"MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7","kind":"nli"},
+  {"id":"bge-reranker","repo":"BAAI/bge-reranker-v2-m3","kind":"reranker"},
+  {"id":"qwen3-0.6b","repo":"Qwen/Qwen3-0.6B","kind":"llm"},
+  {"id":"qwen3-1.7b","repo":"Qwen/Qwen3-1.7B","kind":"llm"},
+  {"id":"rubert-finetuned","repo":"cointegrated/rubert-tiny2","kind":"finetuned"}
+]
