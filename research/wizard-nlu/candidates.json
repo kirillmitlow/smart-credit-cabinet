@@ -8,5 +8,10 @@
   {"id":"bge-reranker","repo":"BAAI/bge-reranker-v2-m3","kind":"reranker"},
   {"id":"qwen3-0.6b","repo":"Qwen/Qwen3-0.6B","kind":"llm"},
   {"id":"qwen3-1.7b","repo":"Qwen/Qwen3-1.7B","kind":"llm"},
-  {"id":"rubert-finetuned","repo":"cointegrated/rubert-tiny2","kind":"finetuned"}
+  {"id":"rubert-finetuned","repo":"cointegrated/rubert-tiny2","kind":"finetuned"},
+  {"id":"user2-small","repo":"deepvk/USER2-small","kind":"embedding","pool":"mean","prefix":"classification: "},
+  {"id":"user2-base","repo":"deepvk/USER2-base","kind":"embedding","pool":"mean","prefix":"classification: "},
+  {"id":"qwen3.5-0.8b","repo":"Qwen/Qwen3.5-0.8B","kind":"llm35"},
+  {"id":"qwen3.5-2b","repo":"Qwen/Qwen3.5-2B","kind":"llm35"},
+  {"id":"gliner-decide","repo":"fastino/GLiNER2.5-multi-Decide","kind":"gliner"}
 ]

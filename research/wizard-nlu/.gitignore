@@ -8,3 +8,5 @@ __pycache__/
 results/logs/
 results/predictions/
 results/frozen/
+log-*.txt
+results/log-*.txt

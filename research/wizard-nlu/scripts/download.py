@@ -70,8 +70,14 @@ def main():
                 subprocess.run(cmd, check=True, timeout=remaining + 5, stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL)
                 partial.rename(target)
-            hashes = {str(f.relative_to(dest)): hashlib.sha256(f.read_bytes()).hexdigest()
-                      for f in dest.rglob("*") if f.is_file() and not f.name.endswith(".partial")}
+            hashes = {}
+            for f in dest.rglob("*"):
+                if f.is_file() and not f.name.endswith(".partial"):
+                    digest = hashlib.sha256()
+                    with f.open("rb") as stream:
+                        for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                            digest.update(chunk)
+                    hashes[str(f.relative_to(dest))] = digest.hexdigest()
             (dest / "download-sha256.json").write_text(json.dumps(hashes, indent=2) + "\n")
             print("READY", c["id"], round(time.monotonic() - started, 1), flush=True)
         except Exception as e:
