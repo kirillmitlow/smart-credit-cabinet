@@ -1,0 +1,4 @@
+split,n,correct,accuracy,stated_amount_n,stated_amount_accuracy,filled_n,extraction_precision,hallucinated_amount_n,latency_p50_s,latency_p95_s
+cases,50,50,1.0,31,1.0,31,1.0,0,,
+dev,60,60,1.0,28,1.0,28,1.0,0,1.997950312215835e-05,3.2564549110247745e-05
+test,90,90,1.0,31,1.0,31,1.0,0,1.925000105984509e-05,2.804345240292605e-05

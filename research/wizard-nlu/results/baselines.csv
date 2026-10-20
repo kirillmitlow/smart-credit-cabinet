@@ -1,0 +1,13 @@
+split,slot,predicted,accuracy,autofill_coverage
+dev,purpose,OTHER,0.16666666666666666,0
+dev,frequency,UNKNOWN,0.6333333333333333,0
+dev,payback_horizon,UNKNOWN,0.43333333333333335,0
+dev,urgency,UNKNOWN,0.5333333333333333,0
+dev,gov_contract,UNKNOWN,0.7166666666666667,0
+dev,collateral,UNKNOWN,0.55,0
+test,purpose,OTHER,0.16666666666666666,0
+test,frequency,UNKNOWN,0.7222222222222222,0
+test,payback_horizon,UNKNOWN,0.5,0
+test,urgency,UNKNOWN,0.6222222222222222,0
+test,gov_contract,UNKNOWN,0.7666666666666667,0
+test,collateral,UNKNOWN,0.5666666666666667,0

@@ -1,0 +1,12 @@
+candidate,phase,status,seconds,reason
+rubert-knn,test,ok,4.011915833005332,
+e5-small,test,ok,4.014868500002194,
+e5-base,test,ok,6.015881792001892,
+user-base,test,ok,6.019945666004787,
+laya,test,ok,50.12488270799804,
+nli,test,ok,56.232605375000276,
+bge-reranker,test,ok,100.38166920899675,
+rubert-finetuned,test,ok,4.026764082998852,
+user2-small,test,ok,4.011734333995264,
+user2-base,test,ok,6.034772332997818,
+gliner-decide,test,ok,124.487413750001,
