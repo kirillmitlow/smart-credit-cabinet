@@ -27,6 +27,7 @@ def main():
     run([sys.executable, "scripts/checks.py", "--split", "test"])
     run([sys.executable, "scripts/aggregate.py"])
     run([sys.executable, "scripts/audit_results.py"])
+    run([sys.executable, "scripts/report_tables.py"])
 
 
 if __name__ == "__main__":

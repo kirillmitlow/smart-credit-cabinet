@@ -20,8 +20,9 @@ UV_CACHE_DIR=.cache/uv uv run --frozen scripts/reproduce.py --repeat
 ## Отдельные этапы
 
 ```sh
-uv run --frozen scripts/run.py dev --ids rubert-knn
-uv run --frozen scripts/run.py test --ids rubert-knn
+uv run --frozen scripts/run.py dev --ids rubert-knn --repeat
+uv run --frozen scripts/seal.py --repeat
+uv run --frozen scripts/run.py test --ids rubert-knn --repeat
 uv run --frozen scripts/aggregate.py
 ```
 
@@ -52,4 +53,4 @@ uv run --frozen scripts/aggregate.py
 
 Средняя обычная точность/F1/ECE — арифметическое среднее шести слотов. Итоговая selective accuracy — число верных подстановок, делённое на число всех подстановок; coverage — подстановки / (число фраз × 6). Дополнительно сохраняется среднее selective accuracy по активным слотам. В таблицах указаны фактические результаты test при **dev-порогах**, даже если они оказались ниже 95%.
 
-Методические ограничения и правила разметки — в [dataset/ANNOTATION.md](dataset/ANNOTATION.md), источники и лицензии — в [SOURCES.md](SOURCES.md). Это один синтетический набор одного автора; высокий результат не заменяет проверку на реальных независимых фразах.
+Подробные параметры обучения, калибровки и замеров — в [PROTOCOL.md](PROTOCOL.md), правила разметки — в [dataset/ANNOTATION.md](dataset/ANNOTATION.md), источники и лицензии — в [SOURCES.md](SOURCES.md). Это один синтетический набор одного автора; высокий результат не заменяет проверку на реальных независимых фразах.

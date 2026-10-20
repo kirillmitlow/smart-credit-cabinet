@@ -19,7 +19,7 @@
 | qwen3.5-2b | [Qwen/Qwen3.5-2B](https://huggingface.co/Qwen/Qwen3.5-2B) | Apache-2.0 |
 | gliner-decide | [fastino/GLiNER2.5-multi-Decide](https://huggingface.co/fastino/GLiNER2.5-multi-Decide) | Apache-2.0 |
 
-Испрошенные [Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) и [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct) существуют с открытыми весами. Вместо них в замер включены более новые Qwen3 и Qwen3.5 близкого размера. Это **не сравнение поколений на одинаковом числе параметров**: 0.5→0.6→0.8B и 1.5→1.7→2B. Qwen3 оставлены как более простой текстовый CPU-вариант; в Qwen3.5 не используются изображения и генерация.
+Указанные в задании [Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) и [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct) существуют с открытыми весами. Вместо них в замер включены более новые Qwen3 и Qwen3.5 близкого размера. Это **не сравнение поколений на одинаковом числе параметров**: 0.5→0.6→0.8B и 1.5→1.7→2B. Qwen3 оставлены как более простой текстовый CPU-вариант; в Qwen3.5 не используются изображения и генерация.
 
 По [карточке USER2](https://huggingface.co/deepvk/USER2-base), USER2 — новое поколение USER. Поэтому помимо запрошенного USER-base добавлены USER2-small/base. Для E5 используется `query: `, для USER-base также `query: `, для USER2 — рекомендованный авторами префикс классификации `classification: `. Для rubert-tiny2 — CLS pooling, для остальных эмбеддингов — masked mean pooling и L2-нормализация, как в официальных примерах.
 

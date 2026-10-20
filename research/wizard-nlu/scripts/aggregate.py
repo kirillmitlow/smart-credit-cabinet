@@ -16,10 +16,19 @@ def read_csv(path):
 
 def main():
     all_metrics, all_bins, all_runtime, summary, confusions, errors, thresholds = [], [], [], [], [], [], []
+    artifacts = []
     curves, pair_stats, baselines, parser_summaries, statuses = [], [], [], []
     manifest = json.loads((ROOT / "model_manifest.json").read_text())
     for c in CANDIDATES:
         ident = c["id"]
+        local = ROOT / "models" / c["repo"].replace("/", "--")
+        hashes_file = local / "download-sha256.json"
+        if hashes_file.exists():
+            for file, digest in json.loads(hashes_file.read_text()).items():
+                if file.endswith(".safetensors"):
+                    artifacts.append(dict(candidate=ident, repo=c["repo"],
+                                          revision=manifest[c["repo"]]["revision"], file=file,
+                                          bytes=(local / file).stat().st_size, sha256=digest))
         for split in ["dev", "test", "human"]:
             path = ROOT / "results" / f"{ident}_{split}_metrics.csv"
             if path.exists():
@@ -116,7 +125,7 @@ def main():
               "runtime.csv": all_runtime, "confusion_all_slots.csv": confusions, "errors.csv": errors,
               "thresholds.csv": thresholds, "diagnostic_risk_coverage.csv": curves,
               "critical_confusion.csv": pair_stats, "dataset_audit.csv": audit, "baselines.csv": baselines,
-              "parser_summary.csv": parser_summaries}
+              "parser_summary.csv": parser_summaries, "model_artifacts.csv": artifacts}
     for file, rows in tables.items():
         if rows:
             fields = list(dict.fromkeys(k for r in rows for k in r))
