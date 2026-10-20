@@ -118,6 +118,9 @@ class Laya:
     def __init__(self, candidate):
         import laya
         self.agent = laya.load(str(model_path(candidate)), device="cpu")
+        # The default 256-token question budget clips long Russian instructions/options.
+        # Increase it before dev measurement; the 1024-token sequence still fits our short texts.
+        self.agent.cfg["head_max_len"] = 512
         self.questions = {s: {"type": "choice", "instructions": INSTRUCTION + QUESTIONS[s],
                               "criteria": SCHEMA[s]} for s in SLOTS}
 

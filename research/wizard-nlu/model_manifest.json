@@ -219,5 +219,111 @@
       "vocab.json"
     ],
     "source": "https://huggingface.co/Qwen/Qwen3-1.7B"
+  },
+  "deepvk/USER2-small": {
+    "revision": "23f65b34cf7632032061f5cc66c14714e6d4cee4",
+    "license": "apache-2.0",
+    "checked_utc": "2026-10-20T19:50:28Z",
+    "files": [
+      ".gitattributes",
+      "1_Pooling/config.json",
+      "README.md",
+      "assets/mrl.png",
+      "assets/training_stages.png",
+      "config.json",
+      "config_sentence_transformers.json",
+      "model.safetensors",
+      "modules.json",
+      "sentence_bert_config.json",
+      "special_tokens_map.json",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "source": "https://huggingface.co/deepvk/USER2-small"
+  },
+  "deepvk/USER2-base": {
+    "revision": "94bbff0cc696f26dc93b275fc874657727df0c29",
+    "license": "apache-2.0",
+    "checked_utc": "2026-10-20T19:51:13Z",
+    "files": [
+      ".gitattributes",
+      "1_Pooling/config.json",
+      "README.md",
+      "assets/mrl.png",
+      "assets/training_stages.png",
+      "config.json",
+      "config_sentence_transformers.json",
+      "model.safetensors",
+      "modules.json",
+      "onnx/config.json",
+      "onnx/model.onnx",
+      "onnx/special_tokens_map.json",
+      "onnx/tokenizer.json",
+      "onnx/tokenizer_config.json",
+      "sentence_bert_config.json",
+      "special_tokens_map.json",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "source": "https://huggingface.co/deepvk/USER2-base"
+  },
+  "Qwen/Qwen3.5-0.8B": {
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "license": "apache-2.0",
+    "checked_utc": "2026-10-20T19:53:41Z",
+    "files": [
+      ".gitattributes",
+      "LICENSE",
+      "README.md",
+      "chat_template.jinja",
+      "config.json",
+      "merges.txt",
+      "model.safetensors-00001-of-00001.safetensors",
+      "model.safetensors.index.json",
+      "preprocessor_config.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "video_preprocessor_config.json",
+      "vocab.json"
+    ],
+    "source": "https://huggingface.co/Qwen/Qwen3.5-0.8B"
+  },
+  "Qwen/Qwen3.5-2B": {
+    "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+    "license": "apache-2.0",
+    "checked_utc": "2026-10-20T20:01:55Z",
+    "files": [
+      ".gitattributes",
+      "LICENSE",
+      "README.md",
+      "chat_template.jinja",
+      "config.json",
+      "merges.txt",
+      "model.safetensors-00001-of-00001.safetensors",
+      "model.safetensors.index.json",
+      "preprocessor_config.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "video_preprocessor_config.json",
+      "vocab.json"
+    ],
+    "source": "https://huggingface.co/Qwen/Qwen3.5-2B"
+  },
+  "fastino/GLiNER2.5-multi-Decide": {
+    "revision": "e173bca1f0c4217d7a55b3b0c705d5ece8a0218d",
+    "license": "apache-2.0",
+    "checked_utc": "2026-10-20T20:04:50Z",
+    "files": [
+      ".gitattributes",
+      "GLiNER-2.5-Decision-HF-Banner.png",
+      "README.md",
+      "SKILL.md",
+      "config.json",
+      "encoder_config/config.json",
+      "model.safetensors",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "source": "https://huggingface.co/fastino/GLiNER2.5-multi-Decide"
   }
 }

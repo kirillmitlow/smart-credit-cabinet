@@ -79,12 +79,17 @@ def main():
         print("No human rows yet. Add 15–20 annotated JSONL rows; no inference run performed.")
         return
     if args.phase != "dev":
-        settings_file = json.loads(frozen.read_text())
+        settings_path = frozen if frozen.exists() else ROOT / "results" / f"{args.id}_settings.json"
+        settings_file = json.loads(settings_path.read_text())
         settings = settings_file["slots"]
         current = code_hashes()
         # Report/aggregation scripts may be added later; all existing prediction code must match.
         for name, digest in settings_file["code_hashes"].items():
             assert current.get(name) == digest, f"Changed after dev freeze: {name}"
+        if args.phase == "test":
+            seal = json.loads((ROOT / "results/evaluation_seal.json").read_text())
+            settings_digest = hashlib.sha256(settings_path.read_bytes()).hexdigest()
+            assert seal["settings_sha256"][args.id] == settings_digest, "Settings changed after evaluation seal"
     import models
     rss_before = psutil.Process().memory_info().rss
     folds, training_seconds = None, 0

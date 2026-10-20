@@ -1,0 +1,16 @@
+[
+  {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "license": "apache-2.0",
+    "source": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct",
+    "decision": "Superseded in measured set by Qwen3 and Qwen3.5"
+  },
+  {
+    "repo": "Qwen/Qwen2.5-1.5B-Instruct",
+    "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "license": "apache-2.0",
+    "source": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct",
+    "decision": "Superseded in measured set by Qwen3 and Qwen3.5"
+  }
+]

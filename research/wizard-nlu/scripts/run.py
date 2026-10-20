@@ -16,7 +16,8 @@ def main():
     p.add_argument("--rerun-dev", action="store_true")
     p.add_argument("--repeat", action="store_true", help="Reproduce an already recorded run explicitly")
     args = p.parse_args()
-    results = []
+    status_path = ROOT / "results" / f"status_{args.phase}.csv"
+    results = list(csv.DictReader(status_path.open())) if status_path.exists() else []
     for c in CANDIDATES:
         if args.ids and c["id"] not in args.ids:
             continue
@@ -35,6 +36,7 @@ def main():
             command.append("--allow-repeat")
         log = ROOT / "results" / f"log-{c['id']}-{args.phase}.txt"
         print("RUN", args.phase, c["id"], flush=True)
+        results = [r for r in results if r["candidate"] != c["id"]]
         started = time.monotonic()
         try:
             with log.open("w") as out:
