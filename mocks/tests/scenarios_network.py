@@ -29,7 +29,7 @@ class RoleNetwork(httpx.AsyncBaseTransport):
 
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
         role = self.hosts[request.url.host]
-        self.calls.append((role, request.method, request.headers["X-Scenario-Code"]))
+        self.calls.append((role, request.method, request.headers.get("X-Scenario-Code", "")))
         if role in self.down:
             raise httpx.ConnectError("Остановленный мок", request=request)
         if request.method == "PUT":

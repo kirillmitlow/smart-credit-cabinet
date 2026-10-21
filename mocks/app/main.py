@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import importlib
+import logging
 from collections.abc import AsyncIterator
 
 from fastapi import APIRouter, FastAPI
@@ -27,6 +28,26 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         async def maintain(db: Database) -> None:
             # Не блокируем старт: /health/live отвечает сразу, ready — после миграций
             await db.migrate_until_done()
+            if db.role == Role.SCENARIOS:
+                import httpx
+
+                from app.roles.scenarios.gateway import AdminGateway
+                from app.roles.scenarios.startup import initialize
+
+                settings: Settings = app.state.settings
+                try:
+                    async with httpx.AsyncClient(
+                        timeout=settings.scenario_request_timeout_seconds
+                    ) as client:
+                        await initialize(
+                            db, AdminGateway(client, settings), app.state.clock, settings.bank_bik
+                        )
+                except Exception:
+                    logging.getLogger("app.scenarios.startup").exception(
+                        "Первое наполнение не завершилось"
+                    )
+                finally:
+                    app.state.initial_attempt_done = True
             async with asyncio.TaskGroup() as tasks:
                 tasks.create_task(purge_forever(db, app.state.clock))
                 if db.role == Role.SCENARIOS:
@@ -70,6 +91,7 @@ def create_app(settings: Settings) -> FastAPI:
         lifespan=_lifespan,
     )
     app.state.settings = settings
+    app.state.initial_attempt_done = role != Role.SCENARIOS
     app.state.clock = Clock(settings.app_today)
     app.state.database = Database(settings.database_url, role) if settings.database_url else None
 
