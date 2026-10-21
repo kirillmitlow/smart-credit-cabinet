@@ -1,40 +1,21 @@
 /**
- * Кто пользователь и что настроено на стенде. Эндпоинтов `GET /me` и `GET /public-config` в схеме api
- * пока нет (50-07, раздел «Вход и сессия»), поэтому запросы написаны руками. Когда ручки появятся
- * в OpenAPI, заменяем на сгенерированные хуки: остальной код про это не знает.
+ * Кто пользователь и что настроено на стенде. Клиентская сессия и публичная настройка идут через
+ * сгенерированные функции orval (`GET /me`, `GET /public-config`). Входа банка в api ещё нет:
+ * для банковской зоны спрашиваем `GET /me?zone=bank` руками; пока api читает только `sid_client`,
+ * ответ «клиент» или `401` и даёт экран «Эта часть для сотрудников банка» либо вход (Q-146).
  */
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { apiGet } from '@/api/client';
 import { isAppError } from '@/api/errors';
+import { getMe, getPublicConfig } from '@/api/generated/api';
+import type { MeResponse, PublicConfig } from '@/api/generated/model';
 import { publicConfigQueryKey, sessionQueryKey } from '@/api/session-keys';
 import type { Zone } from '@/api/zone';
 
-export type Role = 'CLIENT' | 'GUARANTOR' | 'UNDERWRITER' | 'ADMIN';
+/** Ответ `GET /me` целиком: пользователь, роль и компании в форме схемы api */
+export type Me = MeResponse;
 
-export interface CompanyRef {
-  id: string;
-  inn: string;
-  name: string;
-}
-
-export interface Me {
-  user: { id: string; name: string };
-  role: Role;
-  companies: CompanyRef[];
-  activeCompanyId: string | null;
-}
-
-export interface PublicConfig {
-  demoMode: boolean;
-  name?: string;
-  version?: string;
-  nluAvailable?: boolean;
-}
-
-export const ME_PATH = '/api/v1/me';
-export const PUBLIC_CONFIG_PATH = '/api/v1/public-config';
-
-export function isBankRole(role: Role): boolean {
+export function isBankRole(role: string): boolean {
   return role === 'UNDERWRITER' || role === 'ADMIN';
 }
 
@@ -51,7 +32,8 @@ export function useSession(zone: Zone, enabled = true): UseQueryResult<Me | null
     staleTime: 60_000,
     queryFn: async ({ signal }) => {
       try {
-        return await apiGet<Me>(`${ME_PATH}?zone=${zone}`, signal);
+        if (zone === 'client') return (await getMe({ signal })).data;
+        return await apiGet<Me>('/me?zone=bank', signal);
       } catch (error) {
         if (isNotSignedIn(error)) return null;
         throw error;
@@ -67,9 +49,11 @@ export function usePublicConfig(): UseQueryResult<PublicConfig> {
     staleTime: 5 * 60_000,
     queryFn: async ({ signal }) => {
       try {
-        return await apiGet<PublicConfig>(PUBLIC_CONFIG_PATH, signal);
+        return (await getPublicConfig({ signal })).data;
       } catch (error) {
-        if (isNotSignedIn(error)) return { demoMode: false };
+        if (isNotSignedIn(error)) {
+          return { demoMode: false, productName: '', version: '', nluAvailable: false };
+        }
         throw error;
       }
     },

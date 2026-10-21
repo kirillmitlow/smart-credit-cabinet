@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useHealthLive } from '@/api/generated/endpoints/health/health';
-import { getHealthLiveMockHandler } from '@/api/generated/endpoints/health/health.msw';
+import { useHealthLive } from '@/api/generated/api';
+import { getHealthLiveMockHandler } from '@/api/generated/api.msw';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { problemResponse } from '@/test/factories';
 import { renderWithProviders } from '@/test/render';

@@ -1,5 +1,9 @@
 import { http } from 'msw';
-import { getHealthMock } from '@/api/generated/endpoints/health/health.msw';
+import {
+  getHealthDepsMockHandler,
+  getHealthLiveMockHandler,
+  getHealthReadyMockHandler,
+} from '@/api/generated/api.msw';
 import { makePublicConfig, problemResponse } from './factories';
 
 /**
@@ -7,7 +11,9 @@ import { makePublicConfig, problemResponse } from './factories';
  * Обработчики ручек из схемы берутся из сгенерированных файлов `*.msw.ts` и обновляются вместе с клиентом.
  */
 export const defaultHandlers = [
-  ...getHealthMock(),
-  http.get('*/api/v1/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
-  http.get('*/api/v1/public-config', () => Response.json(makePublicConfig({ demoMode: false }))),
+  getHealthLiveMockHandler(),
+  getHealthReadyMockHandler(),
+  getHealthDepsMockHandler(),
+  http.get('*/api/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
+  http.get('*/api/public-config', () => Response.json(makePublicConfig({ demoMode: false }))),
 ];

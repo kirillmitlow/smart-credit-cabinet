@@ -75,6 +75,632 @@
           }
         }
       }
+    },
+    "/auth/roles/{inn}": {
+      "get": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Кто может войти по ИНН: люди компании или компании человека (сессию не создаёт)",
+        "operationId": "getLoginRoles",
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{10}$|^\\d{12}$",
+              "title": "Inn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/request-code": {
+      "post": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Выпустить одноразовый код (в демо он показывается на экране вместо SMS)",
+        "operationId": "requestLoginCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeIssued"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verify-code": {
+      "post": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Проверить код и открыть сессию клиента",
+        "operationId": "verifyLoginCode",
+        "parameters": [
+          {
+            "name": "sid_client",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Client"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeCheck"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Выйти",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "sid_client",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Client"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Кто я и мои компании",
+        "operationId": "getMe",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/active-company": {
+      "put": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Выбрать активную компанию",
+        "operationId": "setActiveCompany",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActiveCompany"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public-config": {
+      "get": {
+        "tags": [
+          "вход"
+        ],
+        "summary": "Настройки для интерфейса без входа",
+        "operationId": "getPublicConfig",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActiveCompany": {
+        "properties": {
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Companyid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "companyId"
+        ],
+        "title": "ActiveCompany"
+      },
+      "CodeCheck": {
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Requestid"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestId",
+          "code"
+        ],
+        "title": "CodeCheck"
+      },
+      "CodeIssued": {
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "title": "Expiresinseconds"
+          },
+          "demoCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Democode",
+            "description": "Только в демо-режиме: код вместо SMS"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestId",
+          "expiresInSeconds"
+        ],
+        "title": "CodeIssued"
+      },
+      "CodeRequest": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "companyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Companyid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId"
+        ],
+        "title": "CodeRequest"
+      },
+      "CompanyBrief": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "canApply": {
+            "type": "boolean",
+            "title": "Canapply"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "inn",
+          "name",
+          "status",
+          "canApply"
+        ],
+        "title": "CompanyBrief"
+      },
+      "CompanyChoice": {
+        "properties": {
+          "company": {
+            "$ref": "#/components/schemas/CompanyBrief"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company",
+          "role"
+        ],
+        "title": "CompanyChoice"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MeResponse": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "activeCompanyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activecompanyid"
+          },
+          "companies": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyChoice"
+            },
+            "type": "array",
+            "title": "Companies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId",
+          "displayName",
+          "role",
+          "activeCompanyId",
+          "companies"
+        ],
+        "title": "MeResponse"
+      },
+      "PersonOption": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId",
+          "displayName",
+          "role"
+        ],
+        "title": "PersonOption"
+      },
+      "PublicConfig": {
+        "properties": {
+          "demoMode": {
+            "type": "boolean",
+            "title": "Demomode"
+          },
+          "productName": {
+            "type": "string",
+            "title": "Productname"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "nluAvailable": {
+            "type": "boolean",
+            "title": "Nluavailable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "demoMode",
+          "productName",
+          "version",
+          "nluAvailable"
+        ],
+        "title": "PublicConfig"
+      },
+      "RolesResponse": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "COMPANY",
+              "PERSON",
+              "NOT_ELIGIBLE"
+            ],
+            "title": "Kind"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonOption"
+            },
+            "type": "array",
+            "title": "People",
+            "default": []
+          },
+          "companies": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyChoice"
+            },
+            "type": "array",
+            "title": "Companies",
+            "default": []
+          },
+          "reasonCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoncode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "RolesResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
     }
   }
 }

@@ -8,7 +8,8 @@ export function ClientLayout() {
   const me = useSession('client').data;
   const config = usePublicConfig().data;
   const companies = me?.companies ?? [];
-  const active = companies.find((company) => company.id === me?.activeCompanyId) ?? companies[0];
+  const active = (companies.find((item) => item.company.id === me?.activeCompanyId) ?? companies[0])
+    ?.company;
   const isGuarantor = me?.role === 'GUARANTOR';
 
   const nav = isGuarantor
@@ -27,7 +28,7 @@ export function ClientLayout() {
       zone="client"
       homeHref="/"
       nav={nav}
-      userName={me?.user.name ?? null}
+      userName={me?.displayName ?? null}
       companyName={active?.name ?? null}
       canSwitchCompany={companies.length > 1}
     >

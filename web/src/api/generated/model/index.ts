@@ -6,5 +6,19 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './activeCompany';
+export * from './codeCheck';
+export * from './codeIssued';
+export * from './codeRequest';
+export * from './companyBrief';
+export * from './companyChoice';
 export * from './healthDeps200';
 export * from './healthLive200';
+export * from './hTTPValidationError';
+export * from './meResponse';
+export * from './personOption';
+export * from './publicConfig';
+export * from './rolesResponse';
+export * from './rolesResponseKind';
+export * from './validationError';
+export * from './validationErrorCtx';

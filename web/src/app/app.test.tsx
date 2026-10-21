@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { apiGet } from '@/api/client';
 import { blockingA11yViolations } from '@/test/a11y';
 import { MockEventSource } from '@/test/eventSource';
-import { makeBankMe, makeMe, problemResponse } from '@/test/factories';
+import { makeBankMe, makeCompanyChoice, makeMe, problemResponse } from '@/test/factories';
 import { renderApp } from '@/test/render';
 import { mockSessions } from '@/test/sessions';
 import { server } from '@/test/server';
@@ -55,8 +55,8 @@ describe('оболочка клиента', () => {
     mockSessions({
       client: makeMe({
         companies: [
-          { id: 'c1', inn: '7707083893', name: 'ООО «Ромашка»' },
-          { id: 'c2', inn: '7707083894', name: 'ИП Иванов' },
+          makeCompanyChoice({ id: 'c1' }),
+          makeCompanyChoice({ id: 'c2', inn: '7707083894', name: 'ИП Иванов' }),
         ],
         activeCompanyId: 'c2',
       }),
@@ -101,7 +101,7 @@ describe('вход и защита маршрутов', () => {
   });
 
   it('401 или 404 от /me — просто «не вошли», без экрана ошибки', async () => {
-    server.use(http.get('*/api/v1/me', () => problemResponse({ status: 404, code: 'NOT_FOUND' })));
+    server.use(http.get('*/api/me', () => problemResponse({ status: 404, code: 'NOT_FOUND' })));
     renderApp('/');
     expect(
       await screen.findByRole('heading', { level: 1, name: loginPlaceholder.zoneClient }),
@@ -171,7 +171,7 @@ describe('вход и защита маршрутов', () => {
 
   it('сбой сервера на /me — отдельный экран с «Повторить», а не вход', async () => {
     server.use(
-      http.get('*/api/v1/me', () =>
+      http.get('*/api/me', () =>
         problemResponse({ status: 503, code: 'SERVICE_UNAVAILABLE', requestId: 'req-503' }),
       ),
     );

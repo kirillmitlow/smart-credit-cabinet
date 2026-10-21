@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | REVIEW — PR #35 (`feat/web-skeleton`); в схеме пока только `/health/*`, `GET /me` и `/public-config` написаны руками (Q-146) |
+| Статус | REVIEW — PR #35 (`feat/web-skeleton`); клиент сгенерирован из схемы с `/auth/*`, `/me`, `/public-config`; банковская зона и поток событий — допущения Q-146 |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/web-api-layer-orval` |
 | Оценка | ~5 ч |

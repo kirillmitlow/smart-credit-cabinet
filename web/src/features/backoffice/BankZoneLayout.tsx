@@ -11,7 +11,7 @@ export function BankZoneLayout() {
       zone="bank"
       homeHref="/bank"
       nav={[{ to: '/bank', label: shell.nav.bankQueue, end: true }]}
-      userName={me?.user.name ?? null}
+      userName={me?.displayName ?? null}
     >
       <Outlet />
     </Shell>

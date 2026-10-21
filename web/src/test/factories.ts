@@ -1,21 +1,41 @@
 import { HttpResponse } from 'msw';
-import type { Me, PublicConfig, Role } from '@/features/auth/session';
+import type { CompanyBrief, CompanyChoice, PublicConfig } from '@/api/generated/model';
+import type { Me } from '@/features/auth/session';
 
 /** Фабрики данных для тестов: значения по умолчанию валидны, тест переопределяет только важное */
 
+export function makeCompanyChoice(
+  overrides: Partial<CompanyBrief> = {},
+  role = 'DIRECTOR',
+): CompanyChoice {
+  return {
+    company: {
+      id: 'company-1',
+      inn: '7707083893',
+      name: 'ООО «Ромашка»',
+      status: 'ACTIVE',
+      canApply: true,
+      ...overrides,
+    },
+    role,
+  };
+}
+
 export function makeMe(overrides: Partial<Me> = {}): Me {
   return {
-    user: { id: 'user-1', name: 'Анна Соколова' },
+    userId: 'user-1',
+    displayName: 'Анна Соколова',
     role: 'CLIENT',
-    companies: [{ id: 'company-1', inn: '7707083893', name: 'ООО «Ромашка»' }],
     activeCompanyId: 'company-1',
+    companies: [makeCompanyChoice()],
     ...overrides,
   };
 }
 
-export function makeBankMe(role: Role = 'UNDERWRITER', overrides: Partial<Me> = {}): Me {
+export function makeBankMe(role = 'UNDERWRITER', overrides: Partial<Me> = {}): Me {
   return makeMe({
-    user: { id: 'bank-user-1', name: 'Ольга Петрова' },
+    userId: 'bank-user-1',
+    displayName: 'Ольга Петрова',
     role,
     companies: [],
     activeCompanyId: null,
@@ -26,7 +46,7 @@ export function makeBankMe(role: Role = 'UNDERWRITER', overrides: Partial<Me> = 
 export function makePublicConfig(overrides: Partial<PublicConfig> = {}): PublicConfig {
   return {
     demoMode: true,
-    name: 'Демо-стенд',
+    productName: 'Умный кредитный кабинет',
     version: '0.1.0',
     nluAvailable: false,
     ...overrides,
