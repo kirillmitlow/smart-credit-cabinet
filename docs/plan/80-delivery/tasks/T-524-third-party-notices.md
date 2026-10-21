@@ -8,7 +8,7 @@
 | Оценка | ~5 ч |
 | Зависит от | [T-500](T-500-monorepo-skeleton.md), [T-100](T-100-mocks-skeleton.md), [40-06](../../40-ai/06-model-packaging-and-licenses.md) |
 | Приоритет | M (Must) |
-| Веха | V7 ([график](../02-schedule.md)) |
+| Веха | V6 ([график](../02-schedule.md)) |
 
 ## Цель
 

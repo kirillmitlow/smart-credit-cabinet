@@ -6,7 +6,7 @@
 | Владелец | Агент A/B (любой сменщик) |
 | Ветка | `chore/jury-rehearsal` |
 | Оценка | ~3 ч |
-| Зависит от | [T-532](T-532-jury-self-check-readme.md), [T-535](T-535-clean-machine-linux.md) |
+| Зависит от | [T-532](T-532-jury-self-check-readme.md) |
 | Приоритет | M (Must) |
 | Веха | V8 ([график](../02-schedule.md)) |
 

@@ -30,6 +30,7 @@
 - [50-13](../../50-architecture/13-config-and-profiles.md)
 - [Спецификация моков](../../../specs/mocks.md), раздел 10.5
 - [Гид по моквам](../../../mocks-guide.md)
+- [30-17](../../30-decisioning/17-persona-walkthrough.md) (ожидаемые исходы и числа для таблицы персон)
 
 ## Критерии приёмки
 

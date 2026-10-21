@@ -22,6 +22,7 @@
   - База `mock_scenarios` (`scenarios`, `scenario_applications`, `idempotency_keys`) и миграции, поля как в 10.7
   - `GET /api/v1/scenarios?origin=`, `GET /scenarios/{code}`, `PATCH` (Merge Patch, массивы заменяются), `DELETE` (встроенные удалять нельзя: `409 BUILTIN_SCENARIO`), `POST /scenarios` с необязательным `Idempotency-Key` (создаёт запись `PENDING`), `POST /scenarios/preview` (заглушка, наполнит [T-120](T-120-mocks-expand-identity.md))
   - Все эндпоинты требуют `X-Admin-Key`; схема безопасности `AdminKeyAuth`; блока `meta` нет
+  - Параметры из 30-17: `finance.noisePercent` (0 у встроенных персон, по умолчанию ±5%) и `application.collateral.valueRub` (оценка залога); эти поля добавляются в модель и в OpenAPI
 - **Не входит:**
   - Разворачивание параметров в данные ([T-120](T-120-mocks-expand-identity.md)…[T-125](T-125-mocks-expand-other-systems.md))
   - Раскладка по мокам ([T-127](T-127-mocks-apply-rollback.md))
@@ -31,6 +32,7 @@
 
 - [Спецификация моков](../../../specs/mocks.md), разделы 10.1, 10.2, 10.4, 10.7
 - [Гид по моквам](../../../mocks-guide.md), раздел «Создать свою компанию»
+- [30-17 Прохождение персон](../../30-decisioning/17-persona-walkthrough.md) (оракул: точные входы и числа), раздел «Нужно внести в спецификацию моков»
 
 ## Критерии приёмки
 
@@ -52,3 +54,4 @@ pytest с БД: CRUD, идемпотентность, `PATCH`, список по
 
 - Модель сценария — центральный контракт, на который опираются все `expand`-задачи; названия полей не менять без решения.
 - Выход `application`, `expected*` и `users` в моки не уходит — это хранится только здесь.
+- Спецификация моков ещё не содержит `noisePercent` и `valueRub`: 30-17 просит внести их. Реализуем по 30-17 и пишем вопрос/правку спецификации (решение владельца спецификации), а не молча расходимся.

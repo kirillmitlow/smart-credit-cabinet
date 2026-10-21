@@ -6,7 +6,7 @@
 | Владелец | Агент A/B (любой сменщик) |
 | Ветка | `chore/synthetic-report-ci` |
 | Оценка | ~3 ч |
-| Зависит от | [T-510](T-510-ci-tests-coverage.md), [T-513](T-513-ci-nightly-full.md), [70-03](../../70-quality/03-synthetic-population-tests.md) |
+| Зависит от | [T-510](T-510-ci-tests-coverage.md), [70-03](../../70-quality/03-synthetic-population-tests.md) |
 | Приоритет | S (Should) |
 | Веха | V6 ([график](../02-schedule.md)) |
 
@@ -48,3 +48,4 @@ Unit-тест скрипта на фиктивных артефактах.
 ## Заметки для реализации
 
 - Приоритет S: без отчёта RQ-67 закрывается описанием в 30-14; с отчётом — доказательством.
+- Подключение к ночному набору делает [T-513](T-513-ci-nightly-full.md).

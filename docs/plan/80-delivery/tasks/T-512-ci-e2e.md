@@ -6,7 +6,7 @@
 | Владелец | Агент A/B; 🧠 кандидат для GPT-6 Astra |
 | Ветка | `chore/ci-e2e` |
 | Оценка | ~6 ч |
-| Зависит от | [T-509](T-509-ci-skeleton.md), [T-502](T-502-compose-main.md), [T-515](T-515-smoke-script.md), [T-517](T-517-personas-api-harness.md), [T-518](T-518-playwright-harness.md), [T-140](T-140-mocks-bruno-collection.md), [T-544](T-544-bruno-collection-api.md) |
+| Зависит от | [T-509](T-509-ci-skeleton.md), [T-502](T-502-compose-main.md), [T-515](T-515-smoke-script.md), [T-517](T-517-personas-api-harness.md), [T-518](T-518-playwright-harness.md), [T-140](T-140-mocks-bruno-collection.md) |
 | Приоритет | M (Must) |
 | Веха | V6 ([график](../02-schedule.md)) |
 
@@ -51,3 +51,4 @@
 
 - Чаос-тесты запускаются отдельным заданием и по одному: режим мока глобален ([T-513](T-513-ci-nightly-full.md)).
 - Если Docker-кэш Actions не помогает, собирайте образы один раз и передавайте артефактом между заданиями.
+- Коллекция для `api` ([T-544](T-544-bruno-collection-api.md), V7) подключается к этому заданию отдельным шагом, когда появится; до этого `bru run` идёт только по папке `mocks/`.
