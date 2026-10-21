@@ -1,15 +1,27 @@
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator, Callable, Iterator
 from typing import Any
 
 import httpx
 import pytest
 from fastapi import FastAPI
+from hypothesis import HealthCheck
+from hypothesis import settings as hypothesis_settings
 from testcontainers.community.postgres import PostgresContainer
 
 from app.main import create_app
 from app.settings import Settings
+
+# Профили Hypothesis (70-02, Q-101): dev — быстро локально, ci — 200 примеров на PR без случайности,
+# deep — 2000 со случайным seed (ночью и перед сдачей). Выбор: переменная HYPOTHESIS_PROFILE.
+hypothesis_settings.register_profile("dev", max_examples=50)
+hypothesis_settings.register_profile("ci", max_examples=200, derandomize=True, deadline=None)
+hypothesis_settings.register_profile(
+    "deep", max_examples=2000, deadline=None, suppress_health_check=[HealthCheck.too_slow]
+)
+hypothesis_settings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "dev"))
 
 API_KEY = "dev-registry-key"
 ADMIN_KEY = "dev-admin-key"

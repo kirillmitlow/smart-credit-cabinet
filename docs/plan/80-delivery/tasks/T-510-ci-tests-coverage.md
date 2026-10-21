@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE |
 | Владелец | Агент A/B (любой сменщик) |
-| Ветка | `chore/ci-tests-coverage` |
+| Ветка | `chore/ci-tests` |
 | Оценка | ~5 ч |
 | Зависит от | [T-509](T-509-ci-skeleton.md), [T-516](T-516-testcontainers-harness.md), [70-01](../../70-quality/01-test-strategy.md), [70-02](../../70-quality/02-unit-and-property-tests.md) |
 | Приоритет | M (Must) |
@@ -54,3 +54,9 @@
 
 - Маркеры pytest из 70-01: `unit`, `property`, `integration`, `contract`, `persona`, `synthetic`, `chaos`, `slow`; `make check` гоняет только быстрые.
 - Нестабильные тесты не лечатся повтором (исключение: один повтор Playwright в CI).
+
+## Итог выполнения
+
+Сделано для того, что существует сегодня (`mocks/`): задание `tests-py` (матрица `api`, `mocks`, `nlu`; отсутствующий проект пропускается чисто), unit + property + integration одним `make test`, порог 70% в `mocks/pyproject.toml`, профили Hypothesis `dev`/`ci`/`deep` (`HYPOTHESIS_PROFILE`), сводка покрытия в `$GITHUB_STEP_SUMMARY`, артефакты JUnit и покрытия на 14 дней, `ci-ok` зависит от задания.
+
+Подключается вместе с кодом, которого ещё нет: пороги ядра 90%/85% (появятся в `api/pyproject.toml` по тому же образцу), `web-unit` с Vitest и axe, ночной профиль `deep` (T-513), проверка искусственным удалением теста и пятикратный прогон `integration` на реальном CI.

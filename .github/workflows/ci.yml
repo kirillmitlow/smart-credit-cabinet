@@ -1,5 +1,5 @@
-# Быстрый набор на PR и полный на main (70-08, T-509). Тестовые, контрактные, e2e и ночные задания
-# добавляются задачами T-510…T-514; итоговая обязательная проверка — `ci-ok`.
+# Быстрый набор на PR и полный на main (70-08, T-509). Python-тесты с покрытием — T-510 (`tests-py`); остальные тестовые,
+# контрактные, e2e и ночные задания добавляются задачами T-511…T-514; итоговая обязательная проверка — `ci-ok`.
 name: ci
 
 on:
@@ -64,6 +64,45 @@ jobs:
       - run: make check
       - run: echo "make check зелёный" >> "$GITHUB_STEP_SUMMARY"
 
+  tests-py:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20  # предел быстрого набора (70-08); превышение — задача на оптимизацию
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [api, mocks, nlu]
+    env:
+      HYPOTHESIS_PROFILE: ci  # 200 примеров на PR и main (Q-101); 2000 («deep») — ночью, T-513
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - id: has
+        run: |
+          if [ -f "${{ matrix.project }}/pyproject.toml" ]; then echo "project=true" >> "$GITHUB_OUTPUT"; else echo "Проекта ${{ matrix.project }} ещё нет" >> "$GITHUB_STEP_SUMMARY"; fi
+      - if: steps.has.outputs.project == 'true'
+        uses: astral-sh/setup-uv@v10.3.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "${{ matrix.project }}/uv.lock"
+      # unit + property + integration (Postgres/Redis через Testcontainers, Docker есть на раннере) с покрытием;
+      # порог покрытия задан в pyproject.toml проекта, не флагом
+      - if: steps.has.outputs.project == 'true'
+        run: make -C ${{ matrix.project }} test
+      - if: always() && steps.has.outputs.project == 'true'
+        run: |
+          {
+            echo "### Покрытие: ${{ matrix.project }}"
+            make --no-print-directory -C ${{ matrix.project }} coverage-md
+          } >> "$GITHUB_STEP_SUMMARY"
+      - if: always() && steps.has.outputs.project == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: tests-${{ matrix.project }}
+          path: ${{ matrix.project }}/reports/
+          if-no-files-found: ignore
+          retention-days: 14
+
   build:
     needs: changes
     if: needs.changes.outputs.code == 'true'
@@ -90,10 +129,10 @@ jobs:
 
   ci-ok:
     if: always()
-    needs: [changes, docs, lint-py, build]
+    needs: [changes, docs, lint-py, tests-py, build]
     runs-on: ubuntu-24.04
     steps:
       - uses: re-actors/alls-green@v1.3.0
         with:
-          allowed-skips: lint-py, build
+          allowed-skips: lint-py, tests-py, build
           jobs: ${{ toJSON(needs) }}
