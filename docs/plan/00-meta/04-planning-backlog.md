@@ -37,7 +37,7 @@
 |---|---|---|---|---|---|---|---|
 | 10-00 | [organizer-clarifications](../10-product/00-organizer-clarifications.md) | Что организаторы уточнили в чате хакатона | Р | — | A/B | M | DRAFT |
 | 10-01 | [requirements-matrix](../10-product/01-requirements-matrix.md) | Каждое требование, критерий, ограничение и артефакт сдачи из кейса → где закрыто и каким тестом проверено | Р | 👁 | A/B | M | REVIEW |
-| 10-02 | [personas](../10-product/02-personas.md) | 9 персон + 9 технических: запрос, ожидаемый исход, что показывает (из спецификации моков, раздел 10.5) | Р | 👁 | A/B | M | REVIEW |
+| 10-02 | [personas](../10-product/02-personas.md) | 9 персон + 10 технических: запрос, ожидаемый исход, что показывает (из спецификации моков, раздел 10.5) | Р | 👁 | A/B | M | REVIEW |
 | 10-03 | [users-and-roles](../10-product/03-users-and-roles.md) | Роли клиента (директор, бухгалтер с доверенностью) и банка. Матрица прав. Способ входа | П | ✋ | A/B | M | DRAFT |
 | 10-04 | [research-jtbd](../10-product/04-research-jtbd.md) | Боли → JTBD → фичи. План CustDev и юзабилити-теста, разбор конкурентов | П | 👁 | A/B | S | DRAFT |
 | 10-05 | [mvp-scope](../10-product/05-mvp-scope.md) | MoSCoW: что входит, что вырезали и почему | П | ✋ | A/B | M | APPROVED |
@@ -76,11 +76,11 @@
 | 30-09 | [pricing-options](../30-decisioning/09-pricing-options.md) | Как назначаем ставку: таблица надбавок / по ожидаемым потерям / по целевой доходности | В | ✋ | A/B | M | REVIEW |
 | 30-10 | [counter-offer-options](../30-decisioning/10-counter-offer-options.md) | Как строим встречные предложения: перебор правил / оптимизация / набор компромиссов | В | ✋ | A/B 🧠 | M | REVIEW |
 | 30-11 | [routing-and-authority](../30-decisioning/11-routing-and-authority.md) | Авто или ручное, матрица полномочий, переопределение андеррайтером, «серые зоны» | П | 👁 | A/B | M | DRAFT |
-| 30-12 | explainability | Коды причин, вклад факторов, тексты клиенту и андеррайтеру, «что изменить, чтобы одобрили» | П | 👁 | A/B | M | — |
-| 30-13 | policy-config-and-versioning | Структура конфига правил, версии, воспроизведение решения, песочница «а что если» | П | 👁 | A/B | M | — |
-| 30-14 | model-validation-monitoring | Gini, KS, PSI, калибровка, доля одобрений: отчёт валидации и мониторинг | П | 👁 | A/B | S | — |
+| 30-12 | [explainability](../30-decisioning/12-explainability.md) | Коды причин, вклад факторов, тексты клиенту и андеррайтеру, «что изменить, чтобы одобрили» | П | 👁 | A/B | M | DRAFT; получен от A в b98f403 |
+| 30-13 | [policy-config-and-versioning](../30-decisioning/13-policy-config-and-versioning.md) | Структура конфига правил, версии, воспроизведение решения, песочница «а что если» | П | 👁 | A/B | M | DRAFT; получен от A в b98f403 |
+| 30-14 | [model-validation-monitoring](../30-decisioning/14-model-validation-monitoring.md) | Gini, KS, PSI, калибровка, доля одобрений: отчёт валидации и мониторинг | П | 👁 | A/B | S | DRAFT; получен от A в b98f403 |
 | 30-15 | [consistency-and-fraud-options](../30-decisioning/15-consistency-and-fraud-options.md) | Сверка анкеты с источниками, аномалии в оборотах: правила или ML | В | ✋ | A/B | S | REVIEW |
-| 30-16 | loan-math | Аннуитет, проценты при погашении в конце срока, линия, график, ПСК, досрочное погашение | П | 👁 | A/B | M | — |
+| 30-16 | [loan-math](../30-decisioning/16-loan-math.md) | Аннуитет, проценты при погашении в конце срока, линия, график, ПСК, досрочное погашение | П | 👁 | A/B | M | DRAFT; получен от A в b98f403 |
 | 30-17 | persona-walkthrough | Прогон всех персон через выбранный дизайн с числами. Это тестовый оракул | Р | 👁 | A/B | M | — |
 | 30-18 | [economic-assumptions](../30-decisioning/18-economic-assumptions.md) | Реестр экономических параметров: значение, источник (ЦБ, Базель, Росстат, закон) или пометка «допущение» (D-073) | Р | — | A/B | M | APPROVED |
 
@@ -93,7 +93,7 @@
 | 40-00 | [problem-map](../40-ai/00-problem-map.md) | Где ИИ даёт понятную ценность, а где нет | Р | 👁 | A/B | M | REVIEW |
 | 40-01 | [ai-principles](../40-ai/01-ai-principles.md) | ИИ не решает по кредиту, у каждой функции есть запасной путь, только открытые веса, работа на CPU | П | 👁 | A/B | M | DRAFT |
 | 40-02 | [free-text-wizard-spec](../40-ai/02-free-text-wizard-spec.md) | Спецификация гибридной схемы (D-060): слоты, пороги, парсер суммы, путь без модели. Модель — по итогам T-001 | П | 👁 | A/B | S | DRAFT |
-| 40-03 | document-ingestion-options | Выписка 1С, PDF отчётности, сканы: парсер, OCR или LLM | В | ✋ | A/B | S | — |
+| 40-03 | [document-ingestion-options](../40-ai/03-document-ingestion-options.md) | Выписка 1С, PDF отчётности, сканы: парсер, OCR или LLM | В | ✋ | A/B | S | REVIEW; выбор Q-018/Q-140 ещё не задан |
 | ~~40-04~~ | ~~news-ranking-options~~ | Лента не делается (D-019) | — | — | — | — | ❌ |
 | 40-05 | texts-generation-options | Объяснения клиенту и записка андеррайтеру: шаблоны или LLM | В | ✋ | A/B | S | ⏸ Q-007 |
 | 40-06 | [model-packaging-and-licenses](../40-ai/06-model-packaging-and-licenses.md) | Как модели попадают в образ, CPU-инференс, размеры, лицензии для THIRD_PARTY_NOTICES | П | 👁 | A/B | S | DRAFT |
@@ -187,3 +187,5 @@ flowchart LR
 ## Что читать пользователю
 
 Только документы с ✋. Их около 20, но у каждого достаточно прочитать два раздела: «Сравнение» и «Рекомендация». Остальное агенты согласуют сами и покажут короткой сводкой.
+
+**Смена B 21.10:** 30-19 получен от A: [simulator-spec](../30-decisioning/19-simulator-spec.md), DRAFT. 30-17, макеты и вся фаза 7 ещё не готовы. Ответы на отдельные развилки D-085…D-092 не означают одобрение всего плана.
