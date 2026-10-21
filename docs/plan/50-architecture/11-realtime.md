@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [20-02](../20-process/02-application-states.md), [01-overview](01-overview.md), [05-async-processing](05-async-processing.md), [06-data-model](06-data-model.md), [09](09-security.md), [10](10-audit-and-observability.md) |
 | Решения | D-020 (живые статусы через SSE), D-056 (Redis для доставки событий) |

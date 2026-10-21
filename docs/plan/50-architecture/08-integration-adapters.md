@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [спецификация моков](../../specs/mocks.md) (разделы 2, 8, 9), [01-overview](01-overview.md), [02-tech-stack](02-tech-stack.md) (Q-047), [05-async-processing](05-async-processing.md) (Q-054), [06-data-model](06-data-model.md) |
 | Решения | D-052, D-054, D-068 (кэш только для автозаполнения), D-033 |

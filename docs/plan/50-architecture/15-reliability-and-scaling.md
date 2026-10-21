@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [01-overview](01-overview.md), [05-async-processing](05-async-processing.md), [06-data-model](06-data-model.md), [08](08-integration-adapters.md), [09](09-security.md), [10](10-audit-and-observability.md), [11](11-realtime.md), [13](13-config-and-profiles.md), [14](14-deployment.md) |
 | Решения | D-054, D-055, D-056, D-052 |

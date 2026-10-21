@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [20-02](../20-process/02-application-states.md), [01-overview](01-overview.md), [02-tech-stack](02-tech-stack.md), [06-data-model](06-data-model.md), [08](08-integration-adapters.md), [09](09-security.md) |
 | Решения | D-055, D-054, D-066 (RAM ≤ 4 ГБ) |

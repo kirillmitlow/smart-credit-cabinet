@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [50-01](01-overview.md), [50-02](02-tech-stack.md), [02-doc-standard.md](../00-meta/02-doc-standard.md), [03-collaboration-protocol.md](../00-meta/03-collaboration-protocol.md), D-00A, D-00E |
 | Решения | Предлагает Q-051 |

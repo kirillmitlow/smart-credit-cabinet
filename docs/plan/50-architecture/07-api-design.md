@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [50-02](02-tech-stack.md), [50-04](04-modules-and-boundaries.md), [50-06](06-data-model.md), [моки, 2.1–2.7](../../specs/mocks.md), [20-02](../20-process/02-application-states.md), D-052, D-055 |
 | Решения | Предлагает Q-059. Источник артефакта сдачи «описание API + OpenAPI/Swagger» |

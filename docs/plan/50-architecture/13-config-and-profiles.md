@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [01-overview](01-overview.md), [05-async-processing](05-async-processing.md), [06-data-model](06-data-model.md), [08](08-integration-adapters.md), [09](09-security.md), [спецификация моков](../../specs/mocks.md) (2.5, 3.1, 3.4), D-030 |
 | Решения | D-030 (правила в версионируемом конфиге), D-066, D-067, D-078 (имена compose-файлов) |

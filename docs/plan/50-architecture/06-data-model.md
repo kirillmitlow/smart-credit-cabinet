@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [50-04](04-modules-and-boundaries.md), [50-05](05-async-processing.md), [20-02](../20-process/02-application-states.md), [моки, 9.4](../../specs/mocks.md), D-030, D-036, D-054, D-055 |
 | Решения | Предлагает Q-057, Q-058. Источник артефакта сдачи «модель данных» |
@@ -102,7 +102,8 @@ erDiagram
 
 | Таблица | Модуль | Назначение | Ключевые поля |
 |---|---|---|---|
-| `documents` | documents | Метаданные файлов; сами файлы — в хранилище (50-12) | `company_id`, `application_id`, `task_id`, `kind` (`BANK_STATEMENT_1C`, `FINANCIALS`, `CONTRACT`, `OTHER`), `filename`, `mime`, `size_bytes`, `sha256`, `storage_key`, `parse_status`, `parsed` (JSONB: период, счёт, обороты по месяцам) |
+| `documents` | documents | Метаданные файлов; сами файлы — в хранилище (50-12) | `company_id`, `application_id`, `task_id`, `kind` (`BANK_STATEMENT_1C`, `FINANCIALS`, `CONTRACT`, `CREDIT_AGREEMENT`, `PAYMENT_SCHEDULE`, `OTHER`), `origin` (`UPLOADED` / `GENERATED` / `DEMO_GENERATED`), `template_version` (у сгенерированных), `filename`, `mime`, `size_bytes`, `sha256`, `storage_key`, `parse_status`, `parsed` (JSONB: период, счёт, обороты по месяцам) |
+| `document_blobs` | documents | Содержимое файлов (Q-068: файлы в Postgres за интерфейсом `FileStore`) | `storage_key`, `content` (bytea), `size_bytes` |
 | `notifications` | notifications | Уведомления внутри продукта (D-020) | `user_id`, `company_id`, `application_id`, `kind`, `text_key`, `params`, `read_at` |
 | `audit_log` | audit | Действия вне заявки: вход, роли, действия андеррайтера, демо | `at`, `actor_id`, `actor_role`, `action`, `object_type`, `object_id`, `company_id`, `details`, `request_id` |
 | `outbox` | shared | Сообщения в БКИ и АБС ([50-05](05-async-processing.md)) | `id` (последовательный), `aggregate_id`, `event_type`, `target_system`, `payload`, `idempotency_key` (уникален), `status` (`PENDING`, `SENT`, `FAILED`), `attempts`, `next_attempt_at`, `lease_until`, `last_error`, `sent_at` |
@@ -143,6 +144,9 @@ erDiagram
 **Рекомендация: A.** Для масштаба прототипа достаточно; RLS (B) можно добавить позже как усиление, схема данных к этому уже готова. Сотрудники банка (`UNDERWRITER`) видят все компании по явной проверке роли.
 
 ## Заметки для реализации
+
+- После сквозного сценария (Q-066, вариант Б): в `application_events` добавить `prev_hash` и `hash` — цепочка хешей для проверки целостности аудита.
+- Новый флаг `PIPELINE_ERROR` (50-05): заявка ушла на ручное рассмотрение, потому что конвейер 5 раз не смог завершиться. Внести в справочник кодов 30-12.
 
 - Статусы и коды — строки с `CHECK` в БД (не `ENUM` Postgres): добавлять значения миграцией проще.
 - `applications.draft` меняется на каждом автосохранении; `application_versions` — только при отправке. Мастер создаёт заявку `DRAFT` сразу в начале.

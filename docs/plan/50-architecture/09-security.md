@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (D-080) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [20-02](../20-process/02-application-states.md), [10-00](../10-product/00-organizer-clarifications.md), [04-modules](04-modules-and-boundaries.md) (правило R11), [06-data-model](06-data-model.md), [08](08-integration-adapters.md), [спецификация моков](../../specs/mocks.md) (9.4, 12) |
 | Решения | D-014, D-020, D-057 (без Keycloak и настоящей ЭП), D-062 (вход отложен) |
