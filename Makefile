@@ -9,7 +9,8 @@ PRE_COMMIT := uvx pre-commit@4.7.0
 PY_SCRIPTS := uv run --python 3.13 --no-project --with pytest==9.1.1 python
 # Python-проекты монорепозитория; каждый со своим pyproject.toml и uv.lock (50-03)
 PY_PROJECTS := $(foreach p,api mocks nlu,$(if $(wildcard $(p)/pyproject.toml),$(p)))
-HAS_WEB := $(wildcard web/package.json)
+# SKIP_WEB=1: не гонять фронт (в CI его проверяет отдельное задание `web`, там ставятся Node и pnpm)
+HAS_WEB := $(if $(SKIP_WEB),,$(wildcard web/package.json))
 HAS_COMPOSE := $(wildcard docker-compose.yml)
 
 .PHONY: help up down check lint docs-check test fmt openapi reset hooks
