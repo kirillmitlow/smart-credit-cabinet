@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.common.admin import merge_patch
 from app.common.clock import Clock
 from app.common.problems import ProblemException
+from app.roles.scenarios.config import ScenarioSettings
 from app.roles.scenarios.expand import expand
 from app.roles.scenarios.models import Scenario
 from app.roles.scenarios.schemas import (
@@ -26,10 +27,12 @@ from app.roles.scenarios.schemas import (
 
 def spec_dump(spec: ScenarioSpec) -> dict[str, Any]:
     """Параметры так, как их прислали: camelCase, без незаданных полей."""
-    return spec.model_dump(mode="json", by_alias=True, exclude_none=True, exclude_defaults=True)
+    return spec.model_dump(mode="json", by_alias=True, exclude_unset=True)
 
 
-async def preview(session: AsyncSession, spec: ScenarioSpec, clock: Clock) -> dict[str, Any]:
+async def preview(
+    session: AsyncSession, spec: ScenarioSpec, clock: Clock, bank_bik: str | None = None
+) -> dict[str, Any]:
     """Чтение занятых ИНН, без резервирования: preview не меняет ни одной таблицы.
 
     При переприменении исключаем собственный снимок. Гонку записей защищает уникальный
@@ -50,7 +53,8 @@ async def preview(session: AsyncSession, spec: ScenarioSpec, clock: Clock) -> di
             if person and person.get("inn"):
                 reserved.add(person["inn"])
     try:
-        return expand(spec, clock.today(), reserved)
+        settings = ScenarioSettings(bank_bik=bank_bik) if bank_bik is not None else None
+        return expand(spec, clock.today(), reserved, settings=settings)
     except ValueError as exc:
         raise ProblemException(422, "VALIDATION_ERROR", str(exc)) from exc
 
