@@ -8,10 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from app.modules.decisioning import DecisionInput, decide
+from app.modules.decisioning import decide, input_to_json
 from app.shared.db import Base
 from app.shared.tables import TABLE_OWNERS
 from tests.conftest import NetworkForbiddenError
+from tests.fixtures.core_personas import sokolova
 
 pytestmark = pytest.mark.unit
 
@@ -69,5 +70,8 @@ def test_decide_is_pure_without_network() -> None:
 
     with pytest.raises(NetworkForbiddenError):
         socket.create_connection(("example.org", 80))
-    inputs = DecisionInput(application_id="a1", facts={"revenue": 1})
-    assert decide(inputs) == decide(inputs)
+    inputs = sokolova()
+    first, second = decide(inputs), decide(inputs)
+    assert first == second
+    assert repr(first) == repr(second)  # побайтно: порядок причин и числа те же (INV-50, INV-51)
+    assert input_to_json(inputs) == input_to_json(inputs)
