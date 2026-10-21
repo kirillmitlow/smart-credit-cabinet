@@ -74,6 +74,7 @@ def active_loan(
     today: date,
     earliest: date | None,
     defaults: CreditDefaults = DEFAULTS,
+    overdue_since: date | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any] | None]:
     term = loan.term_months or 24
     if term > 1200:
@@ -90,7 +91,9 @@ def active_loan(
     if opened > today:
         raise ValueError("openedAt активного кредита не может быть в будущем")
     planned = add_months(opened, term)
-    if due_date(opened, term, working_days=bool(loan.our_bank)) <= today:
+    if overdue_since is not None and overdue_since < opened:
+        raise ValueError("Просрочка не может начаться раньше открытия кредита")
+    if overdue_since is None and due_date(opened, term, working_days=bool(loan.our_bank)) <= today:
         raise ValueError("Срок activeLoans истёк; перенесите кредит в closedLoans")
     uid = contract_uid(code, inn, f"active-{index}")
     body = _base(uid, loan.kind, opened, planned, bool(loan.secured))
@@ -118,14 +121,29 @@ def active_loan(
                 raise ValueError("ratePercent и monthlyPaymentRub задают разные платежи")
         if loan.our_bank:
             rows = schedule(amount, term, rate, opened)
-            paid_rows = [row for row in rows if row.day <= today]
+            paid_rows = [
+                row
+                for row in rows
+                if row.day <= today and (overdue_since is None or row.day < overdue_since)
+            ]
             balance = paid_rows[-1].balance if paid_rows else amount
             payment = rows[0].payment
         else:
-            paid = sum(due_date(opened, month) <= today for month in range(1, term + 1))
+            paid = sum(
+                due_date(opened, month) <= today
+                and (overdue_since is None or due_date(opened, month) < overdue_since)
+                for month in range(1, term + 1)
+            )
             balance = external_balance(amount, term, rate, paid)
             payment = money(annuity(amount, term, rate), 100)
         body.update(amountRub=amount, balanceRub=balance, monthlyPaymentRub=payment)
+    if overdue_since is not None:
+        unpaid = sum(
+            overdue_since <= due_date(opened, month, working_days=bool(loan.our_bank)) <= today
+            for month in range(1, term + 1)
+        )
+        body["overduePeriods"] = [{"since": overdue_since.isoformat(), "until": None}]
+        body["overdueRub"] = unpaid * (body["monthlyPaymentRub"] or 0)
     bank = None
     if loan.our_bank:
         if body["kind"] not in {"LOAN", "CREDIT_LINE", "OVERDRAFT"}:

@@ -212,7 +212,7 @@ def test_rate_is_solved_from_payment() -> None:
         ({"bki": {"company": {"historyYears": 0, "monthlyPaymentsRub": 1000}}}, "historyYears"),
         ({"bki": {"director": {"historyYears": 3}, "owner": {"historyYears": 5}}}, "противоречат"),
         ({"company": {"form": "JSC"}, "bki": {"owner": {"historyYears": 3}}}, "нет такого"),
-        ({"bki": {"company": {"currentOverdueDays": 1}}}, "T-124"),
+        ({"bki": {"company": {"currentOverdueDays": 1}}}, "activeLoans"),
         (
             {
                 "bki": {
