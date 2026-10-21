@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 .claude/launch.json
+.claude/worktrees/
 
 # Python
 __pycache__/

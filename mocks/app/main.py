@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from app import health
 from app.common.clock import Clock
 from app.common.db import Database
+from app.common.idempotency import purge_forever
 from app.common.middleware import RequestContextMiddleware
 from app.common.problems import install_problem_handlers
 from app.settings import ROLE_TITLE, Settings
@@ -21,8 +22,13 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     database: Database | None = app.state.database
     migrations: asyncio.Task[None] | None = None
     if database is not None:
-        # Не блокируем старт: /health/live отвечает сразу, ready — после миграций
-        migrations = asyncio.create_task(database.migrate_until_done())
+
+        async def maintain(db: Database) -> None:
+            # Не блокируем старт: /health/live отвечает сразу, ready — после миграций
+            await db.migrate_until_done()
+            await purge_forever(db, app.state.clock)
+
+        migrations = asyncio.create_task(maintain(database))
     try:
         yield
     finally:
