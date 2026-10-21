@@ -1,6 +1,7 @@
-"""Миграции роли registry. Модели роли подключаются в target_metadata, когда появятся таблицы."""
+"""Миграции роли registry."""
 
 from app.common.migrations_env import run_env
+from app.roles.registry.models import Base
 from app.settings import Role
 
-run_env(Role.REGISTRY, None)
+run_env(Role.REGISTRY, Base.metadata)

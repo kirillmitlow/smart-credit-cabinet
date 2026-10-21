@@ -33,7 +33,7 @@ def build_app() -> FastAPI:
     app = create_app(make_settings())
     router = APIRouter()
 
-    @router.get("/api/v1/companies/{inn}", response_model=CompanyOut, response_model_by_alias=True)
+    @router.get("/api/v1/stub/companies/{inn}", response_model=CompanyOut, response_model_by_alias=True)
     async def company(
         request: Request,
         inn: Annotated[str, Depends(valid_inn)],
@@ -59,7 +59,7 @@ async def stub() -> httpx.AsyncClient:
     return httpx.AsyncClient(transport=transport, base_url="http://mock")
 
 
-BUSINESS = "/api/v1/companies/0017654322"
+BUSINESS = "/api/v1/stub/companies/0017654322"
 
 
 @pytest.mark.parametrize(
@@ -97,7 +97,7 @@ async def test_success_has_meta_and_camel_case(stub: httpx.AsyncClient) -> None:
 
 
 async def test_invalid_inn_is_the_only_400(stub: httpx.AsyncClient) -> None:
-    response = await stub.get("/api/v1/companies/0017654323", headers={"X-Api-Key": API_KEY})
+    response = await stub.get("/api/v1/stub/companies/0017654323", headers={"X-Api-Key": API_KEY})
     assert response.status_code == 400
     body = response.json()
     assert body["code"] == "INN_INVALID"
