@@ -181,6 +181,10 @@ def expand_finance(
     ):
         raise ValueError("Неизвестный taxRegime")
     records = _statements(finance, code, today, registered, legal, settings)
+    if finance.statements_mismatch_percent and not records:
+        raise ValueError(
+            "Для statementsMismatchPercent нужен хотя бы один полный отчётный год компании"
+        )
     year = last_reporting_year(today)
     annual = _annual(finance, code, year, today, settings)
     headcount = finance.headcount if finance.headcount is not None else 1

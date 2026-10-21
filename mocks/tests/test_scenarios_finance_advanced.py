@@ -148,6 +148,25 @@ def test_mismatch_changes_reporting_but_preserves_cash_and_other_invariants() ->
     assert abs(mismatch - Decimal("66.6666666667")) < Decimal("0.000001")
 
 
+@pytest.mark.parametrize("age_months", [0, 6, 12, 21])
+def test_mismatch_requires_an_actual_full_reporting_year(age_months: int) -> None:
+    spec = ScenarioSpec.model_validate(
+        {
+            "title": "Молодая компания без полного отчётного года",
+            "company": {"form": "LLC", "ageMonths": age_months},
+            "finance": {"hasStatements": True, "statementsMismatchPercent": 40},
+        }
+    )
+    identity = expand_identity(spec, "young-mismatch", TODAY, set())["identity"]
+    with pytest.raises(ValueError, match="statementsMismatchPercent.*отчётный год"):
+        expand_finance(spec, identity, "young-mismatch", TODAY)
+    # Без намеренного расхождения молодая компания остаётся допустимой.
+    clean = spec.model_copy(
+        update={"finance": FinanceSpec(has_statements=True, statements_mismatch_percent=0)}
+    )
+    assert expand_finance(clean, identity, "young-mismatch", TODAY)["tax"]["financials"] == []
+
+
 @pytest.mark.parametrize(
     ("regime", "monthly", "staff", "form"),
     [
