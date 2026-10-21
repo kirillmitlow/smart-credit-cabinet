@@ -1,0 +1,22 @@
+# Общие правила ruff для api/, mocks/, nlu/ и scripts/ (50-03, T-501).
+# Проекты не заводят свой [tool.ruff]; если нужно уточнение — `extend = "../ruff.toml"`.
+line-length = 100
+target-version = "py313"
+extend-exclude = ["docs", "web", "**/alembic/versions"]
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "S", "C4", "PT", "DTZ", "TID"]
+
+[lint.flake8-tidy-imports.banned-api]
+# Единые часы приложения (APP_TODAY, 50-02): «сегодня» берём только из shared/clock.
+"datetime.datetime.now".msg = "Используйте часы приложения (clock), а не datetime.now()"
+"datetime.datetime.utcnow".msg = "Используйте часы приложения (clock)"
+"datetime.date.today".msg = "Используйте часы приложения (clock), а не date.today()"
+"datetime.datetime.today".msg = "Используйте часы приложения (clock)"
+
+[lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106", "S311"]
+"**/clock.py" = ["TID251"]
+
+[format]
+quote-style = "double"

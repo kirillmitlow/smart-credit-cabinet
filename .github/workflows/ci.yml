@@ -1,0 +1,96 @@
+# Быстрый набор на PR и полный на main (70-08, T-509). Тестовые, контрактные, e2e и ночные задания
+# добавляются задачами T-510…T-514; итоговая обязательная проверка — `ci-ok`.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  UV_PYTHON: "3.13"
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - id: filter
+        uses: dorny/paths-filter@v4.0.3
+        with:
+          predicate-quantifier: every
+          filters: |
+            code:
+              - '**'
+              - '!docs/plan/**'
+              - '!docs/design/**'
+
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.0
+      - run: make docs-check
+      - run: echo "Документы проверены" >> "$GITHUB_STEP_SUMMARY"
+
+  lint-py:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+      # make check: pre-commit, ссылки, типы, границы модулей и быстрые тесты каждого проекта
+      - run: make check
+      - run: echo "make check зелёный" >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [api, mocks, web, nlu]
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - id: has
+        run: |
+          if [ -f "${{ matrix.service }}/Dockerfile" ]; then echo "dockerfile=true" >> "$GITHUB_OUTPUT"; else echo "Образа ${{ matrix.service }} ещё нет" >> "$GITHUB_STEP_SUMMARY"; fi
+      - if: steps.has.outputs.dockerfile == 'true'
+        uses: docker/setup-buildx-action@v4.4.1
+      - if: steps.has.outputs.dockerfile == 'true'
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: ${{ matrix.service }}
+          push: false
+          tags: scc-${{ matrix.service }}:ci
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  ci-ok:
+    if: always()
+    needs: [changes, docs, lint-py, build]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: re-actors/alls-green@v1.3.0
+        with:
+          allowed-skips: lint-py, build
+          jobs: ${{ toJSON(needs) }}
