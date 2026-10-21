@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Галерея макетов, этап 1 — Умный кредитный кабинет</title>
+<style>
+:root {
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bg: #F3F4F6; --surface: #FFFFFF; --line: #D8DBE0; --text: #1B1F27; --muted: #566070;
+  --accent: #C8202B; --accent-dark: #A81A24; --accent-soft: #FCEBED;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 1280px; background: var(--bg); color: var(--text); font: 15px/1.5 var(--font); }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid #1B5C99; outline-offset: 3px; }
+.demo-strip { background: #E7E9ED; border-bottom: 1px solid var(--line); text-align: center; font-size: 13px; padding: 5px 16px; }
+.demo-strip b { font-weight: 600; }
+.wrap { max-width: 1360px; margin: 0 auto; padding: 32px 32px 56px; }
+header.top h1 { font-size: 30px; line-height: 1.2; letter-spacing: -.02em; }
+header.top p { margin-top: 8px; color: var(--muted); max-width: 900px; font-size: 16px; }
+.legend { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.legend span { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; font-size: 14px; }
+.legend b { font-weight: 700; }
+
+.dir { display: grid; grid-template-columns: 300px 1fr; gap: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 24px; margin-top: 24px; }
+.dir .num { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; margin-bottom: 10px; }
+.dir h2 { font-size: 22px; line-height: 1.25; letter-spacing: -.01em; }
+.dir .tagline { color: var(--muted); margin-top: 4px; }
+.dir .desc { margin-top: 14px; }
+.dir ul { margin: 12px 0 0; padding-left: 18px; }
+.dir li { margin: 3px 0; }
+.dir h3 { margin-top: 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.dir .sw { display: flex; gap: 6px; margin-top: 14px; }
+.dir .sw i { width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(0,0,0,.18); display: block; }
+
+.previews { display: grid; grid-template-columns: 396px 396px; gap: 20px; justify-content: end; }
+.card { display: block; text-decoration: none; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+.card:hover { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.shot { position: relative; width: 374px; height: 390px; overflow: hidden; border-radius: 4px; background: #fff; border: 1px solid var(--line); }
+.shot iframe { position: absolute; top: 0; left: 0; width: 1440px; height: 1500px; border: 0; transform: scale(.26); transform-origin: 0 0; pointer-events: none; }
+.cap { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 4px 2px; gap: 12px; }
+.cap b { font-size: 15px; }
+.cap span { font-size: 13px; color: var(--accent-dark); font-weight: 600; white-space: nowrap; }
+.cap small { display: block; color: var(--muted); font-size: 13px; font-weight: 400; }
+
+section.how { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+section.how > div { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px 24px; }
+section.how h2 { font-size: 18px; margin-bottom: 8px; }
+section.how ol, section.how ul { margin: 0; padding-left: 20px; }
+section.how li { margin: 4px 0; }
+.foot { margin-top: 24px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="demo-strip" role="note"><b>Демо-прототип.</b> Все данные синтетические</div>
+<div class="wrap">
+  <header class="top">
+    <h1>Макеты, этап 1: три направления, два экрана</h1>
+    <p>Сравнивается только внешний вид: тексты, числа и состав экранов одинаковы. Герой макетов — ООО «СнабКонтракт» (запрос 8 млн ₽ на 12 месяцев, встречное предложение). Нажмите на превью, чтобы открыть страницу целиком.</p>
+    <div class="legend">
+      <span><b>Экран 1.</b> Главная: «Что нужно от вас», заявка, «Нужны деньги» с подсказкой помощника</span>
+      <span><b>Экран 2.</b> Таймлайн заявки с исходом «Три встречных предложения»</span>
+    </div>
+  </header>
+
+  <article class="dir" aria-labelledby="d1">
+    <div>
+      <div class="num" aria-hidden="true">1</div>
+      <h2 id="d1">Строгий банк</h2>
+      <p class="tagline">Светлый, плотный, табличный</p>
+      <p class="desc">Серо-белый фон, тонкие линии, малые скругления, красный только на главных кнопках и пометке «Рекомендуем». Варианты встречного сравниваются в таблице «Вы просили / вариант 1 / 2 / 3» рядом со столбцом запроса.</p>
+      <h3>Что отличает</h3>
+      <ul>
+        <li>Верхнее меню, таблицы, строгий шрифт 14 px</li>
+        <li>Сравнение «в одной таблице»: удобно считать и сверять</li>
+        <li>Вертикальный таймлайн с подшагами проверки</li>
+      </ul>
+      <div class="sw" aria-hidden="true"><i style="background:#F3F4F6"></i><i style="background:#FFFFFF"></i><i style="background:#1B1F27"></i><i style="background:#C8202B"></i></div>
+    </div>
+    <div class="previews">
+      <a class="card" href="bank-home.html">
+        <div class="shot" aria-hidden="true"><iframe src="bank-home.html" title="Предпросмотр" tabindex="-1" loading="lazy"></iframe></div>
+        <div class="cap"><b>Главная<small>bank-home.html</small></b><span>Открыть →</span></div>
+      </a>
+      <a class="card" href="bank-timeline.html">
+        <div class="shot" aria-hidden="true"><iframe src="bank-timeline.html" title="Предпросмотр" tabindex="-1" loading="lazy"></iframe></div>
+        <div class="cap"><b>Таймлайн и встречные<small>bank-timeline.html</small></b><span>Открыть →</span></div>
+      </a>
+    </div>
+  </article>
+
+  <article class="dir" aria-labelledby="d2">
+    <div>
+      <div class="num" aria-hidden="true">2</div>
+      <h2 id="d2">Дружелюбный финтех</h2>
+      <p class="tagline">Тёплый, крупный, с воздухом</p>
+      <p class="desc">Тёплый кремовый фон, крупные скругления и мягкие тени, эмодзи вместо иконок, красный коралловый акцент. Три варианта встречного — крупные карточки с большим платежом, «Рекомендуем» поднята рамкой и тенью.</p>
+      <h3>Что отличает</h3>
+      <ul>
+        <li>Шрифт 16 px, заголовки до 40 px, «как разговор»</li>
+        <li>Карточки и таймлайн с цветными узлами и подсказкой-пузырём</li>
+        <li>Понятнее новичку, но банковская часть выглядит легче</li>
+      </ul>
+      <div class="sw" aria-hidden="true"><i style="background:#FFF6F0"></i><i style="background:#FFFFFF"></i><i style="background:#2A2326"></i><i style="background:#D92D37"></i><i style="background:#EFEAFE"></i></div>
+    </div>
+    <div class="previews">
+      <a class="card" href="friendly-home.html">
+        <div class="shot" aria-hidden="true"><iframe src="friendly-home.html" title="Предпросмотр" tabindex="-1" loading="lazy"></iframe></div>
+        <div class="cap"><b>Главная<small>friendly-home.html</small></b><span>Открыть →</span></div>
+      </a>
+      <a class="card" href="friendly-timeline.html">
+        <div class="shot" aria-hidden="true"><iframe src="friendly-timeline.html" title="Предпросмотр" tabindex="-1" loading="lazy"></iframe></div>
+        <div class="cap"><b>Таймлайн и встречные<small>friendly-timeline.html</small></b><span>Открыть →</span></div>
+      </a>
+    </div>
+  </article>
+
+  <article class="dir" aria-labelledby="d3">
+    <div>
+      <div class="num" aria-hidden="true">3</div>
+      <h2 id="d3">Тёмный профессиональный</h2>
+      <p class="tagline">Рабочий инструмент, тёмная тема</p>
+      <p class="desc">Тёмный фон, боковая навигация, цифры моноширинным шрифтом, красный как сигнальный цвет. В таймлайне горизонтальный Stepper и журнал проверки; встречные дополнены столбиками «платёж против того, что по силам бизнесу».</p>
+      <h3>Что отличает</h3>
+      <ul>
+        <li>Боковая панель, плотные ряды, показатели сверху</li>
+        <li>Наглядное сравнение платежей на шкале</li>
+        <li>Сильнее выделяется среди конкурентов, но холоднее для новичка</li>
+      </ul>
+      <div class="sw" aria-hidden="true"><i style="background:#0F1115"></i><i style="background:#171A21"></i><i style="background:#E6E8EC"></i><i style="background:#D8323D"></i><i style="background:#FF6B70"></i></div>
+    </div>
+    <div class="previews">
+      <a class="card" href="dark-home.html">
+        <div class="shot" aria-hidden="true"><iframe src="dark-home.html" title="Предпросмотр" tabindex="-1" loading="lazy"></iframe></div>
+        <div class="cap"><b>Главная<small>dark-home.html</small></b><span>Открыть →</span></div>
+      </a>
+      <a class="card" href="dark-timeline.html">
+        <div class="shot" aria-hidden="true"><iframe src="dark-timeline.html" title="Предпросмотр" tabindex="-1" loading="lazy"></iframe></div>
+        <div class="cap"><b>Таймлайн и встречные<small>dark-timeline.html</small></b><span>Открыть →</span></div>
+      </a>
+    </div>
+  </article>
+
+  <section class="how">
+    <div>
+      <h2>Пять вопросов для выбора</h2>
+      <ol>
+        <li>Какое выглядит надёжнее?</li>
+        <li>Какое понятнее новичку?</li>
+        <li>Какое приятнее?</li>
+        <li>Какое серьёзнее для банка?</li>
+        <li>Какое удобнее для работы?</li>
+      </ol>
+    </div>
+    <div>
+      <h2>Что общее во всех направлениях</h2>
+      <ul>
+        <li>Нейтральное название, красный акцент, без логотипа и имени банка</li>
+        <li>Постоянная плашка «Демо-прототип. Все данные синтетические»</li>
+        <li>«Откуда?» у данных из внешних источников, подсказки к терминам при наведении и Tab</li>
+        <li>Только десктоп, ширина 1280–1440 px; без сборки и внешних файлов</li>
+      </ul>
+    </div>
+  </section>
+  <p class="foot">Ответ в формате «направление N» или «N, но акцент из M». Правила процесса — docs/plan/60-frontend/07-mockups.md.</p>
+</div>
+</body>
+</html>
