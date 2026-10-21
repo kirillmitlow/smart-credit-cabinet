@@ -127,7 +127,7 @@
 
 | ID | Документ | На какой вопрос отвечает | Тип | Выбор | Кто | Пр. | Статус |
 |---|---|---|---|---|---|---|---|
-| 60-01 | [app-structure](../60-frontend/01-app-structure.md) | Одно приложение с двумя зонами, роутинг, состояние, API-клиент | П | 👁 | A/B | M | REVIEW; Q-085/086 приняты D-084 |
+| 60-01 | [app-structure](../60-frontend/01-app-structure.md) | Одно приложение с двумя зонами, роутинг, состояние, API-клиент | П | 👁 | A/B | M | REVIEW; Q-085/086 приняты D-085 |
 | 60-02 | [design-system-options](../60-frontend/02-design-system-options.md) | Готовая библиотека компонентов: варианты и выбор | В | ✋ | A/B | M | DRAFT |
 | 60-03 | [client-screens](../60-frontend/03-client-screens.md) | Все экраны клиента и их состояния (загрузка, пусто, ошибка) | П | 👁 | A/B | M | DRAFT |
 | 60-04 | [backoffice-screens](../60-frontend/04-backoffice-screens.md) | Экраны банка | П | 👁 | A/B | M | DRAFT |
