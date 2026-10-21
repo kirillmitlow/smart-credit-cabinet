@@ -33,7 +33,9 @@ def build_app() -> FastAPI:
     app = create_app(make_settings())
     router = APIRouter()
 
-    @router.get("/api/v1/stub/companies/{inn}", response_model=CompanyOut, response_model_by_alias=True)
+    @router.get(
+        "/api/v1/stub/companies/{inn}", response_model=CompanyOut, response_model_by_alias=True
+    )
     async def company(
         request: Request,
         inn: Annotated[str, Depends(valid_inn)],
