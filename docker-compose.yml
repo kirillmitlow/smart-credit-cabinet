@@ -46,14 +46,16 @@ services:
 
   redis:
     # Очередь, шина событий и сессии; AOF включён ради сессий (50-01, Q-062)
-    image: redis:7.4-bookworm
+    # Valkey — свободный (BSD) форк Redis с теми же командами: Redis 7.4+ вышел под несвободными
+    # лицензиями, а кейс запрещает закрытые лицензии (RQ-51, заметка в 50-02)
+    image: valkey/valkey:8.1-bookworm
     restart: unless-stopped
     mem_limit: 96m
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["valkey-server", "--appendonly", "yes"]
     volumes:
       - redisdata:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 10

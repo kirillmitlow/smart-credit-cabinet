@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DONE |
+| Статус | IN_PROGRESS (сделан .env.example; scripts/check_env.py ждёт Settings из api, T-200) |
 | Владелец | Агент A/B (любой сменщик) |
 | Ветка | `chore/env-example` |
 | Оценка | ~3 ч |
