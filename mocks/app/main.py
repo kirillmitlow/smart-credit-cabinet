@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 
-from app import health
+from app import chaos, health
 from app.common.clock import Clock
 from app.common.db import Database
 from app.common.idempotency import purge_forever
@@ -55,7 +55,12 @@ def create_app(settings: Settings) -> FastAPI:
     app.state.clock = Clock(settings.app_today)
     app.state.database = Database(settings.database_url, role) if settings.database_url else None
 
+    app.state.chaos = chaos.ChaosState(app.state.clock)
+
     install_problem_handlers(app)
+    # Последний добавленный — внешний: request-id и лог → chaos → маршрут (порядок 8.2)
+    app.add_middleware(chaos.ChaosMiddleware)
     app.add_middleware(RequestContextMiddleware, latency_ms=settings.latency_range_ms)
     app.include_router(health.router)
+    app.include_router(chaos.router)
     return app
