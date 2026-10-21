@@ -1,8 +1,8 @@
 # Основной стенд (T-502, 50-14). Запуск: `docker compose up` (локально порты добавляет docker-compose.override.yml).
 # Все значения ${VAR:-по умолчанию} совпадают с .env.example; для локального запуска .env не нужен.
 #
-# Состав V1: postgres, redis, db-init, пять моков. Сервисов api, worker, beat, web и nlu пока нет:
-# их добавят задачи api и фронта, порядок запуска из 50-14 (…→ mock-scenarios → api → worker/beat/web) уже заложен.
+# Состав: postgres, redis, db-init, пять моков, api, worker, beat, web. Сервиса nlu (профиль ai) пока нет.
+# Порядок запуска из 50-14: … → mock-scenarios → api → worker/beat/web.
 name: smart-credit-cabinet
 
 x-mock: &mock
@@ -185,7 +185,22 @@ services:
     depends_on:
       api: { condition: service_healthy }
 
-  # Дальше появятся: web (ждёт api) и nlu (профиль ai).
+  web:
+    # nginx: статика интерфейса и прокси /api в api, один адрес для браузера (T-401, 50-01). Внутри слушает 8080.
+    image: ghcr.io/kirillmitlow/smart-credit-cabinet-web:${IMAGE_TAG:-dev}
+    build: ./web
+    restart: unless-stopped
+    mem_limit: 64m
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    depends_on:
+      api: { condition: service_healthy }
+
+  # Дальше появится: nlu (профиль ai).
 
 # `docker compose down` тома не трогает; полный сброс стенда: `docker compose down -v`
 volumes:
