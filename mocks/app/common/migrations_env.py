@@ -13,12 +13,20 @@ from app.common.db import version_table
 from app.settings import Role
 
 
+def _include(
+    obj: object, name: str | None, type_: str, reflected: bool, compare_to: object
+) -> bool:
+    """Автогенерация не трогает таблицы вне моделей роли (общая idempotency_keys, версии)."""
+    return not (type_ == "table" and reflected and compare_to is None)
+
+
 def _configure_and_run(connection: Connection, metadata: MetaData | None, role: Role) -> None:
     context.configure(
         connection=connection,
         target_metadata=metadata,
         version_table=version_table(role),
         compare_type=True,
+        include_object=_include,
     )
     with context.begin_transaction():
         context.run_migrations()
