@@ -90,9 +90,11 @@ def expand_bki(
             if loans or block.closed_loans:
                 raise ValueError("historyYears: 0 несовместим с кредитами")
             continue
-        # Ограничение возраста компании относится и к бизнес-кредитам ИП.
+        # У организации нет истории до регистрации. У ИП это личная история человека.
         earliest = (
-            date.fromisoformat(identity["registrationDate"]) if inn == identity["inn"] else None
+            date.fromisoformat(identity["registrationDate"])
+            if inn == identity["inn"] and identity["form"] in {"LLC", "JSC"}
+            else None
         )
         obligations, our_loans = [], []
         for index, loan in enumerate(loans):

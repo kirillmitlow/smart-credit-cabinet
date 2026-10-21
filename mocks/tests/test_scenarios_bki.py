@@ -360,3 +360,49 @@ def test_explicit_bullet_closed_loan() -> None:
     assert loan["monthlyPaymentRub"] == 52500
     assert loan["balanceRub"] == 0
     assert loan["secured"] is True
+
+
+def test_ip_keeps_personal_credit_history_predating_business() -> None:
+    result = run(
+        company={"form": "IP", "ageMonths": 42},
+        bki={
+            "company": {"historyYears": 8},
+            "owner": {
+                "closedLoans": [
+                    {
+                        "kind": "CONSUMER_LOAN",
+                        "amountRub": 300000,
+                        "openedAt": "-8y",
+                        "closedAt": "-6y",
+                    }
+                ]
+            },
+        },
+    )
+    assert len(result["bki"]) == 1
+    body = result["bki"][0]["body"]
+    assert body["subject"]["type"] == "PERSON"
+    assert len(body["obligations"]) == 1
+    assert body["obligations"][0]["openedAt"] == "2018-10-20"
+    assert body["obligations"][0]["closedAt"] == "2020-10-20"
+
+
+@pytest.mark.parametrize("form", ["LLC", "JSC"])
+def test_legal_entity_cannot_have_credit_predating_registration(form: str) -> None:
+    with pytest.raises(ValueError, match="раньше|до.*регистрации"):
+        run(
+            company={"form": form, "ageMonths": 42},
+            bki={
+                "company": {
+                    "historyYears": 8,
+                    "closedLoans": [
+                        {
+                            "kind": "LOAN",
+                            "amountRub": 300000,
+                            "openedAt": "-8y",
+                            "closedAt": "-6y",
+                        }
+                    ],
+                }
+            },
+        )
