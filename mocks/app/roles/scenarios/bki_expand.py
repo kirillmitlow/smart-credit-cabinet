@@ -3,7 +3,7 @@
 Вход — уже объединённый с пресетом ScenarioSpec и identity из T-120.
 Выход bki[]: {inn, body} для админ-PUT БКИ, bankLoans[]: {inn, body:{loans:[]}}
 для дополнения bank-core данными T-125. NOT_FOUND представлен отсутствием субъекта.
-Просрочки, запросы, банкротства и реструктуризации добавляются T-124/T-125.
+Просрочки, запросы, отказы и реструктуризации — T-124. Банкротства добавляет T-125.
 """
 
 from __future__ import annotations
@@ -13,18 +13,9 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from app.common.reldate import add_months
+from app.roles.scenarios.bki_events import apply_events, overdue_start
 from app.roles.scenarios.bki_loans import DEFAULTS, CreditDefaults, active_loan, closed_loan
 from app.roles.scenarios.schemas import ActiveLoan, BkiSubjectSpec, ClosedLoan, ScenarioSpec
-
-_ADVANCED = (
-    "current_overdue_days",
-    "current_overdue_rub",
-    "past_max_overdue_days",
-    "restructurings24m",
-    "inquiries30d",
-    "rejected_applications90d",
-    "sold_to_collectors",
-)
 
 
 def merge_subjects(spec: ScenarioSpec, identity: dict[str, Any]) -> dict[str, BkiSubjectSpec]:
@@ -76,10 +67,6 @@ def expand_bki(
     subjects = merge_subjects(spec, identity)
     bki, bank_loans = [], []
     for inn, block in subjects.items():
-        if any(getattr(block, name) for name in _ADVANCED):
-            raise ValueError(
-                "Просрочки, запросы, отказы и реструктуризации требуют расширения T-124"
-            )
         loans = list(block.active_loans or [])
         if block.monthly_payments_rub is not None:
             if loans:
@@ -87,7 +74,21 @@ def expand_bki(
             if block.monthly_payments_rub:
                 loans = [ActiveLoan(kind="LOAN", monthly_payment_rub=block.monthly_payments_rub)]
         if block.history_years == 0:
-            if loans or block.closed_loans:
+            if (
+                loans
+                or block.closed_loans
+                or any(
+                    (
+                        block.current_overdue_days,
+                        block.current_overdue_rub,
+                        block.past_max_overdue_days,
+                        block.restructurings24m,
+                        block.sold_to_collectors,
+                        block.inquiries30d,
+                        block.rejected_applications90d,
+                    )
+                )
+            ):
                 raise ValueError("historyYears: 0 несовместим с кредитами")
             continue
         # У организации нет истории до регистрации. У ИП это личная история человека.
@@ -96,13 +97,16 @@ def expand_bki(
             if inn == identity["inn"] and identity["form"] in {"LLC", "JSC"}
             else None
         )
+        since = overdue_start(block, today)
         obligations, our_loans = [], []
         for index, loan in enumerate(loans):
             if loan.our_bank and (inn != identity["inn"] or identity["form"] == "SELF_EMPLOYED"):
                 raise ValueError("ourBank доступен только для компании или ИП, не для физлица")
             if loan.our_bank and not (spec.bank and spec.bank.is_customer):
                 raise ValueError("Для ourBank нужен bank.isCustomer: true")
-            obligation, bank_loan = active_loan(loan, code, inn, index, today, earliest, defaults)
+            obligation, bank_loan = active_loan(
+                loan, code, inn, index, today, earliest, defaults, since if index == 0 else None
+            )
             obligations.append(obligation)
             if bank_loan:
                 our_loans.append(bank_loan)
@@ -134,14 +138,17 @@ def expand_bki(
                     obligations.append(
                         closed_loan(generated, code, inn, "history", today, earliest, defaults)
                     )
+        inquiries, applications = apply_events(
+            block, obligations, code, inn, today, earliest, defaults
+        )
         bki.append(
             {
                 "inn": inn,
                 "body": {
                     "subject": _subject(identity, inn),
                     "obligations": obligations,
-                    "inquiries": [],
-                    "applications": [],
+                    "inquiries": inquiries,
+                    "applications": applications,
                     "bankruptcies": [],
                 },
             }
