@@ -53,6 +53,10 @@ source = ["app"]
 omit = ["app/**/__init__.py", "alembic/*"]
 
 [tool.coverage.report]
+# Общий порог 70% (D-087); порог ядра 90/85 — отдельной проверкой, когда появится decisioning (T-300)
+fail_under = 70
+show_missing = true
+skip_covered = true
 exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "\\.\\.\\."]
 
 [tool.mypy]
