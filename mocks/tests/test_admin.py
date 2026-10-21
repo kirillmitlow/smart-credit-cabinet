@@ -159,7 +159,10 @@ async def app(admin_url: str) -> AsyncIterator[FastAPI]:
         await conn.run_sync(meta.create_all)
     await engine.dispose()
     app = create_app(make_settings(database_url=admin_url))
+    # Заглушка проверяет общий слой: её маршруты ставим впереди настоящего админ-API роли
+    before = len(app.router.routes)
     app.include_router(make_admin_router(StubHandler()))
+    app.router.routes[:] = app.router.routes[before:] + app.router.routes[:before]
     yield app
     await app.state.database.dispose()
 
