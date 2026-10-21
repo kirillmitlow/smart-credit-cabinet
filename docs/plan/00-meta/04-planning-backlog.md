@@ -107,21 +107,21 @@
 
 | ID | Документ | На какой вопрос отвечает | Тип | Выбор | Кто | Пр. | Статус |
 |---|---|---|---|---|---|---|---|
-| 50-01 | overview | Контейнеры, связи, потоки данных. Источник архитектурной схемы для сдачи | П | 👁 | A/B | M | — |
-| 50-02 | tech-stack | Языки, фреймворки, версии, lock-файлы | П | 👁 | A/B | M | — |
-| 50-03 | repo-and-conventions | Структура монорепо, нейминг, стиль кода, `AGENTS.md` | П | 👁 | A/B | M | — |
-| 50-04 | modules-and-boundaries | Модули `api` и правила зависимостей между ними | П | 👁 | A/B | M | — |
-| 50-05 | async-processing | Фоновые задачи на Celery + Redis (D-056): очереди, outbox, повторы, плановые задачи | П | 👁 | A/B | M | — |
-| 50-06 | data-model | Модель данных `api` (ER). Источник для артефакта сдачи | П | ✋ | A/B | M | — |
-| 50-07 | api-design | Соглашения API, ошибки, идемпотентность, OpenAPI-first, генерация TS-клиента | П | 👁 | A/B | M | — |
-| 50-08 | integration-adapters | Адаптеры к мокам: таймауты, повторы, circuit breaker, кэш, снимки (основа — раздел 9 спецификации моков) | П | 👁 | A/B | M | — |
-| 50-09 | security | Вход, роли, ПДн, секреты, согласия, OWASP, проверка зависимостей | П | 👁 | A/B | M | — |
-| 50-10 | audit-and-observability | Аудит-лог, логи, метрики, трассировка, дашборды | П | 👁 | A/B | S | — |
-| 50-11 | realtime | Живые статусы: SSE и доставка событий между процессами | П | 👁 | A/B | M | — |
-| 50-12 | files-and-documents | Где храним загрузки и сгенерированные договоры, генерация PDF | В | 👁 | A/B | S | — |
-| 50-13 | config-and-profiles | Переменные окружения, `.env.example`, профили compose (основной / ИИ / наблюдаемость) | П | 👁 | A/B | M | — |
-| 50-14 | deployment | Запуск на ПК жюри (бюджет памяти), облачный стенд (Q-008) | П | ✋ | A/B | S | — |
-| 50-15 | reliability-and-scaling | Отказы, деградация, масштабирование: история для критерия «enterprise» | П | 👁 | A/B | S | — |
+| 50-01 | [overview](../50-architecture/01-overview.md) | Контейнеры, связи, потоки данных. Источник архитектурной схемы для сдачи | П | 👁 | A/B | M | REVIEW |
+| 50-02 | [tech-stack](../50-architecture/02-tech-stack.md) | Языки, фреймворки, версии, lock-файлы | П | 👁 | A/B | M | REVIEW |
+| 50-03 | [repo-and-conventions](../50-architecture/03-repo-and-conventions.md) | Структура монорепо, нейминг, стиль кода, `AGENTS.md` | П | 👁 | A/B | M | REVIEW |
+| 50-04 | [modules-and-boundaries](../50-architecture/04-modules-and-boundaries.md) | Модули `api` и правила зависимостей между ними | П | 👁 | A/B | M | REVIEW |
+| 50-05 | [async-processing](../50-architecture/05-async-processing.md) | Фоновые задачи на Celery + Redis (D-056): очереди, outbox, повторы, плановые задачи | П | 👁 | A/B | M | REVIEW |
+| 50-06 | [data-model](../50-architecture/06-data-model.md) | Модель данных `api` (ER). Источник для артефакта сдачи | П | ✋ | A/B | M | REVIEW |
+| 50-07 | [api-design](../50-architecture/07-api-design.md) | Соглашения API, ошибки, идемпотентность, OpenAPI-first, генерация TS-клиента | П | 👁 | A/B | M | REVIEW |
+| 50-08 | [integration-adapters](../50-architecture/08-integration-adapters.md) | Адаптеры к мокам: таймауты, повторы, circuit breaker, кэш, снимки (основа — раздел 9 спецификации моков) | П | 👁 | A/B | M | REVIEW |
+| 50-09 | [security](../50-architecture/09-security.md) | Вход, роли, ПДн, секреты, согласия, OWASP, проверка зависимостей | П | 👁 | A/B | M | REVIEW |
+| 50-10 | [audit-and-observability](../50-architecture/10-audit-and-observability.md) | Аудит-лог, логи, метрики, трассировка, дашборды | П | 👁 | A/B | S | REVIEW |
+| 50-11 | [realtime](../50-architecture/11-realtime.md) | Живые статусы: SSE и доставка событий между процессами | П | 👁 | A/B | M | REVIEW |
+| 50-12 | [files-and-documents](../50-architecture/12-files-and-documents.md) | Где храним загрузки и сгенерированные договоры, генерация PDF | В | 👁 | A/B | S | REVIEW |
+| 50-13 | [config-and-profiles](../50-architecture/13-config-and-profiles.md) | Переменные окружения, `.env.example`, профили compose (основной / ИИ / наблюдаемость) | П | 👁 | A/B | M | REVIEW |
+| 50-14 | [deployment](../50-architecture/14-deployment.md) | Запуск на ПК жюри (бюджет памяти), облачный стенд (Q-008) | П | ✋ | A/B | S | REVIEW |
+| 50-15 | [reliability-and-scaling](../50-architecture/15-reliability-and-scaling.md) | Отказы, деградация, масштабирование: история для критерия «enterprise» | П | 👁 | A/B | S | REVIEW |
 
 ## Фаза 5. Фронт и UX — `60-frontend/`
 
