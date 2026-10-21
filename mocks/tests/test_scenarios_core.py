@@ -14,6 +14,7 @@ from fastapi import FastAPI
 from app.main import create_app
 from app.roles.scenarios.schemas import ScenarioSpec
 from tests.conftest import ADMIN_KEY, API_KEY, database_url, make_settings
+from tests.scenarios_gateway import stub_gateway
 
 pytestmark = pytest.mark.integration
 
@@ -166,6 +167,7 @@ def scenarios_url(postgres_url: str) -> str:
 @pytest.fixture
 async def app(scenarios_url: str) -> AsyncIterator[FastAPI]:
     app = create_app(make_settings(mock_role="scenarios", database_url=scenarios_url))
+    stub_gateway(app)
     await app.state.database.migrate()
     yield app
     await app.state.database.dispose()
@@ -199,7 +201,7 @@ async def test_create_is_idempotent_with_key(client: httpx.AsyncClient) -> None:
     assert first.status_code == again.status_code == 201
     assert first.json()["code"] == again.json()["code"]
     assert first.json()["code"].startswith("custom-")
-    assert first.json()["status"] == "PENDING"
+    assert first.json()["status"] == "APPLIED"
     listed = (await client.get("/api/v1/scenarios", params={"origin": "CUSTOM"})).json()
     assert [s["code"] for s in listed].count(first.json()["code"]) == 1
 

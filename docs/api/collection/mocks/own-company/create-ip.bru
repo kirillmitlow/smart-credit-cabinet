@@ -1,0 +1,25 @@
+meta {
+  name: Создать ИП и применить во всех моках
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{scenariosUrl}}/api/v1/scenarios
+  body: json
+  auth: none
+}
+
+headers {
+  X-Admin-Key: {{mockAdminKey}}
+  Content-Type: application/json
+  Idempotency-Key: jury-custom-create
+}
+
+body:json {
+  {
+    "code": "jury-custom",
+    "title": "ИП жюри",
+    "preset": "IP_HEALTHY"
+  }
+}

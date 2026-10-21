@@ -8,6 +8,7 @@ import pytest
 
 from app.main import create_app
 from tests.conftest import ADMIN_KEY, database_url, make_settings
+from tests.scenarios_gateway import stub_gateway
 
 pytestmark = pytest.mark.integration
 
@@ -27,6 +28,7 @@ async def client(scenarios_url: str) -> AsyncIterator[httpx.AsyncClient]:
             bank_bik="040000111",
         )
     )
+    stub_gateway(app)
     await app.state.database.migrate()
     try:
         async with httpx.AsyncClient(

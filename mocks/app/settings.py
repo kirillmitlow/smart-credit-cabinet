@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     # Пусто — реальная дата; иначе ISO-дата «сегодня» для всего стенда (2.5)
     app_today: date | None = None
     bank_bik: str = Field(default="040000999", pattern=r"^\d{9}$")
+    registry_url: str = "http://mock-registry:8000"
+    tax_url: str = "http://mock-tax:8000"
+    bki_url: str = "http://mock-credit-bureau:8000"
+    bank_core_url: str = "http://mock-bank-core:8000"
+    scenario_request_timeout_seconds: float = Field(default=5, gt=0, le=60)
 
     @field_validator("app_today", "database_url", mode="before")
     @classmethod

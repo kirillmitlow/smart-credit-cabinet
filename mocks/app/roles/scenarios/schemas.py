@@ -326,6 +326,15 @@ class ScenarioListItem(CamelModel):
     modified: bool
 
 
+class ApplicationLog(CamelModel):
+    id: int
+    system: Literal["REGISTRY", "TAX", "BKI", "BANK_CORE"]
+    action: Literal["PUT", "DELETE"]
+    http_status: int | None
+    error: str | None
+    at: datetime
+
+
 class ScenarioView(CamelModel):
     """GET /scenarios/{code} и ответ POST: параметры, ожидания, развёрнутые данные, учётки."""
 
@@ -349,6 +358,7 @@ class ScenarioView(CamelModel):
     expanded: dict[str, Any] | None = None
     last_error: str | None = None
     applied_at: datetime | None = None
+    applications: list[ApplicationLog] = Field(default_factory=list)
 
 
 class PresetView(CamelModel):

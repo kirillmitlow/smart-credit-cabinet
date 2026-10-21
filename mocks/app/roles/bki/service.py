@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.clock import MSK, Clock
 from app.common.db import Origin
+from app.common.idempotency import forget_replies
 from app.common.inn import IdentifierError, validate_inn
 from app.common.problems import ProblemException
 from app.roles.bki import calc, models
@@ -545,6 +546,15 @@ async def purge_subject_records(session: AsyncSession, inns: list[str]) -> None:
     """Удалить всё по ИНН: субъекта и его записи, запросы, отчёты и сведения банка (включая RUNTIME)."""
     if not inns:
         return
+    reports = set(
+        await session.scalars(sa.select(models.Report.id).where(models.Report.inn.in_(inns)))
+    )
+    submissions = set(
+        await session.scalars(
+            sa.select(models.Submission.id).where(models.Submission.inn.in_(inns))
+        )
+    )
+    await forget_replies(session, {"reportId": reports, "submissionId": submissions})
     subject_ids = sa.select(models.Subject.id).where(models.Subject.inn.in_(inns))
     for model in (models.Obligation, models.ApplicationInfo, models.Bankruptcy):
         await session.execute(sa.delete(model).where(model.subject_id.in_(subject_ids)))

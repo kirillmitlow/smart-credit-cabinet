@@ -1,0 +1,15 @@
+meta {
+  name: Вернуть одну компанию в исходное состояние
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{scenariosUrl}}/api/v1/scenarios/jury-custom/apply
+  body: none
+  auth: none
+}
+
+headers {
+  X-Admin-Key: {{mockAdminKey}}
+}

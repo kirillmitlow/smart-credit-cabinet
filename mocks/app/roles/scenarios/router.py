@@ -11,7 +11,10 @@ from app.common.auth import require_admin
 from app.common.db import Session
 from app.common.idempotency import OptionalIdempotencyDep
 from app.common.schemas import problem_responses
+from app.roles.scenarios import apply as transfer
 from app.roles.scenarios import service
+from app.roles.scenarios.gateway import Gateway
+from app.roles.scenarios.locking import locked_session
 from app.roles.scenarios.presets import PRESETS
 from app.roles.scenarios.schemas import (
     PresetView,
@@ -23,6 +26,7 @@ from app.roles.scenarios.schemas import (
 
 router = APIRouter(prefix="/api/v1", tags=["сценарии"], dependencies=[Depends(require_admin)])
 ERRORS = problem_responses(401, 403, 404, 409, 422)
+MUTATION_ERRORS = problem_responses(401, 403, 404, 409, 422, 502)
 
 
 @router.get("/presets", operation_id="listPresets", summary="Пресеты и их параметры по умолчанию")
@@ -45,20 +49,25 @@ async def preview(request: Request, spec: ScenarioSpec, session: Session) -> dic
 @router.post(
     "/scenarios",
     operation_id="createScenario",
-    summary="Создать сценарий (и применить, когда готова раскладка по мокам)",
+    summary="Создать сценарий и применить во всех нужных моках",
     status_code=201,
     response_model=ScenarioView,
-    responses=ERRORS,
+    responses=MUTATION_ERRORS,
 )
 async def create(
-    request: Request, spec: ScenarioSpec, session: Session, idem: OptionalIdempotencyDep
+    request: Request, spec: ScenarioSpec, gateway: Gateway, idem: OptionalIdempotencyDep
 ) -> Response:
     async def handler() -> Response:
-        row = await service.create(
-            session, spec, request.app.state.clock, bank_bik=request.app.state.settings.bank_bik
-        )
-        await session.commit()
-        body = service.view(row).model_dump(mode="json", by_alias=True)
+        # Сначала claim ключа идемпотентности, затем очередь изменений сценариев:
+        # конкурент того же ключа получает 409 IN_PROGRESS без ожидания HTTP к мокам.
+        async with locked_session(request.app.state.database) as session:
+            row = await service.create(
+                session, spec, request.app.state.clock, bank_bik=request.app.state.settings.bank_bik
+            )
+            await transfer.apply(session, row, gateway, request.app.state.clock)
+            body = (await service.view_with_log(session, row)).model_dump(
+                mode="json", by_alias=True
+            )
         return JSONResponse(body, status_code=201)
 
     return await idem.run(handler)
@@ -85,31 +94,54 @@ async def list_scenarios(
     responses=ERRORS,
 )
 async def get_scenario(code: str, session: Session) -> ScenarioView:
-    return service.view(await service.get(session, code))
+    return await service.view_with_log(session, await service.get(session, code))
 
 
 @router.patch(
     "/scenarios/{code}",
     operation_id="patchScenario",
-    summary="Поменять параметры (JSON Merge Patch, массивы заменяются целиком)",
+    summary="Поменять параметры и переприменить (JSON Merge Patch)",
     response_model=ScenarioView,
-    responses=ERRORS,
+    responses=MUTATION_ERRORS,
 )
 async def patch_scenario(
     request: Request,
     code: str,
     changes: Annotated[dict[str, Any], Body(media_type="application/merge-patch+json")],
-    session: Session,
+    gateway: Gateway,
 ) -> ScenarioView:
-    row = await service.patch(
-        session,
-        code,
-        changes,
-        request.app.state.clock,
-        bank_bik=request.app.state.settings.bank_bik,
-    )
-    await session.commit()
-    return service.view(row)
+    async with locked_session(request.app.state.database) as session:
+        row = await service.patch(
+            session,
+            code,
+            changes,
+            request.app.state.clock,
+            bank_bik=request.app.state.settings.bank_bik,
+        )
+        await transfer.apply(session, row, gateway, request.app.state.clock)
+        return await service.view_with_log(session, row)
+
+
+@router.post(
+    "/scenarios/{code}/apply",
+    operation_id="applyScenario",
+    summary="Вернуть одну компанию в исходное состояние, включая RUNTIME",
+    response_model=ScenarioView,
+    responses=MUTATION_ERRORS,
+)
+async def apply_scenario(
+    request: Request, code: str, gateway: Gateway, idem: OptionalIdempotencyDep
+) -> Response:
+    async def handler() -> Response:
+        async with locked_session(request.app.state.database) as session:
+            row = await service.get(session, code)
+            await transfer.apply(session, row, gateway, request.app.state.clock)
+            body = (await service.view_with_log(session, row)).model_dump(
+                mode="json", by_alias=True
+            )
+        return JSONResponse(body)
+
+    return await idem.run(handler)
 
 
 @router.delete(
@@ -117,9 +149,10 @@ async def patch_scenario(
     operation_id="deleteScenario",
     summary="Удалить пользовательский сценарий",
     status_code=204,
-    responses=ERRORS,
+    responses=MUTATION_ERRORS,
 )
-async def delete_scenario(code: str, session: Session) -> Response:
-    await service.delete(session, code)
-    await session.commit()
+async def delete_scenario(request: Request, code: str, gateway: Gateway) -> Response:
+    async with locked_session(request.app.state.database) as session:
+        row = await service.get(session, code)
+        await transfer.delete(session, row, gateway, request.app.state.clock)
     return Response(status_code=204)
