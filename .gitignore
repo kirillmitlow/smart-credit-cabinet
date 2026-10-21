@@ -1,7 +1,29 @@
+# Секреты и локальные настройки
 .env
-node_modules/
+.env.*
+!.env.example
+.claude/launch.json
+
+# Python
 __pycache__/
 *.pyc
 .venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.hypothesis/
+
+# Node
+node_modules/
+web/dist/
+web/coverage/
+web/playwright-report/
+web/test-results/
+
+# Редакторы и ОС
 .idea/
 .vscode/
+.DS_Store

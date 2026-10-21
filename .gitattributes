@@ -1,0 +1,9 @@
+# LF везде: Windows-участники не должны получить CRLF в скриптах и Docker-файлах (T-500, T-536)
+* text=auto eol=lf
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.pdf binary
+*.png binary
+*.jpg binary
