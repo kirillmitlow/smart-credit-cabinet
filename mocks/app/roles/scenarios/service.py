@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.common.admin import merge_patch
 from app.common.clock import Clock
 from app.common.problems import ProblemException
+from app.roles.scenarios.expand import expand
 from app.roles.scenarios.models import Scenario
 from app.roles.scenarios.schemas import (
     AppliedSummary,
@@ -26,6 +27,32 @@ from app.roles.scenarios.schemas import (
 def spec_dump(spec: ScenarioSpec) -> dict[str, Any]:
     """Параметры так, как их прислали: camelCase, без незаданных полей."""
     return spec.model_dump(mode="json", by_alias=True, exclude_none=True, exclude_defaults=True)
+
+
+async def preview(session: AsyncSession, spec: ScenarioSpec, clock: Clock) -> dict[str, Any]:
+    """Чтение занятых ИНН, без резервирования: preview не меняет ни одной таблицы.
+
+    При переприменении исключаем собственный снимок. Гонку записей защищает уникальный
+    индекс Scenario.inn в apply (T-127), предпросмотр ничего не обещает зарезервировать.
+    """
+    query = select(Scenario.inn, Scenario.expanded, Scenario.spec)
+    if spec.code is not None:
+        query = query.where(Scenario.code != spec.code)
+    reserved: set[str] = set()
+    for inn, expanded, stored_spec in (await session.execute(query)).all():
+        if inn:
+            reserved.add(inn)
+        if expanded:
+            for person in expanded.get("identity", {}).get("persons", []):
+                reserved.add(person["inn"])
+        stored_people = stored_spec.get("people") or {}
+        for person in [stored_people.get("director")] + (stored_people.get("founders") or []):
+            if person and person.get("inn"):
+                reserved.add(person["inn"])
+    try:
+        return expand(spec, clock.today(), reserved)
+    except ValueError as exc:
+        raise ProblemException(422, "VALIDATION_ERROR", str(exc)) from exc
 
 
 def not_found(code: str) -> ProblemException:

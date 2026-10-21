@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 from collections.abc import AsyncIterator
+from datetime import date
 from typing import Any
 
 import httpx
@@ -251,3 +252,101 @@ async def test_everything_requires_admin_key(app: FastAPI) -> None:
     async with httpx.AsyncClient(transport=transport, base_url="http://mock") as c:
         assert (await c.get("/api/v1/presets")).status_code == 401
         assert (await c.get("/api/v1/scenarios", headers={"X-Api-Key": API_KEY})).status_code == 403
+
+
+async def test_preview_is_repeatable_and_writes_nothing(
+    app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    from app.common.clock import Clock
+
+    app.state.clock = Clock(app_today=date(2026, 10, 25))
+    before = (await client.get("/api/v1/scenarios")).json()
+    body = {**JURY_EXAMPLE, "code": "preview-only"}
+    first = await client.post("/api/v1/scenarios/preview", json=body)
+    again = await client.post("/api/v1/scenarios/preview", json=body)
+    assert first.status_code == again.status_code == 200
+    assert first.content == again.content
+    assert first.json()["identity"]["registrationDate"] == "2024-10-25"
+    assert first.json()["registry"]["entity"]["inn"] == first.json()["identity"]["inn"]
+    assert (await client.get("/api/v1/scenarios")).json() == before
+    assert (await client.get("/api/v1/scenarios/preview-only")).status_code == 404
+
+
+async def test_preview_observes_occupied_inns_and_excludes_own_scenario(
+    client: httpx.AsyncClient,
+) -> None:
+    preview_body = {**JURY_EXAMPLE, "code": "preview-owner"}
+    generated = (await client.post("/api/v1/scenarios/preview", json=preview_body)).json()[
+        "identity"
+    ]
+    body = {
+        **preview_body,
+        "company": {**JURY_EXAMPLE["company"], "inn": generated["inn"]},
+        "people": {"director": {"inn": generated["director"]["inn"]}},
+    }
+    assert (await client.post("/api/v1/scenarios", json=body)).status_code == 201
+    assert (await client.post("/api/v1/scenarios/preview", json=body)).status_code == 200
+    conflict = await client.post(
+        "/api/v1/scenarios/preview", json={**body, "code": "preview-other"}
+    )
+    assert conflict.status_code == 422
+    assert conflict.json()["code"] == "VALIDATION_ERROR"
+    person_conflict = await client.post(
+        "/api/v1/scenarios/preview",
+        json={
+            "code": "preview-person",
+            "title": "Другой сценарий",
+            "preset": "LLC_HEALTHY",
+            "people": body["people"],
+        },
+    )
+    assert person_conflict.status_code == 422
+    assert "человека" in person_conflict.json()["detail"]
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"title": "Без формы и пресета"},
+        {"title": "Без формы", "company": {"name": "Маяк"}},
+        {"title": "ОГРН без даты", "preset": "LLC_HEALTHY", "company": {"ogrn": "1170000004569"}},
+        {
+            "title": "Другая дата",
+            "preset": "LLC_HEALTHY",
+            "company": {"ogrn": "1170000004569", "registrationDate": "2018-01-01"},
+        },
+        {
+            "title": "Директор ИП из пресета",
+            "preset": "IP_HEALTHY",
+            "people": {"director": {"ref": "boss"}},
+        },
+    ],
+)
+async def test_preview_invalid_input_is_problem_json(
+    client: httpx.AsyncClient, body: dict[str, Any]
+) -> None:
+    response = await client.post("/api/v1/scenarios/preview", json=body)
+    assert response.status_code == 422
+    assert response.headers["content-type"].startswith("application/problem+json")
+    assert response.json()["code"] == "VALIDATION_ERROR"
+
+
+async def test_preview_without_code_still_repeatable_and_requires_admin(
+    app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    first = await client.post("/api/v1/scenarios/preview", json=JURY_EXAMPLE)
+    second = await client.post("/api/v1/scenarios/preview", json=JURY_EXAMPLE)
+    assert first.status_code == 200
+    assert first.content == second.content
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://mock"
+    ) as anonymous:
+        assert (
+            await anonymous.post("/api/v1/scenarios/preview", json=JURY_EXAMPLE)
+        ).status_code == 401
+
+
+async def test_create_requires_explicit_form_or_preset(client: httpx.AsyncClient) -> None:
+    response = await client.post("/api/v1/scenarios", json={"title": "Не угадывать форму"})
+    assert response.status_code == 422
+    assert "company.form" in response.json()["errors"][0]["msg"]

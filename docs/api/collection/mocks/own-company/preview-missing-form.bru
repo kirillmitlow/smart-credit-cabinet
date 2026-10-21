@@ -1,0 +1,22 @@
+meta {
+  name: Ошибка 422 — не указана форма или пресет
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scenariosUrl}}/api/v1/scenarios/preview
+  body: json
+  auth: none
+}
+
+headers {
+  X-Admin-Key: {{mockAdminKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Форма не выбрана"
+  }
+}

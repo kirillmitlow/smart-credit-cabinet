@@ -10,7 +10,6 @@ from fastapi.responses import JSONResponse
 from app.common.auth import require_admin
 from app.common.db import Session
 from app.common.idempotency import OptionalIdempotencyDep
-from app.common.problems import ProblemException
 from app.common.schemas import problem_responses
 from app.roles.scenarios import service
 from app.roles.scenarios.presets import PRESETS
@@ -35,10 +34,10 @@ async def list_presets() -> list[PresetView]:
     "/scenarios/preview",
     operation_id="previewScenario",
     summary="Развернуть сценарий без сохранения",
-    responses=problem_responses(401, 403, 422, 501),
+    responses=problem_responses(401, 403, 422),
 )
-async def preview(spec: ScenarioSpec) -> dict[str, Any]:
-    raise ProblemException(501, "PREVIEW_NOT_READY", "Разворачивание сценария появится в T-120")
+async def preview(request: Request, spec: ScenarioSpec, session: Session) -> dict[str, Any]:
+    return await service.preview(session, spec, request.app.state.clock)
 
 
 @router.post(
