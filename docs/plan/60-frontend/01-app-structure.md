@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | REVIEW |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [50-02](../50-architecture/02-tech-stack.md), [50-07](../50-architecture/07-api-design.md), [50-09](../50-architecture/09-security.md), [50-11](../50-architecture/11-realtime.md), [20-02](../20-process/02-application-states.md) |
 | Решения | Реализует D-010, D-020, D-062 (вход ИНН + код), D-063, D-080, D-085 (две сессии, название и оформление, Mantine), D-086 (демо-панель), D-096 (экран поручителя) |
