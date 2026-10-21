@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | REVIEW — в ветке `feat/web-skeleton`; полное наполнение словаря — T-437 |
+| Статус | REVIEW — PR #35 (`feat/web-skeleton`); полное наполнение словаря — T-437 |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/web-texts-dictionary-infra` |
 | Оценка | ~4 ч |

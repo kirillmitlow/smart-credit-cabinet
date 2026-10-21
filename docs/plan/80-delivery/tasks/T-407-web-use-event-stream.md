@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | REVIEW — реализовано в ветке `feat/web-skeleton` (PR к main) |
+| Статус | REVIEW — реализовано в ветке `feat/web-skeleton` (PR #35) |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/web-use-event-stream` |
 | Оценка | ~5 ч |
