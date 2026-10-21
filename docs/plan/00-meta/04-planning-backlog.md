@@ -37,7 +37,7 @@
 |---|---|---|---|---|---|---|---|
 | 10-00 | [organizer-clarifications](../10-product/00-organizer-clarifications.md) | Что организаторы уточнили в чате хакатона | Р | — | A/B | M | DRAFT |
 | 10-01 | [requirements-matrix](../10-product/01-requirements-matrix.md) | Каждое требование, критерий, ограничение и артефакт сдачи из кейса → где закрыто и каким тестом проверено | Р | 👁 | A/B | M | REVIEW |
-| 10-02 | [personas](../10-product/02-personas.md) | 9 персон + 5 технических: запрос, ожидаемый исход, что показывает (из спецификации моков, раздел 10.5) | Р | 👁 | A/B | M | REVIEW |
+| 10-02 | [personas](../10-product/02-personas.md) | 9 персон + 9 технических: запрос, ожидаемый исход, что показывает (из спецификации моков, раздел 10.5) | Р | 👁 | A/B | M | REVIEW |
 | 10-03 | [users-and-roles](../10-product/03-users-and-roles.md) | Роли клиента (директор, бухгалтер с доверенностью) и банка. Матрица прав. Способ входа | П | ✋ | A/B | M | DRAFT |
 | 10-04 | [research-jtbd](../10-product/04-research-jtbd.md) | Боли → JTBD → фичи. План CustDev и юзабилити-теста, разбор конкурентов | П | 👁 | A/B | S | DRAFT |
 | 10-05 | [mvp-scope](../10-product/05-mvp-scope.md) | MoSCoW: что входит, что вырезали и почему | П | ✋ | A/B | M | APPROVED |
@@ -97,7 +97,7 @@
 | ~~40-04~~ | ~~news-ranking-options~~ | Лента не делается (D-019) | — | — | — | — | ❌ |
 | 40-05 | texts-generation-options | Объяснения клиенту и записка андеррайтеру: шаблоны или LLM | В | ✋ | A/B | S | ⏸ Q-007 |
 | 40-06 | [model-packaging-and-licenses](../40-ai/06-model-packaging-and-licenses.md) | Как модели попадают в образ, CPU-инференс, размеры, лицензии для THIRD_PARTY_NOTICES | П | 👁 | A/B | S | DRAFT |
-| 40-07 | ai-evaluation | Тестовые наборы, метрики, таблица результатов | П | 👁 | A/B | S | Делается через T-001 (Codex) |
+| 40-07 | [ai-evaluation](../40-ai/07-ai-evaluation.md) | Тестовые наборы, метрики, таблица результатов | П | 👁 | A/B | S | REVIEW; T-001 завершён, PR №3; human validation ещё нет |
 
 ## Моки внешних систем — `docs/specs/mocks.md`
 
@@ -127,7 +127,7 @@
 
 | ID | Документ | На какой вопрос отвечает | Тип | Выбор | Кто | Пр. | Статус |
 |---|---|---|---|---|---|---|---|
-| 60-01 | [app-structure](../60-frontend/01-app-structure.md) | Одно приложение с двумя зонами или два, роутинг, состояние, API-клиент | В | ✋ | A/B | M | DRAFT |
+| 60-01 | [app-structure](../60-frontend/01-app-structure.md) | Одно приложение с двумя зонами, роутинг, состояние, API-клиент | П | 👁 | A/B | M | REVIEW; Q-085/086 приняты D-084 |
 | 60-02 | [design-system-options](../60-frontend/02-design-system-options.md) | Готовая библиотека компонентов: варианты и выбор | В | ✋ | A/B | M | DRAFT |
 | 60-03 | [client-screens](../60-frontend/03-client-screens.md) | Все экраны клиента и их состояния (загрузка, пусто, ошибка) | П | 👁 | A/B | M | DRAFT |
 | 60-04 | [backoffice-screens](../60-frontend/04-backoffice-screens.md) | Экраны банка | П | 👁 | A/B | M | DRAFT |

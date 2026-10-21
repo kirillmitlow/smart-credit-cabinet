@@ -6,7 +6,7 @@
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [50-04](04-modules-and-boundaries.md), [50-05](05-async-processing.md), [20-02](../20-process/02-application-states.md), [моки, 9.4](../../specs/mocks.md), D-030, D-036, D-054, D-055 |
 | Решения | Предлагает Q-057, Q-058. Источник артефакта сдачи «модель данных» |
-| Обновлено | 21.10.2026 |
+| Обновлено | 21.10.2026, ред. 2: агент B, сведение R-002 |
 
 ## Зачем
 
@@ -60,7 +60,7 @@ erDiagram
 
 | Таблица | Модуль | Назначение | Ключевые поля |
 |---|---|---|---|
-| `users` | auth | Учётные записи клиентов и сотрудников банка. Для персон создаются из блока `users` сценария ([Q-023](../00-meta/06-open-questions.md)) | `id`, `display_name`, `role` (`CLIENT`, `UNDERWRITER`, `ADMIN`), `status`, `login_ref` (форма зависит от Q-035), `scenario_code` |
+| `users` | auth | Учётные записи клиентов и сотрудников банка. Для персон создаются из блока `users` сценария ([Q-023](../00-meta/06-open-questions.md)) | `id`, `display_name`, `role` (`CLIENT`, `UNDERWRITER`, `ADMIN`), `status`, `person_inn` (личный ИНН; D-062), `login_ref` (внутренний идентификатор), `scenario_code` |
 | `companies` | companies | Компания или ИП клиента, кэш карточки автозаполнения | `id`, `inn` (уникален), `kind` (`LEGAL`, `IP`), `name`, `okved`, `registered_on`, `is_bank_customer`, `profile` (JSONB: карточка с источником и датой каждого поля), `profile_fetched_at` |
 | `company_members` | companies | Кто и с какой ролью работает от компании (D-014, D-015) | `company_id`, `user_id`, `role` (`DIRECTOR`, `ACCOUNTANT`), `can_sign`, `poa_number`, `poa_valid_until`, `status` |
 
@@ -71,9 +71,9 @@ erDiagram
 | `applications` | applications | Заявка и её текущий статус (14 статусов, [20-02](../20-process/02-application-states.md)) | `id`, `number`, `company_id`, `created_by`, `product_code`, `status`, `amount_rub`, `term_months`, `purpose_code`, `draft` (JSONB: ответы мастера и анкета, автосохранение), `flags`, `current_version_id`, `version`, `submitted_at`, `closed_at` |
 | `application_versions` | applications | Неизменяемая копия того, **что именно оценивали**: создаётся при отправке и при каждой повторной отправке (ответ клиента, залог) | `id`, `application_id`, `number`, `reason` (`SUBMIT`, `INFO_PROVIDED`, `COLLATERAL_ADDED`), `data` (JSONB), `data_hash` |
 | `application_events` | applications | Журнал заявки = **аудит + таймлайн клиента**. Каждый переход и шаг конвейера | `id` (последовательный: задаёт порядок и `Last-Event-ID`), `application_id`, `kind` (`TRANSITION`, `STEP`, `TASK`, `OVERRIDE`, `NOTE`), `from_status`, `to_status`, `step_code`, `actor_type` (`CLIENT`, `SYSTEM`, `UNDERWRITER`), `actor_id`, `reason_code`, `payload`, `request_id` |
-| `consents` | applications | Согласия на БКИ, обороты и персональные данные ([моки, 9.4](../../specs/mocks.md)) | `application_id`, `subject_inn`, `subject_type`, `kind` (`BKI`, `TURNOVER`, `PERSONAL_DATA`), `purpose`, `text_version`, `text_hash`, `signed_at`, `valid_until`, `signer_user_id`, `sign_method`, `revoked_at` |
-| `tasks` | applications | Запрос клиенту при `NEEDS_INFO` | `application_id`, `kind` (`DOCUMENT`, `EXPLANATION`, `COLLATERAL`, `CONFIRM_REVENUE`), `title`, `why_text`, `status` (`OPEN`, `ANSWERED`, `EXPIRED`, `CANCELLED`), `expires_at`, `answer` (JSONB), `answered_by`, `answered_at` |
-| `collaterals` | applications | Залог и поручительство (`quick-start`, `stankoprom`) | `application_id`, `kind` (`COLLATERAL`, `GUARANTEE`), `description`, `estimated_value_rub`, `person_inn`, `status` |
+| `consents` | applications | Согласия на БКИ, обороты и персональные данные ([моки, 9.4](../../specs/mocks.md)) | `application_id`, `bundle_id`, `subject_inn`, `subject_type`, `kind` (`BKI`, `TURNOVER`, `PERSONAL_DATA`), `purpose`, `text_version`, `text_hash`, `signed_at`, `valid_until`, `signer_user_id`, `sign_method`, `proof` (HMAC-доказательство), `revoked_at` |
+| `tasks` | applications | Запрос информации или подписи участнику заявки | `application_id`, `kind` (`DOCUMENT`, `EXPLANATION`, `COLLATERAL`, `CONFIRM_REVENUE`, `SIGNATURE`, `GUARANTOR`), `assignee_user_id`, `assignee_person_inn`, `round`, `title`, `why_text`, `status` (`OPEN`, `ANSWERED`, `EXPIRED`, `CANCELLED`), `expires_at`, `answer` (JSONB), `answered_by`, `answered_at` |
+| `collaterals` | applications | Залог и поручительство (`quick-start`, `stankoprom`) | `application_id`, `kind` (`COLLATERAL`, `GUARANTEE`), `description`, `estimated_value_rub`, `person_inn` (связь заявки с конкретным поручителем), `status` |
 
 ### Решение
 
@@ -92,8 +92,8 @@ erDiagram
 |---|---|---|---|
 | `offers` | offers | Предложение банка по решению | `application_id`, `decision_id`, `kind` (`AS_REQUESTED`, `COUNTER`), `status` (`OPEN`, `ACCEPTED`, `DECLINED`, `EXPIRED`), `expires_at`, `accepted_variant_id`, `accepted_by`, `accepted_at` |
 | `offer_variants` | offers | Карточки-варианты (до 3, D-072) | `offer_id`, `label`, `product_code`, `amount_rub`, `term_months`, `rate_percent`, `payment_rub`, `collateral_required`, `recommended`, `what_changed` (JSONB) |
-| `contracts` | offers | Договор по принятому варианту | `application_id`, `variant_id`, `number`, `document_id`, `content_hash`, `status` (`READY`, `SIGNED`, `CANCELLED`) |
-| `signatures` | offers | Имитация простой электронной подписи (без SMS) | `contract_id`, `signer_user_id`, `signer_role`, `method`, `consent_text_version`, `signed_at` |
+| `contracts` | offers | Договор по принятому варианту | `application_id`, `variant_id`, `contract_uid` (стабильный идентификатор), `number`, `document_id`, `content_hash`, `status` (`READY`, `SIGNED`, `CANCELLED`) |
+| `signatures` | offers | Имитация простой электронной подписи (без SMS) | `contract_id`, `signer_user_id`, `signer_person_inn`, `signer_role`, `proof` (HMAC-доказательство), `method`, `consent_text_version`, `signed_at` |
 | `disbursements` | disbursement | Выдача в АБС | `application_id` (уникален), `contract_id`, `amount_rub`, `account_number`, `status` (`PENDING`, `SENT`, `CONFIRMED`, `FAILED`), `idempotency_key`, `bank_core_ref`, `confirmed_at` |
 | `loans` | loans | «Мои кредиты» | `company_id`, `application_id`, `disbursement_id`, `bank_core_loan_id`, `product_code`, `principal_rub`, `rate_percent`, `term_months`, `opened_on`, `status`, `outstanding_rub` |
 | `payment_schedule` | loans | График платежей | `loan_id`, `seq`, `due_date`, `principal_rub`, `interest_rub`, `total_rub`, `status` |
@@ -154,4 +154,4 @@ erDiagram
 - `idempotency_keys` и `integration_calls` чистятся по сроку (сутки и неделя); журналы и снимки — нет.
 - `reset_demo_data` в каждом модуле чистит свои таблицы; журналы, которые защищены триггером, чистятся `TRUNCATE` от имени владельца схемы (только `DEMO_MODE`).
 - Хранение файлов в БД или на диске — 50-12; здесь только метаданные.
-- **Согласовать с 50-10 и 50-11:** там журнал называется единой таблицей `audit_events`, а здесь это `application_events` (по заявке) и `audit_log` (вне заявки). Смысл один: неизменяемый журнал, номер события = `Last-Event-ID`. Если единая таблица принимается, `application_events` и `audit_log` становятся её видами (поле `scope`); остальное в модели не меняется.
+- Сверено с 50-10/11: application_events — события заявки и источник SSE, audit_log — действия вне заявки; отдельной audit_events нет. Старая заметка про переименование снята.
