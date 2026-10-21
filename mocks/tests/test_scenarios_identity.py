@@ -49,6 +49,7 @@ def checked(
     ],
 )
 def test_presets_produce_valid_repeatable_registry(preset: str) -> None:
+    """TS-109: реквизиты синтетические, контрольные суммы верны."""
     spec = scenario(preset=preset)
     first = checked(spec)
     assert json.dumps(first, ensure_ascii=False) == json.dumps(checked(spec), ensure_ascii=False)
@@ -57,8 +58,11 @@ def test_presets_produce_valid_repeatable_registry(preset: str) -> None:
     assert identity["inn"].startswith("00")
     if identity["ogrn"]:
         assert ogrn_is_valid(identity["ogrn"])
+        assert identity["ogrn"][3:5] == "00"
         assert int(identity["ogrn"][1:3]) == int(identity["registrationDate"][:4]) % 100
     for person in identity["persons"]:
+        assert inn_is_valid(person["inn"])
+        assert person["inn"].startswith("00")
         birth = date.fromisoformat(person["birthDate"])
         assert (
             25
