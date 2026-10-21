@@ -1,0 +1,80 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Умный кредитный кабинет — API",
+    "description": "Прототип цифрового кредитного конвейера для малого бизнеса. Данные синтетические.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Процесс жив",
+        "operationId": "healthLive",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthlive"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Готов принимать запросы",
+        "operationId": "healthReady",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "Postgres, Redis или схема БД не готовы"
+          }
+        }
+      }
+    },
+    "/health/deps": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Внешние системы и воркер",
+        "operationId": "healthDeps",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Healthdeps"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
