@@ -117,3 +117,4 @@ def configure_logging(service: str, level: str = "INFO") -> None:
     root.handlers[:] = [handler]
     root.setLevel(level)
     logging.getLogger("uvicorn.access").disabled = True  # свой access-лог с маскированием
+    logging.getLogger("alembic").setLevel(logging.WARNING)  # /health/ready сверяет ревизию часто
