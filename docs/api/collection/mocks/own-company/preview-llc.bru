@@ -1,0 +1,31 @@
+meta {
+  name: Предпросмотр ООО без сохранения
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scenariosUrl}}/api/v1/scenarios/preview
+  body: json
+  auth: none
+}
+
+headers {
+  X-Admin-Key: {{mockAdminKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "code": "jury-preview",
+    "title": "ООО: два учредителя",
+    "preset": "LLC_HEALTHY",
+    "company": {"name": "Маяк", "ageMonths": 24},
+    "people": {
+      "founders": [
+        {"ref": "first", "sharePercent": 40},
+        {"ref": "second", "sharePercent": 60}
+      ]
+    }
+  }
+}

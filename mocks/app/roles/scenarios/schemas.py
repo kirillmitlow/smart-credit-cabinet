@@ -231,6 +231,24 @@ class UserSpec(Strict):
 class ScenarioSpec(Strict):
     """Тело POST /api/v1/scenarios и формат встроенных сценариев (10.2, 10.5)."""
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            "anyOf": [
+                {"required": ["preset"], "properties": {"preset": {"type": "string"}}},
+                {
+                    "required": ["company"],
+                    "properties": {
+                        "company": {
+                            "type": "object",
+                            "required": ["form"],
+                            "properties": {"form": {"type": "string"}},
+                        }
+                    },
+                },
+            ]
+        }
+    )
+
     code: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9-]{1,63}$")
     title: str = Field(min_length=1, max_length=300)
     preset: Preset | None = None
@@ -258,11 +276,15 @@ class ScenarioSpec(Strict):
     @model_validator(mode="after")
     def _consistent(self) -> Self:
         form = self.company.form if self.company else None
+        if form is None and self.preset is None:
+            raise ValueError("Укажите company.form или preset явно")
         founders = self.people.founders if self.people else None
         if form == "JSC" and founders:
             raise ValueError("У АО учредители-люди не указываются: ЕГРЮЛ не показывает акционеров")
         if form in ("IP", "SELF_EMPLOYED") and founders:
             raise ValueError("У ИП и самозанятого нет учредителей")
+        if form in ("IP", "SELF_EMPLOYED") and self.people and self.people.director:
+            raise ValueError("У ИП и самозанятого нет директора")
         if form == "SELF_EMPLOYED" and self.bank and self.bank.is_customer:
             raise ValueError(
                 "Самозанятый в сценарии не может быть клиентом банка (нет расчётного счёта)"
