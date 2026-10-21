@@ -1,7 +1,7 @@
 """shared outbox and idempotency keys
 
 Revision ID: 0001_shared
-Revises: 
+Revises:
 """
 
 from collections.abc import Sequence
