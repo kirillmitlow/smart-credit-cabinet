@@ -85,6 +85,7 @@ class Database:
                 await conn.run_sync(self._upgrade)
                 await conn.commit()
             finally:
+                await conn.rollback()  # после ошибки транзакция прервана, иначе unlock не пройдёт
                 unlock = text("SELECT pg_advisory_unlock(:k)")
                 await conn.execute(unlock, {"k": _lock_key(self.role)})
                 await conn.commit()

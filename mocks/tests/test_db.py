@@ -3,33 +3,29 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator
 
 import httpx
 import pytest
 from asgi_lifespan import LifespanManager
 from sqlalchemy import text
-from testcontainers.community.postgres import PostgresContainer
 
 from app.common.db import Database, head_revision, version_table
 from app.main import create_app
 from app.settings import Role
-from tests.conftest import make_settings
+from tests.conftest import database_url, make_settings
 
 pytestmark = pytest.mark.integration
 
-POSTGRES_IMAGE = "postgres:17-bookworm"
-
 
 @pytest.fixture(scope="module")
-def postgres_url() -> Iterator[str]:
-    with PostgresContainer(POSTGRES_IMAGE, driver="asyncpg") as pg:
-        yield pg.get_connection_url()
+def role_urls(postgres_url: str) -> dict[Role, str]:
+    return {role: database_url(postgres_url, f"mock_{role.value}") for role in Role}
 
 
-async def test_migrations_bring_each_role_to_head(postgres_url: str) -> None:
+async def test_migrations_bring_each_role_to_head(role_urls: dict[Role, str]) -> None:
     for role in Role:
-        database = Database(postgres_url, role)
+        database = Database(role_urls[role], role)
         assert not await database.is_ready()
         await database.migrate()
         await database.migrate()  # повторный старт ничего не ломает
@@ -40,8 +36,9 @@ async def test_migrations_bring_each_role_to_head(postgres_url: str) -> None:
         await database.dispose()
 
 
-async def test_parallel_starts_are_serialized_by_lock(postgres_url: str) -> None:
-    first, second = Database(postgres_url, Role.TAX), Database(postgres_url, Role.TAX)
+async def test_parallel_starts_are_serialized_by_lock(role_urls: dict[Role, str]) -> None:
+    url = role_urls[Role.TAX]
+    first, second = Database(url, Role.TAX), Database(url, Role.TAX)
     await asyncio.gather(first.migrate(), second.migrate())
     assert await first.is_ready()
     assert await second.is_ready()
@@ -50,8 +47,8 @@ async def test_parallel_starts_are_serialized_by_lock(postgres_url: str) -> None
 
 
 @pytest.fixture
-async def ready_client(postgres_url: str) -> AsyncIterator[httpx.AsyncClient]:
-    app = create_app(make_settings(mock_role="bki", database_url=postgres_url))
+async def ready_client(role_urls: dict[Role, str]) -> AsyncIterator[httpx.AsyncClient]:
+    app = create_app(make_settings(mock_role="bki", database_url=role_urls[Role.BKI]))
     async with LifespanManager(app):
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://mock") as client:

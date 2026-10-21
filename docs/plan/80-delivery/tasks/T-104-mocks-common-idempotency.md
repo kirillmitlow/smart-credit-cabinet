@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE |
 | Владелец | Агент A/B; 🧠 кандидат для GPT-6 Astra |
 | Ветка | `feat/mocks-common-idempotency` |
 | Оценка | ~5 ч |

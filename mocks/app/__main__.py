@@ -9,6 +9,7 @@ import sys
 
 import uvicorn
 
+from app.chaos import ServerSendShim
 from app.common.middleware import configure_logging
 from app.main import create_app
 from app.settings import ConfigError, load_settings
@@ -22,7 +23,7 @@ def main() -> int:
         return 2
     configure_logging(settings.service_name)
     uvicorn.run(
-        create_app(settings),
+        ServerSendShim(create_app(settings)),
         host="0.0.0.0",  # noqa: S104 — слушаем внутри контейнера, наружу порт публикует compose
         port=8000,
         workers=1,

@@ -8,9 +8,10 @@ from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 
-from app import health
+from app import chaos, health
 from app.common.clock import Clock
 from app.common.db import Database
+from app.common.idempotency import purge_forever
 from app.common.middleware import RequestContextMiddleware
 from app.common.problems import install_problem_handlers
 from app.settings import ROLE_TITLE, Settings
@@ -21,8 +22,13 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     database: Database | None = app.state.database
     migrations: asyncio.Task[None] | None = None
     if database is not None:
-        # Не блокируем старт: /health/live отвечает сразу, ready — после миграций
-        migrations = asyncio.create_task(database.migrate_until_done())
+
+        async def maintain(db: Database) -> None:
+            # Не блокируем старт: /health/live отвечает сразу, ready — после миграций
+            await db.migrate_until_done()
+            await purge_forever(db, app.state.clock)
+
+        migrations = asyncio.create_task(maintain(database))
     try:
         yield
     finally:
@@ -49,7 +55,12 @@ def create_app(settings: Settings) -> FastAPI:
     app.state.clock = Clock(settings.app_today)
     app.state.database = Database(settings.database_url, role) if settings.database_url else None
 
+    app.state.chaos = chaos.ChaosState(app.state.clock)
+
     install_problem_handlers(app)
+    # Последний добавленный — внешний: request-id и лог → chaos → маршрут (порядок 8.2)
+    app.add_middleware(chaos.ChaosMiddleware)
     app.add_middleware(RequestContextMiddleware, latency_ms=settings.latency_range_ms)
     app.include_router(health.router)
+    app.include_router(chaos.router)
     return app
