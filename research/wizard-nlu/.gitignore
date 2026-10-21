@@ -1,0 +1,12 @@
+.venv/
+.cache/
+models/
+checkpoints/
+__pycache__/
+*.pyc
+*.partial
+results/logs/
+results/predictions/
+results/frozen/
+log-*.txt
+results/log-*.txt

@@ -1,0 +1,14 @@
+{
+  "examples.jsonl": {
+    "count": 42,
+    "sha256": "07289e8705212885ce0065ef223eeb84c2849d6697247e5267019c8a29c136b6"
+  },
+  "dev.jsonl": {
+    "count": 60,
+    "sha256": "7e9fdfbd6083fee28b0ac9bf19f5f8ec9e840489de1a348e2294d00792ce28f9"
+  },
+  "test.jsonl": {
+    "count": 90,
+    "sha256": "12ef1c4aff02948b2ce0ae8aa4bdeb15d34cd37a46f312ae03ccf122037b28f8"
+  }
+}

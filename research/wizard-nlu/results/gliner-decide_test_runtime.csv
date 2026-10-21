@@ -1,0 +1,2 @@
+candidate,split,device,dtype,threads,torch_version,transformers_version,python,platform,arch,physical_ram_bytes,logical_cpus,load_seconds,warmup_seconds,training_seconds,rss_before_bytes,rss_loaded_bytes,peak_rss_bytes,disk_bytes,latency_p50_s,latency_p95_s,model_revision
+gliner-decide,test,cpu,float32,4,2.8.0,5.3.0,3.13.7,macOS-26.6.2-arm64-arm-64bit-Mach-O,arm64,25769803776,10,4.4149465829978,"[1.129614749996108, 1.285062791997916, 1.1587547910021385]",0,356352000,2463989760,4582768640,1165520066,1.2419820619979873,1.321117176747066,e173bca1f0c4217d7a55b3b0c705d5ece8a0218d

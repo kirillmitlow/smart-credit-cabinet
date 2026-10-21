@@ -1,0 +1,74 @@
+{
+  "candidate": {
+    "id": "qwen3.5-0.8b",
+    "repo": "Qwen/Qwen3.5-0.8B",
+    "kind": "llm35"
+  },
+  "slots": {
+    "purpose": {
+      "temperature": 8.680776004552609,
+      "threshold": 0.2351774570534844,
+      "dev_accepted": 5,
+      "dev_selective_accuracy": 1.0
+    },
+    "frequency": {
+      "temperature": 0.21384126252489463,
+      "threshold": 0.8574014771251701,
+      "dev_accepted": 12,
+      "dev_selective_accuracy": 1.0
+    },
+    "payback_horizon": {
+      "temperature": 0.7098134313865205,
+      "threshold": 1.01,
+      "dev_accepted": 0,
+      "dev_selective_accuracy": null
+    },
+    "urgency": {
+      "temperature": 20.0,
+      "threshold": 0.28712192555436167,
+      "dev_accepted": 6,
+      "dev_selective_accuracy": 1.0
+    },
+    "gov_contract": {
+      "temperature": 2.0148073202402537,
+      "threshold": 1.01,
+      "dev_accepted": 0,
+      "dev_selective_accuracy": null
+    },
+    "collateral": {
+      "temperature": 0.6737359904386832,
+      "threshold": 0.5805137570535612,
+      "dev_accepted": 6,
+      "dev_selective_accuracy": 1.0
+    }
+  },
+  "knn_k": null,
+  "dataset_manifest": {
+    "examples.jsonl": {
+      "count": 42,
+      "sha256": "07289e8705212885ce0065ef223eeb84c2849d6697247e5267019c8a29c136b6"
+    },
+    "dev.jsonl": {
+      "count": 60,
+      "sha256": "7e9fdfbd6083fee28b0ac9bf19f5f8ec9e840489de1a348e2294d00792ce28f9"
+    },
+    "test.jsonl": {
+      "count": 90,
+      "sha256": "12ef1c4aff02948b2ce0ae8aa4bdeb15d34cd37a46f312ae03ccf122037b28f8"
+    }
+  },
+  "code_hashes": {
+    "scripts/common.py": "e813cc06ff361e72b1880410e40da1d16bbe243af980cb1f0975564007193a1e",
+    "scripts/models.py": "6fba69400eddad995ee71ca4a7bc2fc93588675fd4df667549414f440dfd230e",
+    "scripts/benchmark.py": "280b560c06378383e9dfa3046a042ba6b9d24aab79b41ec382421b6ec6099b93",
+    "scripts/metrics.py": "083f3e79ed127d5fd3d5cf2ce37d188351ad0f8db6244e9a2a96d4e144f96124",
+    "scripts/amount_parser.py": "1eb13c594012a24e41a27c368730e20e120fa81edce7c57d87467bff8ed92cd7",
+    "schema.json": "6889920bf89d7aae5130f1ea7a0c674cc448693dfad109b31f3fe14a1f59753a",
+    "candidates.json": "bb27184d3b47743c9abeced499510fcba32a0ad6fe7ca5fd3139aaa9bf6065c8",
+    "pyproject.toml": "cccda23616e99cc07ca8e32a47c2fd439ab319785adef5e452b34d05f56b098f",
+    "uv.lock": "10d91760fae26019f5ec5aebcb99bb314dee177760fd54a553671ee44620fcd5",
+    "modern/pyproject.toml": "5e2883b09e7031c6353ac16a9defb21de36905e4416a6b3d4a9adbb155bc10dd",
+    "modern/uv.lock": "242240567e4be244a6508a1d42eaaefa6550731060aecedb621a13db720bb1c6"
+  },
+  "created_utc": "2026-10-20T20:30:02Z"
+}

@@ -1,0 +1,10 @@
+{
+  "timing": "post_inference_annotation_review",
+  "id": "external-synthetic-012",
+  "slot": "purpose",
+  "sealed_gold": "OTHER",
+  "alternative_gold": "GOODS",
+  "reason": "В тексте прямо сказано «на закупку»; GOODS — допустимое прочтение. Исходная метка OTHER и заранее зафиксированная маска не изменены.",
+  "human_reviewed": false,
+  "usage": "Только анализ чувствительности разметки, не подбор порогов и не новый запуск модели."
+}

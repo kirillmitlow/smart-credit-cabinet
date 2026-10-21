@@ -1,0 +1,3 @@
+model,device,dtype,threads,python,torch,transformers,p50_s,p95_s
+user2-base,cpu,float32,4,3.13.7,2.8.0,4.57.1,0.01971360400057165,0.021257302402955248
+laya,cpu,float32,4,3.13.7,2.8.0,4.57.1,0.476910791498085,0.5123396336512088
