@@ -1,0 +1,142 @@
+[project]
+name = "scc-api"
+version = "0.1.0"
+description = "Бэкенд «Умного кредитного кабинета»: FastAPI + Celery, модульный монолит (docs/plan/50-architecture)"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "alembic>=1.20.0",
+    "celery[redis]>=5.6.3",
+    "fastapi>=0.157.0",
+    "psycopg[binary]>=3.3.6",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.1",
+    "redis>=6.4.0",
+    "sqlalchemy>=2.1.5",
+    "structlog>=26.1.0",
+    "uvicorn>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "hypothesis>=6.170.5",
+    "import-linter>=2.15",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "testcontainers[postgres,redis]>=4.15.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+  "unit: быстрые изолированные тесты",
+  "property: тесты свойств (Hypothesis)",
+  "integration: настоящие Postgres/Redis через Testcontainers",
+  "contract: адаптеры против живых моков",
+  "persona: персоны по API на стенде",
+  "synthetic: массовые прогоны на синтетике",
+  "chaos: сбои и восстановление",
+  "slow: долгие тесты",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+omit = ["app/**/__init__.py", "alembic/*"]
+
+[tool.coverage.report]
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "\\.\\.\\."]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
+no_implicit_optional = true
+exclude = ["^alembic/versions/"]
+
+# Строгий режим — для ядра и модулей, где ошибка стоит денег или статуса (Q-051, вариант Б)
+[[tool.mypy.overrides]]
+module = [
+  "app.modules.decisioning.*",
+  "app.modules.simulator.*",
+  "app.modules.pipeline.*",
+  "app.modules.applications.*",
+  "app.shared.*",
+]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["celery.*", "kombu.*", "testcontainers.*"]
+ignore_missing_imports = true
+
+# Границы модулей (50-04): зависимости только вниз, чужой модуль — только через его __init__
+[tool.importlinter]
+root_package = "app"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "R1: уровни — зависимости только вниз"
+type = "layers"
+containers = ["app.modules"]
+layers = [
+  "backoffice | demo",
+  "pipeline | disbursement",
+  "offers",
+  "applications | loans",
+  "companies | catalog",
+  "auth | integrations | documents | notifications | audit",
+  "simulator",
+  "decisioning",
+]
+
+# «Только публичный интерфейс чужого модуля» проверяет tests/unit/test_architecture.py:
+# import-linter не умеет выразить «чужой», а свой repo модулю импортировать можно.
+
+[[tool.importlinter.contracts]]
+name = "R2: ядро decisioning чистое"
+type = "forbidden"
+source_modules = ["app.modules.decisioning"]
+forbidden_modules = [
+  "app.shared",
+  "app.main",
+  "app.worker",
+  "sqlalchemy",
+  "httpx",
+  "celery",
+  "redis",
+  "fastapi",
+  "psycopg",
+  "random",
+]
+
+[[tool.importlinter.contracts]]
+name = "R3: simulator зависит только от ядра"
+type = "forbidden"
+source_modules = ["app.modules.simulator"]
+forbidden_modules = [
+  "app.shared", "app.main", "app.worker", "sqlalchemy", "httpx", "celery", "redis", "fastapi",
+]
+
+[[tool.importlinter.contracts]]
+name = "R4: integrations не знает про заявки и решения"
+type = "forbidden"
+source_modules = ["app.modules.integrations"]
+forbidden_modules = [
+  "app.modules.applications", "app.modules.pipeline", "app.modules.decisioning", "app.modules.offers",
+]
+
+[[tool.importlinter.contracts]]
+name = "shared ни от кого не зависит"
+type = "forbidden"
+source_modules = ["app.shared"]
+forbidden_modules = ["app.modules", "app.main", "app.worker"]
