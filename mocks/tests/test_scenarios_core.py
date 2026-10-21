@@ -350,3 +350,49 @@ async def test_create_requires_explicit_form_or_preset(client: httpx.AsyncClient
     response = await client.post("/api/v1/scenarios", json={"title": "Не угадывать форму"})
     assert response.status_code == 422
     assert "company.form" in response.json()["errors"][0]["msg"]
+
+
+async def test_preview_finance_uses_app_bik_and_exact_persona_numbers(
+    app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    from app.common.accounts import account_is_valid
+
+    app.state.settings = app.state.settings.model_copy(update={"bank_bik": "040000111"})
+    response = await client.post(
+        "/api/v1/scenarios/preview",
+        json={
+            "code": "preview-finance-http",
+            "title": "Финансы",
+            "preset": "IP_HEALTHY",
+            "finance": {
+                "avgMonthlyRevenueRub": 905000,
+                "noisePercent": 0,
+                "netMarginPercent": 10,
+                "minMonthlySurplusRub": 110000,
+            },
+        },
+    )
+    assert response.status_code == 200
+    bank = response.json()["bankCore"]
+    assert account_is_valid("040000111", bank["accounts"][0]["number"])
+    assert {(r["incomingNetRub"], r["outgoingRub"]) for r in bank["turnover"]} == {(905000, 795000)}
+    assert response.json()["tax"]["financials"] == []
+
+
+async def test_create_keeps_nulls_that_clear_preset_bank_parameters(
+    client: httpx.AsyncClient,
+) -> None:
+    body = {
+        "code": "clear-preset-bank",
+        "title": "Без обслуживания",
+        "preset": "IP_HEALTHY",
+        "bank": {"isCustomer": False, "balanceRub": None, "customerSinceMonths": None},
+    }
+    created = await client.post("/api/v1/scenarios", json=body)
+    assert created.status_code == 201
+    saved = created.json()["spec"]
+    assert saved["bank"] == body["bank"]
+    preview = await client.post("/api/v1/scenarios/preview", json=saved)
+    assert preview.status_code == 200
+    assert preview.json()["bankCore"]["customer"] is None
+    assert preview.json()["bankCore"]["turnover"] == []

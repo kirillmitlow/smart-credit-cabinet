@@ -37,7 +37,9 @@ async def list_presets() -> list[PresetView]:
     responses=problem_responses(401, 403, 422),
 )
 async def preview(request: Request, spec: ScenarioSpec, session: Session) -> dict[str, Any]:
-    return await service.preview(session, spec, request.app.state.clock)
+    return await service.preview(
+        session, spec, request.app.state.clock, request.app.state.settings.bank_bik
+    )
 
 
 @router.post(
