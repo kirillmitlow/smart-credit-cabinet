@@ -6,7 +6,7 @@
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [50-01](01-overview.md), [50-02](02-tech-stack.md), [02-doc-standard.md](../00-meta/02-doc-standard.md), [03-collaboration-protocol.md](../00-meta/03-collaboration-protocol.md), D-00A, D-00E |
 | Решения | Предлагает Q-051 |
-| Обновлено | 21.10.2026 |
+| Обновлено | 21.10.2026, ред. 2: агент B, сведение R-002 |
 
 ## Зачем
 
@@ -24,9 +24,9 @@
 | `api/app/modules/<имя>/` | Единый набор файлов: `router.py` (REST), `service.py` (сценарии использования), `domain.py` (правила и типы), `repo.py` (работа с БД), `schemas.py` (формы API), `tasks.py` (Celery, если есть) |
 | `api/tests/` | `unit/`, `property/` (hypothesis), `integration/` (с настоящей БД), `contract/` (адаптеры против живых моков), `personas/` (9 персон по API), `synthetic/` (массовые прогоны) |
 | `web/` | Фронт: `package.json`, lock-файл, `Dockerfile`, `nginx.conf`, `src/`, `e2e/` (Playwright) |
-| `web/src/` | `app/` (роутинг, провайдеры), `features/<имя>/` (экраны и логика по областям: wizard, application, offers, loans, backoffice, demo), `components/` (общие), `api/generated/` (клиент из OpenAPI, руками не правим), `lib/`, `texts/` (словарь формулировок, 60-06) |
+| `web/src/` | `app/` (роутинг, провайдеры), `features/<имя>/` (экраны и логика по областям: auth, home, catalog, wizard, application, offers, loans, backoffice, notifications, demo), `components/` (общие), `api/generated/` (клиент из OpenAPI, руками не правим), `lib/`, `texts/` (словарь формулировок, 60-06) |
 | `mocks/` | Моки строго по [спецификации](../../specs/mocks.md): свой `pyproject.toml` и `uv.lock` |
-| `nlu/` | Сервис свободного текста. Появляется, только если принят Q-044 (A) |
+| `nlu/` | Сервис свободного текста (Q-044 принят D-080; профиль `ai` включён по умолчанию, D-094) |
 | `deploy/` | `db-init/` (SQL создания баз), конфиги nginx, профиль наблюдения, заметки по облачному стенду |
 | `docs/` | `plan/` (планирование), `specs/` (моки), `api/` (выгрузка OpenAPI `api` и моков + коллекция запросов), `architecture/` (картинки схем из mermaid), `data-model/` (картинка ER) |
 | `scripts/` | Вспомогательные скрипты: выгрузка OpenAPI, выгрузка диаграмм, сборка `THIRD_PARTY_NOTICES`, проверка ссылок в документах |

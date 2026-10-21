@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Главная — Умный кредитный кабинет (строгий банк)</title>
+<style>
+/* ============ Направление 1: «Строгий банк» ============
+   Переменные в начале файла: источник токенов темы Mantine (60-07). */
+:root {
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --line: #D8DBE0;
+  --line-strong: #B9BEC7;
+  --text: #1B1F27;
+  --muted: #566070;
+
+  --accent: #C8202B;
+  --accent-dark: #A81A24;
+  --accent-soft: #FCEBED;
+
+  --ok: #1B7340;   --ok-soft: #E5F3EA;
+  --warn: #7A4E00; --warn-soft: #FFF1CF;
+  --info: #1B5C99; --info-soft: #E6F0FA;
+
+  --radius: 4px;
+  --fs: 14px;
+  --gap: 16px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-width: 1280px;
+  background: var(--bg); color: var(--text);
+  font: var(--fs)/1.45 var(--font);
+  font-variant-numeric: tabular-nums;
+}
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+
+/* --- плашка демо: постоянная --- */
+.demo-strip {
+  background: #E7E9ED; color: var(--text);
+  border-bottom: 1px solid var(--line);
+  text-align: center; font-size: 13px; padding: 5px 16px;
+}
+.demo-strip b { font-weight: 600; }
+
+/* --- шапка --- */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+.topbar-in {
+  max-width: 1360px; margin: 0 auto; padding: 0 32px;
+  display: flex; align-items: center; height: 56px; gap: 32px;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; text-decoration: none; letter-spacing: -.01em; }
+.brand-mark { width: 26px; height: 26px; }
+.nav { display: flex; gap: 4px; height: 100%; }
+.nav a {
+  display: flex; align-items: center; padding: 0 14px; text-decoration: none;
+  color: var(--muted); font-weight: 500; border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.nav a:hover { color: var(--text); }
+.nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+.live { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.bell {
+  position: relative; width: 36px; height: 36px; border: 1px solid var(--line); background: var(--surface);
+  border-radius: var(--radius); display: grid; place-items: center; cursor: pointer; color: var(--text);
+}
+.bell .count {
+  position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px;
+  background: var(--accent); color: #fff; border-radius: 9px; font-size: 12px; font-weight: 700; line-height: 18px; text-align: center;
+}
+.company { text-align: right; line-height: 1.25; }
+.company b { display: block; font-weight: 600; }
+.company span { font-size: 13px; color: var(--muted); }
+
+/* --- каркас страницы --- */
+.container { max-width: 1360px; margin: 0 auto; padding: 24px 32px 40px; }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; gap: 24px; }
+.page-head h1 { font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; }
+.page-head .sub { color: var(--muted); margin-top: 4px; }
+.crumbs { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.crumbs a { color: var(--muted); }
+.grid { display: grid; gap: var(--gap); align-items: start; }
+.grid-home { grid-template-columns: minmax(0, 1fr) 400px; }
+.grid-tl { grid-template-columns: 300px minmax(0, 1fr); }
+
+/* --- панель (Mantine Paper/Card) --- */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: var(--gap); }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+}
+.panel-head h2 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.panel-body { padding: 16px; }
+.panel-body.flush { padding: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+/* --- кнопки --- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 16px; border-radius: var(--radius); border: 1px solid transparent;
+  font: 600 14px/1 var(--font); cursor: pointer; text-decoration: none; white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-default { background: var(--surface); color: var(--text); border-color: var(--line-strong); }
+.btn-default:hover { background: #F3F4F6; }
+.btn-subtle { background: transparent; color: var(--muted); padding: 0 8px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
+.btn-block { width: 100%; }
+
+/* --- бейдж, Alert --- */
+.badge {
+  display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap;
+}
+.badge-ok { background: var(--ok-soft); color: var(--ok); }
+.badge-warn { background: var(--warn-soft); color: var(--warn); }
+.badge-info { background: var(--info-soft); color: var(--info); }
+.badge-gray { background: #E7E9ED; color: var(--text); }
+.badge-red { background: var(--accent); color: #fff; }
+.alert { display: flex; gap: 12px; padding: 12px 14px; border-radius: var(--radius); border: 1px solid; }
+.alert-info { background: var(--info-soft); border-color: #B7D3EE; }
+.alert-red { background: var(--accent-soft); border-color: #F0B9BE; }
+.alert-warn { background: var(--warn-soft); border-color: #EBD08A; }
+.alert .ico { flex: none; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; color: #fff; margin-top: 1px; }
+.alert-info .ico { background: var(--info); }
+.alert-red .ico { background: var(--accent); }
+.alert-warn .ico { background: var(--warn); }
+.alert h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+
+/* --- подсказки к терминам и «Откуда?» --- */
+.term, .src { position: relative; }
+.term { border-bottom: 1px dashed var(--muted); cursor: help; }
+.src {
+  font: 500 12.5px/1 var(--font); color: var(--info); background: none; border: 0; padding: 2px 0; cursor: help;
+  text-decoration: underline dotted; text-underline-offset: 3px; margin-left: 6px;
+}
+.term:hover::after, .term:focus::after, .src:hover::after, .src:focus::after {
+  content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 6px); z-index: 30;
+  width: 290px; padding: 9px 11px; background: #1B1F27; color: #fff; border-radius: 4px;
+  font: 400 13px/1.4 var(--font); text-align: left; white-space: normal; text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+}
+.tip-r:hover::after, .tip-r:focus::after { left: auto; right: 0; }
+
+/* --- таблицы --- */
+table.data { width: 100%; border-collapse: collapse; }
+table.data th {
+  text-align: left; font-size: 12.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .03em;
+  padding: 9px 16px; background: #F8F9FA; border-bottom: 1px solid var(--line);
+}
+table.data td { padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.data tr:last-child td { border-bottom: 0; }
+.num { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; font-weight: 500; }
+.right { text-align: right; }
+
+/* --- этапы заявки (мини) --- */
+.mini-steps { display: flex; gap: 3px; margin-bottom: 4px; }
+.mini-steps i { width: 22px; height: 6px; border-radius: 1px; background: #D8DBE0; display: block; }
+.mini-steps i.done { background: var(--ok); }
+.mini-steps i.now { background: var(--accent); }
+
+/* --- задача --- */
+.task { display: flex; align-items: center; gap: 16px; padding: 16px; border-left: 4px solid var(--accent); }
+.task h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.task .go { margin-left: auto; }
+
+/* --- форма --- */
+label.field { display: block; font-weight: 600; margin-bottom: 6px; }
+textarea.input {
+  width: 100%; min-height: 92px; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: var(--radius);
+  font: 14px/1.45 var(--font); color: var(--text); background: #fff; resize: none;
+}
+.row { display: flex; gap: 8px; align-items: center; }
+.counter { font-size: 12.5px; color: var(--muted); text-align: right; margin-top: 4px; }
+
+/* --- Stepper-таймлайн --- */
+.tl { list-style: none; margin: 0; padding: 4px 16px 12px; }
+.tl > li { position: relative; padding: 0 0 18px 38px; }
+.tl > li::before { content: ""; position: absolute; left: 11px; top: 26px; bottom: 0; width: 2px; background: var(--line); }
+.tl > li:last-child::before { display: none; }
+.tl > li.done::before { background: var(--ok); }
+.tl .dot {
+  position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 13px; font-weight: 700; background: #fff; border: 2px solid var(--line-strong); color: var(--muted);
+}
+.tl .done .dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+.tl .now .dot { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 4px var(--accent-soft); }
+.tl h3 { font-size: 14px; font-weight: 600; line-height: 24px; }
+.tl .wait h3 { color: var(--muted); font-weight: 500; }
+.tl .when { font-size: 13px; color: var(--muted); }
+.tl ul { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; }
+.tl ul li { padding: 2px 0; display: flex; align-items: center; }
+.tl ul li::before { content: "✓"; color: var(--ok); font-weight: 700; margin-right: 8px; }
+
+/* --- сравнение вариантов --- */
+.cmp { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.cmp col.lab { width: 150px; }
+.cmp th, .cmp td { padding: 10px 14px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); vertical-align: top; text-align: left; }
+.cmp th:last-child, .cmp td:last-child { border-right: 0; }
+.cmp thead th { background: #F8F9FA; vertical-align: bottom; }
+.cmp tbody th { font-size: 13px; font-weight: 600; color: var(--muted); background: #FBFBFC; }
+.cmp .ask { background: #F8F9FA; color: var(--muted); }
+.cmp .rec { background: #FFF9F9; box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent); }
+.cmp thead .rec { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent), inset 0 3px 0 var(--accent); }
+.cmp tfoot .rec { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent), inset 0 -2px 0 var(--accent); }
+.cmp .opt-title { font-size: 15px; font-weight: 700; line-height: 1.25; display: block; margin-top: 6px; }
+.cmp .big { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.cmp tr:last-child td, .cmp tr:last-child th { border-bottom: 0; }
+.cmp tfoot td { background: #fff; }
+.over { color: var(--accent-dark); font-weight: 600; }
+
+.list-plain { margin: 0; padding-left: 18px; }
+.list-plain li { margin: 2px 0; }
+.opt-row { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.opt-row:last-child { border-bottom: 0; }
+.opt-row .txt { flex: 1; }
+.opt-row b { display: block; }
+.foot { max-width: 1360px; margin: 0 auto; padding: 0 32px 32px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+dl.summary { display: grid; grid-template-columns: repeat(5, auto); gap: 0 40px; margin: 0; justify-content: start; }
+dl.summary div { padding: 2px 0; }
+dl.summary dt { font-size: 12.5px; color: var(--muted); }
+dl.summary dd { margin: 0; font-weight: 600; font-size: 15px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+</style>
+</head>
+<body>
+<div class="demo-strip" role="note"><b>Демо-прототип.</b> Все данные синтетические</div>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="bank-home.html">
+      <svg class="brand-mark" viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="5" fill="#C8202B"/><circle cx="13" cy="13" r="6" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="13" cy="13" r="1.8" fill="#fff"/></svg>
+      Умный кредитный кабинет
+    </a>
+    <nav class="nav" aria-label="Основная навигация">
+      <a href="bank-home.html" aria-current="page">Главная</a>
+      <a href="bank-timeline.html" >Заявки</a>
+      <a href="#">Кредиты</a>
+      <a href="#">Каталог и калькулятор</a>
+    </nav>
+    <div class="topbar-right">
+      
+      <button type="button" class="bell" aria-label="Уведомления: 1 новое">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
+        <span class="count">1</span>
+      </button>
+      <div class="company"><b>ООО «СнабКонтракт»</b><span>Вы вошли как руководитель</span></div>
+    </div>
+  </div>
+</header>
+<main class="container">
+  <div class="page-head">
+    <div>
+      <h1>Главная</h1>
+      <p class="sub">ООО «СнабКонтракт» · 21 октября 2026</p>
+    </div>
+    <a class="btn btn-primary" href="#need">Нужны деньги</a>
+  </div>
+
+  <div class="grid grid-home">
+    <div>
+      <section class="panel" aria-labelledby="h-tasks">
+        <div class="panel-head"><h2 id="h-tasks">Что нужно от вас <span class="badge badge-red">1</span></h2></div>
+        <div class="task">
+          <div>
+            <h3>Выберите вариант по заявке № 2026-0007</h3>
+            <p class="muted">Так, как вы просили, не получится. Мы подготовили три варианта. Ответить нужно до 31 октября.</p>
+          </div>
+          <a class="btn btn-primary go" href="bank-timeline.html">Посмотреть варианты</a>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-apps">
+        <div class="panel-head"><h2 id="h-apps">Мои заявки</h2><a class="btn btn-subtle btn-sm" href="bank-timeline.html">Все заявки</a></div>
+        <table class="data">
+          <thead><tr><th scope="col">Заявка</th><th scope="col">Что просили</th><th scope="col">Где сейчас</th><th scope="col">Статус</th><th scope="col"><span class="sr">Действие</span></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>№ 2026-0007</b><br><span class="muted small">Оборотный кредит · подана 21 октября, 12:04</span></td>
+              <td><span class="num">8 000 000 ₽</span> на 12 месяцев<br><span class="muted small">Платёж <span class="num">744 910 ₽</span> в месяц</span></td>
+              <td><div class="mini-steps" aria-label="Шаг 4 из 6"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div><span class="small">Шаг 4 из 6 · Решение готово</span></td>
+              <td><span class="badge badge-warn">Есть другие варианты</span></td>
+              <td class="right"><a class="btn btn-default btn-sm" href="bank-timeline.html">Открыть</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel" aria-labelledby="h-loans">
+        <div class="panel-head"><h2 id="h-loans">Мои кредиты</h2><a class="btn btn-subtle btn-sm" href="#">Все кредиты</a></div>
+        <div class="panel-body">
+          <p><b>2 действующих кредита.</b> Платежи по ним — около <span class="num">600 000 ₽</span> в месяц, просрочек нет.
+            <button type="button" class="src" data-tip="Источник: кредитная история (бюро) и кредиты в нашем банке. Данные на 21.10.2026.">Откуда?</button></p>
+          <p class="muted small" style="margin-top:6px">Оплата в этом прототипе не моделируется.</p>
+        </div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="panel" id="need" aria-labelledby="h-need">
+        <div class="panel-head"><h2 id="h-need">Нужны деньги?</h2></div>
+        <div class="panel-body">
+          <label class="field" for="free">Опишите своими словами</label>
+          <textarea class="input" id="free" readonly>Выиграли контракт на поставку медтоваров. Нужно закупить товар, заказчик заплатит через 2⁠–⁠3 месяца. Нужно около 8 млн.</textarea>
+          <div class="counter">121 / 500</div>
+
+          <div class="alert alert-info" style="margin-top:12px" role="status">
+            <span class="ico" aria-hidden="true">?</span>
+            <div>
+              <h3>Похоже, вы…</h3>
+              <p>…хотите закупить товар для заказа, за который заплатят позже (госзаказ), на сумму около <b class="num">8 000 000 ₽</b>. Верно?</p>
+              <div class="row" style="margin-top:10px">
+                <button type="button" class="btn btn-primary btn-sm">Да, верно</button>
+                <button type="button" class="btn btn-default btn-sm">Исправить</button>
+              </div>
+            </div>
+          </div>
+          <p class="muted small" style="margin-top:10px">Это подсказка: пока вы не подтвердите, ничего не заполнено. Подходящий кредит подберём по вашим ответам.</p>
+          <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+          <button type="button" class="btn btn-default btn-block">Ответить на вопросы кнопками</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-next">
+        <div class="panel-head"><h2 id="h-next">Что будет дальше</h2></div>
+        <ol class="panel-body list-plain" style="padding-left:34px">
+          <li>Выберите один из вариантов по заявке.</li>
+          <li>Проверьте документы и подпишите. Подписать может руководитель.</li>
+          <li>Деньги зачислим на ваш счёт.</li>
+        </ol>
+      </section>
+    </aside>
+  </div>
+</main>
+<footer class="foot"><span>Умный кредитный кабинет · учебный прототип, не является продуктом банка</span><a href="index.html">← Галерея макетов</a></footer>
+
+</body>
+</html>
