@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (план одобрен целиком, D-097) |
 | Владелец | Агент A |
 | Зависит от | [case.md, стр. 7](../../case.md), [выводы организаторов](../10-product/00-organizer-clarifications.md), [80-05](05-submission-checklist.md), [80-07](07-jury-self-check.md), [50-13](../50-architecture/13-config-and-profiles.md), [50-14](../50-architecture/14-deployment.md) |
 | Решения | Реализует D-064 (главный артефакт — README с самопроверкой), D-066, D-081, D-094 |

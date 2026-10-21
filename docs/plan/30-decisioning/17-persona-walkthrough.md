@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DRAFT |
+| Статус | APPROVED 21.10.2026 (план одобрен целиком, D-097) |
 | Владелец | Агент A (черновик субагента) |
 | Зависит от | [30-01](01-pipeline-overview.md), [30-02](02-features-catalog.md), [30-04](04-stop-factors-and-flags.md), [30-07](07-pd-and-grades.md), [30-09](09-pricing-options.md), [30-10](10-counter-offer-options.md), [30-11](11-routing-and-authority.md), [30-12](12-explainability.md), [30-16](16-loan-math.md), [30-18](18-economic-assumptions.md), [30-19](19-simulator-spec.md), [10-02](../10-product/02-personas.md), [10-06](../10-product/06-product-catalog.md), [10-10](../10-product/10-bank-journey.md), [моки, 10.3 и 10.5](../../specs/mocks.md), [R-002](../reviews/R-002-consolidation.md) |
 | Решения | Реализует D-013 (ожидаемые исходы с числами), D-069, D-079, D-084, D-090; закрывает C-38 и «числа СнабКонтракта» из C-04; решено агентом по D-073 |
