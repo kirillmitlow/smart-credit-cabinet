@@ -7,6 +7,10 @@ extend-exclude = ["docs", "web", "**/alembic/versions"]
 [lint]
 select = ["E", "F", "I", "B", "UP", "S", "C4", "PT", "DTZ", "TID"]
 
+[lint.pycodestyle]
+# Формат держит 100; линтер терпит до 120 — длинные русские докстринги не ломают проверку
+max-line-length = 120
+
 [lint.isort]
 # api/, mocks/ и nlu/ — отдельные проекты, у каждого свои пакеты app и tests
 known-first-party = ["app", "tests", "scripts"]
