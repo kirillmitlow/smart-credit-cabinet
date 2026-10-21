@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
 from app import health
-from app.modules import companies
+from app.modules import applications, companies
 from app.shared import clock, db
 from app.shared.errors import install_error_handlers
 from app.shared.logs import configure_logging
@@ -71,6 +71,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestContextMiddleware)
     app.include_router(health.router)
     app.include_router(companies.login_router)
+    app.include_router(applications.router)
     return app
 
 

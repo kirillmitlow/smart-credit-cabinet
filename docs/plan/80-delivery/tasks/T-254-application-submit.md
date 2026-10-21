@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE — проверку согласий подключит T-260 через register_submit_check; outbox APPLICATION_REGISTERED — T-278 |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/application-submit` |
 | Оценка | ~5 ч |

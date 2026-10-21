@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/application-state-machine` |
 | Оценка | ~6 ч |
