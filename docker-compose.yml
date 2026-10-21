@@ -1,0 +1,138 @@
+# Основной стенд (T-502, 50-14). Запуск: `docker compose up` (локально порты добавляет docker-compose.override.yml).
+# Все значения ${VAR:-по умолчанию} совпадают с .env.example; для локального запуска .env не нужен.
+#
+# Состав V1: postgres, redis, db-init, пять моков. Сервисов api, worker, beat, web и nlu пока нет:
+# их добавят задачи api и фронта, порядок запуска из 50-14 (…→ mock-scenarios → api → worker/beat/web) уже заложен.
+name: smart-credit-cabinet
+
+x-mock: &mock
+  # Один образ на пять ролей (MOCK_ROLE). Тег не latest: в день сдачи образы публикуются с тегом версии (D-081, D-083).
+  # Политику image/build закрепляет T-541: до публикации образа `up` собирает его локально.
+  image: ghcr.io/kirillmitlow/smart-credit-cabinet-mocks:${IMAGE_TAG:-dev}
+  build: ./mocks
+  restart: unless-stopped
+  mem_limit: 160m
+  environment: &mock-env
+    MOCK_ADMIN_KEY: ${MOCK_ADMIN_KEY:-dev-admin-key}
+    APP_TODAY: ${APP_TODAY:-}
+  depends_on:
+    db-init: { condition: service_completed_successfully }
+  healthcheck:
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+    interval: 5s
+    timeout: 3s
+    retries: 10
+    start_period: 10s
+
+services:
+  postgres:
+    # Один сервер, шесть баз: api и по одной на мок (database-per-service, спецификация моков 3.1)
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    mem_limit: 384m
+    command: ["postgres", "-c", "shared_buffers=128MB"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # -h 127.0.0.1: на первом старте временный сервер инициализации слушает только сокет, по TCP он «не готов»
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    # Очередь, шина событий и сессии; AOF включён ради сессий (50-01, Q-062)
+    image: redis:7.4-bookworm
+    restart: unless-stopped
+    mem_limit: 96m
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db-init:
+    # Разовый: создаёт базы и пользователей, если их нет, и завершается с кодом 0 (deploy/db-init/)
+    image: postgres:17-bookworm
+    restart: "no"
+    entrypoint: ["/bin/bash", "/db-init/init.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD:-dev-postgres}
+      API_DB_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres}
+      MOCK_DB_PASSWORD: ${MOCK_DB_PASSWORD:-dev-mock-db}
+    volumes:
+      - ./deploy/db-init:/db-init:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  mock-registry:
+    <<: *mock
+    environment:
+      <<: *mock-env
+      MOCK_ROLE: registry
+      MOCK_LATENCY_MS: "200-600"
+      MOCK_API_KEYS: "api:${REGISTRY_API_KEY:-dev-registry-key}"
+      DATABASE_URL: "postgresql+asyncpg://mock_registry:${MOCK_DB_PASSWORD:-dev-mock-db}@postgres/mock_registry"
+
+  mock-tax:
+    <<: *mock
+    environment:
+      <<: *mock-env
+      MOCK_ROLE: tax
+      MOCK_LATENCY_MS: "200-800"
+      MOCK_API_KEYS: "api:${TAX_API_KEY:-dev-tax-key}"
+      DATABASE_URL: "postgresql+asyncpg://mock_tax:${MOCK_DB_PASSWORD:-dev-mock-db}@postgres/mock_tax"
+
+  mock-credit-bureau:
+    <<: *mock
+    environment:
+      <<: *mock-env
+      MOCK_ROLE: bki
+      MOCK_LATENCY_MS: "800-2500"
+      MOCK_API_KEYS: "api:${BKI_API_KEY:-dev-bki-key}"
+      DATABASE_URL: "postgresql+asyncpg://mock_bki:${MOCK_DB_PASSWORD:-dev-mock-db}@postgres/mock_bki"
+
+  mock-bank-core:
+    <<: *mock
+    environment:
+      <<: *mock-env
+      MOCK_ROLE: bank_core
+      MOCK_LATENCY_MS: "50-200"
+      BANK_BIK: "040000999"
+      MOCK_API_KEYS: "api:${BANK_CORE_API_KEY:-dev-bank-core-key}"
+      DATABASE_URL: "postgresql+asyncpg://mock_bank_core:${MOCK_DB_PASSWORD:-dev-mock-db}@postgres/mock_bank_core"
+
+  mock-scenarios:
+    <<: *mock
+    environment:
+      <<: *mock-env
+      MOCK_ROLE: scenarios
+      MOCK_LATENCY_MS: "0"
+      DATABASE_URL: "postgresql+asyncpg://mock_scenarios:${MOCK_DB_PASSWORD:-dev-mock-db}@postgres/mock_scenarios"
+      REGISTRY_URL: http://mock-registry:8000
+      TAX_URL: http://mock-tax:8000
+      BKI_URL: http://mock-credit-bureau:8000
+      BANK_CORE_URL: http://mock-bank-core:8000
+    depends_on:
+      db-init: { condition: service_completed_successfully }
+      mock-registry: { condition: service_healthy }
+      mock-tax: { condition: service_healthy }
+      mock-credit-bureau: { condition: service_healthy }
+      mock-bank-core: { condition: service_healthy }
+
+  # Дальше появятся (не в V1): api (ждёт postgres, redis и mock-scenarios в состоянии healthy),
+  # worker и beat (ждут api), web (ждёт api), nlu (профиль ai). Скелет x-api-env заведёт задача api.
+
+# `docker compose down` тома не трогает; полный сброс стенда: `docker compose down -v`
+volumes:
+  pgdata:
+  redisdata:

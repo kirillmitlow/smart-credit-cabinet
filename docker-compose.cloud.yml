@@ -1,0 +1,47 @@
+# Облачный профиль (спецификация моков 3.4, 50-13): подключается явно, `docker-compose.override.yml` в нём не читается.
+#   docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d --build
+# Здесь нет ни одного порта моков: админ-API виден только внутри сети compose.
+# Все секреты обязательны (${VAR:?}): без значения compose отказывается стартовать. Значений по умолчанию нет.
+# Прокси Caddy с HTTPS, APP_ENV=cloud и сервисы api/web добавит задача T-507 (веха V9).
+x-require-secrets: &cloud-mock-secrets
+  MOCK_ADMIN_KEY: ${MOCK_ADMIN_KEY:?задайте MOCK_ADMIN_KEY (openssl rand -hex 24)}
+
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD (openssl rand -hex 24)}
+
+  db-init:
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD (openssl rand -hex 24)}
+      API_DB_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD (openssl rand -hex 24)}
+      MOCK_DB_PASSWORD: ${MOCK_DB_PASSWORD:?задайте MOCK_DB_PASSWORD (openssl rand -hex 24)}
+
+  mock-registry:
+    environment:
+      <<: *cloud-mock-secrets
+      MOCK_API_KEYS: "api:${REGISTRY_API_KEY:?задайте REGISTRY_API_KEY (openssl rand -hex 24)}"
+      DATABASE_URL: "postgresql+asyncpg://mock_registry:${MOCK_DB_PASSWORD:?задайте MOCK_DB_PASSWORD}@postgres/mock_registry"
+
+  mock-tax:
+    environment:
+      <<: *cloud-mock-secrets
+      MOCK_API_KEYS: "api:${TAX_API_KEY:?задайте TAX_API_KEY (openssl rand -hex 24)}"
+      DATABASE_URL: "postgresql+asyncpg://mock_tax:${MOCK_DB_PASSWORD:?задайте MOCK_DB_PASSWORD}@postgres/mock_tax"
+
+  mock-credit-bureau:
+    environment:
+      <<: *cloud-mock-secrets
+      MOCK_API_KEYS: "api:${BKI_API_KEY:?задайте BKI_API_KEY (openssl rand -hex 24)}"
+      DATABASE_URL: "postgresql+asyncpg://mock_bki:${MOCK_DB_PASSWORD:?задайте MOCK_DB_PASSWORD}@postgres/mock_bki"
+
+  mock-bank-core:
+    environment:
+      <<: *cloud-mock-secrets
+      MOCK_API_KEYS: "api:${BANK_CORE_API_KEY:?задайте BANK_CORE_API_KEY (openssl rand -hex 24)}"
+      DATABASE_URL: "postgresql+asyncpg://mock_bank_core:${MOCK_DB_PASSWORD:?задайте MOCK_DB_PASSWORD}@postgres/mock_bank_core"
+
+  mock-scenarios:
+    environment:
+      <<: *cloud-mock-secrets
+      DATABASE_URL: "postgresql+asyncpg://mock_scenarios:${MOCK_DB_PASSWORD:?задайте MOCK_DB_PASSWORD}@postgres/mock_scenarios"
