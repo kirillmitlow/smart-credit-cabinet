@@ -34,7 +34,7 @@ def wait_ready(client: httpx.Client) -> None:
 
 
 @pytest.fixture(scope="module")
-def live_roles() -> Iterator[tuple[dict[str, httpx.Client], DockerContainer]]:
+def live_roles() -> Iterator[tuple[dict[str, httpx.Client], DockerContainer, DockerContainer]]:
     image = "scc-mocks-t127-test:local"
     DockerClient().client.images.build(
         path=str(Path(__file__).resolve().parents[1]), tag=image, rm=True
@@ -65,6 +65,7 @@ def live_roles() -> Iterator[tuple[dict[str, httpx.Client], DockerContainer]]:
                 "BANK_CORE_URL": "http://bank_core:8000",
             }.items():
                 container.with_env(key, value)
+            started = time.monotonic()
             containers[role] = stack.enter_context(container)
             client = stack.enter_context(
                 httpx.Client(
@@ -75,13 +76,15 @@ def live_roles() -> Iterator[tuple[dict[str, httpx.Client], DockerContainer]]:
             )
             clients[role] = client
             wait_ready(client)
-        yield clients, containers["bki"]
+            if role == "scenarios":
+                print(f"T-128 initial scenarios ready: {time.monotonic() - started:.2f}s")
+        yield clients, containers["bki"], containers["scenarios"]
 
 
 def test_stopped_bki_is_cleaned_by_background_worker_after_restart(
-    live_roles: tuple[dict[str, httpx.Client], DockerContainer],
+    live_roles: tuple[dict[str, httpx.Client], DockerContainer, DockerContainer],
 ) -> None:
-    clients, bki = live_roles
+    clients, bki, _ = live_roles
     created = clients["scenarios"].post(
         "/api/v1/scenarios",
         json={"code": "container-stop", "title": "Остановка БКИ", "preset": "IP_HEALTHY"},

@@ -25,4 +25,6 @@ async def ready(request: Request) -> JSONResponse:
         return JSONResponse({"status": "not_ready", "db": "not_configured"}, status_code=503)
     if not await database.is_ready():
         return JSONResponse({"status": "not_ready", "db": "unavailable"}, status_code=503)
+    if not request.app.state.initial_attempt_done:
+        return JSONResponse({"status": "not_ready", "db": "ok"}, status_code=503)
     return JSONResponse({"status": "ok", "db": "ok"})
