@@ -1981,7 +1981,7 @@ POST /api/v1/scenarios
 | `stankoprom` | `INVESTMENT` | 15 млн | 60 | покупаемое оборудование | нет | `MANUAL_REVIEW` | `AMOUNT_ABOVE_AUTO_LIMIT`, `COLLATERAL_REVIEW` | Банк просит договор с поставщиком → `APPROVED` |
 | `garipov` | `EXPRESS` | 1,5 млн | 36 | нет | нет | `NEEDS_INFO` | `REVENUE_UNKNOWN` | Загружает выписку (10.8) → `APPROVED` → открытие счёта → выдача |
 | `romashka` | `WORKING_CAPITAL` | 3 млн | 6 | нет | нет | `REJECTED` | `TAX_ARREARS_HIGH` | Отказ после получения БКИ, налоговый долг остаётся приоритетной причиной (D-090) |
-| `vektor` | `EXPRESS` | 2 млн | 12 | нет | нет | `REJECTED` | `COMPANY_NOT_ACTIVE` | Отказ на первом шаге |
+| `vektor` | `EXPRESS` | 2 млн | 12 | нет | нет | `REJECTED` | `COMPANY_NOT_ACTIVE` | Отказ по реестру после получения БКИ (D-090) |
 | `orlov` | — (хочет 300 тыс. на технику) | 300 тыс. | — | — | — | `NOT_ELIGIBLE` | — | Объяснение при вводе ИНН; до заявки не доходит |
 | `zarya` | `CREDIT_LINE` | **20 млн** | 12 | сельхозтехника | нет | `MANUAL_REVIEW` | `AMOUNT_ABOVE_AUTO_LIMIT`, `COLLATERAL_REVIEW` | Ручное рассмотрение → `APPROVED` |
 | `quick-start` | `EXPRESS` | 1 млн | 24 | нет | **владелец** (`owner`) | `COUNTER_OFFER` | `BUSINESS_TOO_YOUNG` | Встречное с поручительством; рассмотрение — вручную (D-035) |

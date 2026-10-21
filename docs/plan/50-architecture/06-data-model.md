@@ -62,7 +62,7 @@ erDiagram
 |---|---|---|---|
 | `users` | auth | Учётные записи клиентов и сотрудников банка. Для персон создаются из блока `users` сценария ([Q-023](../00-meta/06-open-questions.md)) | `id`, `display_name`, `role` (`CLIENT`, `UNDERWRITER`, `ADMIN`), `status`, `person_inn` (личный ИНН; D-062), `login_ref` (внутренний идентификатор), `scenario_code` |
 | `companies` | companies | Компания или ИП клиента, кэш карточки автозаполнения | `id`, `inn` (уникален), `kind` (`LEGAL`, `IP`), `name`, `okved`, `registered_on`, `is_bank_customer`, `profile` (JSONB: карточка с источником и датой каждого поля), `profile_fetched_at` |
-| `company_members` | companies | Кто и с какой ролью работает от компании (D-014, D-015) | `company_id`, `user_id`, `role` (`DIRECTOR`, `ACCOUNTANT`), `can_sign`, `poa_number`, `poa_valid_until`, `status` |
+| `company_members` | companies | Кто и с какой ролью работает от компании (D-014, D-015) | `company_id`, `user_id`, `role` (`DIRECTOR`, `ACCOUNTANT`, `GUARANTOR`), `can_sign`, `poa_permissions` (список; среди значений SIGN_COMPANY_CONSENTS), `poa_number`, `poa_valid_until`, `status` |
 
 ### Заявка
 
@@ -156,4 +156,4 @@ erDiagram
 - Хранение файлов в БД или на диске — 50-12; здесь только метаданные.
 - Сверено с 50-10/11: application_events — события заявки и источник SSE, audit_log — действия вне заявки; отдельной audit_events нет. Старая заметка про переименование снята.
 
-**D-091:** у company_members добавить явный список poa_permissions (включая SIGN_COMPANY_CONSENTS), срок доверенности уже есть; can_sign не использовать как универсальное право на все виды подписи. Участие поручителя создаёт директор; связь с его личным ИНН обязательна. Точный набор прав и значение роли поручителя закрыть Q-141 до миграций, не выдумывать.
+**D-091, D-096 (решено):** у `company_members` есть явный список `poa_permissions` (включая SIGN_COMPANY_CONSENTS), срок доверенности уже есть; `can_sign` не универсальное право на все виды подписи (только кредитный договор). Участие поручителя создаёт директор, роль `GUARANTOR`, связь с личным ИНН обязательна. Права поручителя (D-096): только адресованные ему задачи, свои согласия и поручительство, сводка «за что поручаетесь»; чтения всей заявки и данных компании нет.
