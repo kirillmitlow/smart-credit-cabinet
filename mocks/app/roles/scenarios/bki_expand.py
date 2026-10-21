@@ -39,7 +39,7 @@ def merge_subjects(spec: ScenarioSpec, identity: dict[str, Any]) -> dict[str, Bk
     return {inn: BkiSubjectSpec.model_validate(raw) for inn, raw in merged.items()}
 
 
-def _subject(identity: dict[str, Any], inn: str) -> dict[str, Any]:
+def subject_body(identity: dict[str, Any], inn: str) -> dict[str, Any]:
     if inn == identity["inn"] and identity["form"] in {"LLC", "JSC"}:
         return {
             "type": "LEGAL_ENTITY",
@@ -145,7 +145,7 @@ def expand_bki(
             {
                 "inn": inn,
                 "body": {
-                    "subject": _subject(identity, inn),
+                    "subject": subject_body(identity, inn),
                     "obligations": obligations,
                     "inquiries": inquiries,
                     "applications": applications,

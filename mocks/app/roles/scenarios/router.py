@@ -54,7 +54,9 @@ async def create(
     request: Request, spec: ScenarioSpec, session: Session, idem: OptionalIdempotencyDep
 ) -> Response:
     async def handler() -> Response:
-        row = await service.create(session, spec, request.app.state.clock)
+        row = await service.create(
+            session, spec, request.app.state.clock, bank_bik=request.app.state.settings.bank_bik
+        )
         await session.commit()
         body = service.view(row).model_dump(mode="json", by_alias=True)
         return JSONResponse(body, status_code=201)
@@ -99,7 +101,13 @@ async def patch_scenario(
     changes: Annotated[dict[str, Any], Body(media_type="application/merge-patch+json")],
     session: Session,
 ) -> ScenarioView:
-    row = await service.patch(session, code, changes, request.app.state.clock)
+    row = await service.patch(
+        session,
+        code,
+        changes,
+        request.app.state.clock,
+        bank_bik=request.app.state.settings.bank_bik,
+    )
     await session.commit()
     return service.view(row)
 

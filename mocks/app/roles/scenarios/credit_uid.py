@@ -14,3 +14,14 @@ def contract_uid(code: str, inn: str, label: str) -> str:
     uid = UUID(bytes=digest, version=1)
     check = sum(int(char, 16) * (index % 10 + 1) for index, char in enumerate(uid.hex)) % 16
     return f"{uid}-{check:x}"
+
+
+def uid_is_valid(value: str) -> bool:
+    try:
+        if len(value) != 38 or value[-2] != "-":
+            return False
+        uid = UUID(value[:-2])
+        check = sum(int(char, 16) * (i % 10 + 1) for i, char in enumerate(uid.hex)) % 16
+        return value.lower() == f"{uid}-{check:x}"
+    except ValueError:
+        return False

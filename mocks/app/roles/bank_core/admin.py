@@ -93,7 +93,7 @@ class BankCoreAdminHandler(AdminHandler[BankCoreBody]):
 
     # ---- проверки ----
 
-    def check(self, inn: str, body: BankCoreBody) -> None:
+    def check(self, inn: str, body: BankCoreBody, *, bank_bik: str | None = None) -> None:
         if body.customer is None:
             if body.accounts or body.turnover or body.loans:
                 raise _invalid(
@@ -101,7 +101,7 @@ class BankCoreAdminHandler(AdminHandler[BankCoreBody]):
                 )
             return
         service.check_customer_type(inn, body.customer.type)
-        bik = _current().bik
+        bik = bank_bik or _current().bik
         prefix = service.SETTLEMENT_BALANCE[body.customer.type]
         numbers = [a.number for a in body.accounts if a.number]
         for number in numbers:

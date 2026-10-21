@@ -14,11 +14,14 @@ from typing import Any
 from app.common.admin import merge_patch
 from app.roles.scenarios.bki_expand import expand_bki
 from app.roles.scenarios.config import ScenarioSettings
+from app.roles.scenarios.debt_history import build_history, enrich_statements
 from app.roles.scenarios.finance import expand_finance
 from app.roles.scenarios.identity import expand_identity
 from app.roles.scenarios.other_expand import expand_other
 from app.roles.scenarios.presets import PRESETS
+from app.roles.scenarios.raw_merge import merge_raw
 from app.roles.scenarios.schemas import ScenarioSpec
+from app.roles.scenarios.validators import validate_expanded
 
 
 def resolved_spec(spec: ScenarioSpec) -> ScenarioSpec:
@@ -54,4 +57,8 @@ def expand(
     expanded = expand_identity(resolved, code, today, reserved_inns or set())
     expanded.update(expand_finance(resolved, expanded["identity"], code, today, settings))
     expanded.update(expand_bki(resolved, expanded["identity"], code, today))
-    return expand_other(resolved, expanded, code, today, settings.bank_bik)
+    expanded = expand_other(resolved, expanded, code, today, settings.bank_bik)
+    history = build_history(resolved, expanded, code)
+    enrich_statements(expanded, history)
+    expanded = merge_raw(expanded, resolved.raw)
+    return validate_expanded(resolved, expanded, today, settings, code, history)
