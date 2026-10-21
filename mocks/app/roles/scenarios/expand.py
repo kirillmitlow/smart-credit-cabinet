@@ -1,6 +1,6 @@
 """Чистое разворачивание: пресет → явные параметры → детерминированные части моков.
 
-Реквизиты (T-120) и финансы (T-121); кредитная история добавляется T-123…T-125.
+Реквизиты, финансы, кредитная история и прочие системы (T-120…T-125).
 Ни запросов к другим мокам, ни записи в базу здесь нет.
 """
 
@@ -12,9 +12,11 @@ from datetime import date
 from typing import Any
 
 from app.common.admin import merge_patch
+from app.roles.scenarios.bki_expand import expand_bki
 from app.roles.scenarios.config import ScenarioSettings
 from app.roles.scenarios.finance import expand_finance
 from app.roles.scenarios.identity import expand_identity
+from app.roles.scenarios.other_expand import expand_other
 from app.roles.scenarios.presets import PRESETS
 from app.roles.scenarios.schemas import ScenarioSpec
 
@@ -46,8 +48,10 @@ def expand(
     *,
     settings: ScenarioSettings | None = None,
 ) -> dict[str, Any]:
+    settings = settings or ScenarioSettings()
     code = preview_code(spec)
     resolved = resolved_spec(spec)
     expanded = expand_identity(resolved, code, today, reserved_inns or set())
     expanded.update(expand_finance(resolved, expanded["identity"], code, today, settings))
-    return expanded
+    expanded.update(expand_bki(resolved, expanded["identity"], code, today))
+    return expand_other(resolved, expanded, code, today, settings.bank_bik)
