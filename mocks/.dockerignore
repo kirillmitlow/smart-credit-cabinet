@@ -1,0 +1,6 @@
+# В образ попадает только код приложения и lock-файл
+*
+!pyproject.toml
+!uv.lock
+!app/**
+**/__pycache__
