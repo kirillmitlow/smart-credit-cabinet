@@ -1,4 +1,4 @@
-"""T-106: режимы сбоев, X-Mock-Scenario, лимит запросов, until; обрыв соединения на живом сервере."""
+"""T-106: режимы сбоев, X-Mock-Scenario, лимит, until; обрыв соединения на живом сервере."""
 
 from __future__ import annotations
 
@@ -156,9 +156,7 @@ async def test_until_returns_to_ok_by_itself(app: FastAPI, client: httpx.AsyncCl
 
 
 async def test_header_breaks_exactly_one_request(client: httpx.AsyncClient) -> None:
-    broken = await client.post(
-        "/api/v1/reports", headers={**API, "X-Mock-Scenario": "ERROR"}
-    )
+    broken = await client.post("/api/v1/reports", headers={**API, "X-Mock-Scenario": "ERROR"})
     healthy = await client.post("/api/v1/reports", headers=API)
     assert broken.status_code == 503
     assert healthy.status_code == 200
@@ -174,16 +172,12 @@ async def test_bad_scenario_header_is_422(client: httpx.AsyncClient, value: str)
 async def test_slow_header_with_explicit_delay(client: httpx.AsyncClient) -> None:
     loop = asyncio.get_running_loop()
     started = loop.time()
-    response = await client.post(
-        "/api/v1/reports", headers={**API, "X-Mock-Scenario": "SLOW:250"}
-    )
+    response = await client.post("/api/v1/reports", headers={**API, "X-Mock-Scenario": "SLOW:250"})
     assert response.status_code == 200
     assert loop.time() - started >= 0.25
 
 
-async def test_lost_response_runs_handler_without_answer(
-    app: FastAPI, counter: Counter
-) -> None:
+async def test_lost_response_runs_handler_without_answer(app: FastAPI, counter: Counter) -> None:
     transport = httpx.ASGITransport(app=app, raise_app_exceptions=True)
     async with httpx.AsyncClient(transport=transport, base_url="http://mock") as c:
         with pytest.raises(LostResponseError):
@@ -215,13 +209,10 @@ async def test_lost_response_drops_real_connection(counter: Counter) -> None:
             await asyncio.sleep(0.05)
         async with httpx.AsyncClient(base_url=f"http://127.0.0.1:{port}") as c:
             with pytest.raises(httpx.RemoteProtocolError):
-                await c.post(
-                    "/api/v1/reports", headers={**API, "X-Mock-Scenario": "LOST_RESPONSE"}
-                )
+                await c.post("/api/v1/reports", headers={**API, "X-Mock-Scenario": "LOST_RESPONSE"})
             after = await c.post("/api/v1/reports", headers=API)
         assert counter.calls == 2  # первый запрос выполнился, хотя ответа не было
         assert after.json() == {"n": 2}
     finally:
         server.should_exit = True
         await task
-
