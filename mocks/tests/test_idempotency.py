@@ -67,6 +67,10 @@ def build_app(postgres_url: str, calls: Calls) -> FastAPI:
     async def optional(order: Order, idem: OptionalIdempotencyDep) -> Response:
         return await idem.run(lambda: handle(order))
 
+    @router.post("/api/v1/stub/{inn}/accounts", dependencies=[Depends(require_api_key)])
+    async def per_subject(inn: str, order: Order, idem: IdempotencyDep) -> Response:
+        return await idem.run(lambda: handle(order))
+
     app.include_router(router)
     return app
 
@@ -270,3 +274,18 @@ def test_any_sequence_of_retries_executes_once(idem_url: str, bodies: list[str])
         assert len({r.text for r, b in zip(results, bodies, strict=True) if b == first}) == 1
 
     asyncio.run(scenario())
+
+
+async def test_same_key_on_other_path_param_is_independent(
+    client: httpx.AsyncClient, calls: Calls
+) -> None:
+    key = new_key()
+    first = await client.post(
+        "/api/v1/stub/0017654322/accounts", json={"amountRub": 1}, headers=headers(key)
+    )
+    other = await client.post(
+        "/api/v1/stub/0015557771/accounts", json={"amountRub": 1}, headers=headers(key)
+    )
+    assert first.status_code == other.status_code == 201
+    assert first.json()["id"] != other.json()["id"]
+    assert calls.count == 2

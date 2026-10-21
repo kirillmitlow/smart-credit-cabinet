@@ -38,6 +38,8 @@ markers = ["integration: нужен живой Postgres (Testcontainers или D
 # Покрытие измеряет `make test` (флаг --cov); `make check` гоняет часть тестов и порог не проверяет.
 # Порог 70% для не-ядра (D-087); его проверяет и pytest-cov (из fail_under), и `coverage report`.
 [tool.coverage.run]
+# Код async SQLAlchemy выполняется в greenlet: без этого coverage его не видит
+concurrency = ["greenlet", "thread"]
 source = ["app"]
 branch = true
 omit = [

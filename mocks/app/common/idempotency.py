@@ -250,8 +250,9 @@ def idempotent(*, required: bool) -> Callable[..., Awaitable[Idempotency]]:
                 "Нужен заголовок Idempotency-Key",
                 errors=[{"loc": ["header", "Idempotency-Key"], "msg": "Field required"}],
             )
-        route: Any = request.scope.get("route")
-        endpoint = f"{request.method} {getattr(route, 'path', request.url.path)}"
+        # Область ключа — фактический путь: у `/customers/{inn}/accounts` тот же ключ для другого
+        # ИНН не должен вернуть чужой ответ
+        endpoint = f"{request.method} {request.url.path}"
         return Idempotency(
             request.app.state.database,
             request.app.state.clock,
