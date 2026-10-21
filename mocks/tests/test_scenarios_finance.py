@@ -125,9 +125,9 @@ def test_osno_vat_uses_each_month_date_and_override_has_priority() -> None:
 
 @pytest.mark.parametrize("regime", ["USN_INCOME", "USN_INCOME_MINUS_EXPENSES", "ESHN", "AUSN"])
 def test_non_osno_defaults_to_zero_vat(regime: str) -> None:
-    rows = checked(scenario(finance={"taxRegime": regime, "avgMonthlyRevenueRub": 1000000}))[
-        "bankCore"
-    ]["turnover"]
+    rows = checked(
+        scenario(finance={"taxRegime": regime, "avgMonthlyRevenueRub": 1000000, "headcount": 5})
+    )["bankCore"]["turnover"]
     assert {r["incomingNetRub"] for r in rows} == {1000000}
 
 

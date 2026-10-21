@@ -10,19 +10,32 @@ from app.common.accounts import SETTLEMENT_IP, SETTLEMENT_LEGAL, generate_accoun
 from app.common.clock import last_full_month, last_reporting_year, month_start
 from app.common.reldate import add_months
 from app.roles.scenarios.config import ScenarioSettings
+from app.roles.scenarios.finance_limits import check_regime
 from app.roles.scenarios.finance_series import monthly_revenue, rub, turnover_month
 from app.roles.scenarios.identity_people import rng_for
 from app.roles.scenarios.schemas import BankSpec, FinanceSpec, ScenarioSpec, TaxSpec
 
 
-def _annual(finance: FinanceSpec, code: str, year: int) -> int:
-    return sum(monthly_revenue(finance, code, date(year, m, 1)) for m in range(1, 13))
+def _annual(
+    finance: FinanceSpec, code: str, year: int, today: date, settings: ScenarioSettings
+) -> int:
+    anchor = last_full_month(today)
+    return sum(
+        monthly_revenue(finance, code, date(year, m, 1), anchor, settings) for m in range(1, 13)
+    )
 
 
 def _statements(
-    finance: FinanceSpec, code: str, today: date, registered: date, legal: bool
+    finance: FinanceSpec,
+    code: str,
+    today: date,
+    registered: date,
+    legal: bool,
+    settings: ScenarioSettings,
 ) -> list[dict[str, Any]]:
     if not finance.has_statements:
+        if finance.statements_mismatch_percent:
+            raise ValueError("Для statementsMismatchPercent нужна отчётность: hasStatements: true")
         return []
     if not legal:
         raise ValueError("У ИП и самозанятого нет бухотчётности")
@@ -34,7 +47,11 @@ def _statements(
     )
     records: list[dict[str, Any]] = []
     for year in years:
-        revenue = _annual(finance, code, year)
+        revenue = _annual(finance, code, year, today, settings)
+        if finance.statements_mismatch_percent:
+            revenue = rub(
+                Decimal(revenue) * (1 - Decimal(str(finance.statements_mismatch_percent)) / 100)
+            )
         profit = rub(Decimal(revenue) * margin / 100)
         # Балансовые доли — явное допущение синтетики. Долг/проценты добавятся после T-123.
         assets = max(10000, rub(Decimal(revenue) / 2))
@@ -132,7 +149,7 @@ def _bank(
     month = first
     while month <= last:
         base["turnover"].append(
-            turnover_month(finance, code, month, regime, identity["okved"], settings)
+            turnover_month(finance, code, month, regime, identity["okved"], settings, last)
         )
         month = add_months(month, 1)
     return base
@@ -163,11 +180,18 @@ def expand_finance(
         "NPD",
     ):
         raise ValueError("Неизвестный taxRegime")
-    records = _statements(finance, code, today, registered, legal)
+    records = _statements(finance, code, today, registered, legal, settings)
+    if finance.statements_mismatch_percent and not records:
+        raise ValueError(
+            "Для statementsMismatchPercent нужен хотя бы один полный отчётный год компании"
+        )
     year = last_reporting_year(today)
-    annual = _annual(finance, code, year)
+    annual = _annual(finance, code, year, today, settings)
     headcount = finance.headcount if finance.headcount is not None else 1
+    check_regime(finance, regime, identity["form"], code, today, headcount, settings)
     latest = records[-1] if records else None
+    if latest:
+        annual = latest["lines"]["2110"]
     profile: dict[str, Any] | None = {
         "inn": identity["inn"],
         "taxRegimes": [{"code": regime, "year": year}],

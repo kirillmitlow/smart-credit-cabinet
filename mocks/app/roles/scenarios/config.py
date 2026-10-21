@@ -35,6 +35,33 @@ class ScenarioSettings(BaseSettings):
         ]
     )
 
+    # Числа 2026 года из ФНС; УСН после 2026 требует явного обновления настройки.
+    default_trend_percent: Decimal = Field(default=Decimal(10), ge=0, lt=100)
+    ausn_revenue_limit_rub: int = Field(default=60_000_000, ge=0)
+    ausn_headcount_limit: int = Field(default=5, ge=0)
+    usn_revenue_limit_rub: int = Field(default=490_500_000, ge=0)
+    usn_headcount_limit: int = Field(default=130, ge=0)
+    psn_revenue_limit_schedule: dict[int, int] = Field(
+        default_factory=lambda: {
+            1900: 60_000_000,
+            2026: 20_000_000,
+            2027: 15_000_000,
+            2028: 10_000_000,
+        }
+    )
+    psn_headcount_limit: int = Field(default=15, ge=0)
+
+    @field_validator("psn_revenue_limit_schedule")
+    @classmethod
+    def _psn_limits(cls, value: dict[int, int]) -> dict[int, int]:
+        if not value or any(
+            year < 1 or year > 9999 or amount < 0 for year, amount in value.items()
+        ):
+            raise ValueError(
+                "PSN_REVENUE_LIMIT_SCHEDULE: нужна непустая шкала годов и неотрицательных лимитов"
+            )
+        return value
+
     @field_validator("vat_rate_schedule")
     @classmethod
     def _rates(cls, value: dict[date, Decimal]) -> dict[date, Decimal]:
