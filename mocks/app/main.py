@@ -27,7 +27,12 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         async def maintain(db: Database) -> None:
             # Не блокируем старт: /health/live отвечает сразу, ready — после миграций
             await db.migrate_until_done()
-            await purge_forever(db, app.state.clock)
+            async with asyncio.TaskGroup() as tasks:
+                tasks.create_task(purge_forever(db, app.state.clock))
+                if db.role == Role.SCENARIOS:
+                    from app.roles.scenarios.recovery import recover_forever
+
+                    tasks.create_task(recover_forever(db, app.state.settings, app.state.clock))
 
         migrations = asyncio.create_task(maintain(database))
     try:

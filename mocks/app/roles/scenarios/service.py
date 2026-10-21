@@ -14,8 +14,9 @@ from app.common.clock import Clock
 from app.common.problems import ProblemException
 from app.roles.scenarios.config import ScenarioSettings
 from app.roles.scenarios.expand import expand
-from app.roles.scenarios.models import Scenario
+from app.roles.scenarios.models import Scenario, ScenarioApplication
 from app.roles.scenarios.schemas import (
+    ApplicationLog,
     AppliedSummary,
     DirectorSummary,
     ScenarioListItem,
@@ -210,3 +211,16 @@ def view(row: Scenario) -> ScenarioView:
         last_error=row.last_error,
         applied_at=row.applied_at,
     )
+
+
+async def view_with_log(session: AsyncSession, row: Scenario) -> ScenarioView:
+    entries = await session.scalars(
+        select(ScenarioApplication)
+        .where(ScenarioApplication.scenario_code == row.code)
+        .order_by(ScenarioApplication.id)
+    )
+    result = view(row)
+    result.applications = [
+        ApplicationLog.model_validate(entry, from_attributes=True) for entry in entries
+    ]
+    return result

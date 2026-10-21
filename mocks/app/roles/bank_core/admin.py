@@ -32,7 +32,7 @@ from app.common.admin import (
 )
 from app.common.clock import Clock
 from app.common.db import Origin
-from app.common.idempotency import idempotency_keys
+from app.common.idempotency import forget_replies, idempotency_keys
 from app.common.problems import ProblemException
 from app.roles.bank_core import models as m
 from app.roles.bank_core import service
@@ -600,6 +600,9 @@ class BankCoreAdminHandler(AdminHandler[BankCoreBody]):
                 await session.scalars(
                     sa.select(m.Account.number).where(m.Account.customer_id == customer.id)
                 )
+            )
+            await forget_replies(
+                session, {"number": set(numbers), "settlementAccount": set(numbers)}
             )
             await session.execute(
                 sa.delete(m.Posting).where(

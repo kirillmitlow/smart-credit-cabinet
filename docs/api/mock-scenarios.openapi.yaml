@@ -297,7 +297,7 @@
         "tags": [
           "сценарии"
         ],
-        "summary": "Создать сценарий (и применить, когда готова раскладка по мокам)",
+        "summary": "Создать сценарий и применить во всех нужных моках",
         "operationId": "createScenario",
         "security": [
           {
@@ -404,6 +404,17 @@
               }
             },
             "description": "Unprocessable Content"
+          },
+          "502": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Gateway"
           }
         }
       },
@@ -610,7 +621,7 @@
         "tags": [
           "сценарии"
         ],
-        "summary": "Поменять параметры (JSON Merge Patch, массивы заменяются целиком)",
+        "summary": "Поменять параметры и переприменить (JSON Merge Patch)",
         "operationId": "patchScenario",
         "security": [
           {
@@ -708,6 +719,17 @@
               }
             },
             "description": "Unprocessable Content"
+          },
+          "502": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Gateway"
           }
         }
       },
@@ -794,6 +816,143 @@
               }
             },
             "description": "Unprocessable Content"
+          },
+          "502": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          }
+        }
+      }
+    },
+    "/api/v1/scenarios/{code}/apply": {
+      "post": {
+        "tags": [
+          "сценарии"
+        ],
+        "summary": "Вернуть одну компанию в исходное состояние, включая RUNTIME",
+        "operationId": "applyScenario",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Необязателен; повтор вернёт тот же ответ",
+              "title": "Idempotency-Key"
+            },
+            "description": "Необязателен; повтор вернёт тот же ответ"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioView"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "502": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Gateway"
           }
         }
       }
@@ -929,6 +1088,69 @@
           "kind"
         ],
         "title": "ActiveLoan"
+      },
+      "ApplicationLog": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "system": {
+            "type": "string",
+            "enum": [
+              "REGISTRY",
+              "TAX",
+              "BKI",
+              "BANK_CORE"
+            ],
+            "title": "System"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "PUT",
+              "DELETE"
+            ],
+            "title": "Action"
+          },
+          "httpStatus": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Httpstatus"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "system",
+          "action",
+          "httpStatus",
+          "error",
+          "at"
+        ],
+        "title": "ApplicationLog"
       },
       "ApplicationSpec": {
         "properties": {
@@ -2721,6 +2943,13 @@
               }
             ],
             "title": "Appliedat"
+          },
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationLog"
+            },
+            "type": "array",
+            "title": "Applications"
           }
         },
         "type": "object",

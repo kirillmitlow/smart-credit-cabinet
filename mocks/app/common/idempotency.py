@@ -22,6 +22,7 @@ import sqlalchemy as sa
 from fastapi import Depends, Header, Request
 from fastapi.responses import Response
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.clock import Clock
 from app.common.db import Database
@@ -274,6 +275,34 @@ async def purge_expired(database: Database, clock: Clock) -> int:
             sa.delete(idempotency_keys).where(idempotency_keys.c.expires_at <= clock.now())
         )
     return int(result.rowcount or 0)
+
+
+async def forget_replies(session: AsyncSession, identifiers: dict[str, set[str]]) -> None:
+    """Админ-сброс субъекта удаляет сохранённые ответы о стёртых ресурсах.
+
+    Фильтр по полям и идентификаторам сохраняет ключи остальных компаний.
+    Не-JSON ответы общих тестов не трогаем.
+    """
+    if not any(identifiers.values()):
+        return
+    rows = await session.execute(
+        sa.select(idempotency_keys.c.id, idempotency_keys.c.response_body).where(
+            idempotency_keys.c.state == "DONE"
+        )
+    )
+    removed = []
+    for row_id, body in rows:
+        try:
+            payload = json.loads(body)
+        except (ValueError, TypeError):
+            continue
+        if isinstance(payload, dict) and any(
+            isinstance(payload.get(field), str) and payload[field] in values
+            for field, values in identifiers.items()
+        ):
+            removed.append(row_id)
+    if removed:
+        await session.execute(sa.delete(idempotency_keys).where(idempotency_keys.c.id.in_(removed)))
 
 
 async def purge_forever(database: Database, clock: Clock) -> None:
