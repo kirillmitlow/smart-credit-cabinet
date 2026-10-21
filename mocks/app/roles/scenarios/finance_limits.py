@@ -24,6 +24,8 @@ def check_regime(
     today: date,
     headcount: int,
     settings: ScenarioSettings,
+    *,
+    annual_override: int = 0,
 ) -> None:
     if regime not in {"AUSN", "USN_INCOME", "USN_INCOME_MINUS_EXPENSES", "PSN"}:
         return
@@ -52,6 +54,7 @@ def check_regime(
             for m in range(1, today.month)
         )
         annual = max(annual, previous, current)
+    annual = max(annual, annual_override)
     if annual > revenue_limit:
         raise ValueError(f"{regime}: годовая выручка {annual} ₽ превышает лимит {revenue_limit} ₽")
     if headcount > staff_limit:

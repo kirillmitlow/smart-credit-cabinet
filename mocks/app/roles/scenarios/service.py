@@ -72,6 +72,8 @@ async def create(
     spec: ScenarioSpec,
     clock: Clock,
     origin: ScenarioOrigin = ScenarioOrigin.CUSTOM,
+    *,
+    bank_bik: str | None = None,
 ) -> Scenario:
     code = spec.code or _new_code()
     while spec.code is None and await session.get(Scenario, code) is not None:
@@ -81,6 +83,7 @@ async def create(
     inn = spec.company.inn if spec.company else None
     if inn is not None and await session.scalar(select(Scenario.code).where(Scenario.inn == inn)):
         raise ProblemException(409, "SCENARIO_INN_EXISTS", "Сценарий с этим ИНН уже есть")
+    snapshot = await preview(session, spec.model_copy(update={"code": code}), clock, bank_bik)
     now = clock.now()
     row = Scenario(
         code=code,
@@ -91,8 +94,9 @@ async def create(
         expected_outcome=spec.expected_outcome,
         expected_final_outcome=spec.expected_final_outcome,
         expected_reason_codes=list(spec.expected_reason_codes),
-        inn=inn,
+        inn=snapshot["identity"]["inn"],
         spec={**spec_dump(spec), "code": code},
+        expanded=snapshot,
         status="PENDING",
         needs_reapply=True,
         created_at=now,
@@ -142,20 +146,26 @@ def validate_spec(raw: dict[str, Any]) -> ScenarioSpec:
 
 
 async def patch(
-    session: AsyncSession, code: str, changes: dict[str, Any], clock: Clock
+    session: AsyncSession,
+    code: str,
+    changes: dict[str, Any],
+    clock: Clock,
+    *,
+    bank_bik: str | None = None,
 ) -> Scenario:
     """JSON Merge Patch параметров; компания будет пересоздана при применении (needs_reapply)."""
     row = await get(session, code)
     if "code" in changes and changes["code"] != code:
         raise ProblemException(422, "VALIDATION_ERROR", "Код сценария менять нельзя")
     spec = validate_spec(merge_patch(row.spec, changes))
+    snapshot = await preview(session, spec, clock, bank_bik)
     row.spec = {**spec_dump(spec), "code": code}
     row.title = spec.title
     row.expected_outcome = spec.expected_outcome
     row.expected_final_outcome = spec.expected_final_outcome
     row.expected_reason_codes = list(spec.expected_reason_codes)
-    if spec.company and spec.company.inn:
-        row.inn = spec.company.inn
+    row.inn = snapshot["identity"]["inn"]
+    row.expanded = snapshot
     row.modified = row.modified or row.origin == ScenarioOrigin.BUILTIN.value
     row.needs_reapply = True
     row.updated_at = clock.now()

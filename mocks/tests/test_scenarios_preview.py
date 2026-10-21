@@ -101,3 +101,31 @@ async def test_inconsistent_cross_system_parameters_return_422(client: httpx.Asy
     assert response.status_code == 422
     assert response.json()["code"] == "VALIDATION_ERROR"
     assert "tax.accountBlocked" in response.json()["detail"]
+
+
+async def test_validation_runs_before_create_and_patch_and_preserves_stored_data(
+    client: httpx.AsyncClient,
+) -> None:
+    good = {
+        "code": "validation-before-save",
+        "title": "Правильная компания",
+        "company": {"form": "LLC", "ageMonths": 120},
+        "finance": {"avgMonthlyRevenueRub": 1000000, "hasStatements": True, "noisePercent": 0},
+    }
+    bad_raw = {"tax": {"taxProfile": {"incomeExpenses": {"incomeRub": 1}}}}
+    before = (await client.get("/api/v1/scenarios")).json()
+    for path in ("/api/v1/scenarios/preview", "/api/v1/scenarios"):
+        response = await client.post(path, json={**good, "raw": bad_raw})
+        assert response.status_code == 422
+        assert response.json()["code"] == "VALIDATION_ERROR"
+        assert "PB_REVENUE" in response.json()["detail"]
+    assert (await client.get("/api/v1/scenarios")).json() == before
+    created = await client.post("/api/v1/scenarios", json=good)
+    assert created.status_code == 201, created.text
+    changed = await client.patch(
+        "/api/v1/scenarios/validation-before-save",
+        json={"title": "Не должно сохраниться", "raw": bad_raw},
+    )
+    assert changed.status_code == 422
+    stored = (await client.get("/api/v1/scenarios/validation-before-save")).json()
+    assert stored == created.json()

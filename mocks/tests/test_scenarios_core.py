@@ -59,8 +59,14 @@ STANKOPROM: dict[str, Any] = {
             "sharePercent": 100,
         }
     },
-    "finance": {"avgMonthlyRevenueRub": 35000000, "taxRegime": "OSNO", "headcount": 60},
+    "finance": {
+        "avgMonthlyRevenueRub": 35000000,
+        "taxRegime": "OSNO",
+        "headcount": 60,
+        "noisePercent": 0,
+    },
     "bki": {
+        "owner": None,  # Директор-владелец описан одним блоком, без конфликтующего пресета.
         "company": {
             "historyYears": 6,
             "activeLoans": [],
@@ -81,7 +87,26 @@ STANKOPROM: dict[str, Any] = {
     },
     "bank": {"isCustomer": False},
     "raw": {
-        "tax": {"financials": [{"year": 2025, "formType": "FULL", "lines": {"2110": 420000000}}]}
+        "tax": {
+            "financials": [
+                {
+                    "year": 2025,
+                    "formType": "FULL",
+                    "lines": {
+                        "1100": 182000000,
+                        "1200": 141000000,
+                        "1300": 196000000,
+                        "1400": 22000000,
+                        "1500": 105000000,
+                        "1600": 323000000,
+                        "2110": 420000000,
+                        "2200": 32600000,
+                        "2330": 1900000,
+                        "2400": 30700000,
+                    },
+                }
+            ]
+        }
     },
     "users": [
         {"login": "kuznetsov", "role": "DIRECTOR", "personRef": "kuznetsov"},
@@ -101,6 +126,7 @@ def stanko(code: str) -> dict[str, Any]:
     body = copy.deepcopy(STANKOPROM)
     for field in ("inn", "ogrn", "kpp"):
         body["company"].pop(field)
+    body["people"]["director"].pop("inn")
     return {**body, "code": code}
 
 
@@ -212,6 +238,7 @@ async def test_patch_merges_and_replaces_arrays(client: httpx.AsyncClient) -> No
         "avgMonthlyRevenueRub": 35000000,
         "taxRegime": "OSNO",
         "headcount": 70,
+        "noisePercent": 0,
     }
     assert spec["users"] == [{"login": "kuz", "role": "DIRECTOR"}]
 
