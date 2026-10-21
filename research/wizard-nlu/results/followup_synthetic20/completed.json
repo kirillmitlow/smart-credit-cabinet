@@ -1,0 +1,6 @@
+{
+  "completed_utc": "2026-10-21T06:11:23Z",
+  "input_sha256": "6cc9e7af8b924002709bb9cc1535c2715e22f9c62e8b3c6fb498032ee0460b74",
+  "checks": "hashes, disjoint texts/ids, shared USER2 scores, strict acceptance subset",
+  "human_validation": false
+}

@@ -1,0 +1,13 @@
+variant,subset,slot,n,accuracy,macro_f1,ece,accepted,accepted_correct,selective_accuracy,coverage,selective_wilson_low,selective_wilson_high,meets_95_test,known_gold_n,correctly_filled_known_recall,invented_known_n,invented_and_accepted_n,threshold,temperature
+laya_original,all_provisional,purpose,20,0.25,0.08771929824561403,0.1874023839753185,0,0,,0.0,,,False,20,0.0,0,0,0.7487765482074299,1.3273877251528234
+laya_original,unambiguous,purpose,17,0.29411764705882354,0.09803921568627451,0.19273185579093763,0,0,,0.0,,,False,17,0.0,0,0,0.7487765482074299,1.3273877251528234
+laya_original,all_provisional,frequency,20,0.85,0.526984126984127,0.33600018242779905,0,0,,0.0,,,False,1,0.0,3,0,1.01,0.8300564125867321
+laya_original,unambiguous,frequency,20,0.85,0.526984126984127,0.33600018242779905,0,0,,0.0,,,False,1,0.0,3,0,1.01,0.8300564125867321
+laya_original,all_provisional,payback_horizon,20,0.05,0.03333333333333333,0.12631843660097797,0,0,,0.0,,,False,7,0.0,13,0,1.01,20.0
+laya_original,unambiguous,payback_horizon,15,0.06666666666666667,0.037037037037037035,0.10905032586637735,0,0,,0.0,,,False,6,0.0,9,0,1.01,20.0
+laya_original,all_provisional,urgency,20,0.6,0.1875,0.14082828535654415,0,0,,0.0,,,False,3,0.0,5,0,1.01,0.6394922450618099
+laya_original,unambiguous,urgency,20,0.6,0.1875,0.14082828535654415,0,0,,0.0,,,False,3,0.0,5,0,1.01,0.6394922450618099
+laya_original,all_provisional,gov_contract,20,0.1,0.06060606060606061,0.25076102171308956,0,0,,0.0,,,False,0,0.0,18,0,1.01,20.0
+laya_original,unambiguous,gov_contract,20,0.1,0.06060606060606061,0.25076102171308956,0,0,,0.0,,,False,0,0.0,18,0,1.01,20.0
+laya_original,all_provisional,collateral,20,0.0,0.0,0.21000723806802984,0,0,,0.0,,,False,1,0.0,19,0,1.01,20.0
+laya_original,unambiguous,collateral,20,0.0,0.0,0.21000723806802984,0,0,,0.0,,,False,1,0.0,19,0,1.01,20.0

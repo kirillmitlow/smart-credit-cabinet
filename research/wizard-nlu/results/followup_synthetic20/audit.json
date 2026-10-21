@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "prediction_rows": 360,
+  "scalar_cosine_scores_compared": 540,
+  "max_absolute_score_error": 1.8302301718620129e-07,
+  "max_embedding_norm_error": 1.8752547770173322e-07,
+  "original_predictions_unchanged": true,
+  "note": "Extra encoding was a numerical audit after matmul warnings, not a new quality run or tuning"
+}
