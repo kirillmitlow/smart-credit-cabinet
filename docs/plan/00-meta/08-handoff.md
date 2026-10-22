@@ -43,7 +43,7 @@
 ## В работе (каждый правит свою строку)
 
 - **A:** T-297, ветка `feat/counter-offers-optimizer`; T-133, ветка `feat/mocks-personas-large` (субагенты).
-- **B:** —
+- **B:** Передача новому Codex при остатке 9% (D-104). T-213 в REVIEW, PR [#73](https://github.com/kirillmitlow/smart-credit-cabinet/pull/73), ветка `feat/bank-demo-login`, worktree `worktrees/gov-contracts-list`. Сначала проверить CI/ci-ok и слить при зелёном (D-111), затем T-360/T-361; подробный старт и интерфейсы A: [отчёт B](../reviews/B-2026-10-23-handoff.md). T-362…365, T-429…436 ещё не сделаны; строки A/C не менять.
 - **C:** —
 
 ## Что уже в main

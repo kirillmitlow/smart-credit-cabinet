@@ -6,5 +6,10 @@ export function zoneFromPath(pathname: string): Zone {
 }
 
 export function currentZone(): Zone {
+  if (
+    window.location.pathname === '/login' &&
+    new URLSearchParams(window.location.search).get('zone') === 'bank'
+  )
+    return 'bank';
   return zoneFromPath(window.location.pathname);
 }

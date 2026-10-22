@@ -8,6 +8,8 @@ from app.modules.auth import (
     reset,  # noqa: F401 — регистрирует сброс демо-данных (T-371)
     sessions,
 )
+from app.modules.auth.bank_login import register_bank_audit_recorder
+from app.modules.auth.bank_login import router as bank_login_router
 from app.modules.auth.dependencies import (
     BankPrincipal,
     ClientPrincipal,
@@ -27,11 +29,13 @@ __all__ = [
     "User",
     "Zone",
     "by_person_inn",
+    "bank_login_router",
     "codes",
     "current_bank",
     "current_client",
     "get",
     "require",
+    "register_bank_audit_recorder",
     "sessions",
     "upsert_client",
 ]
