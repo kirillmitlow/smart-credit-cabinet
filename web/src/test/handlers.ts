@@ -15,5 +15,6 @@ export const defaultHandlers = [
   getHealthReadyMockHandler(),
   getHealthDepsMockHandler(),
   http.get('*/api/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
+  http.get('*/api/applications', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/public-config', () => Response.json(makePublicConfig({ demoMode: false }))),
 ];

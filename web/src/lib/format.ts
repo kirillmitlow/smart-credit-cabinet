@@ -161,6 +161,14 @@ export function formatDateTime(input: string | Date | null | undefined): string 
   return `${p.day}${NBSP}${MONTHS_GENITIVE[p.month - 1]}, ${time}`;
 }
 
+/** `12:04` (время по Москве) */
+export function formatTime(input: string | Date | null | undefined): string {
+  if (input === null || input === undefined) return DASH;
+  const p = toParts(input);
+  if (!p) return DASH;
+  return `${String(p.hour).padStart(2, '0')}:${String(p.minute).padStart(2, '0')}`;
+}
+
 /** Срок в месяцах: `12 месяцев`, `1 месяц`, `24 месяца` */
 export function formatTermMonths(months: number | null | undefined): string {
   if (months === null || months === undefined || !Number.isFinite(months)) return DASH;

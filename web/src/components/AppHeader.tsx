@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { Anchor, Box, Group, Text } from '@mantine/core';
+import { Anchor, Box, Button, Group, Text } from '@mantine/core';
 import { Link, NavLink } from 'react-router';
 import { tokens } from '@/app/theme';
 import type { Zone } from '@/api/zone';
 import { ConnectionIndicator } from '@/components/ConnectionIndicator';
-import { fill, shell } from '@/texts';
+import { fill, logout, shell } from '@/texts';
 
 export interface NavItem {
   to: string;
@@ -22,6 +22,8 @@ export interface AppHeaderProps {
   canSwitchCompany?: boolean;
   /** Место под колокольчик уведомлений (T-428) */
   notifications?: ReactNode;
+  /** Кнопка «Выйти»: есть, когда у зоны уже есть способ выйти */
+  onLogout?: () => void;
 }
 
 /**
@@ -36,6 +38,7 @@ export function AppHeader({
   companyName,
   canSwitchCompany = false,
   notifications,
+  onLogout,
 }: AppHeaderProps) {
   const strip =
     zone === 'bank'
@@ -92,6 +95,11 @@ export function AppHeader({
             <Text size="sm" c="dimmed">
               {fill(shell.user.signedInAs, { name: userName })}
             </Text>
+          ) : null}
+          {onLogout ? (
+            <Button variant="subtle" size="compact-sm" onClick={onLogout}>
+              {logout.action}
+            </Button>
           ) : null}
           <ConnectionIndicator />
         </Group>

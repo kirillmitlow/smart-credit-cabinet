@@ -49,6 +49,7 @@ export const needsHelpStep = {
 
 export const timelineNotes = {
   withdrawn: 'Заявка отозвана вами',
+  expired: 'Срок истёк: заявка закрыта. Можно подать новую',
   expiredResponse: 'Срок ответа истёк: заявка закрыта. Можно подать новую',
   expiredOffer: 'Предложение действовало до {date} и закрыто',
   sourceDelayed:

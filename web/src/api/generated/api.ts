@@ -26,12 +26,17 @@ import type {
 
 import type {
   ActiveCompany,
+  ApplicationFields,
+  ApplicationOut,
+  ApplicationPage,
   CodeCheck,
   CodeIssued,
   CodeRequest,
+  DraftPatch,
   HTTPValidationError,
   HealthDeps200,
   HealthLive200,
+  ListApplicationsParams,
   MeResponse,
   PublicConfig,
   RolesResponse
@@ -1156,3 +1161,657 @@ export function useGetPublicConfig<TData = Awaited<ReturnType<typeof getPublicCo
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export type createApplicationResponse201 = {
+  data: ApplicationOut
+  status: 201
+}
+
+export type createApplicationResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type createApplicationResponseSuccess = (createApplicationResponse201) & {
+  headers: Headers;
+};
+export type createApplicationResponseError = (createApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type createApplicationResponse = (createApplicationResponseSuccess | createApplicationResponseError)
+
+export const getCreateApplicationUrl = () => {
+
+
+
+
+  return `/applications`
+}
+
+/**
+ * @summary Создать черновик заявки
+ */
+export const createApplication = async (applicationFields: ApplicationFields, options?: Parameters<typeof customFetch>[1]): Promise<createApplicationResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<createApplicationResponse>(getCreateApplicationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(applicationFields)
+  }
+);}
+
+
+
+
+
+export const getCreateApplicationMutationKey = () => ['createApplication'] as const;
+
+export const getCreateApplicationMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createApplication>>, TError,CreateApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createApplication>>, TError,CreateApplicationMutationVariables, TContext> => {
+
+const mutationKey = getCreateApplicationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createApplication>>, CreateApplicationMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createApplication(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof createApplication>>>
+    export type CreateApplicationMutationBody = ApplicationFields
+    export type CreateApplicationMutationError = HTTPValidationError
+    export type CreateApplicationMutationVariables = {data: ApplicationFields}
+
+    /**
+ * @summary Создать черновик заявки
+ */
+export const useCreateApplication = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createApplication>>, TError,CreateApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createApplication>>,
+        TError,
+        CreateApplicationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateApplicationMutationOptions(options), queryClient);
+    }
+
+export type listApplicationsResponse200 = {
+  data: ApplicationPage
+  status: 200
+}
+
+export type listApplicationsResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type listApplicationsResponseSuccess = (listApplicationsResponse200) & {
+  headers: Headers;
+};
+export type listApplicationsResponseError = (listApplicationsResponse422) & {
+  headers: Headers;
+};
+
+export type listApplicationsResponse = (listApplicationsResponseSuccess | listApplicationsResponseError)
+
+export const getListApplicationsUrl = (params?: ListApplicationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/applications?${stringifiedParams}` : `/applications`
+}
+
+/**
+ * @summary Мои заявки, новые сверху
+ */
+export const listApplications = async (params?: ListApplicationsParams, options?: Parameters<typeof customFetch>[1]): Promise<listApplicationsResponse> => {
+
+  return customFetch<listApplicationsResponse>(getListApplicationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListApplicationsQueryKey = (params?: ListApplicationsParams,) => {
+    return [
+    `/applications`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof listApplications>>, TError = HTTPValidationError>(params?: ListApplicationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplications>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListApplicationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listApplications>>> = ({ signal }) => listApplications(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listApplications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListApplicationsQueryResult = NonNullable<Awaited<ReturnType<typeof listApplications>>>
+export type ListApplicationsQueryError = HTTPValidationError
+
+
+export function useListApplications<TData = Awaited<ReturnType<typeof listApplications>>, TError = HTTPValidationError>(
+ params: undefined |  ListApplicationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplications>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApplications>>,
+          TError,
+          Awaited<ReturnType<typeof listApplications>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApplications<TData = Awaited<ReturnType<typeof listApplications>>, TError = HTTPValidationError>(
+ params?: ListApplicationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplications>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApplications>>,
+          TError,
+          Awaited<ReturnType<typeof listApplications>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApplications<TData = Awaited<ReturnType<typeof listApplications>>, TError = HTTPValidationError>(
+ params?: ListApplicationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplications>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Мои заявки, новые сверху
+ */
+
+export function useListApplications<TData = Awaited<ReturnType<typeof listApplications>>, TError = HTTPValidationError>(
+ params?: ListApplicationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplications>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListApplicationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getApplicationResponse200 = {
+  data: ApplicationOut
+  status: 200
+}
+
+export type getApplicationResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getApplicationResponseSuccess = (getApplicationResponse200) & {
+  headers: Headers;
+};
+export type getApplicationResponseError = (getApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type getApplicationResponse = (getApplicationResponseSuccess | getApplicationResponseError)
+
+export const getGetApplicationUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}`
+}
+
+/**
+ * @summary Заявка
+ */
+export const getApplication = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<getApplicationResponse> => {
+
+  return customFetch<getApplicationResponse>(getGetApplicationUrl(applicationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApplicationQueryKey = (applicationId: string,) => {
+    return [
+    `/applications/${applicationId}`
+    ] as const;
+    }
+
+
+export const getGetApplicationQueryOptions = <TData = Awaited<ReturnType<typeof getApplication>>, TError = HTTPValidationError>(applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApplicationQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplication>>> = ({ signal }) => getApplication(applicationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof getApplication>>>
+export type GetApplicationQueryError = HTTPValidationError
+
+
+export function useGetApplication<TData = Awaited<ReturnType<typeof getApplication>>, TError = HTTPValidationError>(
+ applicationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplication>>,
+          TError,
+          Awaited<ReturnType<typeof getApplication>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplication<TData = Awaited<ReturnType<typeof getApplication>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplication>>,
+          TError,
+          Awaited<ReturnType<typeof getApplication>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplication<TData = Awaited<ReturnType<typeof getApplication>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Заявка
+ */
+
+export function useGetApplication<TData = Awaited<ReturnType<typeof getApplication>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApplicationQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type patchApplicationDraftResponse200 = {
+  data: ApplicationOut
+  status: 200
+}
+
+export type patchApplicationDraftResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type patchApplicationDraftResponseSuccess = (patchApplicationDraftResponse200) & {
+  headers: Headers;
+};
+export type patchApplicationDraftResponseError = (patchApplicationDraftResponse422) & {
+  headers: Headers;
+};
+
+export type patchApplicationDraftResponse = (patchApplicationDraftResponseSuccess | patchApplicationDraftResponseError)
+
+export const getPatchApplicationDraftUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/draft`
+}
+
+/**
+ * @summary Автосохранение черновика
+ */
+export const patchApplicationDraft = async (applicationId: string,
+    draftPatch: DraftPatch, options?: Parameters<typeof customFetch>[1]): Promise<patchApplicationDraftResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<patchApplicationDraftResponse>(getPatchApplicationDraftUrl(applicationId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(draftPatch)
+  }
+);}
+
+
+
+
+
+export const getPatchApplicationDraftMutationKey = () => ['patchApplicationDraft'] as const;
+
+export const getPatchApplicationDraftMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationDraft>>, TError,PatchApplicationDraftMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchApplicationDraft>>, TError,PatchApplicationDraftMutationVariables, TContext> => {
+
+const mutationKey = getPatchApplicationDraftMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApplicationDraft>>, PatchApplicationDraftMutationVariables> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  patchApplicationDraft(applicationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchApplicationDraftMutationResult = NonNullable<Awaited<ReturnType<typeof patchApplicationDraft>>>
+    export type PatchApplicationDraftMutationBody = DraftPatch
+    export type PatchApplicationDraftMutationError = HTTPValidationError
+    export type PatchApplicationDraftMutationVariables = {applicationId: string;data: DraftPatch}
+
+    /**
+ * @summary Автосохранение черновика
+ */
+export const usePatchApplicationDraft = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationDraft>>, TError,PatchApplicationDraftMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchApplicationDraft>>,
+        TError,
+        PatchApplicationDraftMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPatchApplicationDraftMutationOptions(options), queryClient);
+    }
+
+export type submitApplicationResponse200 = {
+  data: ApplicationOut
+  status: 200
+}
+
+export type submitApplicationResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type submitApplicationResponseSuccess = (submitApplicationResponse200) & {
+  headers: Headers;
+};
+export type submitApplicationResponseError = (submitApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type submitApplicationResponse = (submitApplicationResponseSuccess | submitApplicationResponseError)
+
+export const getSubmitApplicationUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/submit`
+}
+
+/**
+ * @summary Отправить заявку
+ */
+export const submitApplication = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<submitApplicationResponse> => {
+
+  return customFetch<submitApplicationResponse>(getSubmitApplicationUrl(applicationId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getSubmitApplicationMutationKey = () => ['submitApplication'] as const;
+
+export const getSubmitApplicationMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitApplication>>, TError,SubmitApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitApplication>>, TError,SubmitApplicationMutationVariables, TContext> => {
+
+const mutationKey = getSubmitApplicationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitApplication>>, SubmitApplicationMutationVariables> = (props) => {
+          const {applicationId} = props ?? {};
+
+          return  submitApplication(applicationId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof submitApplication>>>
+
+    export type SubmitApplicationMutationError = HTTPValidationError
+    export type SubmitApplicationMutationVariables = {applicationId: string}
+
+    /**
+ * @summary Отправить заявку
+ */
+export const useSubmitApplication = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitApplication>>, TError,SubmitApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitApplication>>,
+        TError,
+        SubmitApplicationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitApplicationMutationOptions(options), queryClient);
+    }
+
+export type withdrawApplicationResponse200 = {
+  data: ApplicationOut
+  status: 200
+}
+
+export type withdrawApplicationResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type withdrawApplicationResponseSuccess = (withdrawApplicationResponse200) & {
+  headers: Headers;
+};
+export type withdrawApplicationResponseError = (withdrawApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type withdrawApplicationResponse = (withdrawApplicationResponseSuccess | withdrawApplicationResponseError)
+
+export const getWithdrawApplicationUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/withdraw`
+}
+
+/**
+ * @summary Отозвать заявку
+ */
+export const withdrawApplication = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<withdrawApplicationResponse> => {
+
+  return customFetch<withdrawApplicationResponse>(getWithdrawApplicationUrl(applicationId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getWithdrawApplicationMutationKey = () => ['withdrawApplication'] as const;
+
+export const getWithdrawApplicationMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof withdrawApplication>>, TError,WithdrawApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof withdrawApplication>>, TError,WithdrawApplicationMutationVariables, TContext> => {
+
+const mutationKey = getWithdrawApplicationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof withdrawApplication>>, WithdrawApplicationMutationVariables> = (props) => {
+          const {applicationId} = props ?? {};
+
+          return  withdrawApplication(applicationId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type WithdrawApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof withdrawApplication>>>
+
+    export type WithdrawApplicationMutationError = HTTPValidationError
+    export type WithdrawApplicationMutationVariables = {applicationId: string}
+
+    /**
+ * @summary Отозвать заявку
+ */
+export const useWithdrawApplication = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof withdrawApplication>>, TError,WithdrawApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof withdrawApplication>>,
+        TError,
+        WithdrawApplicationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getWithdrawApplicationMutationOptions(options), queryClient);
+    }

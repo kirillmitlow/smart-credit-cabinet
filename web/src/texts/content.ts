@@ -58,7 +58,7 @@ export const termHints = {
 } as const;
 
 export const demoMarks = {
-  loginCode: 'Демо: в реальном продукте код придёт SMS руководителю',
+  loginCode: 'Демо: в реальной системе код пришёл бы по SMS',
   document: 'ДЕМО. Синтетический документ, юридической силы не имеет',
   syntheticHover: 'Демо: данные придуманы',
 } as const;

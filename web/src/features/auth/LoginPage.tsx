@@ -3,10 +3,12 @@ import { Link, useSearchParams } from 'react-router';
 import { AppFooter } from '@/components/AppFooter';
 import { usePageHeading } from '@/lib/usePageHeading';
 import { loginPlaceholder } from '@/texts';
+import { ClientLogin } from './ClientLogin';
+import { safeNext } from './loginUrl';
 
 /**
- * Заглушка входа: сюда ведёт защита маршрутов, пока способа входа нет. Настоящий вход (ИНН + код, D-062)
- * целиком живёт в этой папке и заменяет только этот файл.
+ * Страница входа (60-01, «Вход как сменный блок»). Клиент: ИНН → кто входит → код → кабинет
+ * (`ClientLogin`). Вход банка (`?zone=bank`) появится вместе с демо-панелью (T-434): пока заглушка.
  */
 export function LoginPage() {
   const [params] = useSearchParams();
@@ -27,15 +29,15 @@ export function LoginPage() {
               {loginPlaceholder.expired}
             </Alert>
           ) : null}
-          <Text>{loginPlaceholder.body}</Text>
           {isBank ? (
-            <Anchor component={Link} to="/login">
-              {loginPlaceholder.clientLink}
-            </Anchor>
+            <>
+              <Text>{loginPlaceholder.body}</Text>
+              <Anchor component={Link} to="/login">
+                {loginPlaceholder.clientLink}
+              </Anchor>
+            </>
           ) : (
-            <Anchor component={Link} to="/login?zone=bank">
-              {loginPlaceholder.bankLink}
-            </Anchor>
+            <ClientLogin next={safeNext(params.get('next'))} />
           )}
         </Stack>
       </Container>
