@@ -40,6 +40,7 @@ import type {
   ContractOut,
   ContractSignedOut,
   DeclinedOut,
+  GovContractPage,
   HealthDeps200,
   HealthLive200,
   LoanDetail,
@@ -77,6 +78,8 @@ export const getGetMeResponseMock = (overrideResponse: Partial<Extract<MeRespons
 export const getSetActiveCompanyResponseMock = (overrideResponse: Partial<Extract<MeResponse, object>> = {}): MeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), activeCompanyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), companies: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({company: {id: faker.string.uuid(), inn: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canApply: faker.datatype.boolean()}, role: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getGetPublicConfigResponseMock = (overrideResponse: Partial<Extract<PublicConfig, object>> = {}): PublicConfig => ({demoMode: faker.datatype.boolean(), productName: faker.string.alpha({length: {min: 10, max: 20}}), version: faker.string.alpha({length: {min: 10, max: 20}}), nluAvailable: faker.datatype.boolean(), ...overrideResponse})
+
+export const getListCompanyGovContractsResponseMock = (overrideResponse: Partial<Extract<GovContractPage, object>> = {}): GovContractPage => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({registryNumber: faker.string.alpha({length: {min: 10, max: 20}}), customerName: faker.string.alpha({length: {min: 10, max: 20}}), subject: faker.string.alpha({length: {min: 10, max: 20}}), priceRub: faker.number.int(), unpaidRub: faker.number.int(), concludedAt: faker.date.past().toISOString().slice(0, 10), paymentDeadline: faker.date.past().toISOString().slice(0, 10), status: faker.string.alpha({length: {min: 10, max: 20}})})), retrievedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', nextCursor: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), source: "EIS", ...overrideResponse})
 
 export const getLookupCompanyResponseMock = (overrideResponse: Partial<Extract<CompanyProfile, object>> = {}): CompanyProfile => ({companyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), inn: faker.string.alpha({length: {min: 10, max: 20}}), form: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(CompanyForm)),null,]), eligibility: faker.helpers.arrayElement(Object.values(Eligibility)), fields: {
         [faker.string.alphanumeric(5)]: {value: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),faker.number.int(),faker.datatype.boolean(),null,]), source: faker.helpers.arrayElement(Object.values(System)), retrievedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), confirmed: faker.datatype.boolean()}
@@ -248,6 +251,18 @@ export const getGetPublicConfigMockHandler = (overrideResponse?: PublicConfig | 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getGetPublicConfigResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getListCompanyGovContractsMockHandler = (overrideResponse?: GovContractPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GovContractPage> | GovContractPage), options?: RequestHandlerOptions) => {
+  return http.get('*/companies/:companyId/gov-contracts', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListCompanyGovContractsResponseMock(),
       { status: 200
       })
   }, options)
@@ -597,6 +612,7 @@ export const getApiMock = () => [
   getGetMeMockHandler(),
   getSetActiveCompanyMockHandler(),
   getGetPublicConfigMockHandler(),
+  getListCompanyGovContractsMockHandler(),
   getLookupCompanyMockHandler(),
   getGetCompanyProfileMockHandler(),
   getCreateApplicationMockHandler(),

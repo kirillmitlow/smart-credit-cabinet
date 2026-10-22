@@ -106,6 +106,7 @@ def stand(
     client.set("scc:session:CLIENT:abc", "{}")
     client.set("scc:otp:otp_1", "{}")
     client.set("lookup:registry:company:001234567887", "{}")
+    client.set("scc:gov-contracts:company-cache", "{}")
     client.set(cache.WORKER_HEARTBEAT_KEY, "2026-10-21T10:00:00+00:00")
     yield {"app": app, "fake": fake, "redis": client, "policy_id": policy_id}
     client.flushdb()
