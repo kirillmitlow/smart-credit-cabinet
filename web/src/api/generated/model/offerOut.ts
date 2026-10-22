@@ -12,7 +12,7 @@ export interface OfferOut {
   applicationId: string;
   kind: string;
   status: string;
-  /** `PENDING`: встречные варианты ещё готовятся (оптимизатор T-297), выбирать нечего */
+  /** `READY`: варианты есть, можно выбирать; `PENDING`: запасное состояние без вариантов, принять нельзя (встречное решения в норме несёт варианты) */
   variantsStatus: string;
   expiresAt: string;
   acceptedVariantId: string | null;

@@ -43,8 +43,12 @@ class VariantOut(Camel):
     overpayment_rub: int
     collateral_required: bool
     recommended: bool
-    what_changed: dict[str, Any]
-    note: str
+    what_changed: dict[str, Any] = Field(
+        description="Чем вариант отличается от запроса (`productCode`, `amountRub`, `termMonths`: "
+        "`{from, to}`; `security`: нужен залог или поручительство) и «что нужно от вас» "
+        "(`requirements`: список фраз; нет ключа — ничего)"
+    )
+    note: str = Field(description="Почему этот вариант: одна фраза клиенту")
     schedule_preview: list[ScheduleRowOut] = Field(
         description="Первые три платежа и последний; полный график — в договоре"
     )
@@ -56,7 +60,8 @@ class OfferOut(Camel):
     kind: str
     status: str
     variants_status: str = Field(
-        description="`PENDING`: встречные варианты ещё готовятся (оптимизатор T-297), выбирать нечего"
+        description="`READY`: варианты есть, можно выбирать; `PENDING`: запасное состояние без "
+        "вариантов, принять нельзя (встречное решения в норме несёт варианты)"
     )
     expires_at: datetime
     accepted_variant_id: UUID | None

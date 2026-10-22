@@ -4,15 +4,15 @@
 баллы, грейд, ставка, исход, уровень и коды — точно. «Главный код равен первому, остальные входят
 в набор» — проверяем строже: последовательность кодов совпадает с оракулом.
 
-Что оракул требует от шагов, которых ещё нет (оптимизатор встречных T-297), помечено
-`xfail(strict=True)` с номером задачи: когда шаг появится, тест упадёт и пометку придётся
-снять, а не забыть. Флаги (T-288, T-290) готовы: все четыре технических сценария с флагами
-проверяются целиком.
+Что оракул требует от шагов, которых ещё нет, помечено `xfail(strict=True)` с номером задачи:
+когда шаг появится, тест упадёт и пометку придётся снять, а не забыть. Флаги (T-288, T-290) и
+встречные (T-297: три карточки СнабКонтракта) готовы и проверяются целиком.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import re
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 
 import pytest
@@ -23,6 +23,7 @@ from app.modules.decisioning.types import (
     Grade,
     Level,
     Outcome,
+    Product,
     Route,
 )
 from tests.fixtures.core_personas import PERSONAS
@@ -30,6 +31,7 @@ from tests.fixtures.core_personas import PERSONAS
 pytestmark = pytest.mark.unit
 
 D = Decimal
+BANNED_CLIENT_WORDS = re.compile(r"DSCR|грейд|балл|скоринг|\bPD\b|стоп-фактор|флаг", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -375,11 +377,85 @@ def test_snabkontrakt_max_amount_by_term_matches_example_7() -> None:
     assert result.numbers.min_term_months == 28  # n_min при пороге 1,25 (30-16)
 
 
-def test_snabkontrakt_counter_offers_are_a_marked_placeholder() -> None:
-    """Три карточки 30-17 строит T-297; пока — явная метка и пустой список."""
+def _near(value: Decimal | None, expected: str, tol: str) -> bool:
+    return value is not None and abs(value - D(expected)) <= D(tol)
+
+
+def test_snabkontrakt_three_cards_match_the_oracle() -> None:
+    """30-17: три карточки; рубли ±1, DSCR и стресс ±0,005, суммы, сроки и продукт точно."""
     result = decide(PERSONAS["snabkontrakt"]())
-    assert result.variants == ()
-    assert result.variants_status == "PLACEHOLDER_T297"
+    assert result.variants_status == "READY"
+    by_kind = {v.kind: v for v in result.variants}
+    assert [v.kind for v in result.variants] == ["LONGER_TERM", "LESS_AMOUNT", "OTHER_PRODUCT"]
+
+    longer = by_kind["LONGER_TERM"]  # 1. Ваша сумма, дольше срок
+    assert (longer.product, longer.amount_rub, longer.term_months, longer.rate) == (
+        Product.WORKING_CAPITAL,
+        8_000_000,
+        36,
+        D("0.195"),
+    )
+    assert abs(longer.payment_rub - 295_274) <= 1
+    assert abs((longer.last_payment_rub or 0) - 295_295) <= 36
+    assert abs((longer.overpayment_rub or 0) - 2_629_885) <= 1
+    assert _near(longer.dscr, "1.340", "0.005")
+    assert _near(longer.stress_dscr, "1.072", "0.005")
+    assert longer.recommended  # «рекомендуем» — только срок меняется
+
+    less = by_kind["LESS_AMOUNT"]  # 2. Ваш срок, меньше сумма
+    assert (less.product, less.amount_rub, less.term_months) == (
+        Product.WORKING_CAPITAL,
+        3_400_000,
+        12,
+    )
+    assert abs(less.payment_rub - 314_144) <= 1
+    assert abs((less.overpayment_rub or 0) - 369_732) <= 1
+    assert _near(less.dscr, "1.313", "0.005")
+    assert _near(less.stress_dscr, "1.050", "0.005")  # граница: 1,0502 против порога 1,05
+    assert not less.recommended
+
+    contract = by_kind["OTHER_PRODUCT"]  # 3. Другой продукт
+    assert (contract.product, contract.amount_rub, contract.term_months, contract.rate) == (
+        Product.CONTRACT,
+        8_000_000,
+        4,
+        D("0.195"),
+    )
+    assert abs(contract.payment_rub - 130_000) <= 1  # проценты в месяц
+    assert abs((contract.last_payment_rub or 0) - 8_130_000) <= 1  # в конце одной суммой
+    assert abs((contract.overpayment_rub or 0) - 520_000) <= 1
+    assert _near(contract.dscr, "1.644", "0.005")
+    assert _near(contract.stress_dscr, "1.315", "0.005")
+    assert not contract.recommended
+    assert not any(v.security_required for v in result.variants)
+
+
+def test_snabkontrakt_distances_match_30_10_and_30_months_is_not_offered() -> None:
+    result = decide(PERSONAS["snabkontrakt"]())
+    # формула расстояния 30-10: 0,78 / 1,73 / 1,00 (точно 0,7767 / 1,725 / 1,0)
+    for v, expected in zip(result.variants, ("0.78", "1.73", "1.00"), strict=True):
+        assert _near(v.distance, expected, "0.005")
+    # 30 мес.: DSCR 1,278 — серая зона, в карточки не попадает; 36 — узел сетки после 30
+    assert 30 not in {v.term_months for v in result.variants}
+    inp = PERSONAS["snabkontrakt"]()
+    thirty = replace(inp, application=replace(inp.application, term_months=30))
+    probe = decide(thirty)
+    assert _near(probe.numbers.dscr, "1.278", "0.005")
+    assert probe.numbers.stress_dscr is not None
+
+
+def test_snabkontrakt_cards_have_label_inputs_why_and_requirements() -> None:
+    result = decide(PERSONAS["snabkontrakt"]())
+    longer, less, contract = result.variants
+    assert longer.requirements == ()
+    assert less.requirements == ()
+    assert "1001500002826000127" in contract.requirements[0]
+    for v in result.variants:
+        assert v.note.endswith(".")
+        assert "\n" not in v.note  # «почему» — одна фраза
+        assert not re.search(r"[.!?]\s+[А-ЯA-Z]", v.note)
+        assert not BANNED_CLIENT_WORDS.search(v.note)
+    assert sum(v.recommended for v in result.variants) == 1
 
 
 def test_quick_start_conditional_counter_offer_has_the_same_terms() -> None:

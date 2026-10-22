@@ -378,3 +378,52 @@ def render(reason: ReasonCode) -> Explanation:
         underwriter=_fill(entry.underwriter, params),
         action=_fill(entry.action, params),
     )
+
+
+# ---------------------------------------------------------------- карточки встречных (T-297, 30-10)
+
+# «Почему» — одна фраза клиенту; без слов «DSCR», «грейд», «балл». Ключ — вид карточки
+VARIANT_WHY: dict[str, str] = {
+    "LONGER_TERM": (
+        "Вся запрошенная сумма: за счёт срока {term} мес. платёж {payment} в месяц "
+        "по силам вашему бизнесу."
+    ),
+    "OTHER_TERM": (
+        "Вся запрошенная сумма на срок {term} мес.: платёж {payment} в месяц по силам вашему бизнесу."
+    ),
+    "LESS_AMOUNT": (
+        "Срок как вы просили, а сумма меньше: платёж {payment} в месяц укладывается "
+        "в доход вашего бизнеса."
+    ),
+    "OTHER_PRODUCT": (
+        "Другой продукт, «{title}»: платёж {payment} в месяц подходит под ваш денежный поток."
+    ),
+    "OTHER_PRODUCT_BULLET": (
+        "Кредит под контракт: ежемесячно платите только проценты ({payment}), "
+        "а основной долг возвращаете из оплаты заказчика."
+    ),
+    "WITH_SECURITY": (
+        "С залогом банк может предложить такие условия: платёж {payment} в месяц по силам бизнесу."
+    ),
+}
+REQUIREMENT_CONTRACT = "Подтвердить контракт № {number}: основной долг гасится из оплаты заказчика"
+REQUIREMENT_SECURITY = (
+    "Предложить залог (оборудование, транспорт или недвижимость): стоимость и документы "
+    "проверит специалист"
+)
+
+
+def variant_why(kind: str, *, bullet: bool = False, **params: str) -> str:
+    """Фраза «почему» для карточки; `bullet` — кредит с процентами в конце (под контракт)."""
+    key = "OTHER_PRODUCT_BULLET" if kind == "OTHER_PRODUCT" and bullet else kind
+    return VARIANT_WHY[key].format(**params)
+
+
+def variant_requirements(*, contract_number: str | None, security_added: bool) -> tuple[str, ...]:
+    """«Что нужно от вас» для карточки: подтвердить контракт, предложить залог; иначе ничего."""
+    needs: list[str] = []
+    if contract_number is not None:
+        needs.append(REQUIREMENT_CONTRACT.format(number=contract_number))
+    if security_added:
+        needs.append(REQUIREMENT_SECURITY)
+    return tuple(needs)

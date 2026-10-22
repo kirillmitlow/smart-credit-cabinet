@@ -85,8 +85,8 @@ class ClientDecisionOut(Camel):
     what_helped: list[str] = Field(description="До двух сильных сторон при одобрении")
     what_affected: list[str] = Field(description="До трёх слабых мест при отказе и встречном")
     offer: offers.OfferOut | None = Field(
-        description="Предложение банка (`APPROVED`, `COUNTER_OFFER`); у встречного без вариантов "
-        "`variantsStatus = PENDING`"
+        description="Предложение банка (`APPROVED`, `COUNTER_OFFER`: до трёх карточек); "
+        "`variantsStatus = PENDING` — запасное состояние без вариантов"
     )
 
 

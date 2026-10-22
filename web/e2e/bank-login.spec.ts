@@ -8,13 +8,19 @@ test('T-213: клиент и андеррайтер входят и выходя
   context,
 }) => {
   await loginAsClient(page, personas.sokolova.inn);
-  const initialClient = await (await page.request.get('/api/v1/me')).json();
+  const initialClient = (await (await page.request.get('/api/v1/me')).json()) as { userId: string };
   const bank = await context.newPage();
   await loginAsUnderwriter(bank);
-  const employee = await (await bank.request.get('/api/v1/auth/bank-me')).json();
+  const employee = (await (await bank.request.get('/api/v1/auth/bank-me')).json()) as {
+    role: string;
+    level: string;
+  };
   expect(employee.role).toBe('UNDERWRITER');
   expect(employee.level).toBe('L2');
-  expect((await (await page.request.get('/api/v1/me')).json()).userId).toBe(initialClient.userId);
+  const unchangedClient = (await (await page.request.get('/api/v1/me')).json()) as {
+    userId: string;
+  };
+  expect(unchangedClient.userId).toBe(initialClient.userId);
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: home.title })).toBeVisible();
   expect((await page.request.post('/api/v1/auth/logout')).status()).toBe(204);

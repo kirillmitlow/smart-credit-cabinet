@@ -9,8 +9,6 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
-
 from app.modules.decisioning import affordability, counter_offers, pricing
 from app.modules.decisioning.eligibility import (
     check_completeness,
@@ -242,11 +240,23 @@ def decide(inputs: DecisionInput) -> DecisionResult:
         )
     )
 
-    # Шаги 11–12. Маршрут и встречные (оптимизатор — заглушка, T-297)
+    # Шаги 11–12. Встречные нужны, только если запрос не проходит; для грейда E маршрут их не смотрит
     flags = evaluate_flags(inp, feats) + unavailable_sources(inp)
-    search = counter_offers.search_counter_offers(
-        policy, app, breakdown.rate, feats, _overdraft_cap(inp, feats)
-    )
+    hard = bool(afford.violations or product_violations)
+    if hard and result.grade != Grade.E:
+        search = counter_offers.search_counter_offers(
+            policy,
+            app,
+            breakdown.rate,
+            feats,
+            grade=result.grade,
+            product_ctx=product_ctx,
+            contract=contract,
+            inflow_average=feats.inflow_average_rub,
+            request=afford,
+        )
+    else:
+        search = counter_offers.NOT_SEARCHED
     routed = route(
         policy, app, feats, result, afford, breakdown.rate, product_violations, flags, search
     )
@@ -266,7 +276,11 @@ def decide(inputs: DecisionInput) -> DecisionResult:
         TraceStep(
             "12.counter_offers",
             routed.outcome == Outcome.COUNTER_OFFER or routed.recommendation is not None,
-            {"status": routed.variants_status, "feasible": search.feasible},
+            {
+                "status": routed.variants_status,
+                "feasible": search.feasible,
+                "cards": len(routed.variants),
+            },
         )
     )
 
@@ -313,10 +327,3 @@ def _auto_limit(inp: DecisionInput, grade: Grade) -> int | None:
     if grade in (Grade.C, Grade.D, Grade.E):
         return None
     return auto_limit(inp.policy, inp.application.product, grade)
-
-
-def _overdraft_cap(inp: DecisionInput, feats: Features) -> int | None:
-    if feats.inflow_average_rub is None:
-        return None
-    share = inp.policy.affordability.overdraft_share_of_inflows.value
-    return int(Decimal(feats.inflow_average_rub) * share)
