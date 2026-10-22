@@ -1,19 +1,15 @@
 /**
- * Кто пользователь и что настроено на стенде. Клиентская сессия и публичная настройка идут через
- * сгенерированные функции orval (`GET /me`, `GET /public-config`). Входа банка в api ещё нет:
- * для банковской зоны спрашиваем `GET /me?zone=bank` руками; пока api читает только `sid_client`,
- * ответ «клиент» или `401` и даёт экран «Эта часть для сотрудников банка» либо вход (Q-146).
+ * Независимые сессии клиента и банка: разные cookie, маршруты API и ключи кэша (D-085).
  */
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import { apiGet } from '@/api/client';
-import { isAppError } from '@/api/errors';
-import { getMe, getPublicConfig } from '@/api/generated/api';
-import type { MeResponse, PublicConfig } from '@/api/generated/model';
+import { appErrorFromResponse, isAppError } from '@/api/errors';
+import { getBankMe, getMe, getPublicConfig } from '@/api/generated/api';
+import type { BankMeResponse, MeResponse, PublicConfig } from '@/api/generated/model';
 import { publicConfigQueryKey, sessionQueryKey } from '@/api/session-keys';
 import type { Zone } from '@/api/zone';
 
 /** Ответ `GET /me` целиком: пользователь, роль и компании в форме схемы api */
-export type Me = MeResponse;
+export type Me = MeResponse & { level?: BankMeResponse['level'] };
 
 export function isBankRole(role: string): boolean {
   return role === 'UNDERWRITER' || role === 'ADMIN';
@@ -33,7 +29,11 @@ export function useSession(zone: Zone, enabled = true): UseQueryResult<Me | null
     queryFn: async ({ signal }) => {
       try {
         if (zone === 'client') return (await getMe({ signal })).data;
-        return await apiGet<Me>('/me?zone=bank', signal);
+        const response = await getBankMe({ signal });
+        if (response.status !== 200) {
+          throw appErrorFromResponse(response.status, response.data, response.headers, null);
+        }
+        return { ...response.data, activeCompanyId: null, companies: [] };
       } catch (error) {
         if (isNotSignedIn(error)) return null;
         throw error;

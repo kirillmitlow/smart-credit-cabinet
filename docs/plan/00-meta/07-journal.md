@@ -643,6 +643,19 @@ PR #60 влит с согласия D-108 после совместной про
 
 **Правило на будущее (D-110):** смена только по просьбе пользователя; перед работой проверить, чья смена. Записано в протокол (раздел «Начало смены»).
 
+
+**23.10, начало параллельной работы B · T-213 и запрос интерфейсов A по D-111**
+
+B взял вход банка (feat/bank-demo-login), далее очередь/карточку T-360/T-361. Модули клиентской стороны и ядра не меняет. Проверка public API выявила блокеры следующих действий; просьба A добавить публичные функции в своей зоне, чтобы B мог закрыть V4 без записи в чужие таблицы:
+
+- **T-362 / pipeline:** сохранение нового immutable UNDERWRITER snapshot со ссылкой на ENGINE, actor/level, reason/comment/deviation; транзакция вызывающего, проверка expected_version. Предлагаемый public record_underwriter_decision(...)->receipt с decision_id/проверенными условиями. Нужно явно определить, кто делает transition/OVERRIDE, чтобы не дублировать события. Существующий persist_decision — ENGINE/SYSTEM и не подходит.
+- **T-362/T-364 / decisioning:** public оценка решения/условий андеррайтера с введённой ставкой, матрицей L1/L2, порогами исключения DSCR1,15/стресс0,9 и причинами UW. Предлагаемый evaluate_underwriter_decision(inputs, engine_result, outcome, terms, actor_level, reason_code, comment)->evaluation. Расчёт повторяется при сохранении, привязан к версии/inputs/policy hash. B не хардкодит новую policy в backoffice.
+- **T-363 / applications, T-350/T-351:** public создание раунда задач информации (что/зачем/срок/исполнитель) с TASK и NEEDS_INFO атомарно; после ответа — новый прогон. Таблиц/методов задач пока нет.
+- **T-363 / pipeline, T-277:** public request_recheck с новым уникальным запуском, CHECKING и enqueue после коммита. Просто transition+pipeline.run не работает: run_key прежней версии уже DONE и не захватывается повторно. Свежий БКИ этой заявки переиспользуется существующим механизмом снимков.
+
+Чтение queue/card будет в backoffice/queries.py через статические Core-проекции Base.metadata (явное исключение R5), без импорта чужих внутренних моделей. Баллы — explain.numbers.factors; ручные причины — trace 11.routing.detail.manual. Для T-365 уже есть public shared.outbox.retry_dead. Уведомления/файлы пока не реализованы — пустые блоки не выдавать за готовые, цикл с документом требует функций A. Новые API/миграции нашей зоны разрешены D-111, повторное согласие не запрашивать.
+
+T-213 реализован: API входа/me/выхода банка, уровень User и миграция0010, отдельный аудит, свежая проверка полномочий, кнопка UI и раздельные кэши. 1359 API и 55 целевых проверок, mypy/import-linter зелёные; 46 целевых web зелёные. Перед PR включаем свежий main (зона C/D-112), сохраняем A/C строки handoff; в handoff меняется только B. Перед следующими действиями ждём публичных интерфейсов A, перечисленных выше.
 ---
 
 **22.10 · Агент A (Claude Code, субагент) · Встречные предложения: оптимизатор и три карточки (T-297)**
@@ -656,3 +669,9 @@ PR #60 влит с согласия D-108 после совместной про
 **Подсказки следующему:** поиск живёт в `counter_offers.py` (класс `_Search`: `passes` — все проверки одной суммы, `best_amount` — деление пополам, три метода карточек и `variant`); веса и сетка — `policy.counter_offers`. Property-тесты `api/tests/property/test_counter_offers.py` (INV-40…43, 50, сверка с полным перебором), unit — `api/tests/unit/decisioning/test_counter_offers.py`, строка оракула — `test_oracle_30_17.py`. Генератор «хороший клиент просит больше, чем тянет» — `counter_offer_params` в `tests/strategies/decisioning.py`.
 
 **Файлы:** api/app/modules/decisioning/{counter_offers,decide,routing,texts_ru,types}.py, api/app/modules/pipeline/{hooks,decision_view}.py, api/app/modules/offers/{schemas,models}.py, api/tests/{fixtures/counter_offers.py,strategies/decisioning.py,property/test_counter_offers.py}, api/tests/unit/{decisioning/test_counter_offers,decisioning/test_routing,test_oracle_30_17,test_offers_unit}.py, docs/api/api.openapi.json, web/src/api/generated/, docs/plan/reviews/R-004-core-implementation-notes.md, docs/plan/30-decisioning/10-counter-offer-options.md, карточки T-296, T-297, T-259, T-340.
+
+---
+
+**23.10 · B: передача при 9% лимита, D-104**
+
+T-213 опубликован в PR #73, REVIEW до зелёного CI/слияния. После включения main f6fb8c1: 55 целевых API, полный web check (404 теста), браузерный независимый вход/выход — зелёные. Общий make check на объединённой ветке завершился exit0, ссылки документации зелёные. Следующему Codex: сначала завершить PR, затем T-360/T-361; T-362…365 и экраны/демо не начаты. Полный отчёт и точные запросы к public API A — reviews/B-2026-10-23-handoff.md. В handoff изменена только строка B, чужие записи сохранены. Новых задач после порога не брали.

@@ -1,14 +1,15 @@
-import { Alert, Anchor, Container, Stack, Text, Title } from '@mantine/core';
-import { Link, useSearchParams } from 'react-router';
+import { Alert, Container, Stack, Title } from '@mantine/core';
+import { useSearchParams } from 'react-router';
 import { AppFooter } from '@/components/AppFooter';
 import { usePageHeading } from '@/lib/usePageHeading';
 import { loginPlaceholder } from '@/texts';
+import { BankLogin } from '@/features/bank/BankLogin';
 import { ClientLogin } from './ClientLogin';
 import { safeNext } from './loginUrl';
 
 /**
  * Страница входа (60-01, «Вход как сменный блок»). Клиент: ИНН → кто входит → код → кабинет
- * (`ClientLogin`). Вход банка (`?zone=bank`) появится вместе с демо-панелью (T-434): пока заглушка.
+ * (`ClientLogin`). Банк входит отдельной демо-кнопкой и сохраняет собственную сессию (T-213).
  */
 export function LoginPage() {
   const [params] = useSearchParams();
@@ -30,12 +31,7 @@ export function LoginPage() {
             </Alert>
           ) : null}
           {isBank ? (
-            <>
-              <Text>{loginPlaceholder.body}</Text>
-              <Anchor component={Link} to="/login">
-                {loginPlaceholder.clientLink}
-              </Anchor>
-            </>
+            <BankLogin next={safeNext(params.get('next'))} />
           ) : (
             <ClientLogin next={safeNext(params.get('next'))} />
           )}
