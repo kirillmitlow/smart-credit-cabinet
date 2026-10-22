@@ -168,6 +168,18 @@ async def client(app: FastAPI, admin: httpx.AsyncClient) -> AsyncIterator[httpx.
         yield c
 
 
+def msk_date(moment: str) -> str:
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    return (
+        datetime.fromisoformat(moment.replace("Z", "+00:00"))
+        .astimezone(ZoneInfo("Europe/Moscow"))
+        .date()
+        .isoformat()
+    )
+
+
 async def put(
     admin: httpx.AsyncClient, inn: str, body: dict[str, Any], scenario: str | None = "demo"
 ) -> httpx.Response:
@@ -469,7 +481,8 @@ async def test_account_blocks_with_and_without_bik(
     everything = (await client.get(f"/api/v1/account-blocks/{ROMASHKA}")).json()
     assert everything["meta"]["source"] == "FNS_BLOCKS"
     assert everything["inn"] == ROMASHKA
-    assert everything["checkedAt"].startswith("2026-10-20T")
+    # Сутки стенда — по Москве: в UTC дата бывает вчерашней (00:00–03:00 МСК)
+    assert msk_date(everything["checkedAt"]) == "2026-10-20"
     assert everything["decisions"] == [
         {
             "number": "4512",
