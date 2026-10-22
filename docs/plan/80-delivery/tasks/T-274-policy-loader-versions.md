@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE — PR feat/api-pipeline |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/policy-loader-versions` |
 | Оценка | ~4 ч |

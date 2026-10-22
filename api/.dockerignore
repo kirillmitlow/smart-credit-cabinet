@@ -4,4 +4,5 @@
 !alembic.ini
 !alembic/**
 !app/**
+!policy/**
 **/__pycache__

@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
 from app import health
-from app.modules import applications, companies
+from app.modules import applications, companies, pipeline
 from app.shared import clock, db
 from app.shared.errors import install_error_handlers
 from app.shared.logs import configure_logging
@@ -27,6 +27,12 @@ def _sync_companies() -> None:
         companies.sync_all(session)
 
 
+def _register_policy() -> None:
+    with db.transaction() as session:
+        row = pipeline.register_current(session)
+        log.info("policy_registered", version=row.version, hash=row.content_hash[:12])
+
+
 async def _migrate_until_done(database: db.Database) -> None:
     """База может подняться позже api: повторяем, /health/ready до этого отвечает 503.
     Затем подтягиваем демо-учётки из сценариев; сбой не критичен — вход досинхронизирует сам."""
@@ -38,6 +44,10 @@ async def _migrate_until_done(database: db.Database) -> None:
         except Exception as exc:
             log.warning("database_not_ready", error=str(exc))
             await asyncio.sleep(MIGRATION_RETRY_SECONDS)
+    try:
+        await run_in_threadpool(_register_policy)
+    except Exception as exc:
+        log.warning("policy_register_failed", error=str(exc))  # запуск зарегистрирует сам
     try:
         await run_in_threadpool(_sync_companies)
     except Exception as exc:
@@ -58,6 +68,8 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
+    # Невалидный файл политики (нет source у числа, дыра в грейдах) — api не стартует (T-274)
+    pipeline.current_policy()
     clock.configure(settings.app_today)
     db.configure(settings.sqlalchemy_url)
     app = FastAPI(
