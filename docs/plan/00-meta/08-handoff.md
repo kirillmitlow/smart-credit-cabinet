@@ -44,7 +44,7 @@
 
 - **A:** T-297, ветка `feat/counter-offers-optimizer`; T-133, ветка `feat/mocks-personas-large` (субагенты).
 - **B:** —
-- **C:** —
+- **C:** T-515, ветка `chore/smoke-script`; готовность стенда и smoke Соколовой до выдачи (23.10, отдельная копия на Mac).
 
 ## Что уже в main
 
