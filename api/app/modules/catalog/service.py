@@ -25,7 +25,7 @@ from app.modules.decisioning.policy import ProductConfig
 from app.shared.errors import AppError
 
 from .facts import CompanyFacts, business_age_months, product_context
-from .schemas import AutoDecisionMode, ProductOut, ReasonOut
+from .schemas import AutoDecisionMode, ProductOut, ProductReasonOut
 
 # Не блокируют показ: залог и контракт клиент добавит позже, это не «недоступно»
 SOFT_CODES = frozenset({"COLLATERAL_REQUIRED", "CONTRACT_INVALID"})
@@ -88,9 +88,9 @@ def _available_from(reason: ReasonCode, facts: CompanyFacts) -> date | None:
     return None
 
 
-def reason_out(reason: ReasonCode, facts: CompanyFacts) -> ReasonOut:
+def reason_out(reason: ReasonCode, facts: CompanyFacts) -> ProductReasonOut:
     explanation = render(reason)
-    return ReasonOut(
+    return ProductReasonOut(
         code=reason.code,
         text=explanation.client,
         action=explanation.action,

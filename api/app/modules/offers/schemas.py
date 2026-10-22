@@ -135,7 +135,7 @@ class SignConfirmIn(Camel):
     code: str = Field(pattern=r"^\d{6}$")
 
 
-class SignedOut(Camel):
+class ContractSignedOut(Camel):
     contract: ContractOut
     just_signed: bool = Field(description="`false` — повторное нажатие: вторая подпись не создана")
 

@@ -18,7 +18,7 @@ from app.modules.offers.schemas import (
     PassedOut,
     SignChallengeOut,
     SignConfirmIn,
-    SignedOut,
+    ContractSignedOut,
     SignStartIn,
 )
 from app.shared import db
@@ -181,12 +181,12 @@ async def request_signing_code(
     return await run_in_threadpool(_start, principal, contract_id, body)
 
 
-def _sign(principal: auth.Principal, contract_id: UUID, body: SignConfirmIn) -> SignedOut:
+def _sign(principal: auth.Principal, contract_id: UUID, body: SignConfirmIn) -> ContractSignedOut:
     with db.transaction() as session:
         contract, application, just_signed = signing.sign(
             session, principal, contract_id, body.request_id, body.code
         )
-        return SignedOut(
+        return ContractSignedOut(
             contract=views.contract_out(session, principal, contract, application),
             just_signed=just_signed,
         )
@@ -196,10 +196,10 @@ def _sign(principal: auth.Principal, contract_id: UUID, body: SignConfirmIn) -> 
     "/contracts/{contract_id}/sign",
     operation_id="signContract",
     summary="Ввести код: договор подписан; когда подписи собраны, заявка → SIGNED и стартует выдача",
-    response_model=SignedOut,
+    response_model=ContractSignedOut,
     response_model_by_alias=True,
 )
 async def sign_contract(
     contract_id: UUID, body: SignConfirmIn, principal: auth.ClientPrincipal
-) -> SignedOut:
+) -> ContractSignedOut:
     return await run_in_threadpool(_sign, principal, contract_id, body)

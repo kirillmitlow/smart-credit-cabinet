@@ -45,7 +45,7 @@ class Camel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
-class ReasonOut(Camel):
+class DecisionReasonOut(Camel):
     code: str
     text: str
     action: str
@@ -71,7 +71,7 @@ class ClientDecisionOut(Camel):
     rate_breakdown: list[RatePartOut] = Field(
         description="Из чего складывается ставка; пусто, если ставки нет"
     )
-    reasons: list[ReasonOut]
+    reasons: list[DecisionReasonOut]
     next_steps: list[str] = Field(description="Что можно сделать, без повторов")
     what_helped: list[str] = Field(description="До двух сильных сторон при одобрении")
     what_affected: list[str] = Field(description="До трёх слабых мест при отказе и встречном")
@@ -103,13 +103,13 @@ def _rate_breakdown(explain: dict[str, Any]) -> list[RatePartOut]:
     return [RatePartOut(label=label, percent=value.normalize()) for label, value in lines if value]
 
 
-def _reasons(explain: dict[str, Any]) -> list[ReasonOut]:
-    out: list[ReasonOut] = []
+def _reasons(explain: dict[str, Any]) -> list[DecisionReasonOut]:
+    out: list[DecisionReasonOut] = []
     for item in explain.get("explanations") or []:
         if not item.get("client"):  # служебные коды (например, потолок грейда) клиенту не нужны
             continue
         code = GENERIC_CODE if item["code"] in HIDDEN_CODES else item["code"]
-        out.append(ReasonOut(code=code, text=item["client"], action=item.get("action") or ""))
+        out.append(DecisionReasonOut(code=code, text=item["client"], action=item.get("action") or ""))
     return out
 
 

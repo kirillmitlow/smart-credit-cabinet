@@ -756,7 +756,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/app__modules__applications__consents_router__SignedOut"
+                  "$ref": "#/components/schemas/ConsentsSignedOut"
                 }
               }
             }
@@ -1324,7 +1324,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/app__modules__offers__schemas__SignedOut"
+                  "$ref": "#/components/schemas/ContractSignedOut"
                 }
               }
             }
@@ -1653,7 +1653,7 @@
           },
           "reasons": {
             "items": {
-              "$ref": "#/components/schemas/app__modules__pipeline__decision_view__ReasonOut"
+              "$ref": "#/components/schemas/DecisionReasonOut"
             },
             "type": "array",
             "title": "Reasons"
@@ -2033,6 +2033,33 @@
         ],
         "title": "ConsentsOut"
       },
+      "ConsentsSignedOut": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "signed": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentItemOut"
+            },
+            "type": "array",
+            "title": "Signed"
+          },
+          "allSigned": {
+            "type": "boolean",
+            "title": "Allsigned"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "signed",
+          "allSigned"
+        ],
+        "title": "ConsentsSignedOut"
+      },
       "ContractOut": {
         "properties": {
           "id": {
@@ -2150,6 +2177,47 @@
           "canPassToDirector"
         ],
         "title": "ContractOut"
+      },
+      "ContractSignedOut": {
+        "properties": {
+          "contract": {
+            "$ref": "#/components/schemas/ContractOut"
+          },
+          "justSigned": {
+            "type": "boolean",
+            "title": "Justsigned",
+            "description": "`false` — повторное нажатие: вторая подпись не создана"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contract",
+          "justSigned"
+        ],
+        "title": "ContractSignedOut"
+      },
+      "DecisionReasonOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "text",
+          "action"
+        ],
+        "title": "DecisionReasonOut"
       },
       "DecisionTime": {
         "type": "string",
@@ -2677,7 +2745,7 @@
           },
           "unavailableReasons": {
             "items": {
-              "$ref": "#/components/schemas/app__modules__catalog__schemas__ReasonOut"
+              "$ref": "#/components/schemas/ProductReasonOut"
             },
             "type": "array",
             "title": "Unavailablereasons"
@@ -2721,6 +2789,42 @@
           "requiresSecurity"
         ],
         "title": "ProductOut"
+      },
+      "ProductReasonOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "availableFrom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availablefrom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "text",
+          "action"
+        ],
+        "title": "ProductReasonOut",
+        "description": "Причина по-человечески; машинный код нужен фронту для словаря (60-06)."
       },
       "ProgressOut": {
         "properties": {
@@ -2889,7 +2993,7 @@
           },
           "reasons": {
             "items": {
-              "$ref": "#/components/schemas/app__modules__catalog__schemas__ReasonOut"
+              "$ref": "#/components/schemas/ProductReasonOut"
             },
             "type": "array",
             "title": "Reasons"
@@ -3585,110 +3689,6 @@
           "askCollateral"
         ],
         "title": "WizardResult"
-      },
-      "app__modules__applications__consents_router__SignedOut": {
-        "properties": {
-          "applicationId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Applicationid"
-          },
-          "signed": {
-            "items": {
-              "$ref": "#/components/schemas/ConsentItemOut"
-            },
-            "type": "array",
-            "title": "Signed"
-          },
-          "allSigned": {
-            "type": "boolean",
-            "title": "Allsigned"
-          }
-        },
-        "type": "object",
-        "required": [
-          "applicationId",
-          "signed",
-          "allSigned"
-        ],
-        "title": "SignedOut"
-      },
-      "app__modules__catalog__schemas__ReasonOut": {
-        "properties": {
-          "code": {
-            "type": "string",
-            "title": "Code"
-          },
-          "text": {
-            "type": "string",
-            "title": "Text"
-          },
-          "action": {
-            "type": "string",
-            "title": "Action"
-          },
-          "availableFrom": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Availablefrom"
-          }
-        },
-        "type": "object",
-        "required": [
-          "code",
-          "text",
-          "action"
-        ],
-        "title": "ReasonOut",
-        "description": "Причина по-человечески; машинный код нужен фронту для словаря (60-06)."
-      },
-      "app__modules__offers__schemas__SignedOut": {
-        "properties": {
-          "contract": {
-            "$ref": "#/components/schemas/ContractOut"
-          },
-          "justSigned": {
-            "type": "boolean",
-            "title": "Justsigned",
-            "description": "`false` — повторное нажатие: вторая подпись не создана"
-          }
-        },
-        "type": "object",
-        "required": [
-          "contract",
-          "justSigned"
-        ],
-        "title": "SignedOut"
-      },
-      "app__modules__pipeline__decision_view__ReasonOut": {
-        "properties": {
-          "code": {
-            "type": "string",
-            "title": "Code"
-          },
-          "text": {
-            "type": "string",
-            "title": "Text"
-          },
-          "action": {
-            "type": "string",
-            "title": "Action"
-          }
-        },
-        "type": "object",
-        "required": [
-          "code",
-          "text",
-          "action"
-        ],
-        "title": "ReasonOut"
       }
     }
   }
