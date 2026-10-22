@@ -669,3 +669,9 @@ T-213 реализован: API входа/me/выхода банка, уров�
 **Подсказки следующему:** поиск живёт в `counter_offers.py` (класс `_Search`: `passes` — все проверки одной суммы, `best_amount` — деление пополам, три метода карточек и `variant`); веса и сетка — `policy.counter_offers`. Property-тесты `api/tests/property/test_counter_offers.py` (INV-40…43, 50, сверка с полным перебором), unit — `api/tests/unit/decisioning/test_counter_offers.py`, строка оракула — `test_oracle_30_17.py`. Генератор «хороший клиент просит больше, чем тянет» — `counter_offer_params` в `tests/strategies/decisioning.py`.
 
 **Файлы:** api/app/modules/decisioning/{counter_offers,decide,routing,texts_ru,types}.py, api/app/modules/pipeline/{hooks,decision_view}.py, api/app/modules/offers/{schemas,models}.py, api/tests/{fixtures/counter_offers.py,strategies/decisioning.py,property/test_counter_offers.py}, api/tests/unit/{decisioning/test_counter_offers,decisioning/test_routing,test_oracle_30_17,test_offers_unit}.py, docs/api/api.openapi.json, web/src/api/generated/, docs/plan/reviews/R-004-core-implementation-notes.md, docs/plan/30-decisioning/10-counter-offer-options.md, карточки T-296, T-297, T-259, T-340.
+
+---
+
+**23.10 · B: передача при 9% лимита, D-104**
+
+T-213 опубликован в PR #73, REVIEW до зелёного CI/слияния. После включения main f6fb8c1: 55 целевых API, полный web check (404 теста), браузерный независимый вход/выход — зелёные. Общий make check повторяется на объединённой ветке. Следующему Codex: сначала завершить PR, затем T-360/T-361; T-362…365 и экраны/демо не начаты. Полный отчёт и точные запросы к public API A — reviews/B-2026-10-23-handoff.md. В handoff изменена только строка B, чужие записи сохранены. Новых задач после порога не брали.
