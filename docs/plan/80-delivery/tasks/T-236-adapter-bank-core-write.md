@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | REVIEW — feat/api-disbursement; адаптер записи и контрактные тесты готовы, до слияния не DONE |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
-| Ветка | `feat/adapter-bank-core-write` |
+| Ветка | `feat/api-disbursement` |
 | Оценка | ~3 ч |
 | Приоритет | M (Must) |
 | Тонкий сквозной сценарий | нет |

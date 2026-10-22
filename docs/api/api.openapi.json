@@ -920,6 +920,158 @@
         }
       }
     },
+    "/loans": {
+      "get": {
+        "tags": [
+          "кредиты"
+        ],
+        "summary": "Мои кредиты, новые сверху",
+        "operationId": "listLoans",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{loan_id}": {
+      "get": {
+        "tags": [
+          "кредиты"
+        ],
+        "summary": "Кредит с графиком и ближайшим платежом",
+        "operationId": "getLoan",
+        "parameters": [
+          {
+            "name": "loan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Loan Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loans/{loan_id}/schedule": {
+      "get": {
+        "tags": [
+          "кредиты"
+        ],
+        "summary": "График платежей",
+        "operationId": "getLoanSchedule",
+        "parameters": [
+          {
+            "name": "loan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Loan Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoanPaymentOut"
+                  },
+                  "title": "Response Getloanschedule"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/applications/{application_id}/decision": {
       "get": {
         "tags": [
@@ -2326,6 +2478,313 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LoanDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "contractNumber": {
+            "type": "string",
+            "title": "Contractnumber"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "repaymentType": {
+            "type": "string",
+            "title": "Repaymenttype"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "limitRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitrub"
+          },
+          "outstandingRub": {
+            "type": "integer",
+            "title": "Outstandingrub"
+          },
+          "ratePercent": {
+            "type": "string",
+            "title": "Ratepercent"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "paymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paymentrub"
+          },
+          "loanAccount": {
+            "type": "string",
+            "title": "Loanaccount"
+          },
+          "settlementAccount": {
+            "type": "string",
+            "title": "Settlementaccount"
+          },
+          "openedOn": {
+            "type": "string",
+            "format": "date",
+            "title": "Openedon"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "nextPayment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LoanPaymentOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schedule": {
+            "items": {
+              "$ref": "#/components/schemas/LoanPaymentOut"
+            },
+            "type": "array",
+            "title": "Schedule"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "contractNumber",
+          "productCode",
+          "kind",
+          "repaymentType",
+          "amountRub",
+          "limitRub",
+          "outstandingRub",
+          "ratePercent",
+          "termMonths",
+          "paymentRub",
+          "loanAccount",
+          "settlementAccount",
+          "openedOn",
+          "status",
+          "nextPayment",
+          "schedule"
+        ],
+        "title": "LoanDetail"
+      },
+      "LoanOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "contractNumber": {
+            "type": "string",
+            "title": "Contractnumber"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "repaymentType": {
+            "type": "string",
+            "title": "Repaymenttype"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "limitRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitrub"
+          },
+          "outstandingRub": {
+            "type": "integer",
+            "title": "Outstandingrub"
+          },
+          "ratePercent": {
+            "type": "string",
+            "title": "Ratepercent"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "paymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paymentrub"
+          },
+          "loanAccount": {
+            "type": "string",
+            "title": "Loanaccount"
+          },
+          "settlementAccount": {
+            "type": "string",
+            "title": "Settlementaccount"
+          },
+          "openedOn": {
+            "type": "string",
+            "format": "date",
+            "title": "Openedon"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "nextPayment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LoanPaymentOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "contractNumber",
+          "productCode",
+          "kind",
+          "repaymentType",
+          "amountRub",
+          "limitRub",
+          "outstandingRub",
+          "ratePercent",
+          "termMonths",
+          "paymentRub",
+          "loanAccount",
+          "settlementAccount",
+          "openedOn",
+          "status",
+          "nextPayment"
+        ],
+        "title": "LoanOut"
+      },
+      "LoanPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LoanOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "LoanPage"
+      },
+      "LoanPaymentOut": {
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Duedate"
+          },
+          "principalRub": {
+            "type": "integer",
+            "title": "Principalrub"
+          },
+          "interestRub": {
+            "type": "integer",
+            "title": "Interestrub"
+          },
+          "totalRub": {
+            "type": "integer",
+            "title": "Totalrub"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seq",
+          "dueDate",
+          "principalRub",
+          "interestRub",
+          "totalRub",
+          "status"
+        ],
+        "title": "LoanPaymentOut"
       },
       "MeResponse": {
         "properties": {

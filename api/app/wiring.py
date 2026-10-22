@@ -13,7 +13,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.modules import catalog, companies
+from app.modules import catalog, companies, disbursement, offers
 
 
 def _date(value: Any) -> date | None:
@@ -44,5 +44,22 @@ def company_facts(session: Session, company_id: UUID) -> catalog.CompanyFacts | 
     )
 
 
+def agreed_terms(session: Session, application_id: UUID) -> disbursement.AgreedTerms | None:
+    """Условия принятого варианта и реквизиты подписанного договора, без подстановок из заявки."""
+    signed = offers.signed_terms(session, application_id)
+    if signed is None:
+        return None
+    return disbursement.AgreedTerms(
+        product_code=signed.product_code,
+        amount_rub=signed.amount_rub,
+        term_months=signed.term_months,
+        rate_percent=signed.rate_percent,
+        contract_number=signed.contract_number,
+        contract_uid=signed.contract_uid,
+        signed_at=signed.signed_at,
+    )
+
+
 def wire_modules() -> None:
     catalog.register_company_facts_provider(company_facts)
+    disbursement.register_terms_provider(agreed_terms)

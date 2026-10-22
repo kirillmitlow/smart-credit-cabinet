@@ -40,6 +40,9 @@ MAX_IN_PROGRESS_WAITS = 5
 REGISTRY = CallPolicy(System.REGISTRY, timeout_s=2.0, attempts=3, budget_s=8.0)
 TAX = CallPolicy(System.TAX, timeout_s=2.0, attempts=3, budget_s=8.0)
 BANK_CORE_READ = CallPolicy(System.BANK_CORE, timeout_s=1.0, attempts=3, budget_s=4.5)
+# Открытие счёта и выдача повторяет outbox с тем же ключом (50-08); внутри вызова только ожидание
+# `409 IDEMPOTENCY_IN_PROGRESS`
+BANK_CORE_WRITE = CallPolicy(System.BANK_CORE, timeout_s=5.0, attempts=1, budget_s=8.0)
 BUREAU_REPORT = CallPolicy(
     System.CREDIT_BUREAU,
     timeout_s=5.0,

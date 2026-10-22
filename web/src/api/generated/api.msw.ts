@@ -37,6 +37,9 @@ import type {
   DeclinedOut,
   HealthDeps200,
   HealthLive200,
+  LoanDetail,
+  LoanPage,
+  LoanPaymentOut,
   MeResponse,
   OfferOut,
   PassedOut,
@@ -94,6 +97,12 @@ export const getGetProductResponseMock = (overrideResponse: Partial<Extract<Prod
 export const getCalculatePaymentResponseMock = (overrideResponse: Partial<Extract<PaymentOut, object>> = {}): PaymentOut => ({productCode: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), paymentKind: faker.helpers.arrayElement(Object.values(PaymentKind)), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), totalPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), ratePercentFrom: faker.number.float({fractionDigits: 2}), effectiveRatePercent: faker.number.float({fractionDigits: 2}), approximate: faker.datatype.boolean(), ...overrideResponse})
 
 export const getRecommendProductResponseMock = (overrideResponse: Partial<Extract<WizardResult, object>> = {}): WizardResult => ({outcome: faker.helpers.arrayElement(Object.values(WizardOutcome)), ruleId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), startPath: faker.datatype.boolean(), primary: faker.helpers.arrayElement([{productCode: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), why: faker.string.alpha({length: {min: 10, max: 20}}), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), paymentKind: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PaymentKind)),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), approximate: faker.datatype.boolean(), decisionTime: faker.helpers.arrayElement(Object.values(DecisionTime)), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), needsCollateral: faker.datatype.boolean(), needsContract: faker.datatype.boolean(), requiresSecurity: faker.datatype.boolean(), comfortableOptions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({termMonths: faker.number.int(), paymentRub: faker.number.int(), overpaymentRub: faker.number.int(), recommended: faker.datatype.boolean()}))},null,]), alternative: faker.helpers.arrayElement([{productCode: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), why: faker.string.alpha({length: {min: 10, max: 20}}), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), paymentKind: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PaymentKind)),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), approximate: faker.datatype.boolean(), decisionTime: faker.helpers.arrayElement(Object.values(DecisionTime)), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), needsCollateral: faker.datatype.boolean(), needsContract: faker.datatype.boolean(), requiresSecurity: faker.datatype.boolean(), comfortableOptions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({termMonths: faker.number.int(), paymentRub: faker.number.int(), overpaymentRub: faker.number.int(), recommended: faker.datatype.boolean()}))},null,]), rejected: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({productCode: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), reasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])}))})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), askCollateral: faker.datatype.boolean(), applicationId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ...overrideResponse})
+
+export const getListLoansResponseMock = (overrideResponse: Partial<Extract<LoanPage, object>> = {}): LoanPage => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), contractNumber: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.string.alpha({length: {min: 10, max: 20}}), repaymentType: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), limitRub: faker.helpers.arrayElement([faker.number.int(),null,]), outstandingRub: faker.number.int(), ratePercent: faker.string.alpha({length: {min: 10, max: 20}}), termMonths: faker.number.int(), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), loanAccount: faker.string.alpha({length: {min: 10, max: 20}}), settlementAccount: faker.string.alpha({length: {min: 10, max: 20}}), openedOn: faker.date.past().toISOString().slice(0, 10), status: faker.string.alpha({length: {min: 10, max: 20}}), nextPayment: faker.helpers.arrayElement([{seq: faker.number.int(), dueDate: faker.date.past().toISOString().slice(0, 10), principalRub: faker.number.int(), interestRub: faker.number.int(), totalRub: faker.number.int(), status: faker.string.alpha({length: {min: 10, max: 20}})},null,])})), nextCursor: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
+
+export const getGetLoanResponseMock = (overrideResponse: Partial<Extract<LoanDetail, object>> = {}): LoanDetail => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), contractNumber: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.string.alpha({length: {min: 10, max: 20}}), repaymentType: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), limitRub: faker.helpers.arrayElement([faker.number.int(),null,]), outstandingRub: faker.number.int(), ratePercent: faker.string.alpha({length: {min: 10, max: 20}}), termMonths: faker.number.int(), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), loanAccount: faker.string.alpha({length: {min: 10, max: 20}}), settlementAccount: faker.string.alpha({length: {min: 10, max: 20}}), openedOn: faker.date.past().toISOString().slice(0, 10), status: faker.string.alpha({length: {min: 10, max: 20}}), nextPayment: faker.helpers.arrayElement([{seq: faker.number.int(), dueDate: faker.date.past().toISOString().slice(0, 10), principalRub: faker.number.int(), interestRub: faker.number.int(), totalRub: faker.number.int(), status: faker.string.alpha({length: {min: 10, max: 20}})},null,]), schedule: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({seq: faker.number.int(), dueDate: faker.date.past().toISOString().slice(0, 10), principalRub: faker.number.int(), interestRub: faker.number.int(), totalRub: faker.number.int(), status: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getGetLoanScheduleResponseMock = (): LoanPaymentOut[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({seq: faker.number.int(), dueDate: faker.date.past().toISOString().slice(0, 10), principalRub: faker.number.int(), interestRub: faker.number.int(), totalRub: faker.number.int(), status: faker.string.alpha({length: {min: 10, max: 20}})})))
 
 export const getGetApplicationDecisionResponseMock = (overrideResponse: Partial<Extract<ClientDecisionOut, object>> = {}): ClientDecisionOut => ({applicationId: faker.string.uuid(), applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), decisionId: faker.string.uuid(), outcome: faker.string.alpha({length: {min: 10, max: 20}}), headline: faker.string.alpha({length: {min: 10, max: 20}}), decidedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', terms: faker.helpers.arrayElement([{id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))},null,]), rateBreakdown: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({label: faker.string.alpha({length: {min: 10, max: 20}}), percent: faker.number.float({fractionDigits: 2})})), reasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}})})), nextSteps: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), whatHelped: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), whatAffected: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), offer: faker.helpers.arrayElement([{id: faker.string.uuid(), applicationId: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), variantsStatus: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acceptedVariantId: faker.helpers.arrayElement([faker.string.uuid(),null,]), contractId: faker.helpers.arrayElement([faker.string.uuid(),null,]), variants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))}))},null,]), ...overrideResponse})
 
@@ -384,6 +393,42 @@ export const getRecommendProductMockHandler = (overrideResponse?: WizardResult |
   }, options)
 }
 
+export const getListLoansMockHandler = (overrideResponse?: LoanPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<LoanPage> | LoanPage), options?: RequestHandlerOptions) => {
+  return http.get('*/loans', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListLoansResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetLoanMockHandler = (overrideResponse?: LoanDetail | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<LoanDetail> | LoanDetail), options?: RequestHandlerOptions) => {
+  return http.get('*/loans/:loanId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetLoanResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetLoanScheduleMockHandler = (overrideResponse?: LoanPaymentOut[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<LoanPaymentOut[]> | LoanPaymentOut[]), options?: RequestHandlerOptions) => {
+  return http.get('*/loans/:loanId/schedule', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetLoanScheduleResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getGetApplicationDecisionMockHandler = (overrideResponse?: ClientDecisionOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ClientDecisionOut> | ClientDecisionOut), options?: RequestHandlerOptions) => {
   return http.get('*/applications/:applicationId/decision', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
 
@@ -513,6 +558,9 @@ export const getApiMock = () => [
   getGetProductMockHandler(),
   getCalculatePaymentMockHandler(),
   getRecommendProductMockHandler(),
+  getListLoansMockHandler(),
+  getGetLoanMockHandler(),
+  getGetLoanScheduleMockHandler(),
   getGetApplicationDecisionMockHandler(),
   getGetApplicationOfferMockHandler(),
   getAcceptOfferMockHandler(),
