@@ -223,15 +223,15 @@ TEXTS: dict[str, TextEntry] = {
     ),
     "DATA_MISMATCH": TextEntry(
         "Мы нашли расхождение в данных. Специалист уточнит его в заявке",
-        "{kind}: {a} против {b}, расхождение {share} (порог 30%)",
+        "{kind}: {a} против {b}, {metric}",
         "Запросить выписку или пояснение",
-        ("kind", "a", "b", "share"),
+        ("kind", "a", "b", "metric"),
     ),
     "TURNOVER_ANOMALY": TextEntry(
         f"Заявку смотрит специалист. {SOON}",
-        "Правило «{rule}»: {details}",
+        "Правило «{rule_text}»: {details}",
         "Запросить договоры и закрывающие документы",
-        ("rule", "details"),
+        ("rule_text", "details"),
     ),
     "SOURCE_UNAVAILABLE": TextEntry(
         "Часть проверок задерживается. Заявку возьмёт специалист, от вас ничего не нужно",
