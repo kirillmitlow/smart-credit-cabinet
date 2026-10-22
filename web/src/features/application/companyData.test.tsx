@@ -83,6 +83,7 @@ describe('TS-001: Данные компании и происхождение п
     await user.type(address, 'Новый адрес');
     await user.click(screen.getByRole('button', { name: applicationForm.next }));
     await waitFor(() => expect(window.location.pathname).toBe('/applications/app-1/edit/3'));
+    await screen.findByRole('heading', { name: applicationForm.steps.product });
     expect(state.patches).toEqual([
       { version: 1, answers: { companyFields: { address: 'Новый адрес' } } },
     ]);
