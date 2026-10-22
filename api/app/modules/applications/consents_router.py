@@ -178,7 +178,9 @@ async def request_signing(
     return await run_in_threadpool(_request, principal, application_id, body)
 
 
-def _confirm(principal: auth.Principal, application_id: UUID, body: SignConfirm) -> ConsentsSignedOut:
+def _confirm(
+    principal: auth.Principal, application_id: UUID, body: SignConfirm
+) -> ConsentsSignedOut:
     with db.transaction() as session:
         application = service.get_for(session, principal, application_id)
         rows = consents.sign_bundle(

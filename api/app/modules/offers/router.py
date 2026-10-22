@@ -13,12 +13,12 @@ from app.modules.offers.schemas import (
     AcceptedOut,
     AcceptIn,
     ContractOut,
+    ContractSignedOut,
     DeclinedOut,
     OfferOut,
     PassedOut,
     SignChallengeOut,
     SignConfirmIn,
-    ContractSignedOut,
     SignStartIn,
 )
 from app.shared import db

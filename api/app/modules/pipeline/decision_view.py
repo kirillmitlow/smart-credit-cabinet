@@ -109,7 +109,9 @@ def _reasons(explain: dict[str, Any]) -> list[DecisionReasonOut]:
         if not item.get("client"):  # служебные коды (например, потолок грейда) клиенту не нужны
             continue
         code = GENERIC_CODE if item["code"] in HIDDEN_CODES else item["code"]
-        out.append(DecisionReasonOut(code=code, text=item["client"], action=item.get("action") or ""))
+        out.append(
+            DecisionReasonOut(code=code, text=item["client"], action=item.get("action") or "")
+        )
     return out
 
 
