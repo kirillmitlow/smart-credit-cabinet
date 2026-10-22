@@ -186,6 +186,61 @@ def test_registry_30_18_matches_policy() -> None:
     assert p.counter_offers.stress_dscr_min.value == Decimal("1.05")
 
 
+def test_flag_thresholds_match_the_catalog_30_02_and_30_04() -> None:
+    """Сверка с 30-02 («Сверка и антифрод») и 30-04 («Флаги»): пороги v1 и их источники."""
+    f = load_policy().flags
+    mismatch = f.data_mismatch
+    assert mismatch.turnover_vs_financials.max_share == Decimal("0.30")  # D-035
+    assert mismatch.declared_vs_calculated.max_share == Decimal("0.30")
+    assert mismatch.statement_vs_financials.max_share == Decimal("0.30")
+    assert mismatch.flow_crosscheck.min_ratio == Decimal("0.5")
+    pump = f.turnover_anomaly.pump
+    assert (pump.recent_months, pump.base_months) == (3, 9)
+    assert (pump.min_ratio, pump.min_modified_z) == (Decimal("1.6"), Decimal("3.5"))
+    assert pump.modified_z_constant == Decimal("0.6745")  # Iglewicz, Hoaglin (1993)
+    assert pump.mad_fallback_share == Decimal("0.05")
+    assert (pump.seasonal_min_months, pump.seasonal_repeat_ratio) == (24, Decimal("1.3"))
+    transit = f.turnover_anomaly.transit
+    assert (transit.window_months, transit.min_months) == (12, 9)
+    assert transit.min_outgoing_share == Decimal("0.985")
+    payer = f.turnover_anomaly.single_payer
+    assert (payer.window_months, payer.max_payers, payer.min_avg_income_rub) == (6, 2, 3_000_000)
+    assert payer.exempt_okved_prefixes == ("47", "55", "56", "96")
+    assert (f.overdue_30_89.min_days, f.overdue_30_89.min_rub) == (30, 10_000)
+    # верхняя граница флага просрочки — порог стопа, дня-щели между ними нет (30-04)
+    assert load_policy().stop_factors.current_overdue_90.days == 90
+
+
+def test_flags_section_is_required_and_every_rule_cites_a_source() -> None:
+    data = raw()
+    del data["flags"]
+    with pytest.raises(PolicyError, match="flags"):
+        parse_policy(data)
+    data = raw()
+    del data["flags"]["turnover_anomaly"]["pump"]["source"]
+    with pytest.raises(PolicyError, match="source"):
+        parse_policy(data)
+    data = raw()
+    data["flags"]["data_mismatch"]["flow_crosscheck"]["min_ratio"] = 0.5  # float вместо строки
+    with pytest.raises(PolicyError, match="строкой"):
+        parse_policy(data)
+
+
+def test_flag_windows_must_be_consistent() -> None:
+    data = raw()
+    data["flags"]["turnover_anomaly"]["pump"]["recent_months"] = 0
+    with pytest.raises(PolicyError, match="окна накачки"):
+        parse_policy(data)
+    data = raw()
+    data["flags"]["turnover_anomaly"]["pump"]["seasonal_min_months"] = 12
+    with pytest.raises(PolicyError, match="не короче года"):
+        parse_policy(data)
+    data = raw()
+    data["flags"]["turnover_anomaly"]["transit"]["min_months"] = 13
+    with pytest.raises(PolicyError, match="в пределах окна"):
+        parse_policy(data)
+
+
 def test_working_capital_term_is_three_to_thirty_six_months() -> None:
     """D-084: срок оборотного кредита 3–36 мес.; остальные границы — по 10-06."""
     p = load_policy()

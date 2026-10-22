@@ -11,6 +11,7 @@ export interface DraftFields {
   productCode?: string;
   amountRub?: number;
   termMonths?: number;
+  answers?: Record<string, unknown>;
 }
 
 export type SaveState =
@@ -27,7 +28,10 @@ function sameFields(application: ApplicationOut, fields: DraftFields): boolean {
   return (
     (fields.productCode === undefined || fields.productCode === application.productCode) &&
     (fields.amountRub === undefined || fields.amountRub === application.amountRub) &&
-    (fields.termMonths === undefined || fields.termMonths === application.termMonths)
+    (fields.termMonths === undefined || fields.termMonths === application.termMonths) &&
+    Object.entries(fields.answers ?? {}).every(
+      ([key, value]) => JSON.stringify(value) === JSON.stringify(application.draft[key]),
+    )
   );
 }
 
@@ -85,7 +89,7 @@ export function useDraftAutosave(
         try {
           const response = await mutateAsync({
             applicationId: applicationRef.current.id,
-            data: { version: versionRef.current, ...fields, answers: {} },
+            data: { version: versionRef.current, ...fields, answers: fields.answers ?? {} },
           });
           if (response.status !== 200) throw new Error(`Unexpected status ${response.status}`);
           versionRef.current = response.data.version;

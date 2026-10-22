@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import type { Result } from 'axe-core';
 
 /** Что блокирует тест. Остальное попадает в отчёт как заметка, но тест не валит (70-07) */
-const BLOCKING = new Set(['critical']);
+const BLOCKING = new Set(['critical', 'serious']);
 
 /** Нарушения читаемым списком: правило, насколько серьёзно, что это значит и где именно */
 export function formatViolations(violations: readonly Result[]): string {
@@ -23,7 +23,7 @@ export function formatViolations(violations: readonly Result[]): string {
 
 /**
  * Проверка доступности текущего экрана: контраст, подписи, роли, порядок фокуса.
- * Критические нарушения валят тест; остальные уходят в аннотации теста и в консоль.
+ * Критические и серьёзные нарушения валят тест; остальные уходят в аннотации теста и в консоль.
  * `screen` — название экрана для сообщения.
  */
 export async function checkAccessibility(page: Page, screen: string): Promise<void> {
@@ -37,10 +37,10 @@ export async function checkAccessibility(page: Page, screen: string): Promise<vo
   if (rest.length > 0) {
     const text = formatViolations(rest);
     test.info().annotations.push({ type: `axe: ${screen}`, description: text });
-    console.warn(`axe, экран «${screen}»: нарушения не критические\n${text}`);
+    console.warn(`axe, экран «${screen}»: остальные нарушения\n${text}`);
   }
   expect(
     blocking,
-    `axe, экран «${screen}»: критические нарушения\n${formatViolations(blocking)}`,
+    `axe, экран «${screen}»: блокирующие нарушения\n${formatViolations(blocking)}`,
   ).toEqual([]);
 }

@@ -27,7 +27,7 @@ from app.modules.integrations.models import IntegrationCall
 from app.modules.loans import Loan, PaymentScheduleRow
 from app.modules.offers.models import Signature
 from app.modules.pipeline.models import Decision, DecisionReason, PipelineRun, SourceSnapshot
-from app.shared import cache, clock, db, resets, tasks
+from app.shared import cache, clock, db, outbox, resets, tasks
 from app.shared.models import IdempotencyKey, OutboxMessage
 from app.shared.settings import Settings, get_settings
 from app.shared.tables import TABLE_OWNERS
@@ -106,6 +106,7 @@ def stand(
     client.set("scc:session:CLIENT:abc", "{}")
     client.set("scc:otp:otp_1", "{}")
     client.set("lookup:registry:company:001234567887", "{}")
+    client.set("scc:gov-contracts:company-cache", "{}")
     client.set(cache.WORKER_HEARTBEAT_KEY, "2026-10-21T10:00:00+00:00")
     yield {"app": app, "fake": fake, "redis": client, "policy_id": policy_id}
     client.flushdb()
@@ -307,6 +308,26 @@ async def test_mocks_failure_names_step_keeps_data_and_retry_completes(
     assert stand["redis"].get("scc:session:CLIENT:abc") == "{}"
     done = await post_reset(stand)
     assert done.status_code == 200, done.text
+    assert counts()["applications"] == 0
+
+
+async def test_busy_outbox_does_not_wipe_mocks_or_database_and_can_retry(
+    stand: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    before = counts()
+    quiet = outbox.quiesce
+    monkeypatch.setattr(outbox, "quiesce", lambda: outbox.Quiesced(dropped=0, in_flight=1))
+    response = await post_reset(stand)
+    assert response.status_code == 502
+    assert response.json()["code"] == "DEMO_RESET_FAILED"
+    assert response.json()["errors"][0]["step"] == "MOCKS"
+    assert stand["fake"].reset_calls == []
+    assert counts() == before
+    assert stand["redis"].get("scc:session:CLIENT:abc") == "{}"
+
+    monkeypatch.setattr(outbox, "quiesce", quiet)
+    retried = await post_reset(stand)
+    assert retried.status_code == 200
     assert counts()["applications"] == 0
 
 

@@ -45,6 +45,7 @@ class ApplicationOut(Camel):
     """Клиентская модель: без баллов, DSCR и снимков источников."""
 
     id: UUID
+    company_id: UUID
     number: str
     status: str
     product_code: str | None
@@ -66,6 +67,7 @@ class ApplicationPage(Camel):
 def _out(application: Application, principal: auth.Principal) -> ApplicationOut:
     return ApplicationOut(
         id=application.id,
+        company_id=application.company_id,
         number=application.number,
         status=application.status,
         product_code=application.product_code,

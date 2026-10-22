@@ -406,6 +406,28 @@ class RateBreakdown:
 
 
 @dataclass(frozen=True, slots=True)
+class Comparison:
+    """Сверка двух чисел (30-02): `|A − B| / B`, знаменатель B — отчётность или расчёт."""
+
+    a_rub: int
+    b_rub: int
+    deviation: Decimal
+    year: int | None = None  # календарный год сверки; `None` у заявленной выручки
+
+
+@dataclass(frozen=True, slots=True)
+class PumpStat:
+    """Накачка оборотов (30-02): `x` — среднее последних месяцев, `b` — медиана базы перед ними."""
+
+    recent_rub: int
+    base_rub: int
+    ratio: Decimal
+    modified_z: Decimal
+    # `x / b` того же окна годом ранее; `None`, если ряд короче 24 мес. (сезонное исключение)
+    prior_year_ratio: Decimal | None
+
+
+@dataclass(frozen=True, slots=True)
 class Features:
     """Признаки шага 6 (30-02). `None` — «нет данных», а не ноль."""
 
@@ -450,6 +472,17 @@ class Features:
     guarantor_confirmed: bool
     security_confirmed: bool
     form_matches_registry: bool
+    # Сверка и антифрод (T-288): `None` — данных для проверки нет
+    mismatch_turnover_fin: Comparison | None
+    mismatch_declared: Comparison | None
+    mismatch_statement: Comparison | None
+    pump: PumpStat | None
+    transit_months: int | None
+    payers_in_6m_max: int | None
+    payers_in_6m_avg_income_rub: int | None
+    risk_mass_address: bool
+    risk_mass_director: bool
+    risk_mass_founder: bool
 
 
 @dataclass(frozen=True, slots=True)

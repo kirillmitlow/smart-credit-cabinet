@@ -3,7 +3,9 @@
 Клиент видит исход, условия, причины и «что можно сделать». Баллов, грейда, PD, DSCR, снимков
 источников и внутренних кодов в ответе нет. Тексты причин не пересобираются: берутся из снимка
 решения (`decisions.explain`), поэтому через месяц клиент видит то же самое (Q-113). Причина
-`AML_LIST` наружу не раскрывается ни кодом, ни текстом.
+`AML_LIST` наружу не раскрывается ни кодом, ни текстом; антифрод-флаги (`MASS_REGISTRATION`,
+`TURNOVER_ANOMALY`) — ни кодом, ни шагом андеррайтера: клиенту только «Заявку смотрит специалист».
+Шаг андеррайтера не показывается ни у одного флага.
 """
 
 from __future__ import annotations
@@ -33,9 +35,16 @@ HEADLINES = {
     "MANUAL_REVIEW": "Заявку смотрит специалист. Обычно до 1 рабочего дня",
     "REJECTED": "Сейчас одобрить не можем",
 }
-# Код причины, который клиенту не раскрываем; вместо него общий (30-12: AML_LIST)
-HIDDEN_CODES = frozenset({"AML_LIST"})
+# Коды причин, которые клиенту не раскрываем; вместо них общий. `AML_LIST` — запрет информировать о
+# мерах ПОД/ФТ (115-ФЗ, 30-12); антифрод-флаги — правило не подсказываем: подбирать обороты и
+# адрес под порог нельзя (30-12: «внутренние названия флагов видит только андеррайтер»).
+# `DATA_MISMATCH` остаётся: клиент может сам уточнить расхождение, текст ему написан для этого.
+HIDDEN_CODES = frozenset({"AML_LIST", "MASS_REGISTRATION", "TURNOVER_ANOMALY"})
 GENERIC_CODE = "BANK_POLICY"
+# У флагов (`kind = FLAG`) третья колонка справочника 30-12 — шаг андеррайтера («запросить договоры…»,
+# «нажать „Перепроверить источники“»): клиенту он не адресован, а у антифрода выдал бы суть проверки.
+# Клиенту говорит сам текст флага («заявку смотрит специалист», «погасите просрочку»).
+FLAG_KIND = "FLAG"
 _PERCENT = Decimal(100)
 
 router = APIRouter(prefix="/applications", tags=["решение"])
@@ -105,13 +114,20 @@ def _rate_breakdown(explain: dict[str, Any]) -> list[RatePartOut]:
 
 def _reasons(explain: dict[str, Any]) -> list[DecisionReasonOut]:
     out: list[DecisionReasonOut] = []
-    for item in explain.get("explanations") or []:
+    seen: set[tuple[str, str]] = set()
+    # Тексты идут в том же порядке, что и причины: вид причины берём по номеру
+    kinds = [r.get("kind") for r in explain.get("reasons") or []]
+    for index, item in enumerate(explain.get("explanations") or []):
         if not item.get("client"):  # служебные коды (например, потолок грейда) клиенту не нужны
             continue
         code = GENERIC_CODE if item["code"] in HIDDEN_CODES else item["code"]
-        out.append(
-            DecisionReasonOut(code=code, text=item["client"], action=item.get("action") or "")
-        )
+        key = (code, item["client"])
+        if key in seen:  # один код с разными параметрами (два правила антифрода): текст один
+            continue
+        seen.add(key)
+        is_flag = index < len(kinds) and kinds[index] == FLAG_KIND
+        action = "" if is_flag else item.get("action") or ""
+        out.append(DecisionReasonOut(code=code, text=item["client"], action=action))
     return out
 
 

@@ -27,3 +27,5 @@ export function money(amount: number): RegExp {
   const digits = new Intl.NumberFormat('ru-RU').format(amount).replace(/[\s\u00a0\u202f]/g, SPACE);
   return new RegExp(`${digits}${SPACE}₽`);
 }
+
+export { companyProfile } from '../../src/texts/companyProfile';

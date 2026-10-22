@@ -35,16 +35,19 @@ import type {
   CodeCheck,
   CodeIssued,
   CodeRequest,
+  CompanyProfile,
   ConsentsOut,
   ConsentsSignedOut,
   ContractOut,
   ContractSignedOut,
   DeclinedOut,
   DraftPatch,
+  GovContractPage,
   HTTPValidationError,
   HealthDeps200,
   HealthLive200,
   ListApplicationsParams,
+  ListCompanyGovContractsParams,
   ListLoansParams,
   LoanDetail,
   LoanPage,
@@ -1183,6 +1186,381 @@ export function useGetPublicConfig<TData = Awaited<ReturnType<typeof getPublicCo
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetPublicConfigQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type listCompanyGovContractsResponse200 = {
+  data: GovContractPage
+  status: 200
+}
+
+export type listCompanyGovContractsResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type listCompanyGovContractsResponseSuccess = (listCompanyGovContractsResponse200) & {
+  headers: Headers;
+};
+export type listCompanyGovContractsResponseError = (listCompanyGovContractsResponse422) & {
+  headers: Headers;
+};
+
+export type listCompanyGovContractsResponse = (listCompanyGovContractsResponseSuccess | listCompanyGovContractsResponseError)
+
+export const getListCompanyGovContractsUrl = (companyId: string,
+    params?: ListCompanyGovContractsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/companies/${companyId}/gov-contracts?${stringifiedParams}` : `/companies/${companyId}/gov-contracts`
+}
+
+/**
+ * @summary List Contracts
+ */
+export const listCompanyGovContracts = async (companyId: string,
+    params?: ListCompanyGovContractsParams, options?: Parameters<typeof customFetch>[1]): Promise<listCompanyGovContractsResponse> => {
+
+  return customFetch<listCompanyGovContractsResponse>(getListCompanyGovContractsUrl(companyId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCompanyGovContractsQueryKey = (companyId: string,
+    params?: ListCompanyGovContractsParams,) => {
+    return [
+    `/companies/${companyId}/gov-contracts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCompanyGovContractsQueryOptions = <TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCompanyGovContractsQueryKey(companyId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCompanyGovContracts>>> = ({ signal }) => listCompanyGovContracts(companyId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: companyId !== null && companyId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCompanyGovContractsQueryResult = NonNullable<Awaited<ReturnType<typeof listCompanyGovContracts>>>
+export type ListCompanyGovContractsQueryError = HTTPValidationError
+
+
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params: undefined |  ListCompanyGovContractsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCompanyGovContracts>>,
+          TError,
+          Awaited<ReturnType<typeof listCompanyGovContracts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCompanyGovContracts>>,
+          TError,
+          Awaited<ReturnType<typeof listCompanyGovContracts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Contracts
+ */
+
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCompanyGovContractsQueryOptions(companyId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type lookupCompanyResponse200 = {
+  data: CompanyProfile
+  status: 200
+}
+
+export type lookupCompanyResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type lookupCompanyResponseSuccess = (lookupCompanyResponse200) & {
+  headers: Headers;
+};
+export type lookupCompanyResponseError = (lookupCompanyResponse422) & {
+  headers: Headers;
+};
+
+export type lookupCompanyResponse = (lookupCompanyResponseSuccess | lookupCompanyResponseError)
+
+export const getLookupCompanyUrl = (inn: string,) => {
+
+
+
+
+  return `/companies/lookup/${inn}`
+}
+
+/**
+ * @summary Lookup Company
+ */
+export const lookupCompany = async (inn: string, options?: Parameters<typeof customFetch>[1]): Promise<lookupCompanyResponse> => {
+
+  return customFetch<lookupCompanyResponse>(getLookupCompanyUrl(inn),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getLookupCompanyQueryKey = (inn: string,) => {
+    return [
+    `/companies/lookup/${inn}`
+    ] as const;
+    }
+
+
+export const getLookupCompanyQueryOptions = <TData = Awaited<ReturnType<typeof lookupCompany>>, TError = HTTPValidationError>(inn: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lookupCompany>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLookupCompanyQueryKey(inn);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof lookupCompany>>> = ({ signal }) => lookupCompany(inn, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: inn !== null && inn !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof lookupCompany>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type LookupCompanyQueryResult = NonNullable<Awaited<ReturnType<typeof lookupCompany>>>
+export type LookupCompanyQueryError = HTTPValidationError
+
+
+export function useLookupCompany<TData = Awaited<ReturnType<typeof lookupCompany>>, TError = HTTPValidationError>(
+ inn: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof lookupCompany>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lookupCompany>>,
+          TError,
+          Awaited<ReturnType<typeof lookupCompany>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLookupCompany<TData = Awaited<ReturnType<typeof lookupCompany>>, TError = HTTPValidationError>(
+ inn: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lookupCompany>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lookupCompany>>,
+          TError,
+          Awaited<ReturnType<typeof lookupCompany>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLookupCompany<TData = Awaited<ReturnType<typeof lookupCompany>>, TError = HTTPValidationError>(
+ inn: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lookupCompany>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Lookup Company
+ */
+
+export function useLookupCompany<TData = Awaited<ReturnType<typeof lookupCompany>>, TError = HTTPValidationError>(
+ inn: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lookupCompany>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getLookupCompanyQueryOptions(inn,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getCompanyProfileResponse200 = {
+  data: CompanyProfile
+  status: 200
+}
+
+export type getCompanyProfileResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getCompanyProfileResponseSuccess = (getCompanyProfileResponse200) & {
+  headers: Headers;
+};
+export type getCompanyProfileResponseError = (getCompanyProfileResponse422) & {
+  headers: Headers;
+};
+
+export type getCompanyProfileResponse = (getCompanyProfileResponseSuccess | getCompanyProfileResponseError)
+
+export const getGetCompanyProfileUrl = (companyId: string,) => {
+
+
+
+
+  return `/companies/${companyId}`
+}
+
+/**
+ * @summary Company Profile
+ */
+export const getCompanyProfile = async (companyId: string, options?: Parameters<typeof customFetch>[1]): Promise<getCompanyProfileResponse> => {
+
+  return customFetch<getCompanyProfileResponse>(getGetCompanyProfileUrl(companyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCompanyProfileQueryKey = (companyId: string,) => {
+    return [
+    `/companies/${companyId}`
+    ] as const;
+    }
+
+
+export const getGetCompanyProfileQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyProfile>>, TError = HTTPValidationError>(companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCompanyProfileQueryKey(companyId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompanyProfile>>> = ({ signal }) => getCompanyProfile(companyId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: companyId !== null && companyId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCompanyProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getCompanyProfile>>>
+export type GetCompanyProfileQueryError = HTTPValidationError
+
+
+export function useGetCompanyProfile<TData = Awaited<ReturnType<typeof getCompanyProfile>>, TError = HTTPValidationError>(
+ companyId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyProfile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyProfile<TData = Awaited<ReturnType<typeof getCompanyProfile>>, TError = HTTPValidationError>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyProfile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyProfile<TData = Awaited<ReturnType<typeof getCompanyProfile>>, TError = HTTPValidationError>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Company Profile
+ */
+
+export function useGetCompanyProfile<TData = Awaited<ReturnType<typeof getCompanyProfile>>, TError = HTTPValidationError>(
+ companyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCompanyProfileQueryOptions(companyId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
