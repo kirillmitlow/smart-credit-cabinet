@@ -14,7 +14,7 @@ import httpx
 import pytest
 from sqlalchemy import text
 
-from app.modules import pipeline
+from app.modules import disbursement, pipeline
 from app.modules.applications import Application, ApplicationVersion
 from app.modules.pipeline.consents import ConsentView
 from app.shared import clock, db
@@ -226,6 +226,15 @@ async def test_sokolova_decision_accept_sign_and_disbursement_handoff(
     # после SIGNED отозвать нельзя
     async with client_for(stand, "sokolova:sokolova") as boss:
         assert (await boss.post(f"/applications/{app_id}/withdraw")).status_code == 409
+    assert disbursement.run(UUID(app_id)) == "STARTED"
+    funding = sql(
+        "SELECT amount_rub, term_months, rate_percent, contract_number, contract_uid "
+        "FROM disbursements WHERE application_id = :i",
+        i=app_id,
+    )[0]
+    assert funding[:3] == (500_000, 12, 21.5)
+    assert funding[3:] == (contract["number"], contract["contractUid"])
+    assert status_of(app_id) == "DISBURSING"
 
 
 async def test_parallel_sign_gives_one_signature_and_one_task(stand: dict[str, Any]) -> None:

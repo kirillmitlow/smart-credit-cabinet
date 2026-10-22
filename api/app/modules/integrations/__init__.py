@@ -16,6 +16,14 @@ from app.modules.integrations.bank_core import (
     Turnover,
     TurnoverMonth,
 )
+from app.modules.integrations.bank_core_write import (
+    BankCoreWriteAdapter,
+    Disbursed,
+    DisbursementRequest,
+    Failure,
+    OpenedAccount,
+    classify_failure,
+)
 from app.modules.integrations.breaker import BreakerState, CircuitBreaker, NullBreaker, Permit
 from app.modules.integrations.client import IntegrationClient
 from app.modules.integrations.credit_bureau import (
@@ -69,6 +77,7 @@ __all__ = [
     "AccountBlock",
     "BankAccount",
     "BankCoreReadAdapter",
+    "BankCoreWriteAdapter",
     "BankruptcyCase",
     "BkiConsent",
     "BreakerState",
@@ -84,9 +93,12 @@ __all__ = [
     "CreditBureauAdapter",
     "CreditHistory",
     "Customer",
+    "Disbursed",
+    "DisbursementRequest",
     "DbCallJournal",
     "EventApplication",
     "EventObligation",
+    "Failure",
     "Financials",
     "GovContract",
     "IntegrationCall",
@@ -94,6 +106,7 @@ __all__ = [
     "Integrations",
     "NullBreaker",
     "Ok",
+    "OpenedAccount",
     "OurLoan",
     "Permit",
     "PersonRoles",
@@ -113,6 +126,7 @@ __all__ = [
     "Turnover",
     "TurnoverMonth",
     "build_integrations",
+    "classify_failure",
     "get_integrations",
     "known_resources",
     "parse_snapshot",

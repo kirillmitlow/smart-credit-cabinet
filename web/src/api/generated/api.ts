@@ -45,6 +45,10 @@ import type {
   HealthDeps200,
   HealthLive200,
   ListApplicationsParams,
+  ListLoansParams,
+  LoanDetail,
+  LoanPage,
+  LoanPaymentOut,
   MeResponse,
   OfferOut,
   PassedOut,
@@ -2620,6 +2624,373 @@ export const useRecommendProduct = <TError = HTTPValidationError,
       > => {
       return useMutation(getRecommendProductMutationOptions(options), queryClient);
     }
+
+export type listLoansResponse200 = {
+  data: LoanPage
+  status: 200
+}
+
+export type listLoansResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type listLoansResponseSuccess = (listLoansResponse200) & {
+  headers: Headers;
+};
+export type listLoansResponseError = (listLoansResponse422) & {
+  headers: Headers;
+};
+
+export type listLoansResponse = (listLoansResponseSuccess | listLoansResponseError)
+
+export const getListLoansUrl = (params?: ListLoansParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/loans?${stringifiedParams}` : `/loans`
+}
+
+/**
+ * @summary Мои кредиты, новые сверху
+ */
+export const listLoans = async (params?: ListLoansParams, options?: Parameters<typeof customFetch>[1]): Promise<listLoansResponse> => {
+
+  return customFetch<listLoansResponse>(getListLoansUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListLoansQueryKey = (params?: ListLoansParams,) => {
+    return [
+    `/loans`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListLoansQueryOptions = <TData = Awaited<ReturnType<typeof listLoans>>, TError = HTTPValidationError>(params?: ListLoansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLoans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListLoansQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listLoans>>> = ({ signal }) => listLoans(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listLoans>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListLoansQueryResult = NonNullable<Awaited<ReturnType<typeof listLoans>>>
+export type ListLoansQueryError = HTTPValidationError
+
+
+export function useListLoans<TData = Awaited<ReturnType<typeof listLoans>>, TError = HTTPValidationError>(
+ params: undefined |  ListLoansParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLoans>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLoans>>,
+          TError,
+          Awaited<ReturnType<typeof listLoans>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListLoans<TData = Awaited<ReturnType<typeof listLoans>>, TError = HTTPValidationError>(
+ params?: ListLoansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLoans>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLoans>>,
+          TError,
+          Awaited<ReturnType<typeof listLoans>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListLoans<TData = Awaited<ReturnType<typeof listLoans>>, TError = HTTPValidationError>(
+ params?: ListLoansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLoans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Мои кредиты, новые сверху
+ */
+
+export function useListLoans<TData = Awaited<ReturnType<typeof listLoans>>, TError = HTTPValidationError>(
+ params?: ListLoansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLoans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListLoansQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getLoanResponse200 = {
+  data: LoanDetail
+  status: 200
+}
+
+export type getLoanResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getLoanResponseSuccess = (getLoanResponse200) & {
+  headers: Headers;
+};
+export type getLoanResponseError = (getLoanResponse422) & {
+  headers: Headers;
+};
+
+export type getLoanResponse = (getLoanResponseSuccess | getLoanResponseError)
+
+export const getGetLoanUrl = (loanId: string,) => {
+
+
+
+
+  return `/loans/${loanId}`
+}
+
+/**
+ * @summary Кредит с графиком и ближайшим платежом
+ */
+export const getLoan = async (loanId: string, options?: Parameters<typeof customFetch>[1]): Promise<getLoanResponse> => {
+
+  return customFetch<getLoanResponse>(getGetLoanUrl(loanId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLoanQueryKey = (loanId: string,) => {
+    return [
+    `/loans/${loanId}`
+    ] as const;
+    }
+
+
+export const getGetLoanQueryOptions = <TData = Awaited<ReturnType<typeof getLoan>>, TError = HTTPValidationError>(loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoan>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLoanQueryKey(loanId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLoan>>> = ({ signal }) => getLoan(loanId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: loanId !== null && loanId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLoan>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLoanQueryResult = NonNullable<Awaited<ReturnType<typeof getLoan>>>
+export type GetLoanQueryError = HTTPValidationError
+
+
+export function useGetLoan<TData = Awaited<ReturnType<typeof getLoan>>, TError = HTTPValidationError>(
+ loanId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoan>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLoan>>,
+          TError,
+          Awaited<ReturnType<typeof getLoan>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLoan<TData = Awaited<ReturnType<typeof getLoan>>, TError = HTTPValidationError>(
+ loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoan>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLoan>>,
+          TError,
+          Awaited<ReturnType<typeof getLoan>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLoan<TData = Awaited<ReturnType<typeof getLoan>>, TError = HTTPValidationError>(
+ loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoan>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Кредит с графиком и ближайшим платежом
+ */
+
+export function useGetLoan<TData = Awaited<ReturnType<typeof getLoan>>, TError = HTTPValidationError>(
+ loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoan>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetLoanQueryOptions(loanId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getLoanScheduleResponse200 = {
+  data: LoanPaymentOut[]
+  status: 200
+}
+
+export type getLoanScheduleResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getLoanScheduleResponseSuccess = (getLoanScheduleResponse200) & {
+  headers: Headers;
+};
+export type getLoanScheduleResponseError = (getLoanScheduleResponse422) & {
+  headers: Headers;
+};
+
+export type getLoanScheduleResponse = (getLoanScheduleResponseSuccess | getLoanScheduleResponseError)
+
+export const getGetLoanScheduleUrl = (loanId: string,) => {
+
+
+
+
+  return `/loans/${loanId}/schedule`
+}
+
+/**
+ * @summary График платежей
+ */
+export const getLoanSchedule = async (loanId: string, options?: Parameters<typeof customFetch>[1]): Promise<getLoanScheduleResponse> => {
+
+  return customFetch<getLoanScheduleResponse>(getGetLoanScheduleUrl(loanId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLoanScheduleQueryKey = (loanId: string,) => {
+    return [
+    `/loans/${loanId}/schedule`
+    ] as const;
+    }
+
+
+export const getGetLoanScheduleQueryOptions = <TData = Awaited<ReturnType<typeof getLoanSchedule>>, TError = HTTPValidationError>(loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoanSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLoanScheduleQueryKey(loanId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLoanSchedule>>> = ({ signal }) => getLoanSchedule(loanId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: loanId !== null && loanId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLoanSchedule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLoanScheduleQueryResult = NonNullable<Awaited<ReturnType<typeof getLoanSchedule>>>
+export type GetLoanScheduleQueryError = HTTPValidationError
+
+
+export function useGetLoanSchedule<TData = Awaited<ReturnType<typeof getLoanSchedule>>, TError = HTTPValidationError>(
+ loanId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoanSchedule>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLoanSchedule>>,
+          TError,
+          Awaited<ReturnType<typeof getLoanSchedule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLoanSchedule<TData = Awaited<ReturnType<typeof getLoanSchedule>>, TError = HTTPValidationError>(
+ loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoanSchedule>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLoanSchedule>>,
+          TError,
+          Awaited<ReturnType<typeof getLoanSchedule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLoanSchedule<TData = Awaited<ReturnType<typeof getLoanSchedule>>, TError = HTTPValidationError>(
+ loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoanSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary График платежей
+ */
+
+export function useGetLoanSchedule<TData = Awaited<ReturnType<typeof getLoanSchedule>>, TError = HTTPValidationError>(
+ loanId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLoanSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetLoanScheduleQueryOptions(loanId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export type getApplicationDecisionResponse200 = {
   data: ClientDecisionOut

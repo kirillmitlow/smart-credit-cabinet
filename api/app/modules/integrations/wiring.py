@@ -6,6 +6,7 @@ import threading
 from dataclasses import dataclass
 
 from app.modules.integrations.bank_core import BankCoreReadAdapter
+from app.modules.integrations.bank_core_write import BankCoreWriteAdapter
 from app.modules.integrations.client import IntegrationClient
 from app.modules.integrations.credit_bureau import CreditBureauAdapter
 from app.modules.integrations.registry import RegistryAdapter
@@ -21,6 +22,8 @@ class Integrations:
     bank_core: BankCoreReadAdapter
     credit_bureau: CreditBureauAdapter
     client: IntegrationClient
+    # Запись в АБС (счёт, выдача). Необязательна: тесты чтения собирают порты без неё
+    bank_core_write: BankCoreWriteAdapter | None = None
 
 
 def build_integrations(client: IntegrationClient | None = None) -> Integrations:
@@ -31,6 +34,7 @@ def build_integrations(client: IntegrationClient | None = None) -> Integrations:
         bank_core=BankCoreReadAdapter(client),
         credit_bureau=CreditBureauAdapter(client),
         client=client,
+        bank_core_write=BankCoreWriteAdapter(client),
     )
 
 

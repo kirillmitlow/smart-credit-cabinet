@@ -3,6 +3,7 @@
 Публичный интерфейс модуля — только то, что ниже.
 """
 
+from app.modules.offers.contracts import SignedTerms, signed_terms
 from app.modules.offers.models import Contract, Offer, OfferVariant, Signature
 from app.modules.offers.router import router
 from app.modules.offers.schemas import OfferOut, Percent, VariantOut
@@ -16,10 +17,12 @@ __all__ = [
     "OfferVariant",
     "Percent",
     "Signature",
+    "SignedTerms",
     "VariantDraft",
     "VariantOut",
     "create_offer",
     "current_offer",
     "offer_out",
     "router",
+    "signed_terms",
 ]

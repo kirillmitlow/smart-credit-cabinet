@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | REVIEW — feat/api-disbursement; LOST_RESPONSE, повтор задач, откат подтверждения и просроченная аренда проверены; реальный kill процесса в e2e ещё нужен |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
-| Ветка | `feat/disbursement-exactly-once` |
+| Ветка | `feat/api-disbursement` |
 | Оценка | ~5 ч |
 | Приоритет | M (Must) |
 | Тонкий сквозной сценарий | нет |
