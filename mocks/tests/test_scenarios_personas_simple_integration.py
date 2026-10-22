@@ -79,11 +79,24 @@ def subject_of(view: dict[str, Any], inn: str) -> dict[str, Any]:
 
 async def test_all_five_personas_apply_and_are_listed_with_expected_outcomes(h: Harness) -> None:
     views = await install(h)
-    assert sorted(views) == ["garipov", "orlov", "quick-start", "romashka", "sokolova", "vektor"]
+    assert sorted(views) == [
+        "garipov",
+        "orlov",
+        "quick-start",
+        "romashka",
+        "snabkontrakt",
+        "sokolova",
+        "stankoprom",
+        "vektor",
+        "zarya",
+    ]
     assert {c: v["status"] for c, v in views.items()} == dict.fromkeys(views, "APPLIED")
     assert all(v["origin"] == "BUILTIN" and v["builtinVersion"] == 1 for v in views.values())
     listing = {i["code"]: i for i in (await h.api.get("/api/v1/scenarios")).json()}
     assert {c: i["expectedOutcome"] for c, i in listing.items()} == {
+        "snabkontrakt": "COUNTER_OFFER",
+        "stankoprom": "MANUAL_REVIEW",
+        "zarya": "MANUAL_REVIEW",
         "sokolova": "APPROVED",
         "vektor": "REJECTED",
         "orlov": "NOT_ELIGIBLE",

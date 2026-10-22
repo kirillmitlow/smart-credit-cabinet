@@ -1,4 +1,6 @@
-"""T-132, T-134: vektor, orlov, romashka, garipov и quick-start от входа до первого решения.
+"""T-132, T-134, T-133: простые и крупные персоны от входа до первого решения.
+
+vektor, orlov, romashka, garipov, quick-start, snabkontrakt, stankoprom и zarya.
 
 Каждая персона подаёт заявку с условиями из своего сценария (`application`) и приходит к исходу
 и кодам причин `expectedOutcome` / `expectedReasonCodes` из мока (оракул 30-17). Тест идёт по API
@@ -10,6 +12,8 @@
 
 from __future__ import annotations
 
+import re
+import time
 from collections.abc import Iterator
 from contextlib import contextmanager
 from decimal import Decimal
@@ -48,7 +52,7 @@ def submit_and_decide(
 ) -> Iterator[tuple[Expected, dict[str, Any], dict[str, Any]]]:
     """Вход → черновик с условиями сценария → согласия → отправка → решение; в конце отзыв."""
     want = expected(code)
-    login(client, want.inn)
+    login(client, want.inn, role="DIRECTOR")
     require_clean_persona(client, code)
     draft = check(
         client.post(
@@ -63,13 +67,23 @@ def submit_and_decide(
     )
     application_id = draft["id"]
     try:
+        collateral = scenario(code)["application"].get("collateral")
+        if collateral:
+            current = check(client.get(f"/applications/{application_id}"))
+            check(
+                client.patch(
+                    f"/applications/{application_id}/draft",
+                    json={"version": current["version"], "answers": {"collateral": collateral}},
+                )
+            )
         consents = sign_all_consents(client, application_id)
         assert consents["allSigned"], consents
         check(client.post(f"/applications/{application_id}/submit"))
         decided = wait_status(client, application_id, DECIDED)
         response = client.get(f"/applications/{application_id}/decision")
         decision = check(response)
-        lowered = response.text.lower()
+        # Коды причин (`DSCR_LOW` и т.п.) — публичный контракт; проверяем только имена полей
+        lowered = re.sub(r'"code"\s*:\s*"[^"]*"', "", response.text).lower()
         for word in HIDDEN:
             assert f'"{word.lower()}' not in lowered, f"во внешнем ответе внутреннее поле {word}"
         yield want, decided, decision
@@ -189,3 +203,61 @@ def test_quick_start_owner_logs_in_by_personal_inn_as_future_guarantor(
     assert roles["kind"] == "PERSON"
     assert [c["company"]["inn"] for c in roles["companies"]] == [want.inn]
     assert roles["companies"][0]["role"] == "DIRECTOR"
+
+
+# ---------------------------------------------------------------- T-133: крупные персоны
+
+
+def reset_persona(client: httpx.Client, code: str) -> None:
+    """Сброс одной компании к сценарию; на 409 (операция идёт) повтор через секунду, до 30 раз."""
+    for _ in range(30):
+        response = client.post(f"/demo/personas/{code}/reset")
+        if response.status_code != 409:
+            check(response)
+            return
+        time.sleep(1)
+    raise AssertionError(f"Сброс персоны {code}: 409 держится больше 30 секунд")
+
+
+@pytest.mark.parametrize("code", ["snabkontrakt", "stankoprom", "zarya"])
+def test_large_persona_reaches_the_oracle_outcome_and_codes(
+    client: httpx.Client, code: str
+) -> None:
+    reset_persona(client, code)
+    with submit_and_decide(client, code) as (want, decided, decision):
+        assert decided["status"] == decision["outcome"] == want.outcome
+        assert_codes(want, decision)
+
+
+@pytest.mark.xfail(
+    strict=False,
+    reason="Три карточки встречного строит T-297 (оптимизатор, ветка feat/counter-offers-optimizer); "
+    "пока в main variantsStatus = PENDING",
+)
+def test_snabkontrakt_counter_offer_has_the_three_cards_of_30_17(client: httpx.Client) -> None:
+    reset_persona(client, "snabkontrakt")
+    with submit_and_decide(client, "snabkontrakt") as (_want, _decided, decision):
+        assert decision["outcome"] == "COUNTER_OFFER"
+        assert reason_codes(decision)[:1] == ["DSCR_LOW"]
+        offer = decision["offer"]
+        assert offer is not None
+        assert offer["variantsStatus"] == "READY"
+        variants = offer["variants"]
+        by_kind = {v["kind"]: v for v in variants}
+        # Условия 30-17: 8 млн на 36 мес 295 274 ₽; 3,4 млн на 12 мес; CONTRACT 8 млн на 4 мес
+        assert any(
+            (v["amountRub"], v["termMonths"]) == (8_000_000, 36)
+            and abs(v["paymentRub"] - 295_274) <= 1
+            for v in variants
+        ), by_kind
+        assert any((v["amountRub"], v["termMonths"]) == (3_400_000, 12) for v in variants)
+        assert any(v.get("productCode") == "CONTRACT" for v in variants), by_kind
+
+
+def test_stankoprom_and_snabkontrakt_logins_by_company_inn(client: httpx.Client) -> None:
+    for code in ("stankoprom", "snabkontrakt", "zarya"):
+        want = expected(code)
+        roles = check(client.get(f"/auth/roles/{want.inn}"))
+        assert roles["people"], (code, roles)
+    roles = check(client.get(f"/auth/roles/{expected('stankoprom').inn}"))
+    assert len(roles["people"]) == 2

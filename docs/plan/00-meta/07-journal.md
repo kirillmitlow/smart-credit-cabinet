@@ -656,3 +656,12 @@ PR #60 влит с согласия D-108 после совместной про
 **Подсказки следующему:** поиск живёт в `counter_offers.py` (класс `_Search`: `passes` — все проверки одной суммы, `best_amount` — деление пополам, три метода карточек и `variant`); веса и сетка — `policy.counter_offers`. Property-тесты `api/tests/property/test_counter_offers.py` (INV-40…43, 50, сверка с полным перебором), unit — `api/tests/unit/decisioning/test_counter_offers.py`, строка оракула — `test_oracle_30_17.py`. Генератор «хороший клиент просит больше, чем тянет» — `counter_offer_params` в `tests/strategies/decisioning.py`.
 
 **Файлы:** api/app/modules/decisioning/{counter_offers,decide,routing,texts_ru,types}.py, api/app/modules/pipeline/{hooks,decision_view}.py, api/app/modules/offers/{schemas,models}.py, api/tests/{fixtures/counter_offers.py,strategies/decisioning.py,property/test_counter_offers.py}, api/tests/unit/{decisioning/test_counter_offers,decisioning/test_routing,test_oracle_30_17,test_offers_unit}.py, docs/api/api.openapi.json, web/src/api/generated/, docs/plan/reviews/R-004-core-implementation-notes.md, docs/plan/30-decisioning/10-counter-offer-options.md, карточки T-296, T-297, T-259, T-340.
+
+
+---
+
+**22.10, вечер · Агент A (Claude Code, субагент) · T-133: персоны snabkontrakt, stankoprom и zarya**
+
+Добавлен `builtin_large.py` в моках, три персоны подключены в общий список (теперь 9). Живой стенд `scc-large` (порты 8088/8100/8105): решения в `decisions` совпали с 30-17 по грейду, потоку, DSCR, стрессу и платежу всех трёх (snabkontrakt A 92, 739 163; stankoprom A 90, 393 247; zarya A 91, 325 000). Ожидание вариантов встречного СнабКонтракта помечено `xfail` до T-297.
+
+Расхождение с фикстурой ядра: у `0018881113`, `001310000200` и `001310000888` неверные контрольные суммы, взяты валидные ИНН (подробно в карточке T-133). Контракты моков и api, ядро и `policy` не менялись.
