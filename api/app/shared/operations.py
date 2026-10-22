@@ -73,7 +73,7 @@ def hold(
     Отсутствующий объект возвращает None: HTTP отдаст обычный 404, старая задача — SKIPPED.
     exclusive=True разрешён контроллеру сброса, в том числе для повтора незавершённого сброса.
     """
-    with db.get_database().engine.connect() as conn:
+    with db.get_database().operation_engine.connect() as conn:
         locks: list[tuple[int, bool]] = []
         try:
             if not _take(conn, GLOBAL_RESET_KEY, exclusive=False):

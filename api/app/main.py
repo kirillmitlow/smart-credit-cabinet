@@ -12,6 +12,7 @@ from starlette.concurrency import run_in_threadpool
 
 from app import health
 from app.modules import applications, catalog, companies, demo, loans, offers, pipeline
+from app.operation_fence import OperationFenceMiddleware
 from app.shared import clock, db
 from app.shared.errors import install_error_handlers
 from app.shared.logs import configure_logging
@@ -24,8 +25,8 @@ MIGRATION_RETRY_SECONDS = 2.0
 
 
 def _sync_companies() -> None:
-    with db.transaction() as session:
-        companies.sync_all(session)
+    # При rolling restart соседний процесс уже может выполнять сброс персоны.
+    companies.refresh_directory()
 
 
 def _register_policy() -> None:
@@ -82,6 +83,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     install_error_handlers(app)
+    app.add_middleware(OperationFenceMiddleware)
     app.add_middleware(RequestContextMiddleware)
     app.include_router(health.router)
     app.include_router(companies.login_router)

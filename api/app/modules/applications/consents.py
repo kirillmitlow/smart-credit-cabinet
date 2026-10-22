@@ -328,6 +328,7 @@ def request_signing(
         signer_identity(principal),
         SIGN_PURPOSE,
         bundle_fingerprint(application.id, (r.key for r in chosen)),
+        company_id=application.company_id,
     )
     return Challenge(issued.request_id, issued.expires_in, issued.code, tuple(chosen))
 

@@ -14,6 +14,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from datetime import date
 from decimal import Decimal
@@ -24,7 +26,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules import audit, companies
-from app.modules.applications import Actor, Application, Status, record_event, transition
+from app.modules.applications import (
+    Actor,
+    Application,
+    Status,
+    hold_operation,
+    record_event,
+    transition,
+)
 from app.modules.decisioning import add_months
 from app.modules.disbursement import bki_events, keys
 from app.modules.disbursement.models import Disbursement
@@ -405,6 +414,13 @@ def deliver_obligation(item: OutboxItem) -> Outcome:
     return _unavailable(result)
 
 
+@contextmanager
+def _delivery_guard(item: OutboxItem) -> Iterator[bool]:
+    # Замок охватывает и сеть, и _finalize в ретрансляторе, включая его запись аудита.
+    with hold_operation(UUID(item.aggregate_id)) as scope:
+        yield scope is not None
+
+
 def audit_dead_letter(session: Session, item: OutboxItem, error: str) -> None:
     """Запись в аудит, когда сообщение ушло в `FAILED` (50-05): ручной разбор."""
     audit.record(
@@ -419,5 +435,7 @@ def audit_dead_letter(session: Session, item: OutboxItem, error: str) -> None:
 
 def register() -> None:
     """Подключить обработчики к ретранслятору (воркер при старте, тесты)."""
-    outbox.register_handler(BANK_CORE, keys.DISBURSEMENT_EVENT, deliver_bank_core)
-    outbox.register_handler(BKI, keys.OBLIGATION_EVENT, deliver_obligation)
+    outbox.register_handler(
+        BANK_CORE, keys.DISBURSEMENT_EVENT, deliver_bank_core, guard=_delivery_guard
+    )
+    outbox.register_handler(BKI, keys.OBLIGATION_EVENT, deliver_obligation, guard=_delivery_guard)

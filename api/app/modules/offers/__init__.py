@@ -6,6 +6,7 @@
 from app.modules.offers import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.offers.contracts import SignedTerms, signed_terms
 from app.modules.offers.models import Contract, Offer, OfferVariant, Signature
+from app.modules.offers.operations import scope as operation_scope
 from app.modules.offers.router import router
 from app.modules.offers.schemas import OfferOut, Percent, VariantOut
 from app.modules.offers.service import VariantDraft, create_offer, current_offer
@@ -24,6 +25,7 @@ __all__ = [
     "create_offer",
     "current_offer",
     "offer_out",
+    "operation_scope",
     "router",
     "signed_terms",
 ]
