@@ -36,6 +36,9 @@ catalog:
       grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "MANUAL", E: "NO"}
       grade_d_requires: SECURITY
       grade_d_max_share_of_max: "0.5"
+      title: "Экспресс-кредит"
+      purpose: "Небольшая сумма на любые цели, быстро"
+      documents: []
     WORKING_CAPITAL:
       source: "10-06, D-084"
       note: "оборотный: 0,5–30 млн, срок 3–36 мес. (D-084), залог выше 10 млн, бизнесу ≥ 1 года"
@@ -55,6 +58,9 @@ catalog:
       grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "MANUAL", E: "NO"}
       grade_d_requires: COLLATERAL
       grade_d_max_share_of_max: "0.5"
+      title: "Оборотный кредит"
+      purpose: "Закупить товар или сырьё"
+      documents: ["До 10 млн ничего, если есть обороты в нашем банке или отчётность в ГИР БО; иначе выписка из другого банка"]
     CONTRACT:
       source: "10-06, допущение: границы суммы и срока не заданы в каталоге"
       note: "под контракт: проценты ежемесячно; верхняя граница — 80% неоплаченной части контракта (affordability)"
@@ -72,6 +78,9 @@ catalog:
       expense_rate: "0.02"
       auto_limit_b_rub: 10000000
       grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "NO", E: "NO"}
+      title: "Кредит под контракт"
+      purpose: "Выполнить заказ или госконтракт, за который заплатят позже"
+      documents: ["Номер контракта"]
     CREDIT_LINE:
       source: "10-06"
       note: "линия: 1–50 млн, 12–36 мес., залог выше 15 млн, бизнесу ≥ 2 лет"
@@ -89,6 +98,9 @@ catalog:
       expense_rate: "0.02"
       auto_limit_b_rub: 5000000
       grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "NO", E: "NO"}
+      title: "Кредитная линия"
+      purpose: "Регулярно не хватает денег до оплаты от клиентов"
+      documents: ["До 10 млн ничего, если есть обороты в нашем банке или отчётность в ГИР БО; иначе выписка из другого банка"]
     OVERDRAFT:
       source: "10-06, допущение: границы суммы в каталоге заданы только долей поступлений"
       note: "овердрафт: только клиент банка с оборотами ≥ 6 мес.; предел — 30% поступлений (affordability), авто без суммы"
@@ -106,6 +118,9 @@ catalog:
       expense_rate: "0.02"
       auto_limit_b_rub: null
       grade_access: {A: "AUTO", B: "AUTO", C: "NO", D: "NO", E: "NO"}
+      title: "Овердрафт"
+      purpose: "Не хватает на несколько дней"
+      documents: []
     INVESTMENT:
       source: "10-06"
       note: "инвестиционный: 1–100 млн, 12–84 мес., залог обязателен, всегда вручную (авто-лимит 0)"
@@ -123,6 +138,151 @@ catalog:
       expense_rate: "0.02"
       auto_limit_b_rub: 0
       grade_access: {A: "MANUAL", B: "MANUAL", C: "MANUAL", D: "MANUAL", E: "NO"}
+      title: "Инвестиционный кредит"
+      purpose: "Купить оборудование, транспорт"
+      documents: ["Договор или счёт от продавца"]
+
+wizard:
+  collateral_question_above_rub:
+    value: 10000000
+    source: "10-06"
+    note: "вопрос о залоге задаём, только если сумма выше наименьшего порога залога в каталоге (оборотный, 10 млн)"
+  default_term_months:
+    value: 12
+    source: "допущение: срок для предварительной проверки продукта, если клиент его ещё не назвал"
+    note: "подгоняется в границы срока продукта"
+  comfortable_terms_months: [12, 24, 36]
+  rules:
+    - id: START_PATH
+      source: "10-07"
+      note: "бизнесу моложе 6 мес.: путь «На запуск», продукт только с поручительством или залогом, ручное рассмотрение (D-035, D-077)"
+      when: {young_business: true}
+      primary: EXPRESS
+      start_path: true
+      why: "Бизнесу до 6 месяцев кредит доступен с поручительством владельца или залогом; заявку посмотрит специалист"
+    - id: EQUIPMENT_SMALL
+      source: "10-07"
+      note: "оборудование, сумма до 3 млн: экспресс, альтернатива инвестиционный"
+      when: {purpose: [EQUIPMENT], amount_max_rub: 3000000}
+      primary: EXPRESS
+      alternatives: [INVESTMENT]
+      why: "Небольшая сумма на оборудование: быстро и без залога"
+    - id: EQUIPMENT_LARGE
+      source: "10-07"
+      note: "оборудование, сумма больше 3 млн: инвестиционный"
+      when: {purpose: [EQUIPMENT], amount_above_rub: 3000000}
+      primary: INVESTMENT
+      why: "Покупка оборудования или транспорта на крупную сумму: длинный срок, оборудование остаётся в залоге"
+    - id: EQUIPMENT_AMOUNT_UNKNOWN
+      source: "допущение: в таблице 10-07 нет строки для «сумму не знаю»; подбираем как для крупной суммы"
+      note: "оборудование без названной суммы"
+      when: {purpose: [EQUIPMENT]}
+      primary: INVESTMENT
+      alternatives: [EXPRESS]
+      why: "Оборудование или транспорт: длинный срок и платёж по силам"
+    - id: GOODS_ONCE
+      source: "10-07"
+      note: "товар, разово: оборотный, альтернатива экспресс (если сумма до 3 млн, отсеет проверка границ)"
+      when: {purpose: [GOODS], frequency: [ONCE]}
+      primary: WORKING_CAPITAL
+      alternatives: [EXPRESS]
+      why: "Разовая закупка товара или сырья"
+    - id: GOODS_REGULAR
+      source: "10-07"
+      note: "товар, регулярно: кредитная линия, альтернатива оборотный"
+      when: {purpose: [GOODS], frequency: [REGULAR]}
+      primary: CREDIT_LINE
+      alternatives: [WORKING_CAPITAL]
+      why: "Закупки повторяются: линию можно брать и возвращать в пределах лимита"
+    - id: GOODS_FREQUENCY_UNKNOWN
+      source: "допущение: в таблице 10-07 нет строки для «не знаю» про регулярность; берём разовый случай"
+      note: "товар без ответа про регулярность"
+      when: {purpose: [GOODS]}
+      primary: WORKING_CAPITAL
+      alternatives: [EXPRESS]
+      why: "Закупка товара или сырья"
+    - id: ORDER_GOV
+      source: "10-07"
+      note: "заказ с оплатой позже, госзаказ: кредит под контракт, альтернатива оборотный"
+      when: {purpose: [ORDER], gov_contract: true}
+      primary: CONTRACT
+      alternatives: [WORKING_CAPITAL]
+      why: "Госзаказ: кредит привязан к контракту и закрывается, когда заказчик заплатит"
+    - id: ORDER_REGULAR
+      source: "10-07"
+      note: "заказы регулярно: кредитная линия, альтернатива под контракт"
+      when: {purpose: [ORDER], frequency: [REGULAR]}
+      primary: CREDIT_LINE
+      alternatives: [CONTRACT]
+      why: "Заказы повторяются: линия закрывает паузу до оплаты от клиентов"
+    - id: ORDER_ANY
+      source: "допущение: в таблице 10-07 нет строки для разового негосударственного заказа; берём кредит под контракт"
+      note: "заказ с оплатой позже без госзаказа и регулярности"
+      when: {purpose: [ORDER]}
+      primary: CONTRACT
+      alternatives: [WORKING_CAPITAL]
+      why: "Заказ, за который заплатят позже: кредит под контракт"
+    - id: GAP_DAYS_CLIENT
+      source: "10-07"
+      note: "нехватка на дни, клиент банка: овердрафт, альтернатива экспресс; если оборотов меньше 6 мес., овердрафт отсеет проверка требований продукта"
+      when: {purpose: [GAP], payback_horizon: [DAYS], client: true}
+      primary: OVERDRAFT
+      alternatives: [EXPRESS]
+      future_hint: OVERDRAFT
+      why: "Нехватка денег на несколько дней: овердрафт гасится поступлениями на счёт"
+    - id: GAP_DAYS_NOT_CLIENT
+      source: "10-07"
+      note: "нехватка на дни, не клиент банка: экспресс и подсказка, когда станет доступен овердрафт"
+      when: {purpose: [GAP], payback_horizon: [DAYS], client: false}
+      primary: EXPRESS
+      future_hint: OVERDRAFT
+      why: "Нехватка денег на несколько дней: подойдёт экспресс-кредит"
+    - id: GAP_WEEKS_REGULAR
+      source: "10-07"
+      note: "нехватка на недели, часто: кредитная линия, альтернатива экспресс"
+      when: {purpose: [GAP], payback_horizon: [WEEKS], frequency: [REGULAR]}
+      primary: CREDIT_LINE
+      alternatives: [EXPRESS]
+      why: "Нехватка повторяется: линия под рукой, проценты только за использованное"
+    - id: GAP_ANY
+      source: "допущение: в таблице 10-07 нет строк для остальных сочетаний срока и частоты нехватки денег"
+      note: "нехватка денег остальных видов: экспресс, альтернатива оборотный"
+      when: {purpose: [GAP]}
+      primary: EXPRESS
+      alternatives: [WORKING_CAPITAL]
+      why: "Временная нехватка денег: быстрый кредит без залога"
+    - id: GROWTH_SMALL
+      source: "10-07"
+      note: "развитие, сумма до 3 млн: экспресс, альтернатива оборотный"
+      when: {purpose: [GROWTH], amount_max_rub: 3000000}
+      primary: EXPRESS
+      alternatives: [WORKING_CAPITAL]
+      why: "Небольшая сумма на развитие: быстро и без залога"
+    - id: GROWTH_LONG
+      source: "10-07"
+      note: "развитие, сумма больше 3 млн, окупается дольше года: инвестиционный"
+      when: {purpose: [GROWTH], amount_above_rub: 3000000, payback_horizon: [OVER_YEAR]}
+      primary: INVESTMENT
+      why: "Развитие, которое окупится не сразу: длинный срок"
+    - id: GROWTH_LARGE
+      source: "10-07, допущение: «не знаю» про срок окупаемости считаем коротким, чтобы не требовать залог"
+      note: "развитие, сумма больше 3 млн, окупается быстрее: оборотный"
+      when: {purpose: [GROWTH], amount_above_rub: 3000000}
+      primary: WORKING_CAPITAL
+      why: "Развитие, которое окупится в ближайший год"
+    - id: GROWTH_AMOUNT_UNKNOWN
+      source: "допущение: в таблице 10-07 нет строки для «сумму не знаю»"
+      note: "развитие без названной суммы"
+      when: {purpose: [GROWTH]}
+      primary: WORKING_CAPITAL
+      alternatives: [EXPRESS]
+      why: "Развитие бизнеса: платёж по силам, срок на выбор"
+    - id: OTHER
+      source: "10-07"
+      note: "другое: экспресс; если сумма больше 3 млн, проверка границ не пропустит, и клиент увидит каталог с подсказкой"
+      when: {purpose: [OTHER]}
+      primary: EXPRESS
+      why: "Небольшая сумма на любые цели"
 
 eligibility:
   self_employed:

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE (ветка feat/api-catalog-consents) |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/consent-bundle-signing` |
 | Оценка | ~5 ч |

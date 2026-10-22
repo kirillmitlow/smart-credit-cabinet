@@ -6,30 +6,60 @@
 Публичный интерфейс (50-04): другие модули импортируют только отсюда.
 """
 
+from app.modules.decisioning.dates import add_months, full_months_between
 from app.modules.decisioning.decide import decide
-from app.modules.decisioning.loan_math import build_schedule
+from app.modules.decisioning.loan_math import (
+    ScheduleRow,
+    build_schedule,
+    bullet_schedule,
+    max_payment,
+    overpayment,
+    payment_for,
+)
 from app.modules.decisioning.policy import Policy, PolicyError, parse_policy
-from app.modules.decisioning.products import ProductContext, check_product
+from app.modules.decisioning.products import ProductContext, auto_limit, check_product
 from app.modules.decisioning.serialization import (
     input_from_json,
     input_to_json,
     inputs_hash,
     policy_hash,
 )
-from app.modules.decisioning.types import DecisionInput, DecisionResult
+from app.modules.decisioning.texts_ru import format_money, render
+from app.modules.decisioning.types import (
+    DecisionInput,
+    DecisionResult,
+    Explanation,
+    Grade,
+    Product,
+    ReasonCode,
+)
 
 __all__ = [
     "DecisionInput",
     "DecisionResult",
+    "Explanation",
+    "Grade",
     "Policy",
     "PolicyError",
+    "Product",
     "ProductContext",
+    "ReasonCode",
+    "ScheduleRow",
+    "add_months",
+    "auto_limit",
     "build_schedule",
+    "bullet_schedule",
     "check_product",
     "decide",
+    "format_money",
+    "full_months_between",
     "input_from_json",
     "input_to_json",
     "inputs_hash",
+    "max_payment",
+    "overpayment",
     "parse_policy",
+    "payment_for",
     "policy_hash",
+    "render",
 ]

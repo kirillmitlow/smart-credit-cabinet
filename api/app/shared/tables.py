@@ -22,4 +22,5 @@ TABLE_OWNERS: dict[str, str] = {
     "source_snapshots": "pipeline",
     "decisions": "pipeline",
     "decision_reasons": "pipeline",
+    "consents": "applications",
 }
