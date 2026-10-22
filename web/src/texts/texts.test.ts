@@ -26,6 +26,9 @@ import {
   consents,
   applicationPage,
   outcomes,
+  wizard,
+  wizardResult,
+  variantCard,
 } from '.';
 import { forbiddenClientWords } from './forbidden';
 
@@ -63,6 +66,9 @@ const allTexts = collectStrings([
   consents,
   applicationPage,
   outcomes,
+  wizard,
+  wizardResult,
+  variantCard,
 ]);
 
 describe('словарь текстов', () => {

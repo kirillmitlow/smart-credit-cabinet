@@ -81,7 +81,6 @@ describe('оболочка клиента', () => {
   it('карта адресов клиента: страницы открываются', async () => {
     mockSessions({ client: makeMe() });
     const paths = [
-      ['/wizard', placeholders.wizard.title],
       ['/products/overdraft', placeholders.product.title],
       ['/applications/a1/offer', placeholders.offer.title],
       ['/applications/a1/sign', placeholders.sign.title],
