@@ -12,6 +12,7 @@ import { useActiveCompany } from '@/features/auth/useActiveCompany';
 import { usePageHeading } from '@/lib/usePageHeading';
 import { emptyStates, fill, home } from '@/texts';
 import { putApplication } from '@/features/application/useApplication';
+import { HomeLoans } from '@/features/loans/HomeLoans';
 import { ApplicationCard } from './ApplicationCard';
 import { tasksFrom } from './tasks';
 
@@ -161,7 +162,7 @@ export function HomePage() {
       </Section>
 
       <Section id="home-loans" title={home.loans.heading}>
-        <Text>{emptyStates.loans}</Text>
+        <HomeLoans />
       </Section>
     </Stack>
   );

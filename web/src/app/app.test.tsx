@@ -15,6 +15,7 @@ import {
   fill,
   guards,
   home as homeText,
+  loansTexts,
   loginPlaceholder,
   placeholders,
   shell,
@@ -84,7 +85,6 @@ describe('оболочка клиента', () => {
       ['/products/overdraft', placeholders.product.title],
       ['/applications/a1/offer', placeholders.offer.title],
       ['/applications/a1/sign', placeholders.sign.title],
-      ['/loans/l1', placeholders.loan.title],
       ['/notifications', placeholders.notifications.title],
     ] as const;
     for (const [path, title] of paths) {
@@ -320,7 +320,7 @@ describe('вход (заглушка)', () => {
   it('после auth_expired показывает «Сессия закончилась»', async () => {
     mockSessions({ client: makeMe() });
     renderApp('/loans');
-    await screen.findByRole('heading', { level: 1, name: placeholders.loans.title });
+    await screen.findByRole('heading', { level: 1, name: loansTexts.title });
     await waitFor(() => expect(MockEventSource.instances.length).toBe(1));
 
     act(() => MockEventSource.latest().emit('auth_expired', {}));

@@ -5,6 +5,8 @@ import { ApplicationEditPage } from '@/features/application/ApplicationEditPage'
 import { ApplicationPage } from '@/features/application/ApplicationPage';
 import { CompanyPage } from '@/features/auth/CompanyPage';
 import { HomePage } from '@/features/home/HomePage';
+import { LoanPage } from '@/features/loans/LoanPage';
+import { LoansPage } from '@/features/loans/LoansPage';
 import { placeholders } from '@/texts';
 import { ClientLayout } from './ClientLayout';
 import { RequireBank, RequireClient, RequireDemo } from './guards';
@@ -105,8 +107,8 @@ export const appRoutes: RouteObject[] = [
                     path: 'applications/:id/sign',
                     element: <PlaceholderPage content={placeholders.sign} />,
                   },
-                  { path: 'loans', element: <PlaceholderPage content={placeholders.loans} /> },
-                  { path: 'loans/:id', element: <PlaceholderPage content={placeholders.loan} /> },
+                  { path: 'loans', element: <LoansPage /> },
+                  { path: 'loans/:id', element: <LoanPage /> },
                   {
                     path: 'notifications',
                     element: <PlaceholderPage content={placeholders.notifications} />,
