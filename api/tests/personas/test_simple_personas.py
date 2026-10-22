@@ -229,11 +229,6 @@ def test_large_persona_reaches_the_oracle_outcome_and_codes(
         assert_codes(want, decision)
 
 
-@pytest.mark.xfail(
-    strict=False,
-    reason="Три карточки встречного строит T-297 (оптимизатор, ветка feat/counter-offers-optimizer); "
-    "пока в main variantsStatus = PENDING",
-)
 def test_snabkontrakt_counter_offer_has_the_three_cards_of_30_17(client: httpx.Client) -> None:
     reset_persona(client, "snabkontrakt")
     with submit_and_decide(client, "snabkontrakt") as (_want, _decided, decision):
@@ -251,7 +246,21 @@ def test_snabkontrakt_counter_offer_has_the_three_cards_of_30_17(client: httpx.C
             for v in variants
         ), by_kind
         assert any((v["amountRub"], v["termMonths"]) == (3_400_000, 12) for v in variants)
-        assert any(v.get("productCode") == "CONTRACT" for v in variants), by_kind
+
+
+@pytest.mark.xfail(
+    strict=False,
+    reason="Q-148: конвейер запрашивает ЕИС только при продукте CONTRACT, карточку «кредит под "
+    "контракт» из заявки WORKING_CAPITAL оптимизатор построить не может",
+)
+def test_snabkontrakt_counter_offer_has_the_contract_card(client: httpx.Client) -> None:
+    """30-17: третья карточка — CONTRACT 8 млн на 4 мес (проценты 130 000, в конце 8 130 000)."""
+    reset_persona(client, "snabkontrakt")
+    with submit_and_decide(client, "snabkontrakt") as (_want, _decided, decision):
+        variants = decision["offer"]["variants"]
+        contract = [v for v in variants if v.get("productCode") == "CONTRACT"]
+        assert contract, [v["productCode"] for v in variants]
+        assert (contract[0]["amountRub"], contract[0]["termMonths"]) == (8_000_000, 4)
 
 
 def test_stankoprom_and_snabkontrakt_logins_by_company_inn(client: httpx.Client) -> None:
