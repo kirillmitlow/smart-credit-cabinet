@@ -20,7 +20,7 @@ from sqlalchemy import text
 
 from app.modules import audit
 from app.modules.integrations import scenarios
-from app.shared import cache, clock, db, resets
+from app.shared import cache, clock, db, outbox, resets
 from app.shared.errors import AppError
 
 log = structlog.get_logger("app.demo.reset")
@@ -88,8 +88,16 @@ def failed(step: ResetStep, exc: Exception) -> AppError:
 
 
 def _reset_mocks() -> dict[str, Any]:
+    # Сначала гасим доставку из outbox: иначе сообщение «в пути» долетит в мок после очистки
+    quiet = outbox.quiesce()
+    if quiet.in_flight:
+        log.warning("demo_reset_outbox_in_flight", in_flight=quiet.in_flight)
     result = scenarios.reset_all(SCENARIOS_MODE)
-    return {"scenarios": len(result.get("scenarios") or [])}
+    return {
+        "scenarios": len(result.get("scenarios") or []),
+        "outboxDropped": quiet.dropped,
+        "outboxInFlight": quiet.in_flight,
+    }
 
 
 def _reset_database() -> dict[str, Any]:

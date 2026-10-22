@@ -301,7 +301,9 @@ async def test_mocks_failure_names_step_keeps_data_and_retry_completes(
     assert problem["errors"][0]["step"] == "MOCKS"
     assert problem["errors"][0]["title"] == "моки"
     assert "Сброс остановился на шаге «моки»" in problem["detail"]
-    assert counts() == before  # база не тронута: мок отказал до неё
+    # База не тронута: мок отказал до неё. Только неотправленный outbox снят заранее (quiesce),
+    # чтобы сообщение в пути не долетело в мок после очистки
+    assert {**counts(), "outbox": 0} == {**before, "outbox": 0}
     assert stand["redis"].get("scc:session:CLIENT:abc") == "{}"
     done = await post_reset(stand)
     assert done.status_code == 200, done.text

@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import structlog
-from sqlalchemy import func, select, tuple_, update
+from sqlalchemy import delete, func, select, tuple_, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, aliased
 
@@ -240,7 +240,9 @@ def _finalize(session: Session, item: OutboxItem, outcome: Outcome) -> str:
     now = clock.system_now()
     row = session.execute(
         select(OutboxMessage).where(OutboxMessage.id == item.id).with_for_update()
-    ).scalar_one()
+    ).scalar_one_or_none()
+    if row is None:  # запись стёрта сбросом демо, пока шла доставка
+        return "STALE"
     if row.status != PENDING or row.lease_until != item.lease_until:
         # Результат старого владельца не снимает новую аренду и не меняет её счётчики.
         return "STALE"
@@ -302,6 +304,45 @@ def relay(budget_s: float = RELAY_BUDGET_S) -> RelayStats:
             case _:
                 stats.retried += 1
     return stats
+
+
+@dataclass(frozen=True)
+class Quiesced:
+    dropped: int
+    in_flight: int
+
+
+def quiesce(timeout_s: float = 15.0, poll_s: float = 0.2) -> Quiesced:
+    """Остановить доставку перед сбросом демо: неотправленное снять, отправляемое дождаться.
+
+    Без этого сообщение, ушедшее в мок за секунду до сброса, долетает уже после очистки мока
+    (например, кредит в БКИ), и после сброса у персоны оказывается лишний долг. Неотправленные
+    записи удаляются сразу; записи под арендой ждём до `timeout_s` — доставка укладывается в
+    бюджет вызова. Истёк срок — возвращаем, сколько ещё в пути: сброс решает сам, что делать.
+    """
+    deadline = clock.monotonic() + timeout_s
+    dropped = 0
+    while True:
+        now = clock.system_now()
+        with db.transaction() as session:
+            dropped += len(
+                session.scalars(
+                    delete(OutboxMessage)
+                    .where(
+                        OutboxMessage.status == PENDING,
+                        (OutboxMessage.lease_until.is_(None)) | (OutboxMessage.lease_until < now),
+                    )
+                    .returning(OutboxMessage.id)
+                ).all()
+            )
+            in_flight = session.scalar(
+                select(func.count())
+                .select_from(OutboxMessage)
+                .where(OutboxMessage.status == PENDING, OutboxMessage.lease_until >= now)
+            )
+        if not in_flight or clock.monotonic() >= deadline:
+            return Quiesced(dropped=dropped, in_flight=int(in_flight or 0))
+        time.sleep(poll_s)
 
 
 def count_dead(session: Session) -> int:
