@@ -16,6 +16,7 @@ export const defaultHandlers = [
   getHealthReadyMockHandler(),
   getHealthDepsMockHandler(),
   http.get('*/api/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
+  http.get('*/api/auth/bank-me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
   http.get('*/api/applications', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/companies/:id', () => Response.json(makeCompanyProfile())),
   http.get('*/api/loans', () => Response.json({ items: [], nextCursor: null })),

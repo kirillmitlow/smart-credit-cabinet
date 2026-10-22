@@ -12,14 +12,17 @@ export interface SessionsInit {
   config?: Partial<PublicConfig>;
 }
 
-/** Две независимые сессии (D-085): `GET /me?zone=…` отвечает по зоне, без сессии — 401 */
+/** Две независимые сессии (D-085): маршруты клиента и банка читают только свой контекст. */
 export function mockSessions({ client = null, bank = null, config = {} }: SessionsInit = {}) {
   server.use(
-    http.get('*/api/me', ({ request }) => {
-      const zone = new URL(request.url).searchParams.get('zone');
-      const me = zone === 'bank' ? bank : client;
-      return me ? Response.json(me) : problemResponse({ status: 401, code: 'UNAUTHENTICATED' });
-    }),
+    http.get('*/api/me', () =>
+      client ? Response.json(client) : problemResponse({ status: 401, code: 'UNAUTHENTICATED' }),
+    ),
+    http.get('*/api/auth/bank-me', () =>
+      bank
+        ? Response.json({ ...bank, level: bank.level ?? 'L2' })
+        : problemResponse({ status: 401, code: 'UNAUTHENTICATED' }),
+    ),
     http.get('*/api/public-config', () => Response.json(makePublicConfig(config))),
   );
 }

@@ -33,6 +33,7 @@ import type {
   AcceptedOut,
   ApplicationOut,
   ApplicationPage,
+  BankMeResponse,
   ClientDecisionOut,
   CodeIssued,
   CompanyProfile,
@@ -80,6 +81,10 @@ export const getGetMeResponseMock = (overrideResponse: Partial<Extract<MeRespons
 export const getSetActiveCompanyResponseMock = (overrideResponse: Partial<Extract<MeResponse, object>> = {}): MeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), activeCompanyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), companies: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({company: {id: faker.string.uuid(), inn: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canApply: faker.datatype.boolean()}, role: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getGetPublicConfigResponseMock = (overrideResponse: Partial<Extract<PublicConfig, object>> = {}): PublicConfig => ({demoMode: faker.datatype.boolean(), productName: faker.string.alpha({length: {min: 10, max: 20}}), version: faker.string.alpha({length: {min: 10, max: 20}}), nluAvailable: faker.datatype.boolean(), ...overrideResponse})
+
+export const getBankDemoLoginResponseMock = (overrideResponse: Partial<Extract<BankMeResponse, object>> = {}): BankMeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(['UNDERWRITER','ADMIN'] as const), level: faker.helpers.arrayElement(['L1','L2'] as const), ...overrideResponse})
+
+export const getGetBankMeResponseMock = (overrideResponse: Partial<Extract<BankMeResponse, object>> = {}): BankMeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(['UNDERWRITER','ADMIN'] as const), level: faker.helpers.arrayElement(['L1','L2'] as const), ...overrideResponse})
 
 export const getListCompanyGovContractsResponseMock = (overrideResponse: Partial<Extract<GovContractPage, object>> = {}): GovContractPage => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({registryNumber: faker.string.alpha({length: {min: 10, max: 20}}), customerName: faker.string.alpha({length: {min: 10, max: 20}}), subject: faker.string.alpha({length: {min: 10, max: 20}}), priceRub: faker.number.int(), unpaidRub: faker.number.int(), concludedAt: faker.date.past().toISOString().slice(0, 10), paymentDeadline: faker.date.past().toISOString().slice(0, 10), status: faker.string.alpha({length: {min: 10, max: 20}})})), retrievedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', nextCursor: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), source: "EIS", ...overrideResponse})
 
@@ -256,6 +261,40 @@ export const getGetPublicConfigMockHandler = (overrideResponse?: PublicConfig | 
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getGetPublicConfigResponseMock(),
       { status: 200
+      })
+  }, options)
+}
+
+export const getBankDemoLoginMockHandler = (overrideResponse?: BankMeResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<BankMeResponse> | BankMeResponse), options?: RequestHandlerOptions) => {
+  return http.post('*/auth/bank-demo-login', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getBankDemoLoginResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetBankMeMockHandler = (overrideResponse?: BankMeResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<BankMeResponse> | BankMeResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/auth/bank-me', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetBankMeResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getBankLogoutMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.post('*/auth/bank-logout', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
       })
   }, options)
 }
@@ -628,6 +667,9 @@ export const getApiMock = () => [
   getGetMeMockHandler(),
   getSetActiveCompanyMockHandler(),
   getGetPublicConfigMockHandler(),
+  getBankDemoLoginMockHandler(),
+  getGetBankMeMockHandler(),
+  getBankLogoutMockHandler(),
   getListCompanyGovContractsMockHandler(),
   getLookupCompanyMockHandler(),
   getGetCompanyProfileMockHandler(),

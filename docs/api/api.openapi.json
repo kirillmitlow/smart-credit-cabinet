@@ -344,6 +344,146 @@
         }
       }
     },
+    "/auth/bank-demo-login": {
+      "post": {
+        "tags": [
+          "вход банка"
+        ],
+        "summary": "Войти как демо-андеррайтер L2 или администратор",
+        "operationId": "bankDemoLogin",
+        "parameters": [
+          {
+            "name": "sid_bank",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Bank"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BankDemoLoginRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankMeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED: демо выключено; FORBIDDEN: доступ отозван"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR: разрешены только роли UNDERWRITER и ADMIN"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE: хранилище сессий недоступно"
+          }
+        }
+      }
+    },
+    "/auth/bank-me": {
+      "get": {
+        "tags": [
+          "вход банка"
+        ],
+        "summary": "Кто я в банковской зоне и мой уровень полномочий",
+        "operationId": "getBankMe",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankMeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: нет банковской сессии или доступ отозван"
+          },
+          "403": {
+            "description": "FORBIDDEN: сессия не даёт права работать в банковской зоне"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE: хранилище сессий недоступно"
+          }
+        }
+      }
+    },
+    "/auth/bank-logout": {
+      "post": {
+        "tags": [
+          "вход банка"
+        ],
+        "summary": "Выйти из банковской зоны",
+        "operationId": "bankLogout",
+        "parameters": [
+          {
+            "name": "sid_bank",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Bank"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE: хранилище сессий недоступно"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/companies/{company_id}/gov-contracts": {
       "get": {
         "tags": [
@@ -2021,6 +2161,59 @@
           "NEVER"
         ],
         "title": "AutoDecisionMode"
+      },
+      "BankDemoLoginRequest": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "UNDERWRITER",
+              "ADMIN"
+            ],
+            "title": "Role",
+            "default": "UNDERWRITER"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "BankDemoLoginRequest"
+      },
+      "BankMeResponse": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "UNDERWRITER",
+              "ADMIN"
+            ],
+            "title": "Role"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "L1",
+              "L2"
+            ],
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId",
+          "displayName",
+          "role",
+          "level"
+        ],
+        "title": "BankMeResponse"
       },
       "ClientDecisionOut": {
         "properties": {
