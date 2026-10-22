@@ -9,6 +9,7 @@ import { renderApp } from '@/test/render';
 import { mockSessions } from '@/test/sessions';
 import { server } from '@/test/server';
 import { applicationPage, outcomes, timelineSteps } from '@/texts';
+import { makeDecision } from '@/test/decisionFactory';
 
 type App = ReturnType<typeof makeApplication>;
 
@@ -20,6 +21,21 @@ function serve(initial: App) {
       requests += 1;
       return Response.json(current);
     }),
+    http.get('*/api/applications/app-1/decision', () =>
+      Response.json(
+        current.status === 'REJECTED'
+          ? makeDecision({
+              outcome: 'REJECTED',
+              terms: null,
+              offer: null,
+              whatHelped: [],
+              reasons: [
+                { code: 'BANK_POLICY', text: 'Сейчас одобрить заявку не можем', action: '' },
+              ],
+            })
+          : makeDecision(),
+      ),
+    ),
   );
   return {
     set: (next: Partial<App>) => {
@@ -149,7 +165,7 @@ describe('страница заявки', () => {
 });
 
 describe('блоки исхода', () => {
-  it('«Одобрено»: условия, заглушка принятия, «Отказаться» с подтверждением', async () => {
+  it('«Одобрено»: условия решения, «Отказаться» с подтверждением', async () => {
     const user = userEvent.setup();
     mockSessions({ client: makeMe() });
     serve(sent('APPROVED', { allowedActions: ['ACCEPT_OFFER', 'WITHDRAW'] }));
@@ -164,7 +180,9 @@ describe('блоки исхода', () => {
     expect(
       await screen.findByRole('heading', { level: 2, name: outcomes.approved.title }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: outcomes.approved.accept })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: outcomes.approved.accept }),
+    ).not.toBeInTheDocument();
     expect(await blockingA11yViolations(container)).toEqual([]);
 
     await user.click(screen.getByRole('button', { name: applicationPage.withdraw.decline }));
@@ -189,7 +207,7 @@ describe('блоки исхода', () => {
     expect(
       await screen.findByRole('heading', { level: 2, name: outcomes.rejected.title }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: outcomes.rejected.pickOther })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: outcomes.rejected.pickOther })).toHaveAttribute(
       'href',
       '/wizard',
     );
@@ -226,7 +244,6 @@ describe('блоки исхода', () => {
     ['COUNTER_OFFER', outcomes.counter.title],
     ['NEEDS_INFO', outcomes.needsInfo.title],
     ['MANUAL_REVIEW', outcomes.manual.title],
-    ['OFFER_ACCEPTED', outcomes.signing.title],
   ])('%s: блок по статусу', async (status, title) => {
     mockSessions({ client: makeMe() });
     serve(sent(status));

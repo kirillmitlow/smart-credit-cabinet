@@ -21,6 +21,7 @@ export type { ApplicationStatus } from './timeline';
 export { emptyStates, termHints, demoMarks } from './content';
 export { login, companyChoice, logout } from './login';
 export { home } from './home';
+export { decision } from './decision';
 export { consents } from './consents';
 export { productNames, applicationForm, applicationPage, outcomes } from './application';
 
