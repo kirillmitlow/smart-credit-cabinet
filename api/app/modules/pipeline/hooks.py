@@ -1,37 +1,110 @@
-"""Заготовки после сохранения решения (T-275): предложение, задачи клиенту, outbox.
+"""Что делаем после сохранения решения (T-275): предложение, задачи клиенту, outbox.
 
-Вызываются внутри транзакции шага 6. Настоящие реализации живут в других задачах; здесь только
-точки подключения, чтобы конвейер не менялся, когда они появятся.
+Вызывается внутри транзакции шага 6. Предложение создаёт модуль `offers` (T-340); задачи клиенту
+и outbox — точки подключения для других задач.
 """
 
 from __future__ import annotations
 
+from typing import Any
+
 import structlog
 from sqlalchemy.orm import Session
 
+from app.modules import offers
 from app.modules.applications import Application
-from app.modules.decisioning import DecisionResult
-from app.modules.decisioning.types import Outcome
+from app.modules.decisioning import DecisionInput, DecisionResult
+from app.modules.decisioning.types import Outcome, Variant
+from app.modules.offers import VariantDraft
 from app.modules.pipeline.models import Decision
 
 log = structlog.get_logger("app.pipeline.hooks")
 
 OFFER_OUTCOMES = frozenset({Outcome.APPROVED, Outcome.COUNTER_OFFER})
+_LABELS = {"CONDITIONAL_SECURITY": "С поручительством владельца или залогом"}
 
 
-def create_offer_stub(session: Session, application: Application, decision: Decision) -> None:
-    """Основа предложения для `APPROVED` и `COUNTER_OFFER`.
+def _changes(inp: DecisionInput, variant: Variant) -> dict[str, Any]:
+    """Чем вариант отличается от запроса клиента: пусто, если условия те же."""
+    asked = inp.application
+    changed: dict[str, Any] = {}
+    if variant.product != asked.product:
+        changed["productCode"] = {"from": asked.product.value, "to": variant.product.value}
+    if variant.amount_rub != asked.amount_rub:
+        changed["amountRub"] = {"from": asked.amount_rub, "to": variant.amount_rub}
+    if variant.term_months != asked.term_months:
+        changed["termMonths"] = {"from": asked.term_months, "to": variant.term_months}
+    if variant.security_required:
+        changed["security"] = True
+    return changed
 
-    TODO(T-340): создать `offers` через публичный интерфейс модуля offers (варианты из
-    `decision.explain["variants"]`, срок оферты 10 дней). Пока предложения как сущности нет.
+
+def _drafts(inp: DecisionInput, result: DecisionResult) -> list[VariantDraft]:
+    if result.outcome == Outcome.APPROVED:
+        asked = inp.application
+        rate = result.numbers.rate
+        if rate is None:  # у одобрения ставка есть всегда; защита от битого результата ядра
+            raise ValueError("APPROVED без ставки")
+        return [
+            VariantDraft(
+                kind="AS_REQUESTED",
+                label="Как вы просили",
+                product_code=asked.product.value,
+                amount_rub=asked.amount_rub,
+                term_months=asked.term_months,
+                annual_rate=rate,
+                recommended=True,
+            )
+        ]
+    return [
+        VariantDraft(
+            kind=v.kind,
+            label=_LABELS.get(v.kind, "Другие условия"),
+            product_code=v.product.value,
+            amount_rub=v.amount_rub,
+            term_months=v.term_months,
+            annual_rate=v.rate,
+            collateral_required=v.security_required,
+            recommended=v.recommended,
+            what_changed=_changes(inp, v),
+            note=v.note,
+        )
+        for v in result.variants
+    ]
+
+
+def create_offer(
+    session: Session,
+    application: Application,
+    decision: Decision,
+    inp: DecisionInput,
+    result: DecisionResult,
+) -> None:
+    """Предложение по решению в той же транзакции (50-05, шаг 6, T-340).
+
+    `APPROVED` — один вариант «как просили». `COUNTER_OFFER` — варианты решения; пока
+    оптимизатор встречных не готов (T-297), их может не быть: предложение помечается `PENDING`.
     """
-    log.info("offer_stub", application=str(application.id), decision=str(decision.id))
+    drafts = _drafts(inp, result)
+    counter = result.outcome == Outcome.COUNTER_OFFER
+    offers.create_offer(
+        session,
+        application,
+        decision_id=decision.id,
+        kind="COUNTER" if counter else "AS_REQUESTED",
+        variants=drafts,
+        variants_status="PENDING" if counter and not drafts else "READY",
+    )
 
 
 def after_decision(
-    session: Session, application: Application, decision: Decision, result: DecisionResult
+    session: Session,
+    application: Application,
+    decision: Decision,
+    inp: DecisionInput,
+    result: DecisionResult,
 ) -> None:
     if result.outcome in OFFER_OUTCOMES:
-        create_offer_stub(session, application, decision)
+        create_offer(session, application, decision, inp, result)
     # TODO(T-278): outbox — сообщение APPLICATION_DECIDED в БКИ, ключ уведомлений клиенту (та же транзакция)
     # TODO(T-2xx, 20-03): задача клиенту при NEEDS_INFO (`REVENUE_UNKNOWN`, `DATA_INCOMPLETE`)

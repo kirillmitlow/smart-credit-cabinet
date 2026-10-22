@@ -34,7 +34,7 @@ class AutoDecisionMode(StrEnum):
     NEVER = "NEVER"
 
 
-class ReasonOut(Camel):
+class ProductReasonOut(Camel):
     """Причина по-человечески; машинный код нужен фронту для словаря (60-06)."""
 
     code: str
@@ -60,7 +60,7 @@ class ProductOut(Camel):
     requires_contract: bool
     documents: list[str]
     available: bool
-    unavailable_reasons: list[ReasonOut]
+    unavailable_reasons: list[ProductReasonOut]
     hint: str | None
     requires_security: bool
 
@@ -170,7 +170,7 @@ class Recommended(Camel):
 class RejectedCandidate(Camel):
     product_code: str
     title: str
-    reasons: list[ReasonOut]
+    reasons: list[ProductReasonOut]
 
 
 class WizardOutcome(StrEnum):

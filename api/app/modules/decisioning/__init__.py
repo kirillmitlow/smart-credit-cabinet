@@ -24,7 +24,7 @@ from app.modules.decisioning.serialization import (
     inputs_hash,
     policy_hash,
 )
-from app.modules.decisioning.texts_ru import format_money, render
+from app.modules.decisioning.texts_ru import client_factor_phrases, format_money, render
 from app.modules.decisioning.types import (
     DecisionInput,
     DecisionResult,
@@ -50,6 +50,7 @@ __all__ = [
     "build_schedule",
     "bullet_schedule",
     "check_product",
+    "client_factor_phrases",
     "decide",
     "format_money",
     "full_months_between",
