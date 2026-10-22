@@ -80,6 +80,7 @@ module = [
   "app.modules.simulator.*",
   "app.modules.pipeline.*",
   "app.modules.applications.*",
+  "app.modules.catalog.*",
   "app.shared.*",
 ]
 strict = true

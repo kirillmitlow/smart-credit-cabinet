@@ -18,6 +18,7 @@ from app.modules.companies.models import Company, CompanyMember
 from app.shared import db, tasks
 from app.shared.errors import AppError
 from app.shared.settings import Settings
+from tests.integration.support import grant_company_bki
 
 pytestmark = pytest.mark.integration
 
@@ -85,6 +86,12 @@ async def stranger(stand: dict[str, Any]) -> AsyncIterator[httpx.AsyncClient]:
         yield c
 
 
+async def submit(client: httpx.AsyncClient, application_id: str) -> httpx.Response:
+    """Согласия здесь не предмет проверки: выдаём обязательные напрямую (их тесты — в test_consents)."""
+    grant_company_bki(application_id)
+    return await client.post(f"/applications/{application_id}/submit")
+
+
 TERMS = {"productCode": "EXPRESS", "amountRub": 500000, "termMonths": 12}
 
 
@@ -125,10 +132,10 @@ async def test_submit_creates_version_event_and_task_once(
     sokolova: httpx.AsyncClient, stand: dict[str, Any]
 ) -> None:
     app_id = (await sokolova.post("/applications", json=TERMS)).json()["id"]
-    submitted = await sokolova.post(f"/applications/{app_id}/submit")
+    submitted = await submit(sokolova, app_id)
     assert submitted.status_code == 200
     assert submitted.json()["status"] == "SUBMITTED"
-    again = await sokolova.post(f"/applications/{app_id}/submit")
+    again = await submit(sokolova, app_id)
     assert again.status_code == 409
     assert again.json()["code"] == "INVALID_TRANSITION"
     assert stand["sent"] == [("pipeline.run", {"application_id": app_id})]
@@ -143,27 +150,27 @@ async def test_submit_creates_version_event_and_task_once(
 
 async def test_submit_without_terms_is_422(sokolova: httpx.AsyncClient) -> None:
     app_id = (await sokolova.post("/applications", json={"productCode": "EXPRESS"})).json()["id"]
-    response = await sokolova.post(f"/applications/{app_id}/submit")
+    response = await submit(sokolova, app_id)
     assert response.status_code == 422
     assert {e["loc"][1] for e in response.json()["errors"]} == {"amount_rub", "term_months"}
 
 
 async def test_second_application_in_progress_is_duplicate(sokolova: httpx.AsyncClient) -> None:
     first = (await sokolova.post("/applications", json=TERMS)).json()["id"]
-    await sokolova.post(f"/applications/{first}/submit")
+    await submit(sokolova, first)
     second = (await sokolova.post("/applications", json=TERMS)).json()["id"]
-    response = await sokolova.post(f"/applications/{second}/submit")
+    response = await submit(sokolova, second)
     assert response.status_code == 409
     assert response.json()["code"] == "DUPLICATE_APPLICATION"
     assert (await sokolova.get(f"/applications/{second}")).json()["status"] == "DRAFT"
     withdrawn = await sokolova.post(f"/applications/{first}/withdraw")
     assert withdrawn.json()["status"] == "WITHDRAWN"
-    assert (await sokolova.post(f"/applications/{second}/submit")).status_code == 200
+    assert (await submit(sokolova, second)).status_code == 200
 
 
 async def test_concurrent_transitions_one_wins(sokolova: httpx.AsyncClient) -> None:
     app_id = (await sokolova.post("/applications", json=TERMS)).json()["id"]
-    await sokolova.post(f"/applications/{app_id}/submit")
+    await submit(sokolova, app_id)
     results: list[str] = []
     barrier = threading.Barrier(2)
 
@@ -193,7 +200,7 @@ async def test_concurrent_transitions_one_wins(sokolova: httpx.AsyncClient) -> N
 
 async def test_journal_cannot_be_changed(sokolova: httpx.AsyncClient) -> None:
     app_id = (await sokolova.post("/applications", json=TERMS)).json()["id"]
-    await sokolova.post(f"/applications/{app_id}/submit")
+    await submit(sokolova, app_id)
     for statement in (
         "UPDATE application_events SET kind = 'NOTE'",
         "DELETE FROM application_events",

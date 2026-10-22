@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Identity,
@@ -102,3 +103,51 @@ class ApplicationEvent(Base):
     reason_code: Mapped[str | None] = mapped_column(String(64))
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
     request_id: Mapped[str | None] = mapped_column(String(64))
+
+
+CONSENT_KINDS = ("BKI", "TURNOVER", "PERSONAL_DATA")
+CONSENT_ROLES = ("COMPANY", "IP", "DIRECTOR", "OWNER", "GUARANTOR")
+_KINDS = ", ".join(f"'{k}'" for k in CONSENT_KINDS)
+_ROLES = ", ".join(f"'{r}'" for r in CONSENT_ROLES)
+
+
+class Consent(IdMixin, Base):
+    """Подписанное согласие (20-04, 50-06): версия и хеш текста, срок, доказательство подписи.
+
+    Одно согласие = один субъект (ИНН) и один вид в одной заявке; на новую заявку не переносится
+    (D-077). Записи не удаляются, отзыв — `revoked_at` (T-262).
+    """
+
+    __tablename__ = "consents"
+    __table_args__ = (
+        CheckConstraint(f"kind IN ({_KINDS})", name="kind"),
+        CheckConstraint("subject_type IN ('COMPANY', 'PERSON')", name="subject_type"),
+        CheckConstraint(f"role IN ({_ROLES})", name="role"),
+        Index(
+            "uq_consents_active_subject_kind",
+            "application_id",
+            "subject_inn",
+            "kind",
+            unique=True,
+            postgresql_where=text("revoked_at IS NULL"),
+        ),
+    )
+
+    application_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("applications.id", ondelete="CASCADE"), index=True
+    )
+    bundle_id: Mapped[UUID] = mapped_column(Uuid, index=True)
+    subject_inn: Mapped[str] = mapped_column(String(12))
+    subject_type: Mapped[str] = mapped_column(String(8))
+    role: Mapped[str] = mapped_column(String(12))
+    kind: Mapped[str] = mapped_column(String(16))
+    purpose: Mapped[str] = mapped_column(String(32), default="LOAN_APPLICATION")
+    text_version: Mapped[str] = mapped_column(String(64))
+    text_hash: Mapped[str] = mapped_column(String(64))
+    signed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=clock.now)
+    valid_until: Mapped[date] = mapped_column(Date)
+    signer_user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("users.id"))
+    signer_inn: Mapped[str | None] = mapped_column(String(12))
+    sign_method: Mapped[str] = mapped_column(String(32), default="SIMPLE_ESIGN")
+    proof: Mapped[str] = mapped_column(String(64))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

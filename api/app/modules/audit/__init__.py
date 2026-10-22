@@ -6,6 +6,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.audit.models import AuditRecord
@@ -37,4 +38,14 @@ def record(
     )
 
 
-__all__ = ["AuditRecord", "record"]
+def exists(session: Session, action: str, *, actor_id: UUID) -> bool:
+    """Было ли у этого пользователя действие `action` (например, принятие правил подписи)."""
+    found = session.scalar(
+        select(AuditRecord.id)
+        .where(AuditRecord.action == action, AuditRecord.actor_id == actor_id)
+        .limit(1)
+    )
+    return found is not None
+
+
+__all__ = ["AuditRecord", "exists", "record"]

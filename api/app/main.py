@@ -11,12 +11,13 @@ from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
 from app import health
-from app.modules import applications, companies, pipeline
+from app.modules import applications, catalog, companies, pipeline
 from app.shared import clock, db
 from app.shared.errors import install_error_handlers
 from app.shared.logs import configure_logging
 from app.shared.request_context import RequestContextMiddleware
 from app.shared.settings import Settings, get_settings
+from app.wiring import wire_modules
 
 log = structlog.get_logger("app.main")
 MIGRATION_RETRY_SECONDS = 2.0
@@ -71,6 +72,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Невалидный файл политики (нет source у числа, дыра в грейдах) — api не стартует (T-274)
     pipeline.current_policy()
     clock.configure(settings.app_today)
+    wire_modules()
     db.configure(settings.sqlalchemy_url)
     app = FastAPI(
         title="Умный кредитный кабинет — API",
@@ -84,6 +86,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health.router)
     app.include_router(companies.login_router)
     app.include_router(applications.router)
+    app.include_router(applications.consents_router)
+    app.include_router(catalog.router)
     return app
 
 

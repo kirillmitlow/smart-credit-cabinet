@@ -122,6 +122,11 @@ class ProductConfig(Cited):
     # Для грейда D: что обязательно и до какой доли максимума продукта (30-07)
     grade_d_requires: str | None = None
     grade_d_max_share_of_max: Dec | None = None
+    # Витрина каталога (10-06): название и «для чего» словами клиента, какие документы просим.
+    # Пустой список — «ничего не нужно». Новый продукт добавляется записью, без правок кода
+    title: str = Field(min_length=1)
+    purpose: str = Field(min_length=1)
+    documents: tuple[str, ...]
 
     @model_validator(mode="after")
     def _check(self) -> ProductConfig:
@@ -525,9 +530,75 @@ class Timing(_Strict):
     consent_months: IntParam
 
 
+# ---------------------------------------------------------------- wizard (10-07)
+
+_PURPOSES = {"EQUIPMENT", "GOODS", "ORDER", "GAP", "GROWTH", "OTHER"}
+_FREQUENCIES = {"ONCE", "REGULAR"}
+_HORIZONS = {"DAYS", "WEEKS", "MONTHS_1_3", "MONTHS_3_12", "OVER_YEAR"}
+
+
+class WizardWhen(_Strict):
+    """Условия строки таблицы 10-07. Отсутствующее условие = «любое значение».
+
+    Ответ «не знаю» (None) подходит только строке, которая это условие не задаёт: подбор идёт
+    без этого ответа. Сумма: `amount_max_rub` — «не больше», `amount_above_rub` — «больше».
+    """
+
+    purpose: tuple[str, ...] | None = None
+    frequency: tuple[str, ...] | None = None
+    payback_horizon: tuple[str, ...] | None = None
+    gov_contract: bool | None = None
+    client: bool | None = None  # клиент банка
+    young_business: bool | None = None  # бизнесу меньше restrictions.business_too_young
+    amount_max_rub: Rub | None = None
+    amount_above_rub: Rub | None = None
+
+    @model_validator(mode="after")
+    def _known_values(self) -> WizardWhen:
+        for name, allowed in (
+            ("purpose", _PURPOSES),
+            ("frequency", _FREQUENCIES),
+            ("payback_horizon", _HORIZONS),
+        ):
+            values = getattr(self, name)
+            if values is not None and not set(values) <= allowed:
+                raise ValueError(f"{name}: допустимы {sorted(allowed)}, получено {sorted(values)}")
+        return self
+
+
+class WizardRule(Cited):
+    """Строка таблицы «ответы → продукт». Первая подошедшая строка побеждает."""
+
+    id: str = Field(pattern=r"^[A-Z0-9_]+$")
+    when: WizardWhen
+    primary: str
+    alternatives: tuple[str, ...] = ()
+    # Что показать клиенту, если кандидата не пропустили требования, но он станет доступен позже
+    future_hint: str | None = None
+    start_path: bool = False  # путь «На запуск»: только с обеспечением, ручное рассмотрение
+    why: str = Field(min_length=1)  # «почему подходит вам» одной фразой
+
+
+class Wizard(_Strict):
+    collateral_question_above_rub: IntParam
+    default_term_months: IntParam
+    comfortable_terms_months: tuple[StrictInt, ...]
+    rules: tuple[WizardRule, ...]
+
+    @model_validator(mode="after")
+    def _check(self) -> Wizard:
+        ids = [r.id for r in self.rules]
+        if len(ids) != len(set(ids)):
+            raise ValueError("wizard.rules: повторяющийся id строки")
+        if not 2 <= len(self.comfortable_terms_months) <= 3:
+            raise ValueError("wizard.comfortable_terms_months: 2–3 варианта срока (10-07)")
+        return self
+
+
 class Policy(_Strict):
     meta: Meta
     catalog: Catalog
+    wizard: Wizard
     eligibility: Eligibility
     stop_factors: StopFactors
     restrictions: Restrictions
