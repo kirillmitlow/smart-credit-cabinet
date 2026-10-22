@@ -12,6 +12,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
+    Integer,
     String,
     UniqueConstraint,
     Uuid,
@@ -24,7 +25,13 @@ from app.shared.db import Base, IdMixin, TimestampMixin
 
 class Company(IdMixin, TimestampMixin, Base):
     __tablename__ = "companies"
-    __table_args__ = (CheckConstraint("kind IN ('LEGAL', 'IP', 'SELF_EMPLOYED')", name="kind"),)
+    __table_args__ = (
+        CheckConstraint("kind IN ('LEGAL', 'IP', 'SELF_EMPLOYED')", name="kind"),
+        CheckConstraint("demo_generation >= 0", name="demo_generation"),
+    )
+
+    demo_generation: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    demo_resetting: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
     inn: Mapped[str] = mapped_column(String(12), unique=True)
     kind: Mapped[str] = mapped_column(String(16))

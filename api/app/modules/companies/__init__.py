@@ -3,6 +3,7 @@
 from app.modules.companies import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.companies.login import router as login_router
 from app.modules.companies.models import Company, CompanyMember
+from app.modules.companies.operations import scope as operation_scope
 from app.modules.companies.profile_router import router as profile_router
 from app.modules.companies.service import (
     Person,
@@ -25,6 +26,7 @@ __all__ = [
     "inn_is_valid",
     "login_router",
     "memberships_of",
+    "operation_scope",
     "people",
     "profile_router",
     "sync_all",
