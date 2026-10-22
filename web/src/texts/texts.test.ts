@@ -22,6 +22,7 @@ import {
   home,
   productNames,
   applicationForm,
+  consents,
   applicationPage,
   outcomes,
 } from '.';
@@ -57,6 +58,7 @@ const allTexts = collectStrings([
   home,
   productNames,
   applicationForm,
+  consents,
   applicationPage,
   outcomes,
 ]);

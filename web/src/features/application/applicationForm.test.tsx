@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { http } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { blockingA11yViolations } from '@/test/a11y';
-import { makeApplication, makeCompanyChoice, makeMe, problemResponse } from '@/test/factories';
+import {
+  makeApplication,
+  makeCompanyChoice,
+  makeMe,
+  makeConsents,
+  problemResponse,
+} from '@/test/factories';
 import { renderApp } from '@/test/render';
 import { mockSessions } from '@/test/sessions';
 import { server } from '@/test/server';
@@ -26,6 +32,9 @@ function mockDraft(
   const patches: PatchBody[] = [];
   server.use(
     http.get('*/api/applications/app-1', () => Response.json(current)),
+    http.get('*/api/applications/app-1/consents', () =>
+      Response.json(makeConsents({ allSigned: true, items: [] })),
+    ),
     http.patch('*/api/applications/app-1/draft', async ({ request }) => {
       const body = (await request.json()) as PatchBody;
       patches.push(body);
@@ -123,7 +132,7 @@ describe('заявка по шагам: Условия и автосохране
     expect(termField()).toHaveValue('18');
   });
 
-  it('шаги 2–4 — честные заглушки; согласия помечены', async () => {
+  it('шаги 2–3 — заглушки; на шаге 4 загружены согласия', async () => {
     const user = userEvent.setup();
     mockSessions({ client: makeMe() });
     mockDraft(makeApplication());
@@ -139,7 +148,10 @@ describe('заявка по шагам: Условия и автосохране
     expect(
       await screen.findByRole('heading', { level: 1, name: /Шаг 4 из 5: Согласия/ }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('later-step')).toHaveTextContent(f.later.badge);
+    expect(
+      await screen.findByRole('heading', { name: 'Согласия на проверку заявки' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('later-step')).not.toBeInTheDocument();
   });
 
   it('несуществующий шаг и чужая заявка', async () => {
@@ -260,7 +272,9 @@ describe('заявка по шагам: Проверьте и отправьте
     mockDraft(makeApplication());
     renderApp('/applications/app-1/edit/5');
     expect(await screen.findByText(f.review.accountantNote)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: f.review.submit })).toBeEnabled();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: f.review.submit })).toBeEnabled(),
+    );
   });
 
   it('нет права отправлять (нет SUBMIT в allowedActions): кнопки нет', async () => {
