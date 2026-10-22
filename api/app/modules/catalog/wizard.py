@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
-from app.modules.decisioning import Policy, max_payment
+from app.modules.decisioning import Policy, Product, lowest_rate, max_payment
 from app.modules.decisioning.policy import WizardRule, WizardWhen
 
 from .calculator import calculate
@@ -186,7 +186,7 @@ def _recommended(
         why=why,
         payment_rub=payment,
         payment_kind=kind,
-        rate_percent_from=cfg.base_rate * 100,
+        rate_percent_from=lowest_rate(policy, Product(code)) * 100,
         decision_time=_decision_time(policy, code, a.amount_rub, manual_path=manual_path or young),
         documents=list(cfg.documents),
         needs_collateral=ev.needs_collateral,

@@ -13,6 +13,7 @@ import { ContractCodeForm } from './ContractCodeForm';
 import { ContractSigning } from './ContractSigning';
 import { OfferActions } from './OfferActions';
 import { testConsents, testContract, testOffer } from '@/test/contractFactory';
+import { MemoryRouter } from 'react-router';
 
 function serve(initial = testContract(), pepAccepted = true) {
   let current = initial;
@@ -222,8 +223,15 @@ describe('договор и подпись', () => {
     ['DISBURSED', t.issued],
   ])('показывает подтверждённый сервером статус %s', async (status, text) => {
     serve(testContract({ status: 'SIGNED', applicationStatus: status, canSign: false }));
-    renderWithProviders(<ContractSigning applicationId="app-1" />);
+    renderWithProviders(
+      <MemoryRouter>
+        <ContractSigning applicationId="app-1" />
+      </MemoryRouter>,
+    );
     await screen.findByText(text);
+    const toLoans = screen.queryByRole('link', { name: t.openLoans });
+    if (status === 'DISBURSED') expect(toLoans).toHaveAttribute('href', '/loans');
+    else expect(toLoans).not.toBeInTheDocument();
   });
 
   it('ошибка загрузки показывает повтор и затем восстанавливает договор', async () => {

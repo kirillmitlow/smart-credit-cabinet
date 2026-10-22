@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 from collections.abc import Callable
 from datetime import date
+from decimal import Decimal
 
 import pytest
 import yaml
@@ -55,7 +56,7 @@ def test_six_products_with_bounds_and_documents() -> None:
     assert (express.term_min_months, express.term_max_months) == (6, 36)
     assert express.title == "Экспресс-кредит"
     assert express.documents == []
-    assert str(express.rate_percent_from) == "24.00"
+    assert express.rate_percent_from == Decimal("21.5")  # нижняя граница: грейд A (D-018)
     assert items[5].documents == ["Договор или счёт от продавца"]
     assert all(p.available for p in items)
 

@@ -12,6 +12,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import {
   getGetContractQueryKey,
   getGetContractDocumentUrl,
@@ -232,6 +233,11 @@ function ContractView({
         <Alert color={status === 'DISBURSED' ? 'green' : 'blue'} role="status">
           {delivery}
         </Alert>
+      ) : null}
+      {status === 'DISBURSED' ? (
+        <Button component={Link} to="/loans" variant="light" w="fit-content">
+          {t.openLoans}
+        </Button>
       ) : null}
       {contract.canSign ? (
         <SigningForm

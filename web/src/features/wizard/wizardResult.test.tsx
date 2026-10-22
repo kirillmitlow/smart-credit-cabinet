@@ -176,6 +176,8 @@ describe('результат подбора: карточки', () => {
       'Овердрафт станет доступен через 6 месяцев',
     );
     expect(screen.getAllByTestId('variant-card')).toHaveLength(1);
+    expect(screen.getByText(wizardResult.introSingle)).toBeInTheDocument();
+    expect(screen.queryByText(wizardResult.intro)).not.toBeInTheDocument();
   });
 
   it('подходящего нет: «что станет доступно», каталог и «Изменить ответы»', async () => {

@@ -17,6 +17,7 @@ from app.modules.decisioning import (
     build_schedule,
     bullet_schedule,
     check_product,
+    lowest_rate,
     overpayment,
     payment_for,
 )
@@ -131,7 +132,7 @@ def calculate(
         total_payment_rub=total,
         overpayment_rub=over,
         rate_percent=rate * 100,
-        rate_percent_from=cfg.base_rate * 100,
+        rate_percent_from=lowest_rate(policy, Product(code)) * 100,
         effective_rate_percent=effective_rate_percent(rate),
         approximate=rate_percent is None,
     )
