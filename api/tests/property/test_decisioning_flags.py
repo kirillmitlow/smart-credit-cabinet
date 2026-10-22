@@ -10,7 +10,7 @@ from dataclasses import replace
 from decimal import Decimal
 
 import pytest
-from hypothesis import given, settings
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from app.modules.decisioning import decide
@@ -21,6 +21,7 @@ from app.modules.decisioning.types import (
     DecisionInput,
     FinancialsData,
     Outcome,
+    Product,
     ReasonKind,
     TurnoverData,
     TurnoverMonth,
@@ -56,12 +57,40 @@ def test_inv_61_a_real_flag_never_gives_auto_approval_or_a_counter_offer(
 
 @no_deadline
 @given(request_params())
+@example(
+    params=RequestParams(
+        product=Product.EXPRESS,
+        amount_rub=100_000,
+        term_months=6,
+        revenue_rub=300_000,
+        pct=(70, 70, 70),
+        age_months=0,
+        tenure_months=0,
+        history_months=0,
+        closed_obligations=0,
+        monthly_payments_rub=150_000,
+        overdue_days=0,
+        inquiries=0,
+        rejected=0,
+        restructurings=0,
+        tax_debt_rub=0,
+        collateral_rub=0,
+        guarantor=False,
+        with_financials=False,
+    )
+)
 def test_a_flag_does_not_hide_a_stop_factor_or_missing_data(params: RequestParams) -> None:
     plain_input = params.to_input()
     plain, with_flag = decide(plain_input), decide(flagged(plain_input))
-    if plain.outcome in (Outcome.REJECTED, Outcome.NEEDS_INFO):
+    has_stop = any(CODE_KINDS[code] == ReasonKind.STOP for code in plain.reason_codes)
+    if has_stop or plain.outcome == Outcome.NEEDS_INFO:
         assert with_flag.outcome == plain.outcome
         assert with_flag.reason_codes == plain.reason_codes
+    elif plain.outcome == Outcome.REJECTED:
+        # 30-11: ручная причина (строка 4) выше RISK_TOO_HIGH/NO_OFFER_FOUND (строка 5).
+        assert with_flag.outcome == Outcome.MANUAL_REVIEW
+        assert with_flag.recommendation is not None
+        assert with_flag.recommendation.outcome == Outcome.REJECTED
 
 
 @no_deadline

@@ -584,3 +584,8 @@ web/src ещё нет, decide — заглушка, V2 ещё не закрыт�
 **Подсказки следующему:** флаги собирает одна функция `evaluate_flags(inp, feats)`; property-тесты INV-61 подменяют её по имени в модуле `decide`, имя и сигнатуру не менять. Новая проверка флага: признак в `features.py`, узел в `flags` файла `policy/v1.yaml` (с `source` и `note`), правило в `flags.py`, тексты в `texts_ru.py`. Тесты: `api/tests/unit/decisioning/test_flags.py`, `api/tests/property/test_decisioning_flags.py`. Стенд с БД, где запуск начат до обновления политики, не перечитает старое содержимое `v1` (нет раздела `flags`): пересоздать стенд.
 
 **Файлы:** api/app/modules/decisioning/{flags,features,policy,types,routing,texts_ru}.py, api/app/modules/pipeline/decision_view.py, api/policy/v1.yaml, api/tests/unit/decisioning/{test_flags,test_policy}.py, api/tests/unit/{test_oracle_30_17,test_offers_unit}.py, api/tests/property/test_decisioning_flags.py, docs/plan/reviews/R-004-core-implementation-notes.md, карточки T-288, T-290, T-296.
+
+
+**22.10, ночь · Агент B (Codex) · Исправление property-теста флагов после PR #61**
+
+Совместный прогон T-372 на main 9f6c20e нашёл пример: базовый NO_OFFER_FOUND превращается при MASS_REGISTRATION в MANUAL_REVIEW с рекомендацией REJECTED. Это верный порядок строк 4–5 утверждённой таблицы 30-11; тест ошибочно приравнивал любой отказ к стоп-фактору. В отдельной ветке fix/flags-stop-property пример воспроизведён явно, добавлен как @example. Теперь неизменность исхода/причин проверяется для настоящего STOP и NEEDS_INFO; для расчётного отказа проверяются ручной маршрут и сохранённая рекомендация отказа. Код ядра, политика, API и миграции не меняются. Пять property-тестов по 200 примеров зелёные.
