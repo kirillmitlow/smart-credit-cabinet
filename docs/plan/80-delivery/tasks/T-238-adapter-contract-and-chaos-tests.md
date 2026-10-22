@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | TODO — частично: три одиночных сбоя (`ERROR`, `SLOW`, `LOST_RESPONSE`) есть в `api/tests/contract/test_failure_modes.py` |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/adapter-contract-and-chaos-tests` |
 | Оценка | ~5 ч |
