@@ -21,12 +21,14 @@ from sqlalchemy import func, select, text, update
 
 from app.modules import disbursement, pipeline
 from app.modules.applications import Application
+from app.modules.disbursement import delivery
 from app.modules.integrations import IntegrationClient, build_integrations, set_integrations
 from app.modules.loans import Loan, PaymentScheduleRow
 from app.modules.pipeline.models import Decision
 from app.shared import clock, db, outbox
 from app.shared.models import OutboxMessage
 from tests.contract.conftest import HOST, PORTS, ListJournal, make_settings
+from tests.fixtures.signed_contract import add_signed_contract
 from tests.integration.conftest import postgres_url, redis_url  # noqa: F401 — фикстуры Testcontainers
 from tests.integration.support import TODAY, Firm, Member, client_for, make_stand
 
@@ -111,6 +113,7 @@ def signed_application(stand: dict[str, Any], who: str = "sokolova") -> UUID:
                 rate_percent=24, payment_rub=47_000, max_amount_rub=600_000,
             )
         )  # fmt: skip
+        add_signed_contract(s, application)
         return application.id
 
 
@@ -221,6 +224,7 @@ def test_my_loans_api_shows_loan_to_owner_and_404_to_foreign(stand: dict[str, An
 
     async def check() -> None:
         async with client_for(stand, "sokolova:owner") as owner:
+            assert (await owner.get("/loans", params={"cursor": "bad"})).status_code == 422
             listing = (await owner.get("/loans")).json()
             assert [i["id"] for i in listing["items"]] == [str(loan_id)]
             detail = (await owner.get(f"/loans/{loan_id}")).json()
@@ -249,3 +253,36 @@ def test_garipov_gets_settlement_account_then_loan(stand: dict[str, Any]) -> Non
         assert application is not None and application.status == "DISBURSED"
         loan = s.scalars(select(Loan)).one()
         assert len(loan.settlement_account) == 20
+
+
+def test_confirmation_transaction_crash_recovers_without_second_bank_loan(
+    stand: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    use_live(None)
+    application_id = signed_application(stand)
+    disbursement.run(application_id)
+    original = delivery.open_loan
+
+    def crash_after_insert(*args: Any, **kwargs: Any) -> Any:
+        original(*args, **kwargs)
+        raise RuntimeError("worker lost before confirmation commit")
+
+    monkeypatch.setattr(delivery, "open_loan", crash_after_insert)
+    assert outbox.relay(budget_s=5).retried == 1
+    assert len(our_loans(application_number(application_id))) == 1
+    with db.transaction() as s:
+        assert s.scalar(select(Loan.id)) is None
+        assert s.get(Application, application_id).status == "DISBURSING"
+        assert s.scalars(select(OutboxMessage.event_type)).all() == ["DISBURSEMENT"]
+
+    monkeypatch.setattr(delivery, "open_loan", original)
+    drain()
+    assert len(our_loans(application_number(application_id))) == 1
+    with db.transaction() as s:
+        assert s.get(Application, application_id).status == "DISBURSED"
+        assert s.scalar(select(func.count()).select_from(Loan)) == 1
+        assert s.scalar(select(func.count()).select_from(PaymentScheduleRow)) == 12
+        assert sorted(s.scalars(select(OutboxMessage.event_type))) == [
+            "DISBURSEMENT",
+            "OBLIGATION_OPENED",
+        ]

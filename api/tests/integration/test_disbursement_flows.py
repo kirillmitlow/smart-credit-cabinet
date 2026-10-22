@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from dataclasses import dataclass, field
-from datetime import date
+from dataclasses import dataclass, field, replace
+from datetime import date, timedelta
 from types import SimpleNamespace
 from typing import Any
 from uuid import UUID
@@ -13,7 +13,7 @@ from uuid import UUID
 import pytest
 from sqlalchemy import select, text
 
-from app.modules import auth, disbursement, pipeline
+from app.modules import auth, disbursement, offers, pipeline
 from app.modules.applications import Application
 from app.modules.companies.models import Company
 from app.modules.disbursement.models import Disbursement
@@ -30,10 +30,11 @@ from app.modules.integrations import (
     System,
     set_integrations,
 )
-from app.modules.loans import Loan
+from app.modules.loans import Loan, PaymentScheduleRow
 from app.modules.pipeline.models import Decision
 from app.shared import clock, db, outbox, tasks
 from app.shared.models import OutboxMessage
+from tests.fixtures.signed_contract import add_signed_contract
 
 pytestmark = pytest.mark.integration
 
@@ -76,7 +77,9 @@ class FakeBureau:
 
 
 @pytest.fixture
-def world(postgres_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[dict[str, Any]]:
+def world(
+    postgres_url: str, monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest
+) -> Iterator[dict[str, Any]]:
     monkeypatch.setattr(tasks, "send_now", lambda name, **kw: None)
     database = db.configure(postgres_url)
     db.migrate(database.engine)
@@ -103,6 +106,10 @@ def world(postgres_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[dict[s
                 inputs_hash="h", explain={}, snapshot_ids=[], rate_percent=24, payment_rub=47_000,
             )
         )  # fmt: skip
+        contract = add_signed_contract(
+            s, application, product_code=getattr(request, "param", "EXPRESS")
+        )
+        contract_number, contract_uid = contract.number, contract.contract_uid
         application_id = application.id
     bank = FakeBank()
     integrations = Integrations(
@@ -115,10 +122,17 @@ def world(postgres_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[dict[s
     wire_modules()
     outbox.clear_handlers()
     disbursement.register()
-    yield {"bank": bank, "application_id": application_id}
+    yield {
+        "bank": bank,
+        "application_id": application_id,
+        "contract_number": contract_number,
+        "contract_uid": contract_uid,
+    }
     set_integrations(None)
     outbox.clear_handlers()
     clock.set_clock(clock.Clock())
+    with database.transaction() as s:
+        s.execute(text("TRUNCATE applications, companies, users, outbox CASCADE"))
     database.dispose()
 
 
@@ -165,7 +179,8 @@ def test_already_disbursed_with_other_key_reconciles_by_application_ref(
     bank.accounts = [account()]
     bank.disburse_answers = [rejected("ALREADY_DISBURSED")]
     bank.loans = [
-        OurLoan("loan_000009", "АЗ-2026-000001", "КД", "uid", "EXPRESS", "LOAN", 500_000, None,
+        OurLoan("loan_000009", "АЗ-2026-000001", world["contract_number"], world["contract_uid"],
+                "EXPRESS", "LOAN", 500_000, None,
                 500_000, 12, 24.0, "ANNUITY", "45406810000000000009", account().number, "ACTIVE",
                 TODAY)
     ]  # fmt: skip
@@ -214,10 +229,21 @@ def test_bank_unavailable_retries_with_same_body_and_cannot_be_withdrawn(
     assert bank.disburse_calls == 2
 
 
-def test_limit_product_opens_only_limit_without_schedule(world: dict[str, Any]) -> None:
+def test_missing_customer_rechecks_account_before_retry(world: dict[str, Any]) -> None:
+    bank: FakeBank = world["bank"]
+    bank.accounts = [account()]
+    bank.disburse_answers = [rejected("CUSTOMER_NOT_FOUND", 404), disbursed()]
+    disbursement.run(world["application_id"])
+    assert outbox.relay(budget_s=5).retried == 1
     with db.transaction() as s:
-        application = s.scalars(select(Application)).one()
-        application.product_code = "CREDIT_LINE"
+        assert s.scalars(select(Disbursement.account_number)).one() is None
+        s.scalars(select(OutboxMessage)).one().next_attempt_at = clock.system_now()
+    outbox.relay(budget_s=5)
+    assert status_of(world["application_id"]) == "DISBURSED"
+
+
+@pytest.mark.parametrize("world", ["CREDIT_LINE"], indirect=True)
+def test_limit_product_opens_only_limit_without_schedule(world: dict[str, Any]) -> None:
     bank: FakeBank = world["bank"]
     bank.accounts = [account()]
     bank.disburse_answers = [disbursed(amount=0)]
@@ -228,3 +254,125 @@ def test_limit_product_opens_only_limit_without_schedule(world: dict[str, Any]) 
         assert loan.kind == "CREDIT_LINE" and loan.limit_rub == 500_000
         assert loan.principal_rub == 0 and loan.payment_rub is None
         assert s.scalar(select(text("count(*) from payment_schedule"))) == 0
+
+
+def test_disbursement_uses_signed_terms_instead_of_application_or_latest_decision(
+    world: dict[str, Any],
+) -> None:
+    with db.transaction() as s:
+        application = s.get(Application, world["application_id"])
+        application.amount_rub, application.term_months = 900_000, 36
+        old = s.scalars(select(Decision)).one()
+        s.add(
+            Decision(
+                application_id=application.id,
+                source="ENGINE",
+                outcome="APPROVED",
+                route="AUTO",
+                required_level="L1",
+                policy_version_id=old.policy_version_id,
+                engine_version="new",
+                inputs={},
+                inputs_hash="new",
+                explain={},
+                snapshot_ids=[],
+                rate_percent=30,
+                created_at=clock.now() + timedelta(seconds=1),
+            )
+        )
+    assert disbursement.run(world["application_id"]) == "STARTED"
+    with db.transaction() as s:
+        row = s.scalars(select(Disbursement)).one()
+        assert (row.amount_rub, row.term_months, row.rate_percent) == (500_000, 12, 24)
+        assert (row.contract_number, row.contract_uid) == (
+            world["contract_number"],
+            world["contract_uid"],
+        )
+
+
+def test_signed_application_without_signed_contract_does_not_issue(world: dict[str, Any]) -> None:
+    with db.transaction() as s:
+        s.scalars(select(offers.Contract)).one().status = "READY"
+    assert disbursement.run(world["application_id"]) == "NO_TERMS"
+    assert status_of(world["application_id"]) == "SIGNED"
+    assert world["bank"].disburse_calls == 0
+
+
+@pytest.mark.parametrize(
+    ("field", "value"), [("amount_rub", 400_000), ("settlement_account", "other")]
+)
+def test_wrong_success_response_does_not_confirm(
+    world: dict[str, Any], field: str, value: Any
+) -> None:
+    bank: FakeBank = world["bank"]
+    bank.accounts = [account()]
+    bank.disburse_answers = [Ok(replace(disbursed().data, **{field: value}), META)]
+    disbursement.run(world["application_id"])
+    assert outbox.relay(budget_s=5).failed == 1
+    with db.transaction() as s:
+        assert s.scalar(select(Loan.id)) is None
+        assert s.scalars(select(Disbursement.last_error)).one() == "DISBURSEMENT_RESPONSE_MISMATCH"
+        assert s.scalars(select(OutboxMessage.event_type)).all() == ["DISBURSEMENT"]
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("contract_uid", "other"),
+        ("contract_number", "other"),
+        ("product_code", "INVESTMENT"),
+        ("term_months", 36),
+        ("rate_percent", 30.0),
+        ("repayment_type", "BULLET"),
+        ("settlement_account", "other"),
+        ("kind", "CREDIT_LINE"),
+    ],
+)
+def test_reconciliation_rejects_different_contract_terms(
+    world: dict[str, Any], field: str, value: Any
+) -> None:
+    bank: FakeBank = world["bank"]
+    bank.accounts = [account()]
+    bank.disburse_answers = [rejected("ALREADY_DISBURSED")]
+    loan = OurLoan(
+        "loan_000009",
+        "АЗ-2026-000001",
+        world["contract_number"],
+        world["contract_uid"],
+        "EXPRESS",
+        "LOAN",
+        500_000,
+        None,
+        500_000,
+        12,
+        24.0,
+        "ANNUITY",
+        "45406810000000000009",
+        account().number,
+        "ACTIVE",
+        TODAY,
+    )
+    bank.loans = [replace(loan, **{field: value})]
+    disbursement.run(world["application_id"])
+    assert outbox.relay(budget_s=5).failed == 1
+    assert status_of(world["application_id"]) == "DISBURSING"
+    with db.transaction() as s:
+        assert s.scalar(select(Loan.id)) is None
+        assert s.scalars(select(Disbursement.last_error)).one() == "ALREADY_DISBURSED_MISMATCH"
+
+
+def test_confirmation_next_day_keeps_bank_value_date(world: dict[str, Any]) -> None:
+    bank: FakeBank = world["bank"]
+    bank.accounts = [account()]
+    bank.disburse_answers = [disbursed()]
+    disbursement.run(world["application_id"])
+    clock.get_clock().advance(timedelta(days=1))
+    outbox.relay(budget_s=5)
+    with db.transaction() as s:
+        assert s.scalars(select(Loan.opened_on)).one() == TODAY
+        first = s.scalars(select(PaymentScheduleRow).order_by(PaymentScheduleRow.seq)).first()
+        assert first.due_date == date(2026, 11, 23)
+        payload = s.scalars(
+            select(OutboxMessage.payload).where(OutboxMessage.event_type == "OBLIGATION_OPENED")
+        ).one()
+        assert payload["obligation"]["openedAt"] == TODAY.isoformat()

@@ -1,9 +1,7 @@
 """Условия кредита, по которым делается выдача, и вид кредита по продукту (20-05, D-093).
 
-Модуль `offers` (принятый вариант, договор) появится отдельной задачей. Пока условия читает
-функция, которую регистрирует `app/wiring.py` (там заявка и решение конвейера): `disbursement`
-с `pipeline` на одном уровне и друг друга не знают. Когда появится договор, заменяется только
-эта функция; номер договора, УИд и время подписи она вправе вернуть сама.
+Условия подписанного договора читает функция, которую регистрирует `app/wiring.py`.
+Без подписанного договора выдача не запускается.
 """
 
 from __future__ import annotations
@@ -25,9 +23,9 @@ class AgreedTerms:
     amount_rub: int
     term_months: int
     rate_percent: Decimal
-    contract_number: str | None = None
-    contract_uid: str | None = None
-    signed_at: datetime | None = None
+    contract_number: str
+    contract_uid: str
+    signed_at: datetime
 
 
 type TermsProvider = Callable[[Session, UUID], AgreedTerms | None]

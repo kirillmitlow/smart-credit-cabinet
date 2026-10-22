@@ -217,8 +217,8 @@ def _stop(plan: _Plan, code: str, *, step: str = "DISBURSEMENT_STOPPED") -> Outc
     return Dead(code)
 
 
-def _reconcile(plan: _Plan, result: SourceUnavailable) -> Disbursed | Outcome:
-    """`409 ALREADY_DISBURSED` (другой ключ): ищем нашу выдачу по `applicationRef` и сверяем сумму."""
+def _reconcile(plan: _Plan) -> Disbursed | Outcome:
+    """`409 ALREADY_DISBURSED`: сверяем договор, условия и счёт, а не только сумму."""
     loans = get_integrations().bank_core.get_loans(
         plan.customer_inn, application_id=plan.application_id
     )
@@ -230,7 +230,19 @@ def _reconcile(plan: _Plan, result: SourceUnavailable) -> Disbursed | Outcome:
     if found is None:
         return _stop(plan, "ALREADY_DISBURSED_NOT_FOUND")
     expected = plan.request
-    if found.amount_rub != expected.amount_rub or found.limit_rub != expected.limit_rub:
+    if (
+        found.amount_rub != expected.amount_rub
+        or found.limit_rub != expected.limit_rub
+        or found.contract_uid != expected.contract_uid
+        or found.contract_number != expected.contract_number
+        or found.product_code != expected.product_code
+        or found.kind != expected.kind
+        or found.term_months != expected.term_months
+        or Decimal(str(found.rate_percent)) != Decimal(str(expected.rate_percent))
+        or found.repayment_type != expected.repayment_type
+        or found.settlement_account != expected.settlement_account
+        or not found.loan_account
+    ):
         log.error(
             "disbursement_amount_mismatch",
             application=str(plan.application_id),
@@ -241,8 +253,8 @@ def _reconcile(plan: _Plan, result: SourceUnavailable) -> Disbursed | Outcome:
     return Disbursed(
         disbursement_id="reconciled",
         loan_id=found.loan_id,
-        loan_account=found.loan_account or "",
-        settlement_account=found.settlement_account or expected.settlement_account,
+        loan_account=found.loan_account,
+        settlement_account=found.settlement_account,
         amount_rub=found.amount_rub or 0,
         value_date=found.disbursed_at,
         settlement_balance_rub=0,
@@ -267,6 +279,7 @@ def deliver_bank_core(item: OutboxItem) -> Outcome:
         _save_account(plan, found)
         account_number = found.number
     request = replace(plan.request, settlement_account=account_number)
+    plan = replace(plan, account_number=account_number, request=request)
 
     _mark_sent(plan)
     result = _write_port().disburse(
@@ -280,16 +293,26 @@ def deliver_bank_core(item: OutboxItem) -> Outcome:
     else:
         failure = classify_failure(result)
         if failure is Failure.ALREADY_DISBURSED:
-            reconciled = _reconcile(plan, result)
+            reconciled = _reconcile(plan)
             if not isinstance(reconciled, Disbursed):
                 return reconciled
             disbursed = reconciled
         elif failure is Failure.ACCOUNT_PROBLEM:
             return _stop(plan, result.error_code or ACCOUNT_NOT_OWNED)
         elif failure is Failure.CUSTOMER_NOT_FOUND:
+            with db.transaction() as session:
+                row = session.get(Disbursement, plan.id)
+                if row is not None and row.status != "CONFIRMED":
+                    row.account_number = None  # следующий запуск заново прочитает/откроет счёт
             return Retry(Failure.CUSTOMER_NOT_FOUND.value)  # счёт откроет следующая попытка
         else:
             return _stop_if_dead(plan, _unavailable(result))
+    if (
+        disbursed.amount_rub != request.amount_rub
+        or disbursed.settlement_account != request.settlement_account
+        or not disbursed.loan_account
+    ):
+        return _stop(plan, "DISBURSEMENT_RESPONSE_MISMATCH")
     _confirm(plan, disbursed)
     return Delivered()
 
@@ -315,7 +338,7 @@ def _confirm(plan: _Plan, done: Disbursed) -> None:
         ).one()
         if row.status == "CONFIRMED":
             return
-        today = clock.today()
+        opened_on = done.value_date
         row.status, row.last_error = "CONFIRMED", None
         row.bank_core_ref = done.loan_id
         row.loan_account = done.loan_account
@@ -339,7 +362,7 @@ def _confirm(plan: _Plan, done: Disbursed) -> None:
                 term_months=row.term_months,
                 loan_account=done.loan_account,
                 settlement_account=done.settlement_account,
-                opened_on=today,
+                opened_on=opened_on,
             ),
         )
         if application.status == Status.DISBURSING.value:
@@ -358,7 +381,7 @@ def _confirm(plan: _Plan, done: Disbursed) -> None:
             event_type=keys.OBLIGATION_EVENT,
             target=BKI,
             payload=bki_events.build_payload(
-                row, loan.payment_rub, today, _planned_close(today, row.term_months)
+                row, loan.payment_rub, opened_on, _planned_close(opened_on, row.term_months)
             ),
             idempotency_key=keys.obligation_key(row.application_id),
         )

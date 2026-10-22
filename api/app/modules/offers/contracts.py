@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import json
 import uuid
+from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -185,3 +187,45 @@ def verify_integrity(contract: Contract) -> None:
         raise AppError(
             409, "CONTRACT_TAMPERED", "Документ изменён: хеш не совпал, подпись не принята"
         )
+
+
+@dataclass(frozen=True, slots=True)
+class SignedTerms:
+    product_code: str
+    amount_rub: int
+    term_months: int
+    rate_percent: Decimal
+    contract_number: str
+    contract_uid: str
+    signed_at: datetime
+
+
+def signed_terms(session: Session, application_id: UUID) -> SignedTerms | None:
+    """Выдача берёт условия только из подписанного договора принятого варианта."""
+    row = session.execute(
+        select(Contract, OfferVariant)
+        .join(OfferVariant, OfferVariant.id == Contract.variant_id)
+        .join(Offer, Offer.id == Contract.offer_id)
+        .where(
+            Contract.application_id == application_id,
+            Contract.status == "SIGNED",
+            Offer.status == "ACCEPTED",
+            Offer.accepted_variant_id == OfferVariant.id,
+            OfferVariant.offer_id == Offer.id,
+        )
+    ).one_or_none()
+    if row is None:
+        return None
+    contract, variant = row
+    if contract.signed_at is None:
+        return None
+    verify_integrity(contract)
+    return SignedTerms(
+        product_code=variant.product_code,
+        amount_rub=variant.amount_rub,
+        term_months=variant.term_months,
+        rate_percent=variant.rate_percent,
+        contract_number=contract.number,
+        contract_uid=contract.contract_uid,
+        signed_at=contract.signed_at,
+    )

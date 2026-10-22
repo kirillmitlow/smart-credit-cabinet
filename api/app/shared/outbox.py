@@ -22,7 +22,7 @@ import random
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 import structlog
@@ -61,6 +61,8 @@ class OutboxItem:
     payload: dict[str, Any]
     idempotency_key: str
     attempts: int
+    lease_until: datetime
+    created_at: datetime
 
 
 @dataclass(frozen=True, slots=True)
@@ -217,10 +219,14 @@ def _claim(session: Session) -> OutboxItem | None:
         row.payload,
         row.idempotency_key,
         row.attempts,
+        row.lease_until,
+        row.created_at,
     )
 
 
 def _deliver(item: OutboxItem) -> Outcome:
+    if clock.system_now() - item.created_at >= MAX_AGE:
+        return Dead("RETRY_WINDOW_EXPIRED")
     handler = _handlers[(item.target_system, item.event_type)]
     try:
         return handler(item)
@@ -235,8 +241,9 @@ def _finalize(session: Session, item: OutboxItem, outcome: Outcome) -> str:
     row = session.execute(
         select(OutboxMessage).where(OutboxMessage.id == item.id).with_for_update()
     ).scalar_one()
-    if row.status != PENDING:  # другой ретранслятор уже закончил (аренда истекла раньше нас)
-        return row.status
+    if row.status != PENDING or row.lease_until != item.lease_until:
+        # Результат старого владельца не снимает новую аренду и не меняет её счётчики.
+        return "STALE"
     row.lease_until = None
     match outcome:
         case Delivered():
@@ -283,6 +290,8 @@ def relay(budget_s: float = RELAY_BUDGET_S) -> RelayStats:
         outcome = _deliver(item)
         with db.transaction() as session:
             status = _finalize(session, item, outcome)
+        if status == "STALE":
+            continue
         match outcome:
             case Delivered():
                 stats.delivered += 1
@@ -305,12 +314,16 @@ def count_dead(session: Session) -> int:
 
 
 def retry_dead(session: Session, message_id: int) -> bool:
-    """Ручной повтор `FAILED` (кнопка в демо-панели, T-365): снова в очередь с нуля."""
+    """Ручной повтор `FAILED` в исходном окне 24 ч; после него нужен отдельный разбор."""
     now = clock.system_now()
     result = session.execute(
         update(OutboxMessage)
-        .where(OutboxMessage.id == message_id, OutboxMessage.status == FAILED)
-        .values(status=PENDING, attempts=0, next_attempt_at=now, created_at=now, lease_until=None)
+        .where(
+            OutboxMessage.id == message_id,
+            OutboxMessage.status == FAILED,
+            OutboxMessage.created_at > now - MAX_AGE,
+        )
+        .values(status=PENDING, attempts=0, next_attempt_at=now, lease_until=None)
     )
     return bool(result.rowcount)  # type: ignore[attr-defined]
 

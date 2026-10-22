@@ -24,7 +24,7 @@ class Camel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
-class PaymentOut(Camel):
+class LoanPaymentOut(Camel):
     seq: int
     due_date: date
     principal_rub: int
@@ -50,11 +50,11 @@ class LoanOut(Camel):
     settlement_account: str
     opened_on: date
     status: str
-    next_payment: PaymentOut | None
+    next_payment: LoanPaymentOut | None
 
 
 class LoanDetail(LoanOut):
-    schedule: list[PaymentOut]
+    schedule: list[LoanPaymentOut]
 
 
 class LoanPage(Camel):
@@ -62,8 +62,8 @@ class LoanPage(Camel):
     next_cursor: str | None
 
 
-def _payment(row: PaymentScheduleRow) -> PaymentOut:
-    return PaymentOut(
+def _payment(row: PaymentScheduleRow) -> LoanPaymentOut:
+    return LoanPaymentOut(
         seq=row.seq,
         due_date=row.due_date,
         principal_rub=row.principal_rub,
@@ -113,9 +113,9 @@ def _list(principal: auth.Principal, limit: int, cursor: str | None) -> LoanPage
 async def list_loans(
     principal: auth.ClientPrincipal,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    cursor: Annotated[str | None, Query(max_length=40)] = None,
+    cursor: Annotated[UUID | None, Query()] = None,
 ) -> LoanPage:
-    return await run_in_threadpool(_list, principal, limit, cursor)
+    return await run_in_threadpool(_list, principal, limit, str(cursor) if cursor else None)
 
 
 def _get(principal: auth.Principal, loan_id: UUID) -> LoanDetail:
@@ -136,7 +136,7 @@ async def get_loan(loan_id: UUID, principal: auth.ClientPrincipal) -> LoanDetail
     return await run_in_threadpool(_get, principal, loan_id)
 
 
-def _schedule(principal: auth.Principal, loan_id: UUID) -> list[PaymentOut]:
+def _schedule(principal: auth.Principal, loan_id: UUID) -> list[LoanPaymentOut]:
     with db.transaction() as session:
         loan = service.get_for(session, principal, loan_id)
         return [_payment(r) for r in service.schedule_of(session, loan)]
@@ -146,8 +146,8 @@ def _schedule(principal: auth.Principal, loan_id: UUID) -> list[PaymentOut]:
     "/{loan_id}/schedule",
     operation_id="getLoanSchedule",
     summary="График платежей",
-    response_model=list[PaymentOut],
+    response_model=list[LoanPaymentOut],
     response_model_by_alias=True,
 )
-async def get_schedule(loan_id: UUID, principal: auth.ClientPrincipal) -> list[PaymentOut]:
+async def get_schedule(loan_id: UUID, principal: auth.ClientPrincipal) -> list[LoanPaymentOut]:
     return await run_in_threadpool(_schedule, principal, loan_id)

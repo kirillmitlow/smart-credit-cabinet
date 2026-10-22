@@ -10,14 +10,11 @@ from app.modules.pipeline.policy_registry import (
     reset_policy_cache,
 )
 from app.modules.pipeline.runner import RunResult, run_pipeline
-from app.modules.pipeline.terms import DecisionTerms, latest_terms
 
 __all__ = [
     "ConsentView",
-    "DecisionTerms",
     "RunResult",
     "current_policy",
-    "latest_terms",
     "load_policy_file",
     "register_current",
     "register_policy",

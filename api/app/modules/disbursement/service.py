@@ -19,7 +19,6 @@ from app.modules.applications import Actor, Application, Status, record_event, t
 from app.modules.disbursement import keys
 from app.modules.disbursement.models import Disbursement
 from app.modules.disbursement.terms import agreed_terms, shape_of
-from app.shared import clock
 from app.shared.outbox import enqueue_outbox
 
 log = structlog.get_logger("app.disbursement")
@@ -72,15 +71,14 @@ def start(session: Session, application_id: UUID) -> StartResult:
         log.error("disbursement_no_terms", application=str(application_id))
         return StartResult.NO_TERMS
     shape = shape_of(terms.product_code)
-    number = terms.contract_number or "КД-" + application.number.split("-", 1)[-1]
     disbursement = Disbursement(
         application_id=application_id,
         company_id=application.company_id,
         application_ref=application.number,
         customer_inn=company.inn,
-        contract_number=number,
-        contract_uid=terms.contract_uid or keys.contract_uid(application_id),
-        signed_at=terms.signed_at or clock.now(),
+        contract_number=terms.contract_number,
+        contract_uid=terms.contract_uid,
+        signed_at=terms.signed_at,
         product_code=terms.product_code,
         kind=shape.kind,
         repayment_type=shape.repayment_type,

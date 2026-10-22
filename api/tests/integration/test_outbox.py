@@ -147,21 +147,54 @@ def test_failed_after_max_attempts_and_hook_called(database: list[str]) -> None:
         assert outbox.count_dead(s) == 1
 
 
-def test_failed_after_one_day_and_manual_retry(database: list[str]) -> None:
-    ok = {"value": False}
-    outbox.register_handler(
-        TARGET, KIND, lambda item: Delivered() if ok["value"] else Retry("down")
-    )
+def test_expired_message_is_not_sent_or_manually_restarted(database: list[str]) -> None:
+    calls: list[int] = []
+    outbox.register_handler(TARGET, KIND, lambda item: calls.append(item.id) or Delivered())
     put("a", "k")
     with db.transaction() as s:
         s.execute(update(OutboxMessage).values(created_at=clock.system_now() - timedelta(days=2)))
     outbox.relay(budget_s=5)
     assert rows()[0].status == "FAILED"
-    ok["value"] = True
+    assert rows()[0].last_error == "RETRY_WINDOW_EXPIRED"
+    assert calls == []
+    with db.transaction() as s:
+        assert not outbox.retry_dead(s, rows()[0].id)
+
+
+def test_manual_retry_within_window_preserves_original_age(database: list[str]) -> None:
+    outbox.register_handler(TARGET, KIND, lambda item: Dead("bad"))
+    put("a", "k")
+    created_at = rows()[0].created_at
+    outbox.relay(budget_s=5)
     with db.transaction() as s:
         assert outbox.retry_dead(s, rows()[0].id)
-    outbox.relay(budget_s=5)
-    assert rows()[0].status == "SENT"
+    outbox.register_handler(TARGET, KIND, lambda item: Delivered())
+    assert outbox.relay(budget_s=5).delivered == 1
+    assert rows()[0].created_at == created_at
+
+
+@pytest.mark.parametrize("outcome", [Retry("old"), Dead("old"), Delivered()])
+def test_stale_worker_cannot_finalize_new_lease(
+    database: list[str], monkeypatch: pytest.MonkeyPatch, outcome: Outcome
+) -> None:
+    outbox.register_handler(TARGET, KIND, lambda item: Delivered())
+    put("a", "k")
+    now = clock.system_now()
+    monkeypatch.setattr(clock, "system_now", lambda: now)
+    with db.transaction() as s:
+        first = outbox._claim(s)
+    now += outbox.LEASE + timedelta(seconds=1)
+    with db.transaction() as s:
+        second = outbox._claim(s)
+    assert first is not None and second is not None
+    assert first.lease_until != second.lease_until
+    with db.transaction() as s:
+        assert outbox._finalize(s, first, outcome) == "STALE"
+    row = rows()[0]
+    assert row.status == "PENDING" and row.attempts == 0
+    assert row.lease_until == second.lease_until
+    with db.transaction() as s:
+        assert outbox._finalize(s, second, Delivered()) == "SENT"
 
 
 def test_dead_goes_failed_at_once(database: list[str]) -> None:

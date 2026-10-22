@@ -8,6 +8,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from uuid import uuid4
 
+import httpx
 import pytest
 
 from app.modules.integrations import (
@@ -45,9 +46,11 @@ def request_for(inn: str, account: str, ref: str, **over: object) -> Disbursemen
 
 
 def test_garipov_open_account_then_disburse_with_replay(
-    live: Integrations, persona: PersonaFactory, journal: ListJournal
+    live: Integrations, persona: PersonaFactory, journal: ListJournal, scenarios_http: httpx.Client
 ) -> None:
-    inn = persona("garipov").inn
+    garipov = persona("garipov")
+    scenarios_http.post(f"/scenarios/{garipov.code}/apply").raise_for_status()
+    inn = garipov.inn
     assert live.bank_core_write is not None
     write = live.bank_core_write
     key = f"acc:{uuid4()}"
