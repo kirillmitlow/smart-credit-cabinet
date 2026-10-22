@@ -1,5 +1,6 @@
 """Оркестрация конвейера: сбор данных, снимки, вызов decide(), переход по результату. Документ: 30-01, 50-05."""
 
+from app.modules.pipeline import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.pipeline.consents import ConsentView, set_consents_provider
 from app.modules.pipeline.decision_view import router
 from app.modules.pipeline.policy_loader import load_policy_file

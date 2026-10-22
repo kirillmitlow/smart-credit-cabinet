@@ -21,7 +21,7 @@ from app.shared.settings import get_settings
 
 CODE_TTL_SECONDS = 300
 MAX_ATTEMPTS = 3
-_PREFIX = "scc:otp:"
+KEY_PREFIX = "scc:otp:"
 
 
 @dataclass(frozen=True)
@@ -48,7 +48,7 @@ def issue(person_inn: str, purpose: str, subject: str = "") -> IssuedCode:
         "attempts": 0,
     }
     try:
-        get_redis().set(_PREFIX + request_id, json.dumps(record), ex=CODE_TTL_SECONDS)
+        get_redis().set(KEY_PREFIX + request_id, json.dumps(record), ex=CODE_TTL_SECONDS)
     except redis.RedisError as exc:
         raise store_unavailable(exc) from exc
     return IssuedCode(request_id, code, CODE_TTL_SECONDS)
@@ -64,7 +64,7 @@ class VerifiedCode:
 def verify(request_id: str, code: str, *, purpose: str) -> VerifiedCode:
     """Проверить код; при успехе он погашается. Ошибки: CODE_EXPIRED, CODE_INVALID, CODE_ATTEMPTS_EXCEEDED."""
     client = get_redis()
-    key = _PREFIX + request_id
+    key = KEY_PREFIX + request_id
     try:
         raw = client.get(key)
         if raw is None:

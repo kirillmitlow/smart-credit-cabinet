@@ -3,6 +3,7 @@
 Публичный интерфейс модуля — только то, что ниже.
 """
 
+from app.modules.offers import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.offers.contracts import SignedTerms, signed_terms
 from app.modules.offers.models import Contract, Offer, OfferVariant, Signature
 from app.modules.offers.router import router

@@ -9,6 +9,7 @@ import structlog
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.modules.audit import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.audit.models import AuditRecord
 
 

@@ -2,13 +2,15 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/demo-reset-all` |
 | Оценка | ~5 ч |
 | Приоритет | M (Must) |
 | Тонкий сквозной сценарий | нет |
 | Зависит от | [T-370](T-370-demo-api-core.md), [T-204](T-204-clock-and-reset-registry.md), [T-237](T-237-cached-vs-fresh-gateway.md), [T-278](T-278-outbox-relay.md) |
+
+**Реализация (22.10.2026).** `POST /demo/reset` в `api/app/modules/demo/`: шаги «моки» (`POST /api/v1/scenarios/reset`, режим `KEEP_CUSTOM`) → «база» (`run_all_resets`: `TRUNCATE … CASCADE` по таблицам каждого модуля, потом `register_after_reset`: `companies.sync_all` возвращает компании и учётки) → «сессии» (ключи `scc:session:`, `scc:otp:`, `lookup:`; служебный ключ воркера остаётся) → запись `DEMO_RESET` в аудит. Ответ `200` приходит по факту завершения. Ошибка шага: `502 DEMO_RESET_FAILED`, шаг в `errors[0].step` (`MOCKS`, `DATABASE`, `SESSIONS`), повтор безопасно доводит сброс. Параллельный вызов: `409 DEMO_RESET_IN_PROGRESS` (advisory lock Postgres). `policy_versions` и `alembic_version` защищены в `shared.resets.truncate`. Не сделано, нет в коде: файлы (хранилища документов ещё нет) и очереди Celery (брокер не чистим: задачи по стёртым заявкам завершатся как «не найдено»; при необходимости — отдельная задача).
 
 ## Цель
 

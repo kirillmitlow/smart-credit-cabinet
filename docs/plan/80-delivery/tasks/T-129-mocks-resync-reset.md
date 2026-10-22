@@ -2,13 +2,15 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | PARTIAL — сделан только `POST /api/v1/scenarios/reset` (оба режима, chaos в `OK`, RUNTIME-данные стираются); досинхронизация, `scenarios/sync`, ежемесячное переприменение, фоновые повторы остаются |
 | Владелец | Агент A/B; 🧠 кандидат для GPT-6 Astra |
 | Ветка | `feat/mocks-resync-reset` |
 | Оценка | ~6 ч |
 | Зависит от | [T-127](T-127-mocks-apply-rollback.md), [T-128](T-128-mocks-startup-fill.md), [T-106](T-106-mocks-chaos.md) |
 | Приоритет | M (Must) |
 | Веха | V4 ([график](../02-schedule.md)) |
+
+**Реализация (22.10.2026, часть).** `POST /api/v1/scenarios/reset` в `mocks/app/roles/scenarios/reset.py` под тем же advisory lock, что `apply`: `PUT /admin/chaos {"mode":"OK"}` и `POST /admin/wipe` у всех четырёх моков (стираются и RUNTIME-кредиты, и ключи идемпотентности) → при `BUILTIN_ONLY` удаление пользовательских сценариев → встроенные возвращаются к исходнику из кода (`modified=false`) → `apply` каждого сценария. Любой сбой: `502 RESET_FAILED` с названием системы или сценария; до очистки все строки помечены `PENDING`, повтор довершает сброс. Критерий «после `reset` chaos у всех `OK`» и «RUNTIME стирается» покрыты тестами `test_scenarios_reset.py`. Не сделано: сверка шагов 3–4 из 10.6, `POST /scenarios/sync`, смена месяца, фоновые повторы `FAILED`/`PARTIAL`. Поле `modified` ставит `PATCH` ещё с T-119, а `reset` его сбрасывает.
 
 ## Цель
 

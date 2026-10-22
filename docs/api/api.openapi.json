@@ -1493,6 +1493,37 @@
           }
         }
       }
+    },
+    "/demo/reset": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Единый сброс стенда: моки, база api, сессии и кэш",
+        "description": "Отвечает по факту завершения, а не по таймеру. При ошибке `502 DEMO_RESET_FAILED` в `errors[0].step` стоит шаг (`MOCKS`, `DATABASE`, `SESSIONS`); повторный вызов безопасно доводит сброс. Параллельный вызов: `409 DEMO_RESET_IN_PROGRESS`.",
+        "operationId": "demoReset",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE выключен (`DEMO_MODE_DISABLED`)"
+          },
+          "409": {
+            "description": "Сброс уже выполняется (`DEMO_RESET_IN_PROGRESS`)"
+          },
+          "502": {
+            "description": "Сброс остановился на одном из шагов (`DEMO_RESET_FAILED`)"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3465,6 +3496,71 @@
           "reasons"
         ],
         "title": "RejectedCandidate"
+      },
+      "ResetOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "DONE",
+            "title": "Status",
+            "default": "DONE"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/ResetStepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "durationMs": {
+            "type": "integer",
+            "title": "Durationms"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Finishedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "steps",
+          "durationMs",
+          "finishedAt"
+        ],
+        "title": "ResetOut"
+      },
+      "ResetStep": {
+        "type": "string",
+        "enum": [
+          "MOCKS",
+          "DATABASE",
+          "SESSIONS"
+        ],
+        "title": "ResetStep"
+      },
+      "ResetStepOut": {
+        "properties": {
+          "step": {
+            "$ref": "#/components/schemas/ResetStep"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "const": "DONE",
+            "title": "Status",
+            "default": "DONE"
+          }
+        },
+        "type": "object",
+        "required": [
+          "step",
+          "title"
+        ],
+        "title": "ResetStepOut"
       },
       "RolesResponse": {
         "properties": {

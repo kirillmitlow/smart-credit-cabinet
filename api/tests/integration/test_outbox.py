@@ -295,3 +295,59 @@ def test_property_order_and_no_duplicates_under_any_failures(
         outbox.relay(budget_s=5)
     assert accepted == [f"m{i}" for i in range(len(plan))]
     assert {r.status for r in rows()} == {"SENT"}
+
+
+def _lease(seconds: float) -> None:
+    with db.transaction() as s:
+        s.execute(
+            update(OutboxMessage)
+            .where(OutboxMessage.idempotency_key == "busy")
+            .values(lease_until=clock.system_now() + timedelta(seconds=seconds))
+        )
+
+
+def test_quiesce_drops_unsent_and_waits_for_in_flight(database: list[str]) -> None:
+    put("a", "idle")
+    put("b", "busy")
+    _lease(60)
+
+    def finish() -> None:
+        time.sleep(0.5)
+        with db.transaction() as s:
+            s.execute(
+                update(OutboxMessage)
+                .where(OutboxMessage.idempotency_key == "busy")
+                .values(status=outbox.SENT, lease_until=None)
+            )
+
+    worker = threading.Thread(target=finish)
+    worker.start()
+    started = time.monotonic()
+    result = outbox.quiesce(timeout_s=10, poll_s=0.05)
+    worker.join()
+    assert result == outbox.Quiesced(dropped=1, in_flight=0)
+    assert 0.4 <= time.monotonic() - started < 5
+    assert [r.idempotency_key for r in rows()] == ["busy"]
+
+
+def test_quiesce_gives_up_after_timeout_and_reports_in_flight(database: list[str]) -> None:
+    put("b", "busy")
+    _lease(60)
+    result = outbox.quiesce(timeout_s=0.2, poll_s=0.05)
+    assert result == outbox.Quiesced(dropped=0, in_flight=1)
+
+
+def test_late_worker_after_wipe_is_stale_not_crash(database: list[str]) -> None:
+    sent: list[str] = []
+
+    def deliver(item: OutboxItem) -> Outcome:
+        with db.transaction() as s:  # сброс стёр outbox, пока шла доставка
+            s.execute(text("TRUNCATE outbox"))
+        sent.append(item.idempotency_key)
+        return Delivered()
+
+    outbox.register_handler(TARGET, KIND, deliver)
+    put("a", "k")
+    outbox.relay(budget_s=2)
+    assert sent == ["k"]
+    assert rows() == []

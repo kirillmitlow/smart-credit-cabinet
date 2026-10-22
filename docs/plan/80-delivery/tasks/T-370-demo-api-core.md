@@ -2,13 +2,15 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | PARTIAL — сделан гейт `DEMO_MODE` (`403 DEMO_MODE_DISABLED` на все `/demo/*`) и каркас модуля `demo`; нет персон, прокси сбоев, `login` для тестов и `POST /demo/scenarios` |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/demo-api-core` |
 | Оценка | ~4 ч |
 | Приоритет | M (Must) |
 | Тонкий сквозной сценарий | нет |
 | Зависит от | [T-213](T-213-bank-demo-login.md), [T-200](T-200-api-skeleton.md), [T-105](T-105-mocks-admin-api.md), [T-106](T-106-mocks-chaos.md), [T-119](T-119-mocks-scenarios-service.md), [T-129](T-129-mocks-resync-reset.md), [T-221](T-221-members-sync-from-scenarios.md) |
+
+**Реализация (22.10.2026, часть).** Модуль `api/app/modules/demo/` и зависимость `require_demo_mode` на весь роутер `/demo`: вне `DEMO_MODE` любая демо-ручка отвечает `403 DEMO_MODE_DISABLED`. Первая ручка роутера — `POST /demo/reset` ([T-371](T-371-demo-reset-all.md)). Остаётся: `GET /demo/personas`, `GET /demo/chaos`, `PUT /demo/chaos/{system}`, `POST /demo/personas/{code}/login`, `POST /demo/scenarios`. Новые ручки повесить на тот же роутер, гейт подействует сам. Локально демо-ручки открыты без входа (D-086); код стенда для облака — [T-374](T-374-demo-stand-code.md).
 
 ## Цель
 

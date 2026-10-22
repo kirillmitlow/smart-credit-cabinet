@@ -37,6 +37,17 @@ class AdminGateway:
             headers={"X-Admin-Key": self.admin_key, "X-Scenario-Code": code},
         )
 
+    async def admin(
+        self, system: System, method: str, path: str, body: dict[str, Any] | None = None
+    ) -> httpx.Response:
+        """Админ-запрос мока без привязки к сценарию (общий сброс, режим сбоев)."""
+        return await self.client.request(
+            method,
+            f"{self.urls[system].rstrip('/')}/admin{path}",
+            json=body,
+            headers={"X-Admin-Key": self.admin_key},
+        )
+
 
 async def get_gateway(request: Request) -> AsyncIterator[AdminGateway]:
     settings: Settings = request.app.state.settings

@@ -4,7 +4,10 @@
 `get_integrations()` и работают с результатами `Ok` / `SourceUnavailable`.
 """
 
-from app.modules.integrations import scenarios
+from app.modules.integrations import (
+    reset,  # noqa: F401 — регистрирует сброс демо-данных (T-371)
+    scenarios,
+)
 from app.modules.integrations.bank_core import (
     BankAccount,
     BankCoreReadAdapter,

@@ -12,12 +12,16 @@ from app.common.db import Session
 from app.common.idempotency import OptionalIdempotencyDep
 from app.common.schemas import problem_responses
 from app.roles.scenarios import apply as transfer
+from app.roles.scenarios import reset as reset_module
 from app.roles.scenarios import service
 from app.roles.scenarios.gateway import Gateway
 from app.roles.scenarios.locking import locked_session
 from app.roles.scenarios.presets import PRESETS
 from app.roles.scenarios.schemas import (
     PresetView,
+    ResetMode,
+    ResetRequest,
+    ResetView,
     ScenarioListItem,
     ScenarioOrigin,
     ScenarioSpec,
@@ -156,3 +160,24 @@ async def delete_scenario(request: Request, code: str, gateway: Gateway) -> Resp
         row = await service.get(session, code)
         await transfer.delete(session, row, gateway, request.app.state.clock)
     return Response(status_code=204)
+
+
+@router.post(
+    "/scenarios/reset",
+    operation_id="resetScenarios",
+    summary="Вернуть все моки в исходное состояние: очистка, chaos в OK, сценарии заново",
+    response_model=ResetView,
+    responses=MUTATION_ERRORS,
+)
+async def reset_scenarios(
+    request: Request, gateway: Gateway, body: ResetRequest | None = None
+) -> ResetView:
+    mode = body.mode if body is not None else ResetMode.KEEP_CUSTOM
+    async with locked_session(request.app.state.database) as session:
+        return await reset_module.reset(
+            session,
+            gateway,
+            request.app.state.clock,
+            request.app.state.settings.bank_bik,
+            mode,
+        )

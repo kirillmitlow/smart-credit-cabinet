@@ -3,7 +3,11 @@
 Публичный интерфейс модуля — только то, что ниже.
 """
 
-from app.modules.auth import codes, sessions
+from app.modules.auth import (
+    codes,
+    reset,  # noqa: F401 — регистрирует сброс демо-данных (T-371)
+    sessions,
+)
 from app.modules.auth.dependencies import (
     BankPrincipal,
     ClientPrincipal,

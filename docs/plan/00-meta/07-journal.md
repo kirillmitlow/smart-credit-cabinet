@@ -530,3 +530,17 @@ web/src ещё нет, decide — заглушка, V2 ещё не закрыт�
 **Подсказки следующему:** запуск: `WEB_PORT=8088 docker compose -p scc-pw up -d --build --wait`, затем `E2E_BASE_URL=http://localhost:8088 make -C web e2e`; Chromium один раз `make -C web e2e-install`. Хелперы в `web/e2e/support/`, фикстуры в `web/e2e/fixtures/index.ts` (`clientPage`, `sessions`, опция `persona`). Точка подключения сброса персоны: `resetPersona` в `support/persona.ts` (TODO T-372). Кириллицу и неразрывные пробелы в деньгах учитывает `money()` в `support/text.ts`.
 
 **Файлы:** web/e2e/, web/playwright.config.ts, web/package.json, web/pnpm-lock.yaml, web/Makefile, web/tsconfig.json, web/eslint.config.js, web/.prettierignore, web/.dockerignore, карточки T-518 и T-440.
+
+**22.10, вечер · Агент A (Claude Code) · Общий сброс стенда (T-371, часть T-370 и T-129)**
+
+**Сделано:** ветка `feat/demo-reset`. В моках `POST /api/v1/scenarios/reset` (`KEEP_CUSTOM` и `BUILTIN_ONLY`): chaos в `OK` и wipe у всех четырёх, встроенные сценарии возвращаются к исходнику из кода, применение заново через существующий `apply`. В `api` модуль `demo` с `POST /demo/reset`: моки, база (`TRUNCATE … CASCADE` из реестра сброса, потом возврат компаний из сценариев), сессии и кэш в Valkey, запись `DEMO_RESET` в аудит. Девять модулей зарегистрировали свою чистку, `policy_versions` не трогаем. Вне `DEMO_MODE` все `/demo/*` дают `403 DEMO_MODE_DISABLED`. Ошибка шага: `502 DEMO_RESET_FAILED` с шагом «моки», «база» или «сессии»; повтор безопасен; двойное нажатие: `409`. T-371 DONE, T-370 и T-129 PARTIAL.
+
+**Решено:** без изменений в реестре решений. Решения в рамках плана: демо-ручки без входа (D-086, облачный код стенда остаётся T-374); режим сброса сценариев `KEEP_CUSTOM` (тестовые компании жюри не пропадают, но возвращаются в исходное состояние); файлы и очереди Celery не чистим (хранилища файлов ещё нет, брокер оставлен как есть).
+
+**Осталось:** остальное T-370 (персоны, сбои, `login` для тестов, `POST /demo/scenarios`); в T-129 досинхронизация, `scenarios/sync`, смена месяца, фоновые повторы; T-435 (кнопка в панели); T-372 (сброс одной персоны).
+
+**Подсказки следующему:** новая демо-ручка вешается на `router` из `api/app/modules/demo/router.py`: гейт `DEMO_MODE` уже на роутере. Модуль, добавивший таблицу, кладёт её в `TABLES` своего `reset.py`, иначе она переживёт сброс (тест `test_demo_reset` проверяет пустоту всех таблиц по `TABLE_OWNERS`). Шаги сброса: `api/app/modules/demo/reset_all.py`. Сброс мока: `mocks/app/roles/scenarios/reset.py`.
+
+**Файлы:** mocks/app/roles/scenarios/{reset,gateway,router,schemas,service}.py, mocks/tests/test_scenarios_reset.py, api/app/modules/demo/, api/app/modules/*/reset.py, api/app/shared/{resets,cache}.py, api/tests/integration/test_demo_reset.py, docs/api/*, web/src/api/generated/.
+
+*Дополнение Агента A после живой проверки:* на стенде путь Соколовой → `POST /demo/reset` → путь снова работает. Нашлась гонка: сброс сразу после выдачи стирал мок БКИ раньше, чем туда долетало сообщение о кредите из outbox, и у персоны оставался лишний долг (`COUNTER_OFFER`, DSCR 0,94). Теперь шаг «моки» сначала вызывает `outbox.quiesce()`: снимает неотправленное и ждёт доставку в пути (до 15 с). Запоздавший воркер больше не падает на стёртой записи. Три прогона подряд со сбросом сразу после выдачи — зелёные.
