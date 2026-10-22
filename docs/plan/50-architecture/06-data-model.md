@@ -90,10 +90,10 @@ erDiagram
 
 | Таблица | Модуль | Назначение | Ключевые поля |
 |---|---|---|---|
-| `offers` | offers | Предложение банка по решению | `application_id`, `decision_id`, `kind` (`AS_REQUESTED`, `COUNTER`), `status` (`OPEN`, `ACCEPTED`, `DECLINED`, `EXPIRED`), `expires_at`, `accepted_variant_id`, `accepted_by`, `accepted_at` |
-| `offer_variants` | offers | Карточки-варианты (до 3, D-072) | `offer_id`, `label`, `product_code`, `amount_rub`, `term_months`, `rate_percent`, `payment_rub`, `collateral_required`, `recommended`, `what_changed` (JSONB) |
-| `contracts` | offers | Договор по принятому варианту | `application_id`, `variant_id`, `contract_uid` (стабильный идентификатор), `number`, `document_id`, `content_hash`, `status` (`READY`, `SIGNED`, `CANCELLED`) |
-| `signatures` | offers | Имитация простой электронной подписи (без SMS) | `contract_id`, `signer_user_id`, `signer_person_inn`, `signer_role`, `proof` (HMAC-доказательство), `method`, `consent_text_version`, `signed_at` |
+| `offers` | offers | Предложение банка по решению | `application_id`, `decision_id`, `kind` (`AS_REQUESTED`, `COUNTER`), `status` (`OPEN`, `ACCEPTED`, `DECLINED`, `EXPIRED`), `expires_at`, `variants_status` (`READY`, `PENDING`: встречные ещё не посчитаны, T-297), `accepted_variant_id`, `accepted_by`, `accepted_at`, `closed_at`; одно предложение на решение |
+| `offer_variants` | offers | Карточки-варианты (до 3, D-072) | `offer_id`, `label`, `product_code`, `amount_rub`, `term_months`, `rate_percent`, `payment_rub`, `last_payment_rub`, `overpayment_rub`, `collateral_required`, `recommended`, `what_changed` (JSONB), `note`; неизменяемы |
+| `contracts` | offers | Договор по принятому варианту | `application_id`, `variant_id`, `offer_id`, `revision`, `contract_uid` (стабильный УИд в формате БКИ), `number`, `document_id` (пока пуст, T-336), `template_version`, `body` (детерминированный JSON до появления PDF), `content_hash` (SHA-256 `body`), `status` (`READY`, `SIGNED`, `CANCELLED`); один живой договор на заявку |
+| `signatures` | offers | Имитация простой электронной подписи (без SMS) | `contract_id`, `signer_user_id`, `signer_person_inn`, `signer_role`, `proof` (HMAC-доказательство), `method`, `attempt_id` (код запроса подписи: повтор не создаёт вторую подпись), `consent_text_version`, `content_hash`, `signed_at`; неизменяемы |
 | `disbursements` | disbursement | Выдача в АБС | `application_id` (уникален), `contract_id`, `amount_rub`, `account_number`, `status` (`PENDING`, `SENT`, `CONFIRMED`, `FAILED`), `idempotency_key`, `bank_core_ref`, `confirmed_at` |
 | `loans` | loans | «Мои кредиты» | `company_id`, `application_id`, `disbursement_id`, `bank_core_loan_id`, `product_code`, `principal_rub`, `rate_percent`, `term_months`, `opened_on`, `status`, `outstanding_rub` |
 | `payment_schedule` | loans | График платежей | `loan_id`, `seq`, `due_date`, `principal_rub`, `interest_rub`, `total_rub`, `status` |

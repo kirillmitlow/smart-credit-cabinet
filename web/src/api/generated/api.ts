@@ -25,21 +25,43 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AcceptIn,
+  AcceptedOut,
   ActiveCompany,
   ApplicationFields,
   ApplicationOut,
   ApplicationPage,
+  ClientDecisionOut,
   CodeCheck,
   CodeIssued,
   CodeRequest,
+  ConsentsOut,
+  ConsentsSignedOut,
+  ContractOut,
+  ContractSignedOut,
+  DeclinedOut,
   DraftPatch,
   HTTPValidationError,
   HealthDeps200,
   HealthLive200,
   ListApplicationsParams,
   MeResponse,
+  OfferOut,
+  PassedOut,
+  PaymentOut,
+  PaymentRequest,
+  ProductList,
+  ProductOut,
   PublicConfig,
-  RolesResponse
+  RolesResponse,
+  SignChallenge,
+  SignChallengeOut,
+  SignConfirm,
+  SignConfirmIn,
+  SignRequest,
+  SignStartIn,
+  WizardRequest,
+  WizardResult
 } from './model';
 
 import { customFetch } from '../client';
@@ -1814,4 +1836,1777 @@ export const useWithdrawApplication = <TError = HTTPValidationError,
         TContext
       > => {
       return useMutation(getWithdrawApplicationMutationOptions(options), queryClient);
+    }
+
+export type listApplicationConsentsResponse200 = {
+  data: ConsentsOut
+  status: 200
+}
+
+export type listApplicationConsentsResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type listApplicationConsentsResponseSuccess = (listApplicationConsentsResponse200) & {
+  headers: Headers;
+};
+export type listApplicationConsentsResponseError = (listApplicationConsentsResponse422) & {
+  headers: Headers;
+};
+
+export type listApplicationConsentsResponse = (listApplicationConsentsResponseSuccess | listApplicationConsentsResponseError)
+
+export const getListApplicationConsentsUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/consents`
+}
+
+/**
+ * @summary Какие согласия нужны, их тексты, кто может подписать и что уже подписано
+ */
+export const listApplicationConsents = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<listApplicationConsentsResponse> => {
+
+  return customFetch<listApplicationConsentsResponse>(getListApplicationConsentsUrl(applicationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListApplicationConsentsQueryKey = (applicationId: string,) => {
+    return [
+    `/applications/${applicationId}/consents`
+    ] as const;
+    }
+
+
+export const getListApplicationConsentsQueryOptions = <TData = Awaited<ReturnType<typeof listApplicationConsents>>, TError = HTTPValidationError>(applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationConsents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListApplicationConsentsQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listApplicationConsents>>> = ({ signal }) => listApplicationConsents(applicationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listApplicationConsents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListApplicationConsentsQueryResult = NonNullable<Awaited<ReturnType<typeof listApplicationConsents>>>
+export type ListApplicationConsentsQueryError = HTTPValidationError
+
+
+export function useListApplicationConsents<TData = Awaited<ReturnType<typeof listApplicationConsents>>, TError = HTTPValidationError>(
+ applicationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationConsents>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApplicationConsents>>,
+          TError,
+          Awaited<ReturnType<typeof listApplicationConsents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApplicationConsents<TData = Awaited<ReturnType<typeof listApplicationConsents>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationConsents>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApplicationConsents>>,
+          TError,
+          Awaited<ReturnType<typeof listApplicationConsents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApplicationConsents<TData = Awaited<ReturnType<typeof listApplicationConsents>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationConsents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Какие согласия нужны, их тексты, кто может подписать и что уже подписано
+ */
+
+export function useListApplicationConsents<TData = Awaited<ReturnType<typeof listApplicationConsents>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationConsents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListApplicationConsentsQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type requestConsentSigningResponse200 = {
+  data: SignChallenge
+  status: 200
+}
+
+export type requestConsentSigningResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type requestConsentSigningResponseSuccess = (requestConsentSigningResponse200) & {
+  headers: Headers;
+};
+export type requestConsentSigningResponseError = (requestConsentSigningResponse422) & {
+  headers: Headers;
+};
+
+export type requestConsentSigningResponse = (requestConsentSigningResponseSuccess | requestConsentSigningResponseError)
+
+export const getRequestConsentSigningUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/consents`
+}
+
+/**
+ * @summary Галочки поставлены: проверить полномочия и выпустить один код на пакет согласий
+ */
+export const requestConsentSigning = async (applicationId: string,
+    signRequest: SignRequest, options?: Parameters<typeof customFetch>[1]): Promise<requestConsentSigningResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<requestConsentSigningResponse>(getRequestConsentSigningUrl(applicationId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signRequest)
+  }
+);}
+
+
+
+
+
+export const getRequestConsentSigningMutationKey = () => ['requestConsentSigning'] as const;
+
+export const getRequestConsentSigningMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestConsentSigning>>, TError,RequestConsentSigningMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestConsentSigning>>, TError,RequestConsentSigningMutationVariables, TContext> => {
+
+const mutationKey = getRequestConsentSigningMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestConsentSigning>>, RequestConsentSigningMutationVariables> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  requestConsentSigning(applicationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestConsentSigningMutationResult = NonNullable<Awaited<ReturnType<typeof requestConsentSigning>>>
+    export type RequestConsentSigningMutationBody = SignRequest
+    export type RequestConsentSigningMutationError = HTTPValidationError
+    export type RequestConsentSigningMutationVariables = {applicationId: string;data: SignRequest}
+
+    /**
+ * @summary Галочки поставлены: проверить полномочия и выпустить один код на пакет согласий
+ */
+export const useRequestConsentSigning = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestConsentSigning>>, TError,RequestConsentSigningMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestConsentSigning>>,
+        TError,
+        RequestConsentSigningMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestConsentSigningMutationOptions(options), queryClient);
+    }
+
+export type signConsentBundleResponse200 = {
+  data: ConsentsSignedOut
+  status: 200
+}
+
+export type signConsentBundleResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type signConsentBundleResponseSuccess = (signConsentBundleResponse200) & {
+  headers: Headers;
+};
+export type signConsentBundleResponseError = (signConsentBundleResponse422) & {
+  headers: Headers;
+};
+
+export type signConsentBundleResponse = (signConsentBundleResponseSuccess | signConsentBundleResponseError)
+
+export const getSignConsentBundleUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/consents/sign`
+}
+
+/**
+ * @summary Ввести код: весь пакет согласий человека подписан
+ */
+export const signConsentBundle = async (applicationId: string,
+    signConfirm: SignConfirm, options?: Parameters<typeof customFetch>[1]): Promise<signConsentBundleResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<signConsentBundleResponse>(getSignConsentBundleUrl(applicationId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signConfirm)
+  }
+);}
+
+
+
+
+
+export const getSignConsentBundleMutationKey = () => ['signConsentBundle'] as const;
+
+export const getSignConsentBundleMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signConsentBundle>>, TError,SignConsentBundleMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof signConsentBundle>>, TError,SignConsentBundleMutationVariables, TContext> => {
+
+const mutationKey = getSignConsentBundleMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof signConsentBundle>>, SignConsentBundleMutationVariables> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  signConsentBundle(applicationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SignConsentBundleMutationResult = NonNullable<Awaited<ReturnType<typeof signConsentBundle>>>
+    export type SignConsentBundleMutationBody = SignConfirm
+    export type SignConsentBundleMutationError = HTTPValidationError
+    export type SignConsentBundleMutationVariables = {applicationId: string;data: SignConfirm}
+
+    /**
+ * @summary Ввести код: весь пакет согласий человека подписан
+ */
+export const useSignConsentBundle = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signConsentBundle>>, TError,SignConsentBundleMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof signConsentBundle>>,
+        TError,
+        SignConsentBundleMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSignConsentBundleMutationOptions(options), queryClient);
+    }
+
+export type listProductsResponse200 = {
+  data: ProductList
+  status: 200
+}
+
+export type listProductsResponseSuccess = (listProductsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listProductsResponse = (listProductsResponseSuccess)
+
+export const getListProductsUrl = () => {
+
+
+
+
+  return `/products`
+}
+
+/**
+ * @summary Каталог: шесть продуктов и доступность каждого компании
+ */
+export const listProducts = async ( options?: Parameters<typeof customFetch>[1]): Promise<listProductsResponse> => {
+
+  return customFetch<listProductsResponse>(getListProductsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListProductsQueryKey = () => {
+    return [
+    `/products`
+    ] as const;
+    }
+
+
+export const getListProductsQueryOptions = <TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListProductsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProducts>>> = ({ signal }) => listProducts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListProductsQueryResult = NonNullable<Awaited<ReturnType<typeof listProducts>>>
+export type ListProductsQueryError = unknown
+
+
+export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listProducts>>,
+          TError,
+          Awaited<ReturnType<typeof listProducts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listProducts>>,
+          TError,
+          Awaited<ReturnType<typeof listProducts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Каталог: шесть продуктов и доступность каждого компании
+ */
+
+export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListProductsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getProductResponse200 = {
+  data: ProductOut
+  status: 200
+}
+
+export type getProductResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getProductResponseSuccess = (getProductResponse200) & {
+  headers: Headers;
+};
+export type getProductResponseError = (getProductResponse422) & {
+  headers: Headers;
+};
+
+export type getProductResponse = (getProductResponseSuccess | getProductResponseError)
+
+export const getGetProductUrl = (code: string,) => {
+
+
+
+
+  return `/products/${code}`
+}
+
+/**
+ * @summary Продукт: границы, документы, доступность
+ */
+export const getProduct = async (code: string, options?: Parameters<typeof customFetch>[1]): Promise<getProductResponse> => {
+
+  return customFetch<getProductResponse>(getGetProductUrl(code),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProductQueryKey = (code: string,) => {
+    return [
+    `/products/${code}`
+    ] as const;
+    }
+
+
+export const getGetProductQueryOptions = <TData = Awaited<ReturnType<typeof getProduct>>, TError = HTTPValidationError>(code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProductQueryKey(code);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProduct>>> = ({ signal }) => getProduct(code, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: code !== null && code !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetProductQueryResult = NonNullable<Awaited<ReturnType<typeof getProduct>>>
+export type GetProductQueryError = HTTPValidationError
+
+
+export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TError = HTTPValidationError>(
+ code: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProduct>>,
+          TError,
+          Awaited<ReturnType<typeof getProduct>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TError = HTTPValidationError>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProduct>>,
+          TError,
+          Awaited<ReturnType<typeof getProduct>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TError = HTTPValidationError>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Продукт: границы, документы, доступность
+ */
+
+export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TError = HTTPValidationError>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetProductQueryOptions(code,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type calculatePaymentResponse200 = {
+  data: PaymentOut
+  status: 200
+}
+
+export type calculatePaymentResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type calculatePaymentResponseSuccess = (calculatePaymentResponse200) & {
+  headers: Headers;
+};
+export type calculatePaymentResponseError = (calculatePaymentResponse422) & {
+  headers: Headers;
+};
+
+export type calculatePaymentResponse = (calculatePaymentResponseSuccess | calculatePaymentResponseError)
+
+export const getCalculatePaymentUrl = () => {
+
+
+
+
+  return `/calculator/payment`
+}
+
+/**
+ * @summary Платёж, переплата и ставка «от» для суммы, срока и продукта
+ */
+export const calculatePayment = async (paymentRequest: PaymentRequest, options?: Parameters<typeof customFetch>[1]): Promise<calculatePaymentResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<calculatePaymentResponse>(getCalculatePaymentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(paymentRequest)
+  }
+);}
+
+
+
+
+
+export const getCalculatePaymentMutationKey = () => ['calculatePayment'] as const;
+
+export const getCalculatePaymentMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof calculatePayment>>, TError,CalculatePaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof calculatePayment>>, TError,CalculatePaymentMutationVariables, TContext> => {
+
+const mutationKey = getCalculatePaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof calculatePayment>>, CalculatePaymentMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  calculatePayment(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CalculatePaymentMutationResult = NonNullable<Awaited<ReturnType<typeof calculatePayment>>>
+    export type CalculatePaymentMutationBody = PaymentRequest
+    export type CalculatePaymentMutationError = HTTPValidationError
+    export type CalculatePaymentMutationVariables = {data: PaymentRequest}
+
+    /**
+ * @summary Платёж, переплата и ставка «от» для суммы, срока и продукта
+ */
+export const useCalculatePayment = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof calculatePayment>>, TError,CalculatePaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof calculatePayment>>,
+        TError,
+        CalculatePaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCalculatePaymentMutationOptions(options), queryClient);
+    }
+
+export type recommendProductResponse200 = {
+  data: WizardResult
+  status: 200
+}
+
+export type recommendProductResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type recommendProductResponseSuccess = (recommendProductResponse200) & {
+  headers: Headers;
+};
+export type recommendProductResponseError = (recommendProductResponse422) & {
+  headers: Headers;
+};
+
+export type recommendProductResponse = (recommendProductResponseSuccess | recommendProductResponseError)
+
+export const getRecommendProductUrl = () => {
+
+
+
+
+  return `/wizard/recommendations`
+}
+
+/**
+ * @summary Мастер подбора: ответы → основной продукт и одна альтернатива
+ */
+export const recommendProduct = async (wizardRequest: WizardRequest, options?: Parameters<typeof customFetch>[1]): Promise<recommendProductResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<recommendProductResponse>(getRecommendProductUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(wizardRequest)
+  }
+);}
+
+
+
+
+
+export const getRecommendProductMutationKey = () => ['recommendProduct'] as const;
+
+export const getRecommendProductMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recommendProduct>>, TError,RecommendProductMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recommendProduct>>, TError,RecommendProductMutationVariables, TContext> => {
+
+const mutationKey = getRecommendProductMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recommendProduct>>, RecommendProductMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  recommendProduct(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecommendProductMutationResult = NonNullable<Awaited<ReturnType<typeof recommendProduct>>>
+    export type RecommendProductMutationBody = WizardRequest
+    export type RecommendProductMutationError = HTTPValidationError
+    export type RecommendProductMutationVariables = {data: WizardRequest}
+
+    /**
+ * @summary Мастер подбора: ответы → основной продукт и одна альтернатива
+ */
+export const useRecommendProduct = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recommendProduct>>, TError,RecommendProductMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recommendProduct>>,
+        TError,
+        RecommendProductMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRecommendProductMutationOptions(options), queryClient);
+    }
+
+export type getApplicationDecisionResponse200 = {
+  data: ClientDecisionOut
+  status: 200
+}
+
+export type getApplicationDecisionResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getApplicationDecisionResponseSuccess = (getApplicationDecisionResponse200) & {
+  headers: Headers;
+};
+export type getApplicationDecisionResponseError = (getApplicationDecisionResponse422) & {
+  headers: Headers;
+};
+
+export type getApplicationDecisionResponse = (getApplicationDecisionResponseSuccess | getApplicationDecisionResponseError)
+
+export const getGetApplicationDecisionUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/decision`
+}
+
+/**
+ * @summary Решение простым языком: исход, условия, причины и что можно сделать
+ */
+export const getApplicationDecision = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<getApplicationDecisionResponse> => {
+
+  return customFetch<getApplicationDecisionResponse>(getGetApplicationDecisionUrl(applicationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApplicationDecisionQueryKey = (applicationId: string,) => {
+    return [
+    `/applications/${applicationId}/decision`
+    ] as const;
+    }
+
+
+export const getGetApplicationDecisionQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationDecision>>, TError = HTTPValidationError>(applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationDecision>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApplicationDecisionQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicationDecision>>> = ({ signal }) => getApplicationDecision(applicationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApplicationDecision>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApplicationDecisionQueryResult = NonNullable<Awaited<ReturnType<typeof getApplicationDecision>>>
+export type GetApplicationDecisionQueryError = HTTPValidationError
+
+
+export function useGetApplicationDecision<TData = Awaited<ReturnType<typeof getApplicationDecision>>, TError = HTTPValidationError>(
+ applicationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationDecision>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationDecision>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationDecision>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationDecision<TData = Awaited<ReturnType<typeof getApplicationDecision>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationDecision>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationDecision>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationDecision>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationDecision<TData = Awaited<ReturnType<typeof getApplicationDecision>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationDecision>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Решение простым языком: исход, условия, причины и что можно сделать
+ */
+
+export function useGetApplicationDecision<TData = Awaited<ReturnType<typeof getApplicationDecision>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationDecision>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApplicationDecisionQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getApplicationOfferResponse200 = {
+  data: OfferOut
+  status: 200
+}
+
+export type getApplicationOfferResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getApplicationOfferResponseSuccess = (getApplicationOfferResponse200) & {
+  headers: Headers;
+};
+export type getApplicationOfferResponseError = (getApplicationOfferResponse422) & {
+  headers: Headers;
+};
+
+export type getApplicationOfferResponse = (getApplicationOfferResponseSuccess | getApplicationOfferResponseError)
+
+export const getGetApplicationOfferUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/offer`
+}
+
+/**
+ * @summary Предложение банка по заявке: варианты, платёж, переплата, срок действия
+ */
+export const getApplicationOffer = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<getApplicationOfferResponse> => {
+
+  return customFetch<getApplicationOfferResponse>(getGetApplicationOfferUrl(applicationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApplicationOfferQueryKey = (applicationId: string,) => {
+    return [
+    `/applications/${applicationId}/offer`
+    ] as const;
+    }
+
+
+export const getGetApplicationOfferQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationOffer>>, TError = HTTPValidationError>(applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationOffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApplicationOfferQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicationOffer>>> = ({ signal }) => getApplicationOffer(applicationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApplicationOffer>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApplicationOfferQueryResult = NonNullable<Awaited<ReturnType<typeof getApplicationOffer>>>
+export type GetApplicationOfferQueryError = HTTPValidationError
+
+
+export function useGetApplicationOffer<TData = Awaited<ReturnType<typeof getApplicationOffer>>, TError = HTTPValidationError>(
+ applicationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationOffer>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationOffer>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationOffer>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationOffer<TData = Awaited<ReturnType<typeof getApplicationOffer>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationOffer>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationOffer>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationOffer>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationOffer<TData = Awaited<ReturnType<typeof getApplicationOffer>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationOffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Предложение банка по заявке: варианты, платёж, переплата, срок действия
+ */
+
+export function useGetApplicationOffer<TData = Awaited<ReturnType<typeof getApplicationOffer>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationOffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApplicationOfferQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type acceptOfferResponse200 = {
+  data: AcceptedOut
+  status: 200
+}
+
+export type acceptOfferResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type acceptOfferResponseSuccess = (acceptOfferResponse200) & {
+  headers: Headers;
+};
+export type acceptOfferResponseError = (acceptOfferResponse422) & {
+  headers: Headers;
+};
+
+export type acceptOfferResponse = (acceptOfferResponseSuccess | acceptOfferResponseError)
+
+export const getAcceptOfferUrl = (offerId: string,) => {
+
+
+
+
+  return `/offers/${offerId}/accept`
+}
+
+/**
+ * @summary Принять предложение (выбранный вариант): заявка → OFFER_ACCEPTED, готовится договор
+ */
+export const acceptOffer = async (offerId: string,
+    acceptInNull?: AcceptIn | null, options?: Parameters<typeof customFetch>[1]): Promise<acceptOfferResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<acceptOfferResponse>(getAcceptOfferUrl(offerId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(acceptInNull)
+  }
+);}
+
+
+
+
+
+export const getAcceptOfferMutationKey = () => ['acceptOffer'] as const;
+
+export const getAcceptOfferMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptOffer>>, TError,AcceptOfferMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof acceptOffer>>, TError,AcceptOfferMutationVariables, TContext> => {
+
+const mutationKey = getAcceptOfferMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acceptOffer>>, AcceptOfferMutationVariables> = (props) => {
+          const {offerId,data} = props ?? {};
+
+          return  acceptOffer(offerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AcceptOfferMutationResult = NonNullable<Awaited<ReturnType<typeof acceptOffer>>>
+    export type AcceptOfferMutationBody = AcceptIn | null | undefined
+    export type AcceptOfferMutationError = HTTPValidationError
+    export type AcceptOfferMutationVariables = {offerId: string;data?: AcceptIn | null}
+
+    /**
+ * @summary Принять предложение (выбранный вариант): заявка → OFFER_ACCEPTED, готовится договор
+ */
+export const useAcceptOffer = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptOffer>>, TError,AcceptOfferMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof acceptOffer>>,
+        TError,
+        AcceptOfferMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAcceptOfferMutationOptions(options), queryClient);
+    }
+
+export type declineOfferResponse200 = {
+  data: DeclinedOut
+  status: 200
+}
+
+export type declineOfferResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type declineOfferResponseSuccess = (declineOfferResponse200) & {
+  headers: Headers;
+};
+export type declineOfferResponseError = (declineOfferResponse422) & {
+  headers: Headers;
+};
+
+export type declineOfferResponse = (declineOfferResponseSuccess | declineOfferResponseError)
+
+export const getDeclineOfferUrl = (offerId: string,) => {
+
+
+
+
+  return `/offers/${offerId}/decline`
+}
+
+/**
+ * @summary Отказаться от предложения: заявка → WITHDRAWN
+ */
+export const declineOffer = async (offerId: string, options?: Parameters<typeof customFetch>[1]): Promise<declineOfferResponse> => {
+
+  return customFetch<declineOfferResponse>(getDeclineOfferUrl(offerId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeclineOfferMutationKey = () => ['declineOffer'] as const;
+
+export const getDeclineOfferMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof declineOffer>>, TError,DeclineOfferMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof declineOffer>>, TError,DeclineOfferMutationVariables, TContext> => {
+
+const mutationKey = getDeclineOfferMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof declineOffer>>, DeclineOfferMutationVariables> = (props) => {
+          const {offerId} = props ?? {};
+
+          return  declineOffer(offerId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeclineOfferMutationResult = NonNullable<Awaited<ReturnType<typeof declineOffer>>>
+
+    export type DeclineOfferMutationError = HTTPValidationError
+    export type DeclineOfferMutationVariables = {offerId: string}
+
+    /**
+ * @summary Отказаться от предложения: заявка → WITHDRAWN
+ */
+export const useDeclineOffer = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof declineOffer>>, TError,DeclineOfferMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof declineOffer>>,
+        TError,
+        DeclineOfferMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeclineOfferMutationOptions(options), queryClient);
+    }
+
+export type getContractResponse200 = {
+  data: ContractOut
+  status: 200
+}
+
+export type getContractResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getContractResponseSuccess = (getContractResponse200) & {
+  headers: Headers;
+};
+export type getContractResponseError = (getContractResponse422) & {
+  headers: Headers;
+};
+
+export type getContractResponse = (getContractResponseSuccess | getContractResponseError)
+
+export const getGetContractUrl = (contractId: string,) => {
+
+
+
+
+  return `/contracts/${contractId}`
+}
+
+/**
+ * @summary Договор: номер, УИд, хеш документа, кто подписал и сколько подписей нужно
+ */
+export const getContract = async (contractId: string, options?: Parameters<typeof customFetch>[1]): Promise<getContractResponse> => {
+
+  return customFetch<getContractResponse>(getGetContractUrl(contractId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetContractQueryKey = (contractId: string,) => {
+    return [
+    `/contracts/${contractId}`
+    ] as const;
+    }
+
+
+export const getGetContractQueryOptions = <TData = Awaited<ReturnType<typeof getContract>>, TError = HTTPValidationError>(contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContract>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetContractQueryKey(contractId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContract>>> = ({ signal }) => getContract(contractId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: contractId !== null && contractId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContract>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetContractQueryResult = NonNullable<Awaited<ReturnType<typeof getContract>>>
+export type GetContractQueryError = HTTPValidationError
+
+
+export function useGetContract<TData = Awaited<ReturnType<typeof getContract>>, TError = HTTPValidationError>(
+ contractId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContract>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContract>>,
+          TError,
+          Awaited<ReturnType<typeof getContract>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContract<TData = Awaited<ReturnType<typeof getContract>>, TError = HTTPValidationError>(
+ contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContract>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContract>>,
+          TError,
+          Awaited<ReturnType<typeof getContract>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContract<TData = Awaited<ReturnType<typeof getContract>>, TError = HTTPValidationError>(
+ contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContract>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Договор: номер, УИд, хеш документа, кто подписал и сколько подписей нужно
+ */
+
+export function useGetContract<TData = Awaited<ReturnType<typeof getContract>>, TError = HTTPValidationError>(
+ contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContract>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetContractQueryOptions(contractId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getContractDocumentResponse200 = {
+  data: unknown
+  status: 200
+}
+
+export type getContractDocumentResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getContractDocumentResponseSuccess = (getContractDocumentResponse200) & {
+  headers: Headers;
+};
+export type getContractDocumentResponseError = (getContractDocumentResponse422) & {
+  headers: Headers;
+};
+
+export type getContractDocumentResponse = (getContractDocumentResponseSuccess | getContractDocumentResponseError)
+
+export const getGetContractDocumentUrl = (contractId: string,) => {
+
+
+
+
+  return `/contracts/${contractId}/document`
+}
+
+/**
+ * @summary Сохранённый текст договора (подписывается именно он); хеш — в X-Content-SHA256
+ */
+export const getContractDocument = async (contractId: string, options?: Parameters<typeof customFetch>[1]): Promise<getContractDocumentResponse> => {
+
+  return customFetch<getContractDocumentResponse>(getGetContractDocumentUrl(contractId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetContractDocumentQueryKey = (contractId: string,) => {
+    return [
+    `/contracts/${contractId}/document`
+    ] as const;
+    }
+
+
+export const getGetContractDocumentQueryOptions = <TData = Awaited<ReturnType<typeof getContractDocument>>, TError = HTTPValidationError>(contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContractDocument>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetContractDocumentQueryKey(contractId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContractDocument>>> = ({ signal }) => getContractDocument(contractId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: contractId !== null && contractId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContractDocument>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetContractDocumentQueryResult = NonNullable<Awaited<ReturnType<typeof getContractDocument>>>
+export type GetContractDocumentQueryError = HTTPValidationError
+
+
+export function useGetContractDocument<TData = Awaited<ReturnType<typeof getContractDocument>>, TError = HTTPValidationError>(
+ contractId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContractDocument>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContractDocument>>,
+          TError,
+          Awaited<ReturnType<typeof getContractDocument>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContractDocument<TData = Awaited<ReturnType<typeof getContractDocument>>, TError = HTTPValidationError>(
+ contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContractDocument>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContractDocument>>,
+          TError,
+          Awaited<ReturnType<typeof getContractDocument>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContractDocument<TData = Awaited<ReturnType<typeof getContractDocument>>, TError = HTTPValidationError>(
+ contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContractDocument>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Сохранённый текст договора (подписывается именно он); хеш — в X-Content-SHA256
+ */
+
+export function useGetContractDocument<TData = Awaited<ReturnType<typeof getContractDocument>>, TError = HTTPValidationError>(
+ contractId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContractDocument>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetContractDocumentQueryOptions(contractId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type requestContractSignatureResponse200 = {
+  data: PassedOut
+  status: 200
+}
+
+export type requestContractSignatureResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type requestContractSignatureResponseSuccess = (requestContractSignatureResponse200) & {
+  headers: Headers;
+};
+export type requestContractSignatureResponseError = (requestContractSignatureResponse422) & {
+  headers: Headers;
+};
+
+export type requestContractSignatureResponse = (requestContractSignatureResponseSuccess | requestContractSignatureResponseError)
+
+export const getRequestContractSignatureUrl = (contractId: string,) => {
+
+
+
+
+  return `/contracts/${contractId}/request-signature`
+}
+
+/**
+ * @summary Передать руководителю на подпись (сотрудник; D-014)
+ */
+export const requestContractSignature = async (contractId: string, options?: Parameters<typeof customFetch>[1]): Promise<requestContractSignatureResponse> => {
+
+  return customFetch<requestContractSignatureResponse>(getRequestContractSignatureUrl(contractId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRequestContractSignatureMutationKey = () => ['requestContractSignature'] as const;
+
+export const getRequestContractSignatureMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestContractSignature>>, TError,RequestContractSignatureMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestContractSignature>>, TError,RequestContractSignatureMutationVariables, TContext> => {
+
+const mutationKey = getRequestContractSignatureMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestContractSignature>>, RequestContractSignatureMutationVariables> = (props) => {
+          const {contractId} = props ?? {};
+
+          return  requestContractSignature(contractId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestContractSignatureMutationResult = NonNullable<Awaited<ReturnType<typeof requestContractSignature>>>
+
+    export type RequestContractSignatureMutationError = HTTPValidationError
+    export type RequestContractSignatureMutationVariables = {contractId: string}
+
+    /**
+ * @summary Передать руководителю на подпись (сотрудник; D-014)
+ */
+export const useRequestContractSignature = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestContractSignature>>, TError,RequestContractSignatureMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestContractSignature>>,
+        TError,
+        RequestContractSignatureMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestContractSignatureMutationOptions(options), queryClient);
+    }
+
+export type requestContractSigningCodeResponse200 = {
+  data: SignChallengeOut
+  status: 200
+}
+
+export type requestContractSigningCodeResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type requestContractSigningCodeResponseSuccess = (requestContractSigningCodeResponse200) & {
+  headers: Headers;
+};
+export type requestContractSigningCodeResponseError = (requestContractSigningCodeResponse422) & {
+  headers: Headers;
+};
+
+export type requestContractSigningCodeResponse = (requestContractSigningCodeResponseSuccess | requestContractSigningCodeResponseError)
+
+export const getRequestContractSigningCodeUrl = (contractId: string,) => {
+
+
+
+
+  return `/contracts/${contractId}/sign/request`
+}
+
+/**
+ * @summary Галочка поставлена: выпустить код подписи договора (только руководитель)
+ */
+export const requestContractSigningCode = async (contractId: string,
+    signStartIn: SignStartIn, options?: Parameters<typeof customFetch>[1]): Promise<requestContractSigningCodeResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<requestContractSigningCodeResponse>(getRequestContractSigningCodeUrl(contractId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signStartIn)
+  }
+);}
+
+
+
+
+
+export const getRequestContractSigningCodeMutationKey = () => ['requestContractSigningCode'] as const;
+
+export const getRequestContractSigningCodeMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestContractSigningCode>>, TError,RequestContractSigningCodeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestContractSigningCode>>, TError,RequestContractSigningCodeMutationVariables, TContext> => {
+
+const mutationKey = getRequestContractSigningCodeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestContractSigningCode>>, RequestContractSigningCodeMutationVariables> = (props) => {
+          const {contractId,data} = props ?? {};
+
+          return  requestContractSigningCode(contractId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestContractSigningCodeMutationResult = NonNullable<Awaited<ReturnType<typeof requestContractSigningCode>>>
+    export type RequestContractSigningCodeMutationBody = SignStartIn
+    export type RequestContractSigningCodeMutationError = HTTPValidationError
+    export type RequestContractSigningCodeMutationVariables = {contractId: string;data: SignStartIn}
+
+    /**
+ * @summary Галочка поставлена: выпустить код подписи договора (только руководитель)
+ */
+export const useRequestContractSigningCode = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestContractSigningCode>>, TError,RequestContractSigningCodeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestContractSigningCode>>,
+        TError,
+        RequestContractSigningCodeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestContractSigningCodeMutationOptions(options), queryClient);
+    }
+
+export type signContractResponse200 = {
+  data: ContractSignedOut
+  status: 200
+}
+
+export type signContractResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type signContractResponseSuccess = (signContractResponse200) & {
+  headers: Headers;
+};
+export type signContractResponseError = (signContractResponse422) & {
+  headers: Headers;
+};
+
+export type signContractResponse = (signContractResponseSuccess | signContractResponseError)
+
+export const getSignContractUrl = (contractId: string,) => {
+
+
+
+
+  return `/contracts/${contractId}/sign`
+}
+
+/**
+ * @summary Ввести код: договор подписан; когда подписи собраны, заявка → SIGNED и стартует выдача
+ */
+export const signContract = async (contractId: string,
+    signConfirmIn: SignConfirmIn, options?: Parameters<typeof customFetch>[1]): Promise<signContractResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<signContractResponse>(getSignContractUrl(contractId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signConfirmIn)
+  }
+);}
+
+
+
+
+
+export const getSignContractMutationKey = () => ['signContract'] as const;
+
+export const getSignContractMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signContract>>, TError,SignContractMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof signContract>>, TError,SignContractMutationVariables, TContext> => {
+
+const mutationKey = getSignContractMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof signContract>>, SignContractMutationVariables> = (props) => {
+          const {contractId,data} = props ?? {};
+
+          return  signContract(contractId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SignContractMutationResult = NonNullable<Awaited<ReturnType<typeof signContract>>>
+    export type SignContractMutationBody = SignConfirmIn
+    export type SignContractMutationError = HTTPValidationError
+    export type SignContractMutationVariables = {contractId: string;data: SignConfirmIn}
+
+    /**
+ * @summary Ввести код: договор подписан; когда подписи собраны, заявка → SIGNED и стартует выдача
+ */
+export const useSignContract = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signContract>>, TError,SignContractMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof signContract>>,
+        TError,
+        SignContractMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSignContractMutationOptions(options), queryClient);
     }

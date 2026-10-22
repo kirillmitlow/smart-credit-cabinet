@@ -26,4 +26,8 @@ TABLE_OWNERS: dict[str, str] = {
     "disbursements": "disbursement",
     "loans": "loans",
     "payment_schedule": "loans",
+    "offers": "offers",
+    "offer_variants": "offers",
+    "contracts": "offers",
+    "signatures": "offers",
 }

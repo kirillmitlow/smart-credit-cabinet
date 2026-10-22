@@ -17,7 +17,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.applications import Actor, Application, Status, record_event, transition
-from app.modules.decisioning import DecisionInput, DecisionResult, input_to_json
+from app.modules.decisioning import (
+    DecisionInput,
+    DecisionResult,
+    client_factor_phrases,
+    input_to_json,
+)
 from app.modules.decisioning.types import Outcome
 from app.modules.pipeline import hooks
 from app.modules.pipeline.models import Decision, DecisionReason, PipelineRun
@@ -54,6 +59,8 @@ def build_decision(
     """Строка `decisions` по результату ядра (без записи в базу)."""
     n = result.numbers
     explain = _RESULT.dump_python(result, mode="json")
+    # Что помогло / что повлияло — фразами клиенту; считаем сейчас и храним (Q-113, T-259)
+    explain["clientFactors"] = client_factor_phrases(result.numbers.factors)
     outcome = Outcome.REJECTED if result.outcome == Outcome.NOT_ELIGIBLE else result.outcome
     return Decision(
         application_id=run.application_id,
@@ -148,5 +155,5 @@ def persist_decision(
             "policyVersion": result.policy_version,
         },
     )
-    hooks.after_decision(session, application, decision, result)
+    hooks.after_decision(session, application, decision, inp, result)
     return decision, True

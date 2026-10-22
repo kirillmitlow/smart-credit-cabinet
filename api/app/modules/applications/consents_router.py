@@ -83,7 +83,7 @@ class SignConfirm(Camel):
     items: list[ConsentRef] = Field(min_length=1, max_length=20)
 
 
-class SignedOut(Camel):
+class ConsentsSignedOut(Camel):
     application_id: UUID
     signed: list[ConsentItemOut]
     all_signed: bool
@@ -178,7 +178,9 @@ async def request_signing(
     return await run_in_threadpool(_request, principal, application_id, body)
 
 
-def _confirm(principal: auth.Principal, application_id: UUID, body: SignConfirm) -> SignedOut:
+def _confirm(
+    principal: auth.Principal, application_id: UUID, body: SignConfirm
+) -> ConsentsSignedOut:
     with db.transaction() as session:
         application = service.get_for(session, principal, application_id)
         rows = consents.sign_bundle(
@@ -195,7 +197,7 @@ def _confirm(principal: auth.Principal, application_id: UUID, body: SignConfirm)
             for s in consents.item_states(session, principal, application)
             if consents.visible_to(principal, application, s)
         ]
-        return SignedOut(
+        return ConsentsSignedOut(
             application_id=application.id,
             signed=[
                 _item(application, s, by_key[s.required.key])
@@ -210,10 +212,10 @@ def _confirm(principal: auth.Principal, application_id: UUID, body: SignConfirm)
     "/{application_id}/consents/sign",
     operation_id="signConsentBundle",
     summary="Ввести код: весь пакет согласий человека подписан",
-    response_model=SignedOut,
+    response_model=ConsentsSignedOut,
     response_model_by_alias=True,
 )
 async def sign(
     application_id: UUID, body: SignConfirm, principal: auth.ClientPrincipal
-) -> SignedOut:
+) -> ConsentsSignedOut:
     return await run_in_threadpool(_confirm, principal, application_id, body)

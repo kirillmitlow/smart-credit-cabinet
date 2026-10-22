@@ -18,15 +18,36 @@ import type {
   RequestHandlerOptions
 } from 'msw';
 
+import {
+  AutoDecisionMode,
+  DecisionTime,
+  PaymentKind,
+  WizardOutcome
+} from './model';
 import type {
+  AcceptedOut,
   ApplicationOut,
   ApplicationPage,
+  ClientDecisionOut,
   CodeIssued,
+  ConsentsOut,
+  ConsentsSignedOut,
+  ContractOut,
+  ContractSignedOut,
+  DeclinedOut,
   HealthDeps200,
   HealthLive200,
   MeResponse,
+  OfferOut,
+  PassedOut,
+  PaymentOut,
+  ProductList,
+  ProductOut,
   PublicConfig,
-  RolesResponse
+  RolesResponse,
+  SignChallenge,
+  SignChallengeOut,
+  WizardResult
 } from './model';
 
 
@@ -59,6 +80,36 @@ export const getPatchApplicationDraftResponseMock = (overrideResponse: Partial<E
 export const getSubmitApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
 export const getWithdrawApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getListApplicationConsentsResponseMock = (overrideResponse: Partial<Extract<ConsentsOut, object>> = {}): ConsentsOut => ({applicationId: faker.string.uuid(), pepRules: {version: faker.string.alpha({length: {min: 10, max: 20}}), textHash: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), accepted: faker.datatype.boolean()}, items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.string.alpha({length: {min: 10, max: 20}}), subjectInn: faker.string.alpha({length: {min: 10, max: 20}}), subjectName: faker.string.alpha({length: {min: 10, max: 20}}), subjectType: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['PENDING','SIGNED','EXPIRED'] as const), canSign: faker.datatype.boolean(), textVersion: faker.string.alpha({length: {min: 10, max: 20}}), textHash: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), validUntil: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,]), consentId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,])})), allSigned: faker.datatype.boolean(), ...overrideResponse})
+
+export const getRequestConsentSigningResponseMock = (overrideResponse: Partial<Extract<SignChallenge, object>> = {}): SignChallenge => ({requestId: faker.string.alpha({length: {min: 10, max: 20}}), expiresInSeconds: faker.number.int(), demoCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.helpers.arrayElement(['BKI','TURNOVER','PERSONAL_DATA'] as const), subjectInn: faker.helpers.fromRegExp("^\\d{10}$|^\\d{12}$")})), ...overrideResponse})
+
+export const getSignConsentBundleResponseMock = (overrideResponse: Partial<Extract<ConsentsSignedOut, object>> = {}): ConsentsSignedOut => ({applicationId: faker.string.uuid(), signed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.string.alpha({length: {min: 10, max: 20}}), subjectInn: faker.string.alpha({length: {min: 10, max: 20}}), subjectName: faker.string.alpha({length: {min: 10, max: 20}}), subjectType: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['PENDING','SIGNED','EXPIRED'] as const), canSign: faker.datatype.boolean(), textVersion: faker.string.alpha({length: {min: 10, max: 20}}), textHash: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), validUntil: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,]), consentId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,])})), allSigned: faker.datatype.boolean(), ...overrideResponse})
+
+export const getListProductsResponseMock = (overrideResponse: Partial<Extract<ProductList, object>> = {}): ProductList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), purpose: faker.string.alpha({length: {min: 10, max: 20}}), repayment: faker.string.alpha({length: {min: 10, max: 20}}), amountMinRub: faker.number.int(), amountMaxRub: faker.number.int(), termMinMonths: faker.number.int(), termMaxMonths: faker.number.int(), collateralRequiredAboveRub: faker.helpers.arrayElement([faker.number.int(),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), autoDecisionMode: faker.helpers.arrayElement(Object.values(AutoDecisionMode)), autoDecisionUpToRub: faker.helpers.arrayElement([faker.number.int(),null,]), requiresBankCustomer: faker.datatype.boolean(), requiresContract: faker.datatype.boolean(), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), available: faker.datatype.boolean(), unavailableReasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiresSecurity: faker.datatype.boolean()})), ...overrideResponse})
+
+export const getGetProductResponseMock = (overrideResponse: Partial<Extract<ProductOut, object>> = {}): ProductOut => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), purpose: faker.string.alpha({length: {min: 10, max: 20}}), repayment: faker.string.alpha({length: {min: 10, max: 20}}), amountMinRub: faker.number.int(), amountMaxRub: faker.number.int(), termMinMonths: faker.number.int(), termMaxMonths: faker.number.int(), collateralRequiredAboveRub: faker.helpers.arrayElement([faker.number.int(),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), autoDecisionMode: faker.helpers.arrayElement(Object.values(AutoDecisionMode)), autoDecisionUpToRub: faker.helpers.arrayElement([faker.number.int(),null,]), requiresBankCustomer: faker.datatype.boolean(), requiresContract: faker.datatype.boolean(), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), available: faker.datatype.boolean(), unavailableReasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiresSecurity: faker.datatype.boolean(), ...overrideResponse})
+
+export const getCalculatePaymentResponseMock = (overrideResponse: Partial<Extract<PaymentOut, object>> = {}): PaymentOut => ({productCode: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), paymentKind: faker.helpers.arrayElement(Object.values(PaymentKind)), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), totalPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), ratePercentFrom: faker.number.float({fractionDigits: 2}), effectiveRatePercent: faker.number.float({fractionDigits: 2}), approximate: faker.datatype.boolean(), ...overrideResponse})
+
+export const getRecommendProductResponseMock = (overrideResponse: Partial<Extract<WizardResult, object>> = {}): WizardResult => ({outcome: faker.helpers.arrayElement(Object.values(WizardOutcome)), ruleId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), startPath: faker.datatype.boolean(), primary: faker.helpers.arrayElement([{productCode: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), why: faker.string.alpha({length: {min: 10, max: 20}}), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), paymentKind: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PaymentKind)),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), approximate: faker.datatype.boolean(), decisionTime: faker.helpers.arrayElement(Object.values(DecisionTime)), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), needsCollateral: faker.datatype.boolean(), needsContract: faker.datatype.boolean(), requiresSecurity: faker.datatype.boolean(), comfortableOptions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({termMonths: faker.number.int(), paymentRub: faker.number.int(), overpaymentRub: faker.number.int(), recommended: faker.datatype.boolean()}))},null,]), alternative: faker.helpers.arrayElement([{productCode: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), why: faker.string.alpha({length: {min: 10, max: 20}}), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), paymentKind: faker.helpers.arrayElement([faker.helpers.arrayElement(Object.values(PaymentKind)),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), approximate: faker.datatype.boolean(), decisionTime: faker.helpers.arrayElement(Object.values(DecisionTime)), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), needsCollateral: faker.datatype.boolean(), needsContract: faker.datatype.boolean(), requiresSecurity: faker.datatype.boolean(), comfortableOptions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({termMonths: faker.number.int(), paymentRub: faker.number.int(), overpaymentRub: faker.number.int(), recommended: faker.datatype.boolean()}))},null,]), rejected: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({productCode: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), reasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])}))})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), askCollateral: faker.datatype.boolean(), applicationId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ...overrideResponse})
+
+export const getGetApplicationDecisionResponseMock = (overrideResponse: Partial<Extract<ClientDecisionOut, object>> = {}): ClientDecisionOut => ({applicationId: faker.string.uuid(), applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), decisionId: faker.string.uuid(), outcome: faker.string.alpha({length: {min: 10, max: 20}}), headline: faker.string.alpha({length: {min: 10, max: 20}}), decidedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', terms: faker.helpers.arrayElement([{id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))},null,]), rateBreakdown: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({label: faker.string.alpha({length: {min: 10, max: 20}}), percent: faker.number.float({fractionDigits: 2})})), reasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}})})), nextSteps: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), whatHelped: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), whatAffected: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), offer: faker.helpers.arrayElement([{id: faker.string.uuid(), applicationId: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), variantsStatus: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acceptedVariantId: faker.helpers.arrayElement([faker.string.uuid(),null,]), contractId: faker.helpers.arrayElement([faker.string.uuid(),null,]), variants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))}))},null,]), ...overrideResponse})
+
+export const getGetApplicationOfferResponseMock = (overrideResponse: Partial<Extract<OfferOut, object>> = {}): OfferOut => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), variantsStatus: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acceptedVariantId: faker.helpers.arrayElement([faker.string.uuid(),null,]), contractId: faker.helpers.arrayElement([faker.string.uuid(),null,]), variants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))})), ...overrideResponse})
+
+export const getAcceptOfferResponseMock = (overrideResponse: Partial<Extract<AcceptedOut, object>> = {}): AcceptedOut => ({applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), offer: {id: faker.string.uuid(), applicationId: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), variantsStatus: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acceptedVariantId: faker.helpers.arrayElement([faker.string.uuid(),null,]), contractId: faker.helpers.arrayElement([faker.string.uuid(),null,]), variants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))}))}, contract: {id: faker.string.uuid(), applicationId: faker.string.uuid(), applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), contractUid: faker.string.alpha({length: {min: 10, max: 20}}), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), templateVersion: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), productCode: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), signers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({role: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), signed: faker.datatype.boolean(), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), progress: {signed: faker.number.int(), required: faker.number.int()}, canSign: faker.datatype.boolean(), canPassToDirector: faker.datatype.boolean()}, ...overrideResponse})
+
+export const getDeclineOfferResponseMock = (overrideResponse: Partial<Extract<DeclinedOut, object>> = {}): DeclinedOut => ({applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), offer: {id: faker.string.uuid(), applicationId: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), variantsStatus: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', acceptedVariantId: faker.helpers.arrayElement([faker.string.uuid(),null,]), contractId: faker.helpers.arrayElement([faker.string.uuid(),null,]), variants: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), kind: faker.string.alpha({length: {min: 10, max: 20}}), label: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.string.alpha({length: {min: 10, max: 20}}), productTitle: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), lastPaymentRub: faker.number.int(), overpaymentRub: faker.number.int(), collateralRequired: faker.datatype.boolean(), recommended: faker.datatype.boolean(), whatChanged: {}, note: faker.string.alpha({length: {min: 10, max: 20}}), schedulePreview: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({number: faker.number.int(), paymentRub: faker.number.int(), principalRub: faker.number.int(), interestRub: faker.number.int(), balanceRub: faker.number.int()}))}))}, ...overrideResponse})
+
+export const getGetContractResponseMock = (overrideResponse: Partial<Extract<ContractOut, object>> = {}): ContractOut => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), contractUid: faker.string.alpha({length: {min: 10, max: 20}}), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), templateVersion: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), productCode: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), signers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({role: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), signed: faker.datatype.boolean(), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), progress: {signed: faker.number.int(), required: faker.number.int()}, canSign: faker.datatype.boolean(), canPassToDirector: faker.datatype.boolean(), ...overrideResponse})
+
+export const getRequestContractSignatureResponseMock = (overrideResponse: Partial<Extract<PassedOut, object>> = {}): PassedOut => ({contractId: faker.string.uuid(), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', repeated: faker.datatype.boolean(), ...overrideResponse})
+
+export const getRequestContractSigningCodeResponseMock = (overrideResponse: Partial<Extract<SignChallengeOut, object>> = {}): SignChallengeOut => ({requestId: faker.string.alpha({length: {min: 10, max: 20}}), expiresInSeconds: faker.number.int(), demoCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
+
+export const getSignContractResponseMock = (overrideResponse: Partial<Extract<ContractSignedOut, object>> = {}): ContractSignedOut => ({contract: {id: faker.string.uuid(), applicationId: faker.string.uuid(), applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), contractUid: faker.string.alpha({length: {min: 10, max: 20}}), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), templateVersion: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), productCode: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), signers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({role: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), signed: faker.datatype.boolean(), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), progress: {signed: faker.number.int(), required: faker.number.int()}, canSign: faker.datatype.boolean(), canPassToDirector: faker.datatype.boolean()}, justSigned: faker.datatype.boolean(), ...overrideResponse})
 
 
 export const getHealthLiveMockHandler = (overrideResponse?: HealthLive200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthLive200> | HealthLive200), options?: RequestHandlerOptions) => {
@@ -248,6 +299,196 @@ export const getWithdrawApplicationMockHandler = (overrideResponse?: Application
       })
   }, options)
 }
+
+export const getListApplicationConsentsMockHandler = (overrideResponse?: ConsentsOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ConsentsOut> | ConsentsOut), options?: RequestHandlerOptions) => {
+  return http.get('*/applications/:applicationId/consents', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListApplicationConsentsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getRequestConsentSigningMockHandler = (overrideResponse?: SignChallenge | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<SignChallenge> | SignChallenge), options?: RequestHandlerOptions) => {
+  return http.post('*/applications/:applicationId/consents', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getRequestConsentSigningResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getSignConsentBundleMockHandler = (overrideResponse?: ConsentsSignedOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ConsentsSignedOut> | ConsentsSignedOut), options?: RequestHandlerOptions) => {
+  return http.post('*/applications/:applicationId/consents/sign', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getSignConsentBundleResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getListProductsMockHandler = (overrideResponse?: ProductList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProductList> | ProductList), options?: RequestHandlerOptions) => {
+  return http.get('*/products', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListProductsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetProductMockHandler = (overrideResponse?: ProductOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProductOut> | ProductOut), options?: RequestHandlerOptions) => {
+  return http.get('*/products/:code', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetProductResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getCalculatePaymentMockHandler = (overrideResponse?: PaymentOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PaymentOut> | PaymentOut), options?: RequestHandlerOptions) => {
+  return http.post('*/calculator/payment', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCalculatePaymentResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getRecommendProductMockHandler = (overrideResponse?: WizardResult | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<WizardResult> | WizardResult), options?: RequestHandlerOptions) => {
+  return http.post('*/wizard/recommendations', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getRecommendProductResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApplicationDecisionMockHandler = (overrideResponse?: ClientDecisionOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ClientDecisionOut> | ClientDecisionOut), options?: RequestHandlerOptions) => {
+  return http.get('*/applications/:applicationId/decision', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApplicationDecisionResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApplicationOfferMockHandler = (overrideResponse?: OfferOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<OfferOut> | OfferOut), options?: RequestHandlerOptions) => {
+  return http.get('*/applications/:applicationId/offer', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApplicationOfferResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAcceptOfferMockHandler = (overrideResponse?: AcceptedOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AcceptedOut> | AcceptedOut), options?: RequestHandlerOptions) => {
+  return http.post('*/offers/:offerId/accept', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAcceptOfferResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDeclineOfferMockHandler = (overrideResponse?: DeclinedOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<DeclinedOut> | DeclinedOut), options?: RequestHandlerOptions) => {
+  return http.post('*/offers/:offerId/decline', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDeclineOfferResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetContractMockHandler = (overrideResponse?: ContractOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ContractOut> | ContractOut), options?: RequestHandlerOptions) => {
+  return http.get('*/contracts/:contractId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetContractResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetContractDocumentMockHandler = (overrideResponse?: unknown | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown), options?: RequestHandlerOptions) => {
+  return http.get('*/contracts/:contractId/document', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 200
+      })
+  }, options)
+}
+
+export const getRequestContractSignatureMockHandler = (overrideResponse?: PassedOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PassedOut> | PassedOut), options?: RequestHandlerOptions) => {
+  return http.post('*/contracts/:contractId/request-signature', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getRequestContractSignatureResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getRequestContractSigningCodeMockHandler = (overrideResponse?: SignChallengeOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<SignChallengeOut> | SignChallengeOut), options?: RequestHandlerOptions) => {
+  return http.post('*/contracts/:contractId/sign/request', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getRequestContractSigningCodeResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getSignContractMockHandler = (overrideResponse?: ContractSignedOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ContractSignedOut> | ContractSignedOut), options?: RequestHandlerOptions) => {
+  return http.post('*/contracts/:contractId/sign', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getSignContractResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getApiMock = () => [
   getHealthLiveMockHandler(),
   getHealthReadyMockHandler(),
@@ -264,5 +505,21 @@ export const getApiMock = () => [
   getGetApplicationMockHandler(),
   getPatchApplicationDraftMockHandler(),
   getSubmitApplicationMockHandler(),
-  getWithdrawApplicationMockHandler()
+  getWithdrawApplicationMockHandler(),
+  getListApplicationConsentsMockHandler(),
+  getRequestConsentSigningMockHandler(),
+  getSignConsentBundleMockHandler(),
+  getListProductsMockHandler(),
+  getGetProductMockHandler(),
+  getCalculatePaymentMockHandler(),
+  getRecommendProductMockHandler(),
+  getGetApplicationDecisionMockHandler(),
+  getGetApplicationOfferMockHandler(),
+  getAcceptOfferMockHandler(),
+  getDeclineOfferMockHandler(),
+  getGetContractMockHandler(),
+  getGetContractDocumentMockHandler(),
+  getRequestContractSignatureMockHandler(),
+  getRequestContractSigningCodeMockHandler(),
+  getSignContractMockHandler()
 ]

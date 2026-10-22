@@ -9,11 +9,12 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from typing import TYPE_CHECKING
 
-from app.modules.decisioning.types import Explanation, ParamValue, ReasonCode
+from app.modules.decisioning.types import Explanation, FactorScore, ParamValue, ReasonCode
 
 if TYPE_CHECKING:
     from app.modules.decisioning.scoring import ScoreResult
@@ -97,6 +98,42 @@ def top_deficit_phrases(score: ScoreResult, limit: int = 3) -> str:
     bad = [f for f in score.factors if f.max_points and f.deficit * 2 > f.max_points]
     bad.sort(key=lambda f: (-f.deficit, f.factor))
     return "; ".join(FACTOR_CLIENT_PHRASES[f.factor] for f in bad[:limit]) or "общая картина"
+
+
+FACTOR_HELPED_PHRASES: dict[str, str] = {
+    "SC_CREDIT_HISTORY": "чистая кредитная история",
+    "SC_VOLATILITY": "стабильная выручка",
+    "SC_TAX": "нет долгов по налогам",
+    "SC_COVERAGE": "текущие платежи вам по силам",
+    "SC_CLIENT": "вы давно обслуживаетесь у нас",
+    "SC_INQUIRIES": "вы не подавали много заявок в другие банки",
+    "SC_DEBT_LOAD": "небольшие долги по сравнению с выручкой",
+    "SC_TREND": "выручка растёт",
+    "SC_AGE": "бизнес работает достаточно давно",
+}  # порядок = важность для клиента: первыми идут фразы про историю и стабильность
+HELPED_LIMIT = 2
+AFFECTED_LIMIT = 3
+
+
+def client_factor_phrases(factors: Sequence[FactorScore]) -> dict[str, list[str]]:
+    """Что помогло (до 2, только почти полный балл) и что повлияло (до 3 недоборов) — клиенту.
+
+    Тексты считаются в момент решения и хранятся в снимке (Q-113): через месяц клиент видит то же.
+    """
+    by_name = {f.factor: f for f in factors}
+    helped = [
+        FACTOR_HELPED_PHRASES[name]
+        for name in FACTOR_HELPED_PHRASES
+        if name in by_name
+        and by_name[name].max_points
+        and by_name[name].points * 10 >= by_name[name].max_points * 8
+    ]
+    bad = [f for f in factors if f.max_points and f.deficit * 2 > f.max_points]
+    bad.sort(key=lambda f: (-f.deficit, f.factor))
+    return {
+        "whatHelped": helped[:HELPED_LIMIT],
+        "whatAffected": [FACTOR_CLIENT_PHRASES[f.factor] for f in bad[:AFFECTED_LIMIT]],
+    }
 
 
 # ---------------------------------------------------------------- справочник

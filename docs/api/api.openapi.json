@@ -626,10 +626,765 @@
           }
         }
       }
+    },
+    "/applications/{application_id}/consents": {
+      "get": {
+        "tags": [
+          "согласия"
+        ],
+        "summary": "Какие согласия нужны, их тексты, кто может подписать и что уже подписано",
+        "operationId": "listApplicationConsents",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "согласия"
+        ],
+        "summary": "Галочки поставлены: проверить полномочия и выпустить один код на пакет согласий",
+        "operationId": "requestConsentSigning",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignChallenge"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications/{application_id}/consents/sign": {
+      "post": {
+        "tags": [
+          "согласия"
+        ],
+        "summary": "Ввести код: весь пакет согласий человека подписан",
+        "operationId": "signConsentBundle",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignConfirm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentsSignedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "каталог"
+        ],
+        "summary": "Каталог: шесть продуктов и доступность каждого компании",
+        "operationId": "listProducts",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{code}": {
+      "get": {
+        "tags": [
+          "каталог"
+        ],
+        "summary": "Продукт: границы, документы, доступность",
+        "operationId": "getProduct",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z_]{3,32}$",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calculator/payment": {
+      "post": {
+        "tags": [
+          "каталог"
+        ],
+        "summary": "Платёж, переплата и ставка «от» для суммы, срока и продукта",
+        "operationId": "calculatePayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wizard/recommendations": {
+      "post": {
+        "tags": [
+          "каталог"
+        ],
+        "summary": "Мастер подбора: ответы → основной продукт и одна альтернатива",
+        "operationId": "recommendProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WizardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WizardResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications/{application_id}/decision": {
+      "get": {
+        "tags": [
+          "решение"
+        ],
+        "summary": "Решение простым языком: исход, условия, причины и что можно сделать",
+        "operationId": "getApplicationDecision",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientDecisionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications/{application_id}/offer": {
+      "get": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Предложение банка по заявке: варианты, платёж, переплата, срок действия",
+        "operationId": "getApplicationOffer",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfferOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offers/{offer_id}/accept": {
+      "post": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Принять предложение (выбранный вариант): заявка → OFFER_ACCEPTED, готовится договор",
+        "operationId": "acceptOffer",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Offer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AcceptIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offers/{offer_id}/decline": {
+      "post": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Отказаться от предложения: заявка → WITHDRAWN",
+        "operationId": "declineOffer",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Offer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeclinedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contract_id}": {
+      "get": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Договор: номер, УИд, хеш документа, кто подписал и сколько подписей нужно",
+        "operationId": "getContract",
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contract_id}/document": {
+      "get": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Сохранённый текст договора (подписывается именно он); хеш — в X-Content-SHA256",
+        "operationId": "getContractDocument",
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contract_id}/request-signature": {
+      "post": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Передать руководителю на подпись (сотрудник; D-014)",
+        "operationId": "requestContractSignature",
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contract_id}/sign/request": {
+      "post": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Галочка поставлена: выпустить код подписи договора (только руководитель)",
+        "operationId": "requestContractSigningCode",
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignStartIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignChallengeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{contract_id}/sign": {
+      "post": {
+        "tags": [
+          "предложение и договор"
+        ],
+        "summary": "Ввести код: договор подписан; когда подписи собраны, заявка → SIGNED и стартует выдача",
+        "operationId": "signContract",
+        "parameters": [
+          {
+            "name": "contract_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contract Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignConfirmIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractSignedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AcceptIn": {
+        "properties": {
+          "variantId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variantid",
+            "description": "Обязателен, если в предложении больше одного варианта"
+          }
+        },
+        "type": "object",
+        "title": "AcceptIn"
+      },
+      "AcceptedOut": {
+        "properties": {
+          "applicationStatus": {
+            "type": "string",
+            "title": "Applicationstatus"
+          },
+          "offer": {
+            "$ref": "#/components/schemas/OfferOut"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/ContractOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationStatus",
+          "offer",
+          "contract"
+        ],
+        "title": "AcceptedOut"
+      },
       "ActiveCompany": {
         "properties": {
           "companyId": {
@@ -839,6 +1594,125 @@
         ],
         "title": "ApplicationPage"
       },
+      "AutoDecisionMode": {
+        "type": "string",
+        "enum": [
+          "ALWAYS",
+          "UP_TO",
+          "NEVER"
+        ],
+        "title": "AutoDecisionMode"
+      },
+      "ClientDecisionOut": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "applicationStatus": {
+            "type": "string",
+            "title": "Applicationstatus"
+          },
+          "decisionId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Decisionid"
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "headline": {
+            "type": "string",
+            "title": "Headline"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Decidedat"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VariantOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Условия при одобрении «как просили»: сумма, срок, ставка, платёж, переплата"
+          },
+          "rateBreakdown": {
+            "items": {
+              "$ref": "#/components/schemas/RatePartOut"
+            },
+            "type": "array",
+            "title": "Ratebreakdown",
+            "description": "Из чего складывается ставка; пусто, если ставки нет"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionReasonOut"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "nextSteps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nextsteps",
+            "description": "Что можно сделать, без повторов"
+          },
+          "whatHelped": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Whathelped",
+            "description": "До двух сильных сторон при одобрении"
+          },
+          "whatAffected": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Whataffected",
+            "description": "До трёх слабых мест при отказе и встречном"
+          },
+          "offer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OfferOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Предложение банка (`APPROVED`, `COUNTER_OFFER`); у встречного без вариантов `variantsStatus = PENDING`"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "applicationStatus",
+          "decisionId",
+          "outcome",
+          "headline",
+          "decidedAt",
+          "terms",
+          "rateBreakdown",
+          "reasons",
+          "nextSteps",
+          "whatHelped",
+          "whatAffected",
+          "offer"
+        ],
+        "title": "ClientDecisionOut",
+        "description": "Клиентская модель. Полная модель для андеррайтера — отдельная (бэк-офис)."
+      },
       "CodeCheck": {
         "properties": {
           "requestId": {
@@ -916,6 +1790,35 @@
         ],
         "title": "CodeRequest"
       },
+      "ComfortableOption": {
+        "properties": {
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "paymentRub": {
+            "type": "integer",
+            "title": "Paymentrub"
+          },
+          "overpaymentRub": {
+            "type": "integer",
+            "title": "Overpaymentrub"
+          },
+          "recommended": {
+            "type": "boolean",
+            "title": "Recommended",
+            "description": "По силам при известном денежном потоке"
+          }
+        },
+        "type": "object",
+        "required": [
+          "termMonths",
+          "paymentRub",
+          "overpaymentRub",
+          "recommended"
+        ],
+        "title": "ComfortableOption"
+      },
       "CompanyBrief": {
         "properties": {
           "id": {
@@ -973,6 +1876,373 @@
           "role"
         ],
         "title": "CompanyChoice"
+      },
+      "ConsentItemOut": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "subjectInn": {
+            "type": "string",
+            "title": "Subjectinn"
+          },
+          "subjectName": {
+            "type": "string",
+            "title": "Subjectname"
+          },
+          "subjectType": {
+            "type": "string",
+            "title": "Subjecttype"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SIGNED",
+              "EXPIRED"
+            ],
+            "title": "Status"
+          },
+          "canSign": {
+            "type": "boolean",
+            "title": "Cansign"
+          },
+          "textVersion": {
+            "type": "string",
+            "title": "Textversion"
+          },
+          "textHash": {
+            "type": "string",
+            "title": "Texthash"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "signedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signedat"
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validuntil"
+          },
+          "consentId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consentid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "subjectInn",
+          "subjectName",
+          "subjectType",
+          "role",
+          "status",
+          "canSign",
+          "textVersion",
+          "textHash",
+          "text",
+          "signedAt",
+          "validUntil",
+          "consentId"
+        ],
+        "title": "ConsentItemOut"
+      },
+      "ConsentRef": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "BKI",
+              "TURNOVER",
+              "PERSONAL_DATA"
+            ],
+            "title": "Kind"
+          },
+          "subjectInn": {
+            "type": "string",
+            "pattern": "^\\d{10}$|^\\d{12}$",
+            "title": "Subjectinn"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "subjectInn"
+        ],
+        "title": "ConsentRef"
+      },
+      "ConsentsOut": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "pepRules": {
+            "$ref": "#/components/schemas/PepRulesOut"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "allSigned": {
+            "type": "boolean",
+            "title": "Allsigned"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "pepRules",
+          "items",
+          "allSigned"
+        ],
+        "title": "ConsentsOut"
+      },
+      "ConsentsSignedOut": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "signed": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentItemOut"
+            },
+            "type": "array",
+            "title": "Signed"
+          },
+          "allSigned": {
+            "type": "boolean",
+            "title": "Allsigned"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "signed",
+          "allSigned"
+        ],
+        "title": "ConsentsSignedOut"
+      },
+      "ContractOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "applicationStatus": {
+            "type": "string",
+            "title": "Applicationstatus"
+          },
+          "contractUid": {
+            "type": "string",
+            "title": "Contractuid"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "contentHash": {
+            "type": "string",
+            "title": "Contenthash"
+          },
+          "templateVersion": {
+            "type": "string",
+            "title": "Templateversion"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "signedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signedat"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "title": "Ratepercent"
+          },
+          "paymentRub": {
+            "type": "integer",
+            "title": "Paymentrub"
+          },
+          "signers": {
+            "items": {
+              "$ref": "#/components/schemas/SignerOut"
+            },
+            "type": "array",
+            "title": "Signers"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/ProgressOut"
+          },
+          "canSign": {
+            "type": "boolean",
+            "title": "Cansign",
+            "description": "Текущий пользователь может подписать прямо сейчас"
+          },
+          "canPassToDirector": {
+            "type": "boolean",
+            "title": "Canpasstodirector",
+            "description": "Показать «Передать руководителю на подпись»"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "applicationStatus",
+          "contractUid",
+          "number",
+          "status",
+          "contentHash",
+          "templateVersion",
+          "createdAt",
+          "signedAt",
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "ratePercent",
+          "paymentRub",
+          "signers",
+          "progress",
+          "canSign",
+          "canPassToDirector"
+        ],
+        "title": "ContractOut"
+      },
+      "ContractSignedOut": {
+        "properties": {
+          "contract": {
+            "$ref": "#/components/schemas/ContractOut"
+          },
+          "justSigned": {
+            "type": "boolean",
+            "title": "Justsigned",
+            "description": "`false` — повторное нажатие: вторая подпись не создана"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contract",
+          "justSigned"
+        ],
+        "title": "ContractSignedOut"
+      },
+      "DecisionReasonOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "text",
+          "action"
+        ],
+        "title": "DecisionReasonOut"
+      },
+      "DecisionTime": {
+        "type": "string",
+        "enum": [
+          "AUTO",
+          "MANUAL"
+        ],
+        "title": "DecisionTime"
+      },
+      "DeclinedOut": {
+        "properties": {
+          "applicationStatus": {
+            "type": "string",
+            "title": "Applicationstatus"
+          },
+          "offer": {
+            "$ref": "#/components/schemas/OfferOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationStatus",
+          "offer"
+        ],
+        "title": "DeclinedOut"
       },
       "DraftPatch": {
         "properties": {
@@ -1102,6 +2372,255 @@
         ],
         "title": "MeResponse"
       },
+      "OfferOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "variantsStatus": {
+            "type": "string",
+            "title": "Variantsstatus",
+            "description": "`PENDING`: встречные варианты ещё готовятся (оптимизатор T-297), выбирать нечего"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expiresat"
+          },
+          "acceptedVariantId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acceptedvariantid"
+          },
+          "contractId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractid"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantOut"
+            },
+            "type": "array",
+            "title": "Variants"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "kind",
+          "status",
+          "variantsStatus",
+          "expiresAt",
+          "acceptedVariantId",
+          "contractId",
+          "variants"
+        ],
+        "title": "OfferOut"
+      },
+      "PassedOut": {
+        "properties": {
+          "contractId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Contractid"
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Requestedat"
+          },
+          "repeated": {
+            "type": "boolean",
+            "title": "Repeated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contractId",
+          "requestedAt",
+          "repeated"
+        ],
+        "title": "PassedOut"
+      },
+      "PaymentKind": {
+        "type": "string",
+        "enum": [
+          "ANNUITY",
+          "INTEREST_ONLY"
+        ],
+        "title": "PaymentKind"
+      },
+      "PaymentOut": {
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "paymentKind": {
+            "$ref": "#/components/schemas/PaymentKind"
+          },
+          "paymentRub": {
+            "type": "integer",
+            "title": "Paymentrub"
+          },
+          "lastPaymentRub": {
+            "type": "integer",
+            "title": "Lastpaymentrub"
+          },
+          "totalPaymentRub": {
+            "type": "integer",
+            "title": "Totalpaymentrub"
+          },
+          "overpaymentRub": {
+            "type": "integer",
+            "title": "Overpaymentrub"
+          },
+          "ratePercent": {
+            "type": "number",
+            "title": "Ratepercent"
+          },
+          "ratePercentFrom": {
+            "type": "number",
+            "title": "Ratepercentfrom"
+          },
+          "effectiveRatePercent": {
+            "type": "number",
+            "title": "Effectiveratepercent"
+          },
+          "approximate": {
+            "type": "boolean",
+            "title": "Approximate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "paymentKind",
+          "paymentRub",
+          "lastPaymentRub",
+          "totalPaymentRub",
+          "overpaymentRub",
+          "ratePercent",
+          "ratePercentFrom",
+          "effectiveRatePercent",
+          "approximate"
+        ],
+        "title": "PaymentOut"
+      },
+      "PaymentRequest": {
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "pattern": "^(EXPRESS|WORKING_CAPITAL|CONTRACT|CREDIT_LINE|OVERDRAFT|INVESTMENT)$",
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "integer",
+            "maximum": 1000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratepercent",
+            "description": "Итоговая ставка из оферты; без неё считаем по базовой ставке продукта"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productCode",
+          "amountRub",
+          "termMonths"
+        ],
+        "title": "PaymentRequest"
+      },
+      "PepRulesOut": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "textHash": {
+            "type": "string",
+            "title": "Texthash"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "textHash",
+          "text",
+          "accepted"
+        ],
+        "title": "PepRulesOut"
+      },
       "PersonOption": {
         "properties": {
           "userId": {
@@ -1125,6 +2644,205 @@
           "role"
         ],
         "title": "PersonOption"
+      },
+      "ProductList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProductOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "ProductList"
+      },
+      "ProductOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "Purpose"
+          },
+          "repayment": {
+            "type": "string",
+            "title": "Repayment"
+          },
+          "amountMinRub": {
+            "type": "integer",
+            "title": "Amountminrub"
+          },
+          "amountMaxRub": {
+            "type": "integer",
+            "title": "Amountmaxrub"
+          },
+          "termMinMonths": {
+            "type": "integer",
+            "title": "Termminmonths"
+          },
+          "termMaxMonths": {
+            "type": "integer",
+            "title": "Termmaxmonths"
+          },
+          "collateralRequiredAboveRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collateralrequiredaboverub"
+          },
+          "ratePercentFrom": {
+            "type": "number",
+            "title": "Ratepercentfrom"
+          },
+          "autoDecisionMode": {
+            "$ref": "#/components/schemas/AutoDecisionMode"
+          },
+          "autoDecisionUpToRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Autodecisionuptorub"
+          },
+          "requiresBankCustomer": {
+            "type": "boolean",
+            "title": "Requiresbankcustomer"
+          },
+          "requiresContract": {
+            "type": "boolean",
+            "title": "Requirescontract"
+          },
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "unavailableReasons": {
+            "items": {
+              "$ref": "#/components/schemas/ProductReasonOut"
+            },
+            "type": "array",
+            "title": "Unavailablereasons"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "requiresSecurity": {
+            "type": "boolean",
+            "title": "Requiressecurity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "purpose",
+          "repayment",
+          "amountMinRub",
+          "amountMaxRub",
+          "termMinMonths",
+          "termMaxMonths",
+          "collateralRequiredAboveRub",
+          "ratePercentFrom",
+          "autoDecisionMode",
+          "autoDecisionUpToRub",
+          "requiresBankCustomer",
+          "requiresContract",
+          "documents",
+          "available",
+          "unavailableReasons",
+          "hint",
+          "requiresSecurity"
+        ],
+        "title": "ProductOut"
+      },
+      "ProductReasonOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "availableFrom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availablefrom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "text",
+          "action"
+        ],
+        "title": "ProductReasonOut",
+        "description": "Причина по-человечески; машинный код нужен фронту для словаря (60-06)."
+      },
+      "ProgressOut": {
+        "properties": {
+          "signed": {
+            "type": "integer",
+            "title": "Signed"
+          },
+          "required": {
+            "type": "integer",
+            "title": "Required"
+          }
+        },
+        "type": "object",
+        "required": [
+          "signed",
+          "required"
+        ],
+        "title": "ProgressOut"
       },
       "PublicConfig": {
         "properties": {
@@ -1153,6 +2871,141 @@
           "nluAvailable"
         ],
         "title": "PublicConfig"
+      },
+      "RatePartOut": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "percent"
+        ],
+        "title": "RatePartOut"
+      },
+      "Recommended": {
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "why": {
+            "type": "string",
+            "title": "Why"
+          },
+          "paymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paymentrub"
+          },
+          "paymentKind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaymentKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ratePercentFrom": {
+            "type": "number",
+            "title": "Ratepercentfrom"
+          },
+          "approximate": {
+            "type": "boolean",
+            "title": "Approximate",
+            "default": true
+          },
+          "decisionTime": {
+            "$ref": "#/components/schemas/DecisionTime"
+          },
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "needsCollateral": {
+            "type": "boolean",
+            "title": "Needscollateral"
+          },
+          "needsContract": {
+            "type": "boolean",
+            "title": "Needscontract"
+          },
+          "requiresSecurity": {
+            "type": "boolean",
+            "title": "Requiressecurity"
+          },
+          "comfortableOptions": {
+            "items": {
+              "$ref": "#/components/schemas/ComfortableOption"
+            },
+            "type": "array",
+            "title": "Comfortableoptions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productCode",
+          "title",
+          "why",
+          "paymentRub",
+          "paymentKind",
+          "ratePercentFrom",
+          "decisionTime",
+          "documents",
+          "needsCollateral",
+          "needsContract",
+          "requiresSecurity",
+          "comfortableOptions"
+        ],
+        "title": "Recommended"
+      },
+      "RejectedCandidate": {
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/ProductReasonOut"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productCode",
+          "title",
+          "reasons"
+        ],
+        "title": "RejectedCandidate"
       },
       "RolesResponse": {
         "properties": {
@@ -1209,6 +3062,239 @@
         ],
         "title": "RolesResponse"
       },
+      "ScheduleRowOut": {
+        "properties": {
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "paymentRub": {
+            "type": "integer",
+            "title": "Paymentrub"
+          },
+          "principalRub": {
+            "type": "integer",
+            "title": "Principalrub"
+          },
+          "interestRub": {
+            "type": "integer",
+            "title": "Interestrub"
+          },
+          "balanceRub": {
+            "type": "integer",
+            "title": "Balancerub"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "paymentRub",
+          "principalRub",
+          "interestRub",
+          "balanceRub"
+        ],
+        "title": "ScheduleRowOut"
+      },
+      "SignChallenge": {
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "title": "Expiresinseconds"
+          },
+          "demoCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Democode",
+            "description": "Только в демо-режиме: код вместо SMS"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentRef"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestId",
+          "expiresInSeconds",
+          "items"
+        ],
+        "title": "SignChallenge"
+      },
+      "SignChallengeOut": {
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "title": "Expiresinseconds"
+          },
+          "demoCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Democode",
+            "description": "Только в демо-режиме: код вместо SMS"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestId",
+          "expiresInSeconds"
+        ],
+        "title": "SignChallengeOut"
+      },
+      "SignConfirm": {
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Requestid"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentRef"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestId",
+          "code",
+          "items"
+        ],
+        "title": "SignConfirm"
+      },
+      "SignConfirmIn": {
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Requestid"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requestId",
+          "code"
+        ],
+        "title": "SignConfirmIn"
+      },
+      "SignRequest": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentRef"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Items"
+          },
+          "acceptPepRules": {
+            "type": "boolean",
+            "title": "Acceptpeprules",
+            "description": "Галочка «Принимаю правила простой подписи»; нужна один раз",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "SignRequest"
+      },
+      "SignStartIn": {
+        "properties": {
+          "agree": {
+            "type": "boolean",
+            "title": "Agree",
+            "description": "Галочка «Ознакомлен, согласен»; открывать документ не обязательно"
+          },
+          "acceptPepRules": {
+            "type": "boolean",
+            "title": "Acceptpeprules",
+            "description": "«Принимаю правила простой подписи»; нужна один раз на человека",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "agree"
+        ],
+        "title": "SignStartIn"
+      },
+      "SignerOut": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "signed": {
+            "type": "boolean",
+            "title": "Signed"
+          },
+          "signedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "name",
+          "signed",
+          "signedAt"
+        ],
+        "title": "SignerOut"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -1248,6 +3334,361 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VariantOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "productTitle": {
+            "type": "string",
+            "title": "Producttitle"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "title": "Ratepercent"
+          },
+          "paymentRub": {
+            "type": "integer",
+            "title": "Paymentrub"
+          },
+          "lastPaymentRub": {
+            "type": "integer",
+            "title": "Lastpaymentrub"
+          },
+          "overpaymentRub": {
+            "type": "integer",
+            "title": "Overpaymentrub"
+          },
+          "collateralRequired": {
+            "type": "boolean",
+            "title": "Collateralrequired"
+          },
+          "recommended": {
+            "type": "boolean",
+            "title": "Recommended"
+          },
+          "whatChanged": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Whatchanged"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "schedulePreview": {
+            "items": {
+              "$ref": "#/components/schemas/ScheduleRowOut"
+            },
+            "type": "array",
+            "title": "Schedulepreview",
+            "description": "Первые три платежа и последний; полный график — в договоре"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "productCode",
+          "productTitle",
+          "amountRub",
+          "termMonths",
+          "ratePercent",
+          "paymentRub",
+          "lastPaymentRub",
+          "overpaymentRub",
+          "collateralRequired",
+          "recommended",
+          "whatChanged",
+          "note",
+          "schedulePreview"
+        ],
+        "title": "VariantOut"
+      },
+      "WizardAnswers": {
+        "properties": {
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EQUIPMENT",
+                  "GOODS",
+                  "ORDER",
+                  "GAP",
+                  "GROWTH",
+                  "OTHER",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "amountRub": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amountrub"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ONCE",
+                  "REGULAR",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency"
+          },
+          "paybackHorizon": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "DAYS",
+                  "WEEKS",
+                  "MONTHS_1_3",
+                  "MONTHS_3_12",
+                  "OVER_YEAR",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paybackhorizon"
+          },
+          "govContract": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "YES",
+                  "NO",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Govcontract"
+          },
+          "urgency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "NOW",
+                  "WEEK",
+                  "NO_RUSH",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Urgency"
+          },
+          "termMonths": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 120.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termmonths"
+          },
+          "collateral": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PURCHASED_ITEM",
+                  "REAL_ESTATE",
+                  "OTHER_EQUIPMENT",
+                  "NONE",
+                  "NOT_SURE",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collateral"
+          }
+        },
+        "type": "object",
+        "title": "WizardAnswers",
+        "description": "Ответы по кодам слотов (10-07). «Не знаю» — `UNKNOWN` или `null`: подбор идёт без ответа."
+      },
+      "WizardOutcome": {
+        "type": "string",
+        "enum": [
+          "RECOMMENDED",
+          "CATALOG_HINT"
+        ],
+        "title": "WizardOutcome"
+      },
+      "WizardRequest": {
+        "properties": {
+          "answers": {
+            "$ref": "#/components/schemas/WizardAnswers"
+          },
+          "applicationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicationid",
+            "description": "Черновик заявки; без него мастер создаёт черновик и возвращает его id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "answers"
+        ],
+        "title": "WizardRequest"
+      },
+      "WizardResult": {
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/WizardOutcome"
+          },
+          "ruleId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ruleid"
+          },
+          "startPath": {
+            "type": "boolean",
+            "title": "Startpath"
+          },
+          "primary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Recommended"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternative": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Recommended"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rejected": {
+            "items": {
+              "$ref": "#/components/schemas/RejectedCandidate"
+            },
+            "type": "array",
+            "title": "Rejected"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "askCollateral": {
+            "type": "boolean",
+            "title": "Askcollateral"
+          },
+          "applicationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicationid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "ruleId",
+          "startPath",
+          "primary",
+          "alternative",
+          "rejected",
+          "hint",
+          "askCollateral"
+        ],
+        "title": "WizardResult"
       }
     }
   }
