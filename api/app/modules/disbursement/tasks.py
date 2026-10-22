@@ -16,8 +16,10 @@ from celery.exceptions import SoftTimeLimitExceeded
 from redis.exceptions import RedisError
 from sqlalchemy.exc import DBAPIError
 
+from app.modules.applications import hold_operation
 from app.modules.disbursement import delivery, service
 from app.shared import db
+from app.shared.operations import ResetInProgress
 from app.shared.tasks import celery_app
 
 log = structlog.get_logger("app.disbursement.task")
@@ -33,8 +35,14 @@ delivery.register()
 
 def run(application_id: UUID) -> str:
     """Тело задачи: отдельная функция, чтобы вызывать её из тестов без брокера."""
-    with db.transaction() as session:
-        result = service.start(session, application_id)
+    try:
+        with hold_operation(application_id) as scope:
+            if scope is None:
+                return service.StartResult.SKIPPED.value
+            with db.transaction() as session:
+                result = service.start(session, application_id)
+    except ResetInProgress:
+        return service.StartResult.SKIPPED.value
     log.info("disbursement_run", application=str(application_id), result=result.value)
     return result.value
 

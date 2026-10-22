@@ -21,6 +21,7 @@ from __future__ import annotations
 import random
 import time
 from collections.abc import Callable
+from contextlib import AbstractContextManager, nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
@@ -32,6 +33,7 @@ from sqlalchemy.orm import Session, aliased
 
 from app.shared import clock, db
 from app.shared.models import OutboxMessage
+from app.shared.operations import ResetInProgress
 from app.shared.tasks import celery_app, enqueue
 
 log = structlog.get_logger("app.outbox")
@@ -94,19 +96,29 @@ class Dead:
 
 type Outcome = Delivered | Retry | Defer | Dead
 type Handler = Callable[[OutboxItem], Outcome]
+type Guard = Callable[[OutboxItem], AbstractContextManager[bool]]
 type DeadHook = Callable[[Session, OutboxItem, str], None]
 
 _handlers: dict[tuple[str, str], Handler] = {}
 _dead_hook: DeadHook | None = None
+_guards: dict[tuple[str, str], Guard] = {}
 
 
-def register_handler(target_system: str, event_type: str, handler: Handler) -> None:
+def register_handler(
+    target_system: str, event_type: str, handler: Handler, *, guard: Guard | None = None
+) -> None:
     """Модуль регистрирует доставку своего вида сообщений при старте (воркер и тесты)."""
-    _handlers[(target_system, event_type)] = handler
+    key = (target_system, event_type)
+    _handlers[key] = handler
+    if guard is not None:
+        _guards[key] = guard
+    else:
+        _guards.pop(key, None)
 
 
 def clear_handlers() -> None:
     _handlers.clear()
+    _guards.clear()
 
 
 def set_dead_letter_hook(hook: DeadHook | None) -> None:
@@ -289,9 +301,17 @@ def relay(budget_s: float = RELAY_BUDGET_S) -> RelayStats:
             item = _claim(session)
         if item is None:
             break
-        outcome = _deliver(item)
-        with db.transaction() as session:
-            status = _finalize(session, item, outcome)
+        guard = _guards.get((item.target_system, item.event_type))
+        try:
+            with guard(item) if guard else nullcontext(True) as allowed:
+                outcome = _deliver(item) if allowed else Delivered()
+                with db.transaction() as session:
+                    status = _finalize(session, item, outcome)
+        except ResetInProgress:
+            # Ни сеть, ни запись итога доставки не проходят во время сброса компании.
+            outcome = Defer(seconds=1, error="DEMO_RESET_IN_PROGRESS")
+            with db.transaction() as session:
+                status = _finalize(session, item, outcome)
         if status == "STALE":
             continue
         match outcome:

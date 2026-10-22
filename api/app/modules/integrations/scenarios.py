@@ -53,6 +53,25 @@ def get_scenario(code: str) -> dict[str, Any]:
 RESET_TIMEOUT_SECONDS = 120.0  # сброс чистит четыре мока и применяет все сценарии заново
 
 
+def apply_one(code: str, *, idempotency_key: str) -> dict[str, Any]:
+    """Повторно применить исходный сценарий к одной компании, включая RUNTIME моков."""
+    settings = get_settings()
+    try:
+        with httpx.Client(
+            base_url=settings.scenarios_url,
+            headers={"X-Admin-Key": settings.mock_admin_key, "Idempotency-Key": idempotency_key},
+            timeout=RESET_TIMEOUT_SECONDS * settings.integration_timeout_scale,
+        ) as client:
+            response = client.post(f"/api/v1/scenarios/{code}/apply")
+            response.raise_for_status()
+            view: dict[str, Any] = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        raise ScenariosUnavailableError(f"{type(exc).__name__}: {exc}") from exc
+    if view.get("status") != "APPLIED":
+        raise ScenariosUnavailableError("Сценарий не применён полностью")
+    return view
+
+
 def reset_all(mode: str = "KEEP_CUSTOM") -> dict[str, Any]:
     """Общий сброс моков (`POST /scenarios/reset`, 8.4): очистка, chaos в OK, сценарии заново.
 

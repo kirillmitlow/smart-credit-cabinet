@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import time
-import zlib
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -20,12 +19,12 @@ from sqlalchemy import text
 
 from app.modules import audit
 from app.modules.integrations import scenarios
-from app.shared import cache, clock, db, outbox, resets
+from app.shared import cache, clock, db, operations, outbox, resets
 from app.shared.errors import AppError
 
 log = structlog.get_logger("app.demo.reset")
 
-RESET_LOCK = zlib.crc32(b"scc-demo-reset")
+RESET_LOCK = operations.GLOBAL_RESET_KEY
 DB_LOCK_TIMEOUT = "15s"  # чужая долгая транзакция не должна подвесить сброс навсегда
 AUDIT_ACTION = "DEMO_RESET"
 # Режим сценариев: пользовательские компании жюри остаются и применяются заново (10.4)
@@ -57,7 +56,7 @@ class ResetDone:
 @contextmanager
 def exclusive() -> Iterator[None]:
     """Один сброс за раз. Блокировка сессии Postgres держится на отдельном соединении."""
-    with db.get_database().engine.connect() as conn:
+    with db.get_database().operation_engine.connect() as conn:
         got = conn.scalar(text("SELECT pg_try_advisory_lock(:k)"), {"k": RESET_LOCK})
         conn.commit()
         if not got:

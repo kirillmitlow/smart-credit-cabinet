@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from functools import partial
 from typing import Any
 
 import structlog
@@ -13,8 +14,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules import auth
+from app.modules.companies import operations as company_operations
 from app.modules.companies.models import Company, CompanyMember
 from app.modules.integrations import scenarios
+from app.shared import db, operations
 
 log = structlog.get_logger("app.companies.sync")
 
@@ -87,3 +90,17 @@ def sync_all(session: Session) -> int:
             count += 1
     log.info("companies_synced", companies=count)
     return count
+
+
+def refresh_directory() -> None:
+    """Обновление при входе: сеть вне транзакции; занятая сбросом компания не перезаписывается."""
+    for item in scenarios.list_scenarios():
+        if item.get("status") not in ("APPLIED", "PARTIAL"):
+            continue
+        view = scenarios.get_scenario(item["code"])
+        try:
+            with operations.hold(partial(company_operations.for_scenario, item["code"])):
+                with db.transaction() as session:
+                    apply_scenario(session, view)
+        except operations.ResetInProgress:
+            continue

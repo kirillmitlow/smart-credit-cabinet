@@ -4,6 +4,8 @@ from app.modules.companies import reset  # noqa: F401 — регистрируе
 from app.modules.companies.gov_contracts_router import router as gov_contracts_router
 from app.modules.companies.login import router as login_router
 from app.modules.companies.models import Company, CompanyMember
+from app.modules.companies.operations import begin_reset, finish_reset, for_scenario
+from app.modules.companies.operations import scope as operation_scope
 from app.modules.companies.profile_router import router as profile_router
 from app.modules.companies.service import (
     Person,
@@ -14,20 +16,26 @@ from app.modules.companies.service import (
     memberships_of,
     people,
 )
-from app.modules.companies.sync import sync_all
+from app.modules.companies.sync import apply_scenario, refresh_directory, sync_all
 
 __all__ = [
     "Company",
     "CompanyMember",
     "Person",
     "by_id",
+    "apply_scenario",
+    "begin_reset",
+    "finish_reset",
+    "for_scenario",
     "by_inn",
     "can_sign_company_consents",
     "gov_contracts_router",
     "inn_is_valid",
     "login_router",
     "memberships_of",
+    "operation_scope",
     "people",
     "profile_router",
+    "refresh_directory",
     "sync_all",
 ]

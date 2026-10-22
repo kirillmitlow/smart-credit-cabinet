@@ -57,6 +57,7 @@ import type {
   PassedOut,
   PaymentOut,
   PaymentRequest,
+  PersonaResetOut,
   ProductList,
   ProductOut,
   PublicConfig,
@@ -4463,4 +4464,118 @@ export const useDemoReset = <TError = void,
         TContext
       > => {
       return useMutation(getDemoResetMutationOptions(options), queryClient);
+    }
+
+export type demoResetPersonaResponse200 = {
+  data: PersonaResetOut
+  status: 200
+}
+
+export type demoResetPersonaResponse403 = {
+  data: void
+  status: 403
+}
+
+export type demoResetPersonaResponse404 = {
+  data: void
+  status: 404
+}
+
+export type demoResetPersonaResponse409 = {
+  data: void
+  status: 409
+}
+
+export type demoResetPersonaResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type demoResetPersonaResponse502 = {
+  data: void
+  status: 502
+}
+
+export type demoResetPersonaResponseSuccess = (demoResetPersonaResponse200) & {
+  headers: Headers;
+};
+export type demoResetPersonaResponseError = (demoResetPersonaResponse403 | demoResetPersonaResponse404 | demoResetPersonaResponse409 | demoResetPersonaResponse422 | demoResetPersonaResponse502) & {
+  headers: Headers;
+};
+
+export type demoResetPersonaResponse = (demoResetPersonaResponseSuccess | demoResetPersonaResponseError)
+
+export const getDemoResetPersonaUrl = (code: string,) => {
+
+
+
+
+  return `/demo/personas/${code}/reset`
+}
+
+/**
+ * Не затрагивает соседние компании. Сохраняет идентификатор компании и вход пользователя. При частичном сбое компания закрыта для изменений до успешного повтора. 409 DEMO_RESET_IN_PROGRESS: операция компании или сброс ещё выполняется. 502 DEMO_RESET_FAILED: errors[0].step содержит MOCKS, CACHE или DATABASE.
+ * @summary Вернуть одну компанию к исходному сценарию
+ */
+export const demoResetPersona = async (code: string, options?: Parameters<typeof customFetch>[1]): Promise<demoResetPersonaResponse> => {
+
+  return customFetch<demoResetPersonaResponse>(getDemoResetPersonaUrl(code),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDemoResetPersonaMutationKey = () => ['demoResetPersona'] as const;
+
+export const getDemoResetPersonaMutationOptions = <TError = void | HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoResetPersona>>, TError,DemoResetPersonaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoResetPersona>>, TError,DemoResetPersonaMutationVariables, TContext> => {
+
+const mutationKey = getDemoResetPersonaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoResetPersona>>, DemoResetPersonaMutationVariables> = (props) => {
+          const {code} = props ?? {};
+
+          return  demoResetPersona(code,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoResetPersonaMutationResult = NonNullable<Awaited<ReturnType<typeof demoResetPersona>>>
+
+    export type DemoResetPersonaMutationError = void | HTTPValidationError
+    export type DemoResetPersonaMutationVariables = {code: string}
+
+    /**
+ * @summary Вернуть одну компанию к исходному сценарию
+ */
+export const useDemoResetPersona = <TError = void | HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoResetPersona>>, TError,DemoResetPersonaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoResetPersona>>,
+        TError,
+        DemoResetPersonaMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoResetPersonaMutationOptions(options), queryClient);
     }

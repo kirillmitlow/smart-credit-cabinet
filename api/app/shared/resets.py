@@ -10,14 +10,20 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+import json
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass, field
 from typing import Any
+from uuid import UUID
 
-from sqlalchemy import text
+from sqlalchemy import delete, select, text
 from sqlalchemy.orm import Session
 
+from app.shared.db import Base
 from app.shared.errors import AppError
+from app.shared.models import IdempotencyKey, OutboxMessage
 from app.shared.settings import get_settings
+from app.shared.tables import TABLE_OWNERS
 
 ResetFn = Callable[[Session], None]
 AfterResetFn = Callable[[Session], Any]
@@ -90,3 +96,153 @@ def run_after_resets(session: Session) -> dict[str, Any]:
 
 # Платформенные таблицы shared чистит сам реестр: у них нет модуля-владельца
 register_reset("shared", lambda session: truncate(session, "outbox", "idempotency_keys"))
+
+
+# Выборочный сброс (T-372): сначала собрать идентификаторы всех владельцев, затем чистить.
+
+
+@dataclass
+class Persona:
+    company_id: UUID
+    inn: str
+    resources: dict[str, tuple[str, ...]] = field(default_factory=dict)
+
+    def add(self, name: str, values: Iterable[object]) -> None:
+        self.resources[name] = tuple(str(value) for value in values)
+
+    def keys(self, name: str) -> tuple[str, ...]:
+        return self.resources.get(name, ())
+
+    def ids(self, name: str) -> tuple[UUID, ...]:
+        return tuple(UUID(value) for value in self.keys(name))
+
+    def journal_ids(self) -> tuple[str, ...]:
+        values = {str(self.company_id)}
+        for group in self.resources.values():
+            for value in group:
+                try:
+                    values.add(str(UUID(value)))
+                except ValueError:
+                    pass  # числовые id outbox не являются разрешением стирать UUID-ресурсы
+        return tuple(sorted(values))
+
+
+PersonaFn = Callable[[Session, Persona], None]
+PersonaCacheFn = Callable[[Persona], None]
+
+
+@dataclass(frozen=True)
+class PersonaReset:
+    module: str
+    clean: PersonaFn
+    priority: int
+    prepare: PersonaFn | None = None
+    prepare_priority: int = 50
+    cache: PersonaCacheFn | None = None
+
+
+_persona: list[PersonaReset] = []
+
+
+def register_persona_reset(
+    module: str,
+    clean: PersonaFn,
+    *,
+    priority: int,
+    prepare: PersonaFn | None = None,
+    prepare_priority: int = 50,
+    cache: PersonaCacheFn | None = None,
+) -> None:
+    if any(entry.module == module for entry in _persona):
+        raise ValueError(f"Сброс персоны модуля {module} уже зарегистрирован")
+    _persona.append(PersonaReset(module, clean, priority, prepare, prepare_priority, cache))
+
+
+def collect_persona(session: Session, company_id: UUID, inn: str) -> Persona:
+    scope = Persona(company_id, inn)
+    for entry in sorted(_persona, key=lambda item: item.prepare_priority):
+        if entry.prepare is not None:
+            entry.prepare(session, scope)
+    return scope
+
+
+def reset_persona_cache(scope: Persona) -> None:
+    for entry in _persona:
+        if entry.cache is not None:
+            entry.cache(scope)
+
+
+def reset_persona_rows(session: Session, scope: Persona) -> list[str]:
+    if not get_settings().demo_mode:
+        raise AppError(403, "DEMO_DISABLED")
+    session.execute(
+        text("SELECT set_config('scc.demo_reset_ids', :ids, true)"),
+        {"ids": ",".join(scope.journal_ids())},
+    )
+    session.execute(
+        text("SELECT set_config('scc.demo_reset_outbox_ids', :ids, true)"),
+        {"ids": ",".join(scope.keys("outbox"))},
+    )
+    entries = sorted(_persona, key=lambda entry: entry.priority)
+    for entry in entries:
+        entry.clean(session, scope)
+    return [entry.module for entry in entries]
+
+
+def owned_ids(
+    session: Session, module: str, table: str, column: str, values: Iterable[object]
+) -> tuple[str, ...]:
+    if TABLE_OWNERS.get(table) != module:
+        raise ValueError(f"{table} не принадлежит {module}")
+    resource = Base.metadata.tables[table]
+    rows = session.scalars(select(resource.c.id).where(resource.c[column].in_(tuple(values))))
+    return tuple(str(value) for value in rows)
+
+
+def delete_owned(
+    session: Session, module: str, table: str, column: str, values: Iterable[object]
+) -> None:
+    if TABLE_OWNERS.get(table) != module or table in PROTECTED_TABLES:
+        raise ValueError(f"Нельзя очистить {table} из {module}")
+    resource = Base.metadata.tables[table]
+    session.execute(delete(resource).where(resource.c[column].in_(tuple(values))))
+
+
+def _prepare_shared(session: Session, scope: Persona) -> None:
+    scope.add(
+        "outbox",
+        session.scalars(
+            select(OutboxMessage.id).where(
+                OutboxMessage.aggregate_id.in_(scope.keys("applications"))
+            )
+        ),
+    )
+
+
+def _mentions(value: object, resources: set[str]) -> bool:
+    if isinstance(value, dict):
+        return any(_mentions(item, resources) for item in value.values())
+    if isinstance(value, list):
+        return any(_mentions(item, resources) for item in value)
+    return isinstance(value, str) and value in resources
+
+
+def _reset_shared(session: Session, scope: Persona) -> None:
+    session.execute(
+        delete(OutboxMessage).where(OutboxMessage.aggregate_id.in_(scope.keys("applications")))
+    )
+    resources = set(scope.journal_ids())
+    for row in session.scalars(select(IdempotencyKey)):
+        matches = any(value in row.scope for value in resources)
+        if not matches and row.response_body:
+            try:
+                matches = _mentions(json.loads(row.response_body), resources)
+            except (ValueError, UnicodeError):
+                pass  # старые/незавершённые ключи без привязки нельзя отнести к компании
+        if matches:
+            session.delete(row)
+
+
+register_persona_reset(
+    "shared", _reset_shared, priority=5, prepare=_prepare_shared, prepare_priority=90
+)

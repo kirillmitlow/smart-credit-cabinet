@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.shared.resets import register_reset, truncate
+from app.shared.resets import (
+    Persona,
+    delete_owned,
+    register_persona_reset,
+    register_reset,
+    truncate,
+)
 
 TABLES = ("disbursements",)
 
@@ -14,3 +20,10 @@ def reset_demo_data(session: Session) -> None:
 
 
 register_reset("disbursement", reset_demo_data)
+
+
+def reset_persona(session: Session, scope: Persona) -> None:
+    delete_owned(session, "disbursement", "disbursements", "company_id", [scope.company_id])
+
+
+register_persona_reset("disbursement", reset_persona, priority=20)
