@@ -23,6 +23,7 @@ export { login, companyChoice, logout } from './login';
 export { home } from './home';
 export { decision } from './decision';
 export { consents } from './consents';
+export { wizard, wizardResult, variantCard } from './wizard';
 export { productNames, applicationForm, applicationPage, outcomes } from './application';
 
 /** Название продукта по коду; неизвестный код показываем как есть, чтобы не терять данные */

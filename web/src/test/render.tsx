@@ -34,6 +34,25 @@ export function renderApp(route = '/', queryClient = createTestQueryClient()): R
   return Object.assign(result, { queryClient });
 }
 
+/**
+ * Всё приложение по адресу `route` с состоянием перехода (`navigate(to, { state })`): так на экран
+ * попадают данные, которые другой экран передал через адрес (например, результат мастера подбора).
+ */
+export function renderAppWithState(
+  route: string,
+  state: unknown,
+  queryClient = createTestQueryClient(),
+): RenderAppResult {
+  window.history.pushState({ usr: state, key: 'test-key', idx: 1 }, '', route);
+  const router = createBrowserRouter(appRoutes);
+  const result = render(
+    <AppProviders queryClient={queryClient}>
+      <RouterProvider router={router} />
+    </AppProviders>,
+  );
+  return Object.assign(result, { queryClient });
+}
+
 /** Отдельный компонент или хук внутри темы и кэша (без маршрутов) */
 export function renderWithProviders(
   ui: ReactElement,

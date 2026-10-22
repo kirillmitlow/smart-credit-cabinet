@@ -95,8 +95,6 @@ export const loginPlaceholder = {
 
 export const placeholders = {
   soon: 'Этот экран появится в следующих задачах',
-  wizard: { title: 'Подбор кредита', body: 'Расскажите, на что нужны деньги' },
-  wizardResult: { title: 'Результат подбора', body: 'Здесь будет подходящий продукт' },
   products: { title: 'Продукты', body: 'Каталог продуктов и калькулятор' },
   product: { title: 'Продукт', body: 'Условия и калькулятор платежа' },
   offer: { title: 'Выбор варианта', body: 'Предложения банка' },

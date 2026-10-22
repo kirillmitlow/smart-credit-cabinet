@@ -5,6 +5,8 @@ import { ApplicationEditPage } from '@/features/application/ApplicationEditPage'
 import { ApplicationPage } from '@/features/application/ApplicationPage';
 import { CompanyPage } from '@/features/auth/CompanyPage';
 import { HomePage } from '@/features/home/HomePage';
+import { WizardPage } from '@/features/wizard/WizardPage';
+import { WizardResultPage } from '@/features/wizard/WizardResultPage';
 import { placeholders } from '@/texts';
 import { ClientLayout } from './ClientLayout';
 import { RequireBank, RequireClient, RequireDemo } from './guards';
@@ -82,11 +84,8 @@ export const appRoutes: RouteObject[] = [
                 children: [
                   { index: true, element: <HomePage /> },
                   { path: 'company', element: <CompanyPage /> },
-                  { path: 'wizard', element: <PlaceholderPage content={placeholders.wizard} /> },
-                  {
-                    path: 'wizard/result',
-                    element: <PlaceholderPage content={placeholders.wizardResult} />,
-                  },
+                  { path: 'wizard', element: <WizardPage /> },
+                  { path: 'wizard/result', element: <WizardResultPage /> },
                   {
                     path: 'products',
                     element: <PlaceholderPage content={placeholders.products} />,
