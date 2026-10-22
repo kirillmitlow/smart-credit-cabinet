@@ -12,6 +12,7 @@ import type { ApplicationOutDraft } from './applicationOutDraft';
  */
 export interface ApplicationOut {
   id: string;
+  companyId: string;
   number: string;
   status: string;
   productCode: string | null;

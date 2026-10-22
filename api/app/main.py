@@ -86,6 +86,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health.router)
     app.include_router(companies.login_router)
     app.include_router(companies.gov_contracts_router)
+    app.include_router(companies.profile_router)
     app.include_router(applications.router)
     app.include_router(applications.consents_router)
     app.include_router(catalog.router)

@@ -5,6 +5,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.modules.companies.gov_contracts import CACHE_PREFIX
+from app.modules.companies.profile_limit import KEY_PREFIX
 from app.modules.companies.sync import sync_all
 from app.shared.resets import register_after_reset, register_cache_prefix, register_reset, truncate
 
@@ -19,6 +20,7 @@ def reset_demo_data(session: Session) -> None:
 
 
 register_reset("companies", reset_demo_data)
+register_cache_prefix("companies", KEY_PREFIX)
 # После чистки базы компании и учётки нужны снова: вход по ИНН берёт их отсюда (T-221)
 register_after_reset("companies", sync_all)
 
