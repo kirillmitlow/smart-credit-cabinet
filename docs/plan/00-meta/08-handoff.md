@@ -25,7 +25,7 @@
 
 ## В работе (каждый правит свою строку)
 
-- **A:** T-297, ветка `feat/counter-offers-optimizer` (субагент).
+- **A:** T-297, ветка `feat/counter-offers-optimizer`; T-133, ветка `feat/mocks-personas-large` (субагенты).
 - **B:** —
 
 ## Что уже в main
