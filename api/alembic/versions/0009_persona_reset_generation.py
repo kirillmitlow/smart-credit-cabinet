@@ -28,12 +28,20 @@ def upgrade() -> None:
         CREATE OR REPLACE FUNCTION forbid_journal_change() RETURNS trigger AS $$
         DECLARE
             allowed text[] := string_to_array(current_setting('scc.demo_reset_ids', true), ',');
+            outbox_ids text[] := string_to_array(
+                current_setting('scc.demo_reset_outbox_ids', true), ',');
         BEGIN
             IF TG_OP = 'DELETE' AND TG_TABLE_NAME <> 'policy_versions' AND EXISTS (
                 SELECT 1 FROM jsonb_each_text(to_jsonb(OLD)) AS f
-                WHERE f.key IN ('application_id', 'contract_id', 'offer_id', 'decision_id')
+                WHERE f.key IN ('application_id', 'contract_id', 'offer_id', 'decision_id',
+                                'company_id', 'object_id')
                   AND f.value = ANY(allowed)
             ) THEN
+                RETURN OLD;
+            END IF;
+            IF TG_OP = 'DELETE' AND TG_TABLE_NAME = 'audit_log'
+               AND to_jsonb(OLD)->>'object_type' = 'outbox'
+               AND to_jsonb(OLD)->>'object_id' = ANY(outbox_ids) THEN
                 RETURN OLD;
             END IF;
             RAISE EXCEPTION 'Журнал % неизменяем', TG_TABLE_NAME USING ERRCODE = 'P0001';

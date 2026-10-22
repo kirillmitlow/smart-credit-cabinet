@@ -8,7 +8,7 @@ from threading import Event
 from typing import Any
 
 import pytest
-from sqlalchemy import delete, select, text, update
+from sqlalchemy import create_engine, delete, select, text, update
 from sqlalchemy.exc import DBAPIError
 
 from app.modules import applications, companies
@@ -72,6 +72,21 @@ def test_global_reset_excludes_operations(stand: dict[str, Any]) -> None:
         with pytest.raises(operations.ResetInProgress):
             with operations.hold(provider(stand)):
                 pytest.fail("Операция не должна начаться во время общего сброса")
+
+
+def test_operation_lease_does_not_exhaust_business_pool(
+    stand: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = db.get_database()
+    small = create_engine(database.engine.url, pool_size=1, max_overflow=0, pool_timeout=0.2)
+    try:
+        monkeypatch.setattr(database, "engine", small)
+        with operations.hold(provider(stand)):
+            with db.transaction() as session:
+                assert session.scalar(select(Company.id).limit(1)) is not None
+    finally:
+        small.dispose()
 
 
 def test_partial_reset_flag_survives_and_only_allows_reset_retry(stand: dict[str, Any]) -> None:

@@ -75,6 +75,8 @@ test('TS-001: Соколова проходит путь от входа до «
     await page.keyboard.press('Enter');
     const details = page.getByRole('dialog');
     await expect(details).toBeVisible();
+    // Контраст проверяем после fade-in: полупрозрачный кадр ещё смешивает текст с фоном.
+    await expect(details).toHaveCSS('opacity', '1');
     await expect(details).toContainText(companyProfile.sourceNames.registry);
     await expect(details).toContainText('Получено');
     await checkAccessibility(page, 'Данные компании и источник');

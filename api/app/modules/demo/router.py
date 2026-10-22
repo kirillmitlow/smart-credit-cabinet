@@ -7,14 +7,15 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
+from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 from starlette.concurrency import run_in_threadpool
 
-from app.modules.demo import reset_all
+from app.modules.demo import reset_all, reset_persona
 from app.shared import clock
 from app.shared.errors import AppError
 from app.shared.settings import get_settings
@@ -74,3 +75,53 @@ def _reset() -> ResetOut:
 )
 async def reset() -> ResetOut:
     return await run_in_threadpool(_reset)
+
+
+class PersonaResetStepOut(Camel):
+    step: reset_persona.Step
+    title: str
+    status: Literal["DONE"] = "DONE"
+
+
+class PersonaResetOut(Camel):
+    status: Literal["DONE"] = "DONE"
+    company_id: UUID
+    generation: int
+    steps: list[PersonaResetStepOut]
+    duration_ms: int
+    finished_at: datetime
+
+
+@router.post(
+    "/personas/{code}/reset",
+    operation_id="demoResetPersona",
+    summary="Вернуть одну компанию к исходному сценарию",
+    description=(
+        "Не затрагивает соседние компании. Сохраняет идентификатор компании и вход пользователя. "
+        "При частичном сбое компания закрыта для изменений до успешного повтора. "
+        "409 DEMO_RESET_IN_PROGRESS: операция компании или сброс ещё выполняется. "
+        "502 DEMO_RESET_FAILED: errors[0].step содержит MOCKS, CACHE или DATABASE."
+    ),
+    response_model=PersonaResetOut,
+    response_model_by_alias=True,
+    responses={
+        403: {"description": "Демо-режим выключен"},
+        404: {"description": "Компания сценария не найдена"},
+        409: {"description": "Операция компании или сброс ещё выполняется"},
+        502: {"description": "Частичный сбой; повторите сброс компании"},
+    },
+)
+async def reset_one_persona(
+    code: Annotated[str, Path(pattern=r"^[a-z0-9][a-z0-9-]{1,63}$")],
+) -> PersonaResetOut:
+    done = await run_in_threadpool(reset_persona.run, code)
+    return PersonaResetOut(
+        company_id=done.company_id,
+        generation=done.generation,
+        steps=[
+            PersonaResetStepOut(step=step, title=reset_persona.TITLES[step])
+            for step in reset_persona.Step
+        ],
+        duration_ms=done.duration_ms,
+        finished_at=clock.system_now(),
+    )
