@@ -1,7 +1,9 @@
 """Встроенные сценарии в общем формате ScenarioSpec (10.5, оракул 30-17).
 
-В T-131 здесь только Соколова; T-132…135 добавят остальных. Стартовое применение — T-128.
-Месяцы вычисляются из часов стенда, реквизиты и абсолютные даты остаются постоянными.
+Здесь Соколова (T-131) и общий список; vektor, orlov, romashka, garipov и quick-start (T-132,
+T-134) лежат в `builtin_simple.py`, крупные и технические (T-133, T-135) добавят свои модули.
+Стартовое применение — T-128. Месяцы вычисляются из часов стенда, реквизиты и абсолютные
+даты остаются постоянными.
 """
 
 from datetime import date
@@ -10,6 +12,7 @@ from typing import Any
 from app.common.accounts import SETTLEMENT_IP, generate_account
 from app.common.clock import last_full_month
 from app.common.reldate import add_months
+from app.roles.scenarios.builtin_simple import simple_personas
 from app.roles.scenarios.identity_people import rng_for
 from app.roles.scenarios.schemas import ScenarioSpec
 
@@ -17,11 +20,16 @@ SOKOLOVA_INN = "001234567887"
 
 
 def builtin_scenarios(today: date, bank_bik: str = "040000999") -> list[ScenarioSpec]:
-    """Новые независимые модели на каждый вызов; месяцы — 12 полных перед today.
+    """Новые независимые модели на каждый вызов, порядок стабилен: основные персоны по списку.
 
     bank_bik передаётся из настроек приложения, как в preview. Версия меняется только
     при изменении исходной персоны; смену месяца обработает T-129 отдельно.
     """
+    return [*_sokolova(today, bank_bik), *simple_personas(today)]
+
+
+def _sokolova(today: date, bank_bik: str) -> list[ScenarioSpec]:
+    """Соколова: месяцы — 12 полных перед today."""
     last = last_full_month(today)
     turnover = [
         {

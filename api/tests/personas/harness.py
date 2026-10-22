@@ -39,27 +39,36 @@ class Expected:
     final_outcome: str | None
     reason_codes: list[str]
     inn: str
-    product_code: str
+    # У orlov заявки нет: продукта и срока в сценарии не задано (он хочет только 300 тыс.)
+    product_code: str | None
     amount_rub: int
-    term_months: int
+    term_months: int | None
 
 
-def expected(code: str) -> Expected:
-    """Ожидания сценария из мока: исход, коды причин, ИНН входа и условия заявки."""
+def scenario(code: str) -> dict[str, Any]:
+    """Сценарий персоны из мока целиком: заявка, ожидания, учётки, развёрнутые данные."""
     url = os.environ.get(SCENARIOS_ENV, "http://127.0.0.1:8105").rstrip("/")
     key = os.environ.get(ADMIN_KEY_ENV, DEFAULT_ADMIN_KEY)
     response = httpx.get(f"{url}/api/v1/scenarios/{code}", headers={"X-Admin-Key": key}, timeout=10)
     response.raise_for_status()
-    body = response.json()
+    body: dict[str, Any] = response.json()
+    return body
+
+
+def expected(code: str) -> Expected:
+    """Ожидания сценария из мока: исход, коды причин, ИНН входа и условия заявки."""
+    body = scenario(code)
+    application = body["application"]
+    term = application.get("termMonths")
     return Expected(
         code=code,
         outcome=body.get("expectedOutcome"),
         final_outcome=body.get("expectedFinalOutcome"),
         reason_codes=list(body.get("expectedReasonCodes") or []),
         inn=str(body["inn"]),
-        product_code=body["application"]["productCode"],
-        amount_rub=int(body["application"]["amountRub"]),
-        term_months=int(body["application"]["termMonths"]),
+        product_code=application.get("productCode"),
+        amount_rub=int(application["amountRub"]),
+        term_months=int(term) if term is not None else None,
     )
 
 
