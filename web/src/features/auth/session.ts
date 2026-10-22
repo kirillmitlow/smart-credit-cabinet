@@ -2,7 +2,7 @@
  * Независимые сессии клиента и банка: разные cookie, маршруты API и ключи кэша (D-085).
  */
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import { isAppError } from '@/api/errors';
+import { appErrorFromResponse, isAppError } from '@/api/errors';
 import { getBankMe, getMe, getPublicConfig } from '@/api/generated/api';
 import type { BankMeResponse, MeResponse, PublicConfig } from '@/api/generated/model';
 import { publicConfigQueryKey, sessionQueryKey } from '@/api/session-keys';
@@ -29,8 +29,11 @@ export function useSession(zone: Zone, enabled = true): UseQueryResult<Me | null
     queryFn: async ({ signal }) => {
       try {
         if (zone === 'client') return (await getMe({ signal })).data;
-        const bank = (await getBankMe({ signal })).data;
-        return { ...bank, activeCompanyId: null, companies: [] };
+        const response = await getBankMe({ signal });
+        if (response.status !== 200) {
+          throw appErrorFromResponse(response.status, response.data, response.headers, null);
+        }
+        return { ...response.data, activeCompanyId: null, companies: [] };
       } catch (error) {
         if (isNotSignedIn(error)) return null;
         throw error;
