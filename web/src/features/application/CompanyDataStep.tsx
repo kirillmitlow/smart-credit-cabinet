@@ -163,7 +163,11 @@ function Fields({
               onChange={(event) => change(key, event.currentTarget.value, field.value)}
             />
             <Group gap="xs">
-              <Badge variant="light" color={manual ? 'blue' : field.confirmed ? 'green' : 'gray'}>
+              <Badge
+                variant="light"
+                color={manual ? 'blue' : field.confirmed ? 'green' : 'gray'}
+                styles={{ label: { color: 'var(--mantine-color-text)' } }}
+              >
                 {manual ? t.manual : field.confirmed ? t.confirmed : t.unconfirmed}
               </Badge>
               <Source name={label} field={field} manual={manual} />

@@ -62,8 +62,10 @@ test('TS-001: Соколова проходит путь от входа до «
       /500[\s\u00a0\u202f]?000/,
     );
     await page.getByRole('button', { name: applicationForm.next }).click();
-    await expect(page.getByLabel(companyProfile.labels.inn)).toHaveValue('001234567887');
-    await expect(page.getByLabel(companyProfile.labels.name)).toHaveValue(
+    await expect(page.getByLabel(companyProfile.labels.inn, { exact: true })).toHaveValue(
+      '001234567887',
+    );
+    await expect(page.getByLabel(companyProfile.labels.name, { exact: true })).toHaveValue(
       'Соколова Анна Сергеевна',
     );
     const source = page.getByRole('button', {
