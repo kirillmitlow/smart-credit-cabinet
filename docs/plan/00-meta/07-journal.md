@@ -374,3 +374,18 @@ web/src ещё нет, decide — заглушка, V2 ещё не закрыт�
 **Подсказки следующему:** подписание в два шага (`sign/request`, затем `sign`), как у согласий; код привязан к хешу договора. `applications` теперь экспортирует `proof_for`, `ensure_pep_rules`, `signer_identity`, `get_for`. Сценарий Соколовой: `api/tests/integration/test_offers_signing.py`.
 
 **Файлы:** api/app/modules/offers/, api/app/modules/pipeline/{decision_view,hooks,persist}.py, api/alembic/versions/0007_offers.py, api/tests/{unit/test_offers_unit.py,integration/test_offers_signing.py}.
+
+**22.10, утро · Агент A (Claude Code) · Слияние PR #45 и передача смены**
+
+**Сделано:** проверил и влил [PR #45](https://github.com/kirillmitlow/smart-credit-cabinet/pull/45): решение клиенту, предложение, договор и подпись. В main `0eac2c1`. Перед слиянием поправил:
+- перегенерировал TS-клиент (CI-задание `web` падало на `gen:api:check`);
+- дал уникальные имена схемам API: `ContractSignedOut`, `ConsentsSignedOut`, `DecisionReasonOut`, `ProductReasonOut`, иначе orval давал типы `app__modules__…`;
+- поправил формат ruff.
+
+Работу субагента по выдаче кредита (`feat/api-disbursement`) запушил как резерв: PR ещё не открыт. Посчитал готовность (37% плана, 83% тонкого пути) и предложил пользователю задачи для команды людей.
+
+**Осталось:** PR выдачи (миграция `0008` после `0007_offers`), экраны T-419, T-412/T-413, T-422/T-423, T-426, T-427, затем e2e Соколовой (V3).
+
+**Подсказки следующему:** всё в [08-handoff](08-handoff.md), раздел «Ловушки»: выгрузка OpenAPI вручную, ruff не входит в `make -C api check`, pnpm через `npx`.
+
+**Файлы:** docs/plan/00-meta/08-handoff.md, docs/plan/00-meta/07-journal.md.
