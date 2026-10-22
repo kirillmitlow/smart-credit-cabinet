@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | REVIEW (ветка `feat/company-lookup-autofill`; изменение API, слияние по D-098) |
+| Статус | DONE (PR #59, `c1f257d`, согласие пользователя D-108) |
 | Владелец | Агент B (Codex) |
 | Ветка | `feat/company-lookup-autofill` (общая с T-220) |
 | Оценка | ~5 ч |
