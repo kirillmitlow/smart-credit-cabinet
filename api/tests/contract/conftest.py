@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import time
 from collections.abc import Callable, Iterator
@@ -42,7 +43,15 @@ SERVICES = [
     "mock-scenarios",
 ]
 HOST = "http://127.0.0.1"
-PORTS = {"registry": 8101, "tax": 8102, "bki": 8103, "bank_core": 8104, "scenarios": 8105}
+# SCC_MOCK_PORT_OFFSET: стенд моков под другим compose-проектом на сдвинутых портах (параллельные агенты)
+_OFFSET = int(os.environ.get("SCC_MOCK_PORT_OFFSET", "0"))
+PORTS = {
+    "registry": 8101 + _OFFSET,
+    "tax": 8102 + _OFFSET,
+    "bki": 8103 + _OFFSET,
+    "bank_core": 8104 + _OFFSET,
+    "scenarios": 8105 + _OFFSET,
+}
 ADMIN = {"X-Admin-Key": "dev-admin-key"}
 
 # Параметры временных сценариев (спецификация моков 10.2/10.5), имена как у персон

@@ -91,6 +91,7 @@ class EventObligation:
     planned_close_at: date | None = None
     closed_at: date | None = None
     amount_rub: int | None = None
+    limit_rub: int | None = None  # для линии и овердрафта
     monthly_payment_rub: int | None = None
     secured: bool | None = None
 
@@ -440,6 +441,7 @@ def _event_body(event: BureauEvent) -> dict[str, Any]:
                 "plannedCloseAt": o.planned_close_at.isoformat() if o.planned_close_at else None,
                 "closedAt": o.closed_at.isoformat() if o.closed_at else None,
                 "amountRub": o.amount_rub,
+                "limitRub": o.limit_rub,
                 "monthlyPaymentRub": o.monthly_payment_rub,
                 "secured": o.secured,
             }

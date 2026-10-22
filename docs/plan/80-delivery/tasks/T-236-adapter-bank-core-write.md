@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE — PR feat/api-disbursement; контракт на живых моках (garipov, Соколова) |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/adapter-bank-core-write` |
 | Оценка | ~3 ч |

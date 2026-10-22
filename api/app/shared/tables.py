@@ -23,4 +23,7 @@ TABLE_OWNERS: dict[str, str] = {
     "decisions": "pipeline",
     "decision_reasons": "pipeline",
     "consents": "applications",
+    "disbursements": "disbursement",
+    "loans": "loans",
+    "payment_schedule": "loans",
 }

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE — PR feat/api-disbursement; LOST_RESPONSE и двойная доставка проверены на живом моке; property на порядок и дубли; сверка ALREADY_DISBURSED в интеграционных тестах |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/disbursement-exactly-once` |
 | Оценка | ~5 ч |

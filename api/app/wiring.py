@@ -11,9 +11,10 @@ from datetime import date
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.modules import catalog, companies
+from app.modules import applications, catalog, companies, disbursement, pipeline
 
 
 def _date(value: Any) -> date | None:
@@ -44,5 +45,40 @@ def company_facts(session: Session, company_id: UUID) -> catalog.CompanyFacts | 
     )
 
 
+def agreed_terms(session: Session, application_id: UUID) -> disbursement.AgreedTerms | None:
+    """Условия выдачи: продукт, сумма и срок из заявки, ставка из последнего решения.
+
+    Запасной путь до модуля `offers` (принятый вариант и договор, T-340/T-341): когда он появится,
+    эта функция берёт условия оттуда и отдаёт номер и УИд договора. Время подписи — из журнала заявки.
+    """
+    application = session.get(applications.Application, application_id)
+    decision = pipeline.latest_terms(session, application_id)
+    if (
+        application is None
+        or decision is None
+        or application.product_code is None
+        or application.amount_rub is None
+        or application.term_months is None
+    ):
+        return None
+    signed_at = session.scalar(
+        select(applications.ApplicationEvent.at)
+        .where(
+            applications.ApplicationEvent.application_id == application_id,
+            applications.ApplicationEvent.to_status == applications.Status.SIGNED.value,
+        )
+        .order_by(applications.ApplicationEvent.id.desc())
+        .limit(1)
+    )
+    return disbursement.AgreedTerms(
+        product_code=application.product_code,
+        amount_rub=application.amount_rub,
+        term_months=application.term_months,
+        rate_percent=decision.rate_percent,
+        signed_at=signed_at,
+    )
+
+
 def wire_modules() -> None:
     catalog.register_company_facts_provider(company_facts)
+    disbursement.register_terms_provider(agreed_terms)
