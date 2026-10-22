@@ -85,6 +85,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestContextMiddleware)
     app.include_router(health.router)
     app.include_router(companies.login_router)
+    app.include_router(companies.profile_router)
     app.include_router(applications.router)
     app.include_router(applications.consents_router)
     app.include_router(catalog.router)
