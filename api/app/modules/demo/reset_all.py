@@ -92,6 +92,9 @@ def _reset_mocks() -> dict[str, Any]:
     quiet = outbox.quiesce()
     if quiet.in_flight:
         log.warning("demo_reset_outbox_in_flight", in_flight=quiet.in_flight)
+        raise RuntimeError(
+            "Доставка в источники ещё выполняется; дождитесь завершения и повторите сброс"
+        )
     result = scenarios.reset_all(SCENARIOS_MODE)
     return {
         "scenarios": len(result.get("scenarios") or []),
