@@ -19,6 +19,21 @@ export const errorTexts = {
   INN_INVALID: {
     text: 'В ИНН должно быть 10 цифр для компании или 12 для ИП. Проверьте номер',
   },
+  INN_NOT_FOUND: { text: 'Не нашли такую компанию. Проверьте номер и попробуйте ещё раз' },
+  DIRECTORY_UNAVAILABLE: {
+    text: 'Не получилось проверить ИНН: справочник компаний не отвечает. Попробуйте ещё раз',
+    action: 'Повторить',
+  },
+  CODE_INVALID: { text: 'Код не подошёл. Проверьте цифры' },
+  CODE_EXPIRED: {
+    text: 'Код устарел или уже использован. Получите новый',
+    action: 'Получить новый',
+  },
+  CODE_ATTEMPTS_EXCEEDED: {
+    text: 'Попытки ввода закончились. Получите новый код',
+    action: 'Получить новый',
+  },
+  FORBIDDEN: { text: 'Это действие вам недоступно' },
   NOT_FOUND: { text: 'Не нашли такую страницу или заявку', action: 'На главную' },
   VERSION_CONFLICT: {
     text: 'Заявку изменили в другой вкладке. Обновите, чтобы не потерять данные',
@@ -77,7 +92,7 @@ export const genericError = errorTexts.UNKNOWN_ERROR;
 
 /** Отдельные тексты, у которых нет `code` в API (60-06) */
 export const otherErrors = {
-  wrongLoginCode: 'Код не подошёл. Осталось {attempts}',
+  wrongLoginCode: 'Код не подошёл. Попыток осталось: {attempts}',
   newCodeAction: 'Получить новый',
   fileUnreadable: 'Этот файл не получилось прочитать. Нужна выписка в формате 1С (текстовый файл)',
   chooseOtherFile: 'Выбрать другой',

@@ -5,6 +5,7 @@
 import { formatSeconds } from '@/lib/format';
 import { isAppError, toAppError, type AppError } from '@/api/errors';
 import { errorTexts, genericError, retryAfterText, type ErrorText } from './errors';
+import { productNames } from './application';
 
 export {
   errorTexts,
@@ -18,6 +19,34 @@ export { shell, guards, loginPlaceholder, placeholders } from './shell';
 export { timelineSteps, needsHelpStep, timelineNotes, applicationStatusLabels } from './timeline';
 export type { ApplicationStatus } from './timeline';
 export { emptyStates, termHints, demoMarks } from './content';
+export { login, companyChoice, logout } from './login';
+export { home } from './home';
+export { productNames, applicationForm, applicationPage, outcomes } from './application';
+
+/** Название продукта по коду; неизвестный код показываем как есть, чтобы не терять данные */
+export function productName(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return Object.prototype.hasOwnProperty.call(productNames, code)
+    ? productNames[code as keyof typeof productNames]
+    : code;
+}
+
+/**
+ * Как `fill`, но для данных, которых у экрана может не быть: подстановка без значения пропадает
+ * вместе с пробелом перед ней («Договор подписан {date}» → «Договор подписан»)
+ */
+export function fillKnown(
+  template: string,
+  values: Record<string, string | number | null | undefined>,
+): string {
+  return template
+    .replace(/\s*\{(\w+)\}/g, (whole: string, name: string) => {
+      const value = values[name];
+      if (value === undefined || value === null || value === '') return '';
+      return whole.startsWith('{') ? String(value) : ` ${String(value)}`;
+    })
+    .trim();
+}
 
 /** Подстановка `{имя}` в строку словаря; неизвестное имя остаётся как есть (видно в тесте) */
 export function fill(template: string, values: Record<string, string | number>): string {

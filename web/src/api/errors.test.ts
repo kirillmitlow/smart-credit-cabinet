@@ -62,6 +62,28 @@ describe('appErrorFromResponse', () => {
     expect(error.requestId).toBe('sent');
   });
 
+  it('разбирает loc-массив FastAPI: служебное начало пути отбрасывается', () => {
+    const error = appErrorFromResponse(
+      422,
+      {
+        code: 'VALIDATION_ERROR',
+        errors: [
+          { loc: ['body', 'amountRub'], msg: 'Field required', type: 'missing' },
+          { loc: ['body', 'answers', 0, 'x'], msg: 'bad' },
+          { loc: [] },
+        ],
+      },
+      new Headers(),
+      null,
+    );
+    expect(error.errors.map((item) => item.field)).toEqual(['amountRub', 'answers.0.x']);
+    expect(error.errors[0]).toEqual({
+      field: 'amountRub',
+      code: 'missing',
+      message: 'Field required',
+    });
+  });
+
   it('тело не объект → код по статусу', () => {
     const error = appErrorFromResponse(404, 'текст', new Headers(), null);
     expect(error.code).toBe('NOT_FOUND');

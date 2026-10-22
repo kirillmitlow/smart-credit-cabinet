@@ -7,14 +7,21 @@
  */
 
 export * from './activeCompany';
+export * from './applicationFields';
+export * from './applicationOut';
+export * from './applicationOutDraft';
+export * from './applicationPage';
 export * from './codeCheck';
 export * from './codeIssued';
 export * from './codeRequest';
 export * from './companyBrief';
 export * from './companyChoice';
+export * from './draftPatch';
+export * from './draftPatchAnswers';
 export * from './healthDeps200';
 export * from './healthLive200';
 export * from './hTTPValidationError';
+export * from './listApplicationsParams';
 export * from './meResponse';
 export * from './personOption';
 export * from './publicConfig';

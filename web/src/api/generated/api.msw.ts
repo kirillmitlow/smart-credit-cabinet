@@ -19,6 +19,8 @@ import type {
 } from 'msw';
 
 import type {
+  ApplicationOut,
+  ApplicationPage,
   CodeIssued,
   HealthDeps200,
   HealthLive200,
@@ -45,6 +47,18 @@ export const getGetMeResponseMock = (overrideResponse: Partial<Extract<MeRespons
 export const getSetActiveCompanyResponseMock = (overrideResponse: Partial<Extract<MeResponse, object>> = {}): MeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), activeCompanyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), companies: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({company: {id: faker.string.uuid(), inn: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canApply: faker.datatype.boolean()}, role: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getGetPublicConfigResponseMock = (overrideResponse: Partial<Extract<PublicConfig, object>> = {}): PublicConfig => ({demoMode: faker.datatype.boolean(), productName: faker.string.alpha({length: {min: 10, max: 20}}), version: faker.string.alpha({length: {min: 10, max: 20}}), nluAvailable: faker.datatype.boolean(), ...overrideResponse})
+
+export const getCreateApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getListApplicationsResponseMock = (overrideResponse: Partial<Extract<ApplicationPage, object>> = {}): ApplicationPage => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}})))})), nextCursor: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
+
+export const getGetApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getPatchApplicationDraftResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getSubmitApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getWithdrawApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
 
 export const getHealthLiveMockHandler = (overrideResponse?: HealthLive200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthLive200> | HealthLive200), options?: RequestHandlerOptions) => {
@@ -162,6 +176,78 @@ export const getGetPublicConfigMockHandler = (overrideResponse?: PublicConfig | 
       })
   }, options)
 }
+
+export const getCreateApplicationMockHandler = (overrideResponse?: ApplicationOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApplicationOut> | ApplicationOut), options?: RequestHandlerOptions) => {
+  return http.post('*/applications', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateApplicationResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getListApplicationsMockHandler = (overrideResponse?: ApplicationPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApplicationPage> | ApplicationPage), options?: RequestHandlerOptions) => {
+  return http.get('*/applications', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListApplicationsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApplicationMockHandler = (overrideResponse?: ApplicationOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApplicationOut> | ApplicationOut), options?: RequestHandlerOptions) => {
+  return http.get('*/applications/:applicationId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApplicationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPatchApplicationDraftMockHandler = (overrideResponse?: ApplicationOut | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<ApplicationOut> | ApplicationOut), options?: RequestHandlerOptions) => {
+  return http.patch('*/applications/:applicationId/draft', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPatchApplicationDraftResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getSubmitApplicationMockHandler = (overrideResponse?: ApplicationOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApplicationOut> | ApplicationOut), options?: RequestHandlerOptions) => {
+  return http.post('*/applications/:applicationId/submit', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getSubmitApplicationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getWithdrawApplicationMockHandler = (overrideResponse?: ApplicationOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApplicationOut> | ApplicationOut), options?: RequestHandlerOptions) => {
+  return http.post('*/applications/:applicationId/withdraw', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getWithdrawApplicationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getApiMock = () => [
   getHealthLiveMockHandler(),
   getHealthReadyMockHandler(),
@@ -172,5 +258,11 @@ export const getApiMock = () => [
   getLogoutMockHandler(),
   getGetMeMockHandler(),
   getSetActiveCompanyMockHandler(),
-  getGetPublicConfigMockHandler()
+  getGetPublicConfigMockHandler(),
+  getCreateApplicationMockHandler(),
+  getListApplicationsMockHandler(),
+  getGetApplicationMockHandler(),
+  getPatchApplicationDraftMockHandler(),
+  getSubmitApplicationMockHandler(),
+  getWithdrawApplicationMockHandler()
 ]

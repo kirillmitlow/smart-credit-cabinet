@@ -10,7 +10,15 @@ import { renderApp } from '@/test/render';
 import { mockSessions } from '@/test/sessions';
 import { server } from '@/test/server';
 import { appRoutes } from './router';
-import { errorTexts, fill, guards, loginPlaceholder, placeholders, shell } from '@/texts';
+import {
+  errorTexts,
+  fill,
+  guards,
+  home as homeText,
+  loginPlaceholder,
+  placeholders,
+  shell,
+} from '@/texts';
 
 const banner = () => screen.getByTestId('demo-banner');
 
@@ -24,7 +32,7 @@ describe('оболочка клиента', () => {
     const { container } = renderApp('/');
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: placeholders.home.title }),
+      await screen.findByRole('heading', { level: 1, name: homeText.title }),
     ).toBeInTheDocument();
     expect(banner()).toHaveTextContent(shell.demoBanner);
     expect(screen.getByRole('link', { name: shell.productName })).toBeInTheDocument();
@@ -38,7 +46,7 @@ describe('оболочка клиента', () => {
     // зона клиента не похожа на банк: полосы нет
     expect(screen.queryByTestId('zone-strip')).not.toBeInTheDocument();
     expect(screen.queryByText(shell.bankZoneLabel)).not.toBeInTheDocument();
-    expect(document.title).toContain(placeholders.home.title);
+    expect(document.title).toContain(homeText.title);
 
     await expectNoBlockingViolations(container);
   });
@@ -74,8 +82,6 @@ describe('оболочка клиента', () => {
     const paths = [
       ['/wizard', placeholders.wizard.title],
       ['/products/overdraft', placeholders.product.title],
-      ['/applications/a1', placeholders.application.title],
-      ['/applications/a1/edit/2', placeholders.applicationEdit.title],
       ['/applications/a1/offer', placeholders.offer.title],
       ['/applications/a1/sign', placeholders.sign.title],
       ['/loans/l1', placeholders.loan.title],
@@ -185,14 +191,14 @@ describe('вход и защита маршрутов', () => {
     mockSessions({ client: makeMe() });
     await userEvent.click(screen.getByRole('button', { name: shell.common.retry }));
     expect(
-      await screen.findByRole('heading', { level: 1, name: placeholders.home.title }),
+      await screen.findByRole('heading', { level: 1, name: homeText.title }),
     ).toBeInTheDocument();
   });
 
   it('401 посреди работы возвращает на вход', async () => {
     mockSessions({ client: makeMe() });
     const { queryClient } = renderApp('/');
-    await screen.findByRole('heading', { level: 1, name: placeholders.home.title });
+    await screen.findByRole('heading', { level: 1, name: homeText.title });
 
     server.use(
       http.get('*/api/v1/tasks', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
@@ -221,7 +227,7 @@ describe('две независимые сессии', () => {
 
     renderApp('/');
     expect(
-      await screen.findByRole('heading', { level: 1, name: placeholders.home.title }),
+      await screen.findByRole('heading', { level: 1, name: homeText.title }),
     ).toBeInTheDocument();
   });
 });
@@ -266,7 +272,7 @@ describe('демо', () => {
   it('при выключенном демо нет ни пункта меню, ни адреса', async () => {
     mockSessions({ client: makeMe(), config: { demoMode: false } });
     const home = renderApp('/');
-    await screen.findByRole('heading', { level: 1, name: placeholders.home.title });
+    await screen.findByRole('heading', { level: 1, name: homeText.title });
     expect(screen.queryByRole('link', { name: shell.nav.demo })).not.toBeInTheDocument();
     home.unmount();
 
@@ -344,7 +350,7 @@ describe('индикатор связи', () => {
   it('показывает три состояния', async () => {
     mockSessions({ client: makeMe() });
     renderApp('/');
-    await screen.findByRole('heading', { level: 1, name: placeholders.home.title });
+    await screen.findByRole('heading', { level: 1, name: homeText.title });
     await waitFor(() => expect(MockEventSource.instances.length).toBe(1));
     const indicator = screen.getByTestId('connection-indicator');
     expect(indicator).toHaveAttribute('role', 'status');
@@ -380,7 +386,7 @@ describe('нет связи', () => {
   it('тонкая полоса «Нет связи», пока сети нет', async () => {
     mockSessions({ client: makeMe() });
     renderApp('/');
-    await screen.findByRole('heading', { level: 1, name: placeholders.home.title });
+    await screen.findByRole('heading', { level: 1, name: homeText.title });
     expect(screen.queryByTestId('offline-bar')).not.toBeInTheDocument();
 
     const spy = Object.getOwnPropertyDescriptor(Navigator.prototype, 'onLine');

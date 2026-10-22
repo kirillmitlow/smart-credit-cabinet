@@ -1,6 +1,9 @@
 import { createBrowserRouter, type RouteObject } from 'react-router';
 import { PlaceholderPage } from '@/components/PlaceholderPage';
 import { LoginPage } from '@/features/auth/LoginPage';
+import { ApplicationEditPage } from '@/features/application/ApplicationEditPage';
+import { ApplicationPage } from '@/features/application/ApplicationPage';
+import { CompanyPage } from '@/features/auth/CompanyPage';
 import { HomePage } from '@/features/home/HomePage';
 import { placeholders } from '@/texts';
 import { ClientLayout } from './ClientLayout';
@@ -78,7 +81,7 @@ export const appRoutes: RouteObject[] = [
                 element: <ClientLayout />,
                 children: [
                   { index: true, element: <HomePage /> },
-                  { path: 'company', element: <PlaceholderPage content={placeholders.company} /> },
+                  { path: 'company', element: <CompanyPage /> },
                   { path: 'wizard', element: <PlaceholderPage content={placeholders.wizard} /> },
                   {
                     path: 'wizard/result',
@@ -92,14 +95,8 @@ export const appRoutes: RouteObject[] = [
                     path: 'products/:code',
                     element: <PlaceholderPage content={placeholders.product} />,
                   },
-                  {
-                    path: 'applications/:id',
-                    element: <PlaceholderPage content={placeholders.application} />,
-                  },
-                  {
-                    path: 'applications/:id/edit/:step',
-                    element: <PlaceholderPage content={placeholders.applicationEdit} />,
-                  },
+                  { path: 'applications/:id', element: <ApplicationPage /> },
+                  { path: 'applications/:id/edit/:step', element: <ApplicationEditPage /> },
                   {
                     path: 'applications/:id/offer',
                     element: <PlaceholderPage content={placeholders.offer} />,

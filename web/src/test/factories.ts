@@ -1,5 +1,11 @@
 import { HttpResponse } from 'msw';
-import type { CompanyBrief, CompanyChoice, PublicConfig } from '@/api/generated/model';
+import type {
+  ApplicationOut,
+  CompanyBrief,
+  CompanyChoice,
+  PublicConfig,
+  RolesResponse,
+} from '@/api/generated/model';
 import type { Me } from '@/features/auth/session';
 
 /** Фабрики данных для тестов: значения по умолчанию валидны, тест переопределяет только важное */
@@ -81,4 +87,59 @@ export function problemResponse(init: ProblemInit): Response {
       headers: { 'Content-Type': 'application/problem+json', ...headers },
     },
   );
+}
+
+export function makeApplication(overrides: Partial<ApplicationOut> = {}): ApplicationOut {
+  return {
+    id: 'app-1',
+    number: 'АЗ-2026-000001',
+    status: 'DRAFT',
+    productCode: 'EXPRESS',
+    amountRub: 500_000,
+    termMonths: 12,
+    purposeCode: null,
+    draft: {},
+    version: 1,
+    createdAt: '2026-10-21T09:00:00Z',
+    submittedAt: null,
+    allowedActions: ['EDIT_DRAFT', 'SUBMIT', 'DELETE_DRAFT'],
+    ...overrides,
+  };
+}
+
+export function makeCompanyRoles(
+  people: { userId: string; displayName: string; role: string }[],
+  company: Partial<CompanyBrief> = {},
+): RolesResponse {
+  return {
+    kind: 'COMPANY',
+    company: {
+      id: 'company-1',
+      inn: '0012345673',
+      name: 'ООО «СтанкоПром»',
+      status: 'ACTIVE',
+      canApply: true,
+      ...company,
+    },
+    people,
+    companies: [],
+    reasonCode: null,
+  };
+}
+
+export function makePersonRoles(
+  choices: CompanyChoice[],
+  person = { userId: 'user-1', displayName: 'Анна Соколова', role: 'PERSON' },
+): RolesResponse {
+  return { kind: 'PERSON', company: null, people: [person], companies: choices, reasonCode: null };
+}
+
+export function makeNotEligible(): RolesResponse {
+  return {
+    kind: 'NOT_ELIGIBLE',
+    company: null,
+    people: [],
+    companies: [],
+    reasonCode: 'SELF_EMPLOYED',
+  };
 }

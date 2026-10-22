@@ -9,6 +9,7 @@ import {
   formatPercent,
   formatSeconds,
   formatTermMonths,
+  formatTime,
   plural,
 } from './format';
 
@@ -146,5 +147,17 @@ describe('срок и склонение', () => {
   it('пустой срок → тире', () => {
     expect(formatTermMonths(null)).toBe('—');
     expect(formatTermMonths(Number.NaN)).toBe('—');
+  });
+});
+
+describe('formatTime', () => {
+  it('время по Москве', () => {
+    expect(formatTime('2026-10-21T09:04:00Z')).toBe('12:04');
+    expect(formatTime(new Date('2026-10-21T21:30:00Z'))).toBe('00:30');
+  });
+
+  it('пустое или неверное значение → тире', () => {
+    expect(formatTime(null)).toBe('—');
+    expect(formatTime('мусор')).toBe('—');
   });
 });

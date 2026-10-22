@@ -16,6 +16,14 @@ import {
   timelineSteps,
   demoMarks,
   otherErrors,
+  login,
+  companyChoice,
+  logout,
+  home,
+  productNames,
+  applicationForm,
+  applicationPage,
+  outcomes,
 } from '.';
 import { forbiddenClientWords } from './forbidden';
 
@@ -43,6 +51,14 @@ const allTexts = collectStrings([
   emptyStates,
   termHints,
   demoMarks,
+  login,
+  companyChoice,
+  logout,
+  home,
+  productNames,
+  applicationForm,
+  applicationPage,
+  outcomes,
 ]);
 
 describe('словарь текстов', () => {

@@ -70,18 +70,34 @@ function asString(value: unknown): string | null {
   return typeof value === 'string' && value !== '' ? value : null;
 }
 
+/** Служебные начала пути в ответах FastAPI: `["body", "amountRub"]` → `amountRub` */
+const LOC_PREFIXES = new Set(['body', 'query', 'path', 'header', 'cookie']);
+
+function fieldFromLoc(value: unknown): string | null {
+  if (!Array.isArray(value)) return null;
+  const parts = (value as unknown[])
+    .filter((part): part is string | number => typeof part === 'string' || typeof part === 'number')
+    .map(String);
+  while (parts.length > 1 && LOC_PREFIXES.has(parts[0] ?? '')) parts.shift();
+  return parts.length > 0 ? parts.join('.') : null;
+}
+
 function parseFieldErrors(value: unknown): FieldError[] {
   if (!Array.isArray(value)) return [];
   const result: FieldError[] = [];
   for (const item of value as unknown[]) {
     const record = asRecord(item);
     if (!record) continue;
-    const field = asString(record.field) ?? asString(record.path) ?? asString(record.loc);
+    const field =
+      asString(record.field) ??
+      asString(record.path) ??
+      asString(record.loc) ??
+      fieldFromLoc(record.loc);
     if (!field) continue;
     result.push({
       field,
-      code: asString(record.code),
-      message: asString(record.message) ?? asString(record.detail),
+      code: asString(record.code) ?? asString(record.type),
+      message: asString(record.message) ?? asString(record.detail) ?? asString(record.msg),
     });
   }
   return result;

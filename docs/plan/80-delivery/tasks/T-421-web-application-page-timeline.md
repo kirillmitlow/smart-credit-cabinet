@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | REVIEW — таймлайн по статусу с опросом каждые 3 с (SSE на бэкенде нет); галочки подшагов ждут `GET …/timeline`; ветка feat/web-login-application |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/web-application-page-timeline` |
 | Оценка | ~6 ч |
