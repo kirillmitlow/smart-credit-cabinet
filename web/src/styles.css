@@ -1,0 +1,32 @@
+/* Минимальная ширина 1280 px: адаптив под телефон не делаем (D-063, 60-01) */
+body {
+  min-width: 1280px;
+  margin: 0;
+}
+
+.desktop-hint {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  .desktop-hint {
+    display: block;
+  }
+}
+
+/* Ссылка «Перейти к содержимому» видна только при фокусе с клавиатуры */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: #fff;
+  color: #1a1b1e;
+  border: 2px solid #c22b21;
+  border-radius: 4px;
+}
+
+.skip-link:focus {
+  top: 8px;
+}

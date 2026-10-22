@@ -1,7 +1,7 @@
 # Быстрые проверки перед коммитом (50-03, T-501). Тяжёлое (mypy, тесты, import-linter) — в `make check` и CI.
 # Установка: uvx pre-commit@4.7.0 install
 minimum_pre_commit_version: "4.0.0"
-exclude: ^docs/(design/mockups/|.*\.pdf$)
+exclude: ^(docs/(design/mockups/|.*\.pdf$)|web/src/api/generated/)
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

@@ -60,9 +60,36 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-      # make check: pre-commit, ссылки, типы, границы модулей и быстрые тесты каждого проекта
-      - run: make check
+      # make check: pre-commit, ссылки, типы, границы модулей и быстрые тесты каждого проекта.
+      # Фронт здесь не проверяем (SKIP_WEB=1): на раннере нет pnpm, его гоняет задание `web`
+      - run: make check SKIP_WEB=1
       - run: echo "make check зелёный" >> "$GITHUB_STEP_SUMMARY"
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - id: has
+        run: |
+          if [ -f web/package.json ]; then echo "project=true" >> "$GITHUB_OUTPUT"; else echo "Проекта web ещё нет" >> "$GITHUB_STEP_SUMMARY"; fi
+      # Версию pnpm берём из web/package.json (`packageManager`), Node — из .nvmrc
+      - if: steps.has.outputs.project == 'true'
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          package_json_file: web/package.json
+      - if: steps.has.outputs.project == 'true'
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      # make -C web check: ESLint, Prettier, tsc --noEmit, Vitest (сборка и покрытие — в `make -C web test`)
+      - if: steps.has.outputs.project == 'true'
+        run: make -C web check
+      - if: steps.has.outputs.project == 'true'
+        run: echo "make -C web check зелёный" >> "$GITHUB_STEP_SUMMARY"
 
   tests-py:
     needs: changes
@@ -129,10 +156,10 @@ jobs:
 
   ci-ok:
     if: always()
-    needs: [changes, docs, lint-py, tests-py, build]
+    needs: [changes, docs, lint-py, web, tests-py, build]
     runs-on: ubuntu-24.04
     steps:
       - uses: re-actors/alls-green@v1.3.0
         with:
-          allowed-skips: lint-py, tests-py, build
+          allowed-skips: lint-py, web, tests-py, build
           jobs: ${{ toJSON(needs) }}
