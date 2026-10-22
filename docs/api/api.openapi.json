@@ -2110,7 +2110,7 @@
                 "type": "null"
               }
             ],
-            "description": "Предложение банка (`APPROVED`, `COUNTER_OFFER`); у встречного без вариантов `variantsStatus = PENDING`"
+            "description": "Предложение банка (`APPROVED`, `COUNTER_OFFER`: до трёх карточек); `variantsStatus = PENDING` — запасное состояние без вариантов"
           }
         },
         "type": "object",
@@ -3300,7 +3300,7 @@
           "variantsStatus": {
             "type": "string",
             "title": "Variantsstatus",
-            "description": "`PENDING`: встречные варианты ещё готовятся (оптимизатор T-297), выбирать нечего"
+            "description": "`READY`: варианты есть, можно выбирать; `PENDING`: запасное состояние без вариантов, принять нельзя (встречное решения в норме несёт варианты)"
           },
           "expiresAt": {
             "type": "string",
@@ -4520,11 +4520,13 @@
           "whatChanged": {
             "additionalProperties": true,
             "type": "object",
-            "title": "Whatchanged"
+            "title": "Whatchanged",
+            "description": "Чем вариант отличается от запроса (`productCode`, `amountRub`, `termMonths`: `{from, to}`; `security`: нужен залог или поручительство) и «что нужно от вас» (`requirements`: список фраз; нет ключа — ничего)"
           },
           "note": {
             "type": "string",
-            "title": "Note"
+            "title": "Note",
+            "description": "Почему этот вариант: одна фраза клиенту"
           },
           "schedulePreview": {
             "items": {

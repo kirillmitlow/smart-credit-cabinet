@@ -22,7 +22,9 @@ export interface VariantOut {
   overpaymentRub: number;
   collateralRequired: boolean;
   recommended: boolean;
+  /** Чем вариант отличается от запроса (`productCode`, `amountRub`, `termMonths`: `{from, to}`; `security`: нужен залог или поручительство) и «что нужно от вас» (`requirements`: список фраз; нет ключа — ничего) */
   whatChanged: VariantOutWhatChanged;
+  /** Почему этот вариант: одна фраза клиенту */
   note: string;
   /** Первые три платежа и последний; полный график — в договоре */
   schedulePreview: ScheduleRowOut[];

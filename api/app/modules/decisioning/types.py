@@ -517,7 +517,12 @@ class Numbers:
 
 @dataclass(frozen=True, slots=True)
 class Variant:
-    """Встречное предложение (T-297; здесь только условное для молодого бизнеса)."""
+    """Карточка встречного предложения (T-297, 30-10) или условное встречное молодому бизнесу.
+
+    `note` — одна фраза «почему»; `requirements` — «что нужно от вас» (пусто — ничего);
+    `distance` — расстояние до запроса (чем меньше, тем ближе); у условного встречного его нет.
+    У овердрафта графика платежей нет, поэтому DSCR и стресс — `None`.
+    """
 
     kind: str
     product: Product
@@ -525,11 +530,15 @@ class Variant:
     term_months: int
     rate: Decimal
     payment_rub: int
-    dscr: Decimal
-    stress_dscr: Decimal
+    dscr: Decimal | None
+    stress_dscr: Decimal | None
     security_required: bool = False
     recommended: bool = False
     note: str = ""
+    requirements: tuple[str, ...] = ()
+    last_payment_rub: int | None = None
+    overpayment_rub: int | None = None
+    distance: Decimal | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -556,7 +565,7 @@ class DecisionResult:
     numbers: Numbers
     features: Features | None
     variants: tuple[Variant, ...]
-    # Пока оптимизатор встречных не готов (T-297), здесь `PLACEHOLDER_T297`
+    # READY — карточки построены; CONDITIONAL_ONLY — условное встречное; NOT_APPLICABLE — иначе
     variants_status: str
     recommendation: Recommendation | None
     explanations: tuple[Explanation, ...]

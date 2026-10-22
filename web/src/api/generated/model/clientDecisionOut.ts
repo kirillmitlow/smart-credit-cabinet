@@ -31,6 +31,6 @@ export interface ClientDecisionOut {
   whatHelped: string[];
   /** До трёх слабых мест при отказе и встречном */
   whatAffected: string[];
-  /** Предложение банка (`APPROVED`, `COUNTER_OFFER`); у встречного без вариантов `variantsStatus = PENDING` */
+  /** Предложение банка (`APPROVED`, `COUNTER_OFFER`: до трёх карточек); `variantsStatus = PENDING` — запасное состояние без вариантов */
   offer: OfferOut | null;
 }

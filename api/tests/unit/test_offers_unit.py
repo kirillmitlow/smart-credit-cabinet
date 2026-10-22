@@ -99,12 +99,30 @@ def test_conditional_security_variant_is_marked_and_explained() -> None:
     assert drafts[0].what_changed.get("security") is True
 
 
-def test_counter_offer_without_optimizer_has_no_drafts() -> None:
+def test_counter_offer_from_the_optimizer_gives_three_labelled_drafts() -> None:
     inp = snabkontrakt()
     result = decide(inp)
 
+    drafts = hooks._drafts(inp, result)
+
     assert result.outcome == Outcome.COUNTER_OFFER
-    assert hooks._drafts(inp, result) == []  # варианты ждут T-297: предложение будет PENDING
+    assert [d.label for d in drafts] == [
+        "Ваша сумма, дольше срок",
+        "Ваш срок, меньше сумма",
+        "Другой продукт или с залогом",
+    ]
+    assert [d.recommended for d in drafts] == [True, False, False]
+    assert [(d.product_code, d.amount_rub, d.term_months) for d in drafts] == [
+        ("WORKING_CAPITAL", 8_000_000, 36),
+        ("WORKING_CAPITAL", 3_400_000, 12),
+        ("CONTRACT", 8_000_000, 4),
+    ]
+    assert all(d.note for d in drafts)  # «почему» одной фразой
+    assert drafts[0].what_changed == {"termMonths": {"from": 12, "to": 36}}
+    assert drafts[1].what_changed == {"amountRub": {"from": 8_000_000, "to": 3_400_000}}
+    contract_change = drafts[2].what_changed
+    assert contract_change["productCode"] == {"from": "WORKING_CAPITAL", "to": "CONTRACT"}
+    assert "1001500002826000127" in contract_change["requirements"][0]  # что нужно от клиента
 
 
 def test_client_factors_for_approved_name_strengths_only() -> None:

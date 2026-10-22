@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | DONE — PR feat/api-offer-signing; варианты встречных ждут T-297 (`variantsStatus = PENDING`); вариант с залогом/поручителем → 409 `SECURITY_REQUIRED` до T-257; `APPROVED` в БКИ (Q-022) не отправляется |
+| Статус | DONE — PR feat/api-offer-signing; варианты встречных строит T-297 (`variantsStatus = READY`, `PENDING` — запасное состояние); вариант с залогом/поручителем → 409 `SECURITY_REQUIRED` до T-257; `APPROVED` в БКИ (Q-022) не отправляется |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/offers-variants-accept` |
 | Оценка | ~6 ч |
