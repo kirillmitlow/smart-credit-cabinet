@@ -3,6 +3,8 @@ import type {
   ApplicationOut,
   CompanyBrief,
   CompanyChoice,
+  ConsentsOut,
+  ConsentItemOut,
   PublicConfig,
   RolesResponse,
 } from '@/api/generated/model';
@@ -141,5 +143,43 @@ export function makeNotEligible(): RolesResponse {
     people: [],
     companies: [],
     reasonCode: 'SELF_EMPLOYED',
+  };
+}
+
+export function makeConsent(overrides: Partial<ConsentItemOut> = {}): ConsentItemOut {
+  return {
+    kind: 'BKI',
+    subjectInn: '540812345678',
+    subjectName: 'Анна Соколова',
+    subjectType: 'PERSON',
+    role: 'IP',
+    status: 'PENDING',
+    canSign: true,
+    textVersion: 'bki-v1',
+    textHash: 'hash-v1',
+    text: 'Согласие на запрос кредитной истории.',
+    signedAt: null,
+    validUntil: null,
+    consentId: null,
+    ...overrides,
+  };
+}
+
+export function makeConsents(overrides: Partial<ConsentsOut> = {}): ConsentsOut {
+  return {
+    applicationId: 'app-1',
+    pepRules: {
+      version: 'pep-v1',
+      textHash: 'pep-hash',
+      text: 'Правила простой подписи.',
+      accepted: false,
+    },
+    items: [
+      makeConsent(),
+      makeConsent({ kind: 'TURNOVER', subjectType: 'COMPANY' }),
+      makeConsent({ kind: 'PERSONAL_DATA' }),
+    ],
+    allSigned: false,
+    ...overrides,
   };
 }

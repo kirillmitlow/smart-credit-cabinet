@@ -10,11 +10,12 @@ import { ProblemAlert } from '@/components/ProblemAlert';
 import { useActiveCompany } from '@/features/auth/useActiveCompany';
 import { indicativePayment } from '@/lib/finance';
 import { formatMoney, formatTermMonths } from '@/lib/format';
-import { applicationForm, fill, productName } from '@/texts';
+import { applicationForm, consents as consentTexts, fill, productName } from '@/texts';
 import { missingFields } from './conditionsSchema';
 import { isInFlight } from './statuses';
 import { putApplication } from './useApplication';
 import type { DraftAutosave } from './useDraftAutosave';
+import { useConsents } from './useConsents';
 
 const r = applicationForm.review;
 
@@ -51,6 +52,8 @@ export function ReviewStep({
   const [busy, setBusy] = useState(false);
   const submittingRef = useRef(false);
 
+  const consents = useConsents(application.id);
+  const allSigned = consents.data?.allSigned === true && !consents.isError;
   const missing = missingFields(application);
   const canSubmit = application.allowedActions.includes('SUBMIT');
   const payment = indicativePayment(
@@ -62,7 +65,7 @@ export function ReviewStep({
 
   const onSubmit = async () => {
     // двойной клик: второе нажатие не создаёт ещё одну отправку
-    if (submittingRef.current) return;
+    if (submittingRef.current || !allSigned) return;
     submittingRef.current = true;
     setBusy(true);
     try {
@@ -148,6 +151,24 @@ export function ReviewStep({
           })}
         </Text>
       ) : null}
+      {consents.isError ? (
+        <ProblemAlert
+          error={consents.error}
+          onAction={() => {
+            void consents.refetch();
+          }}
+        />
+      ) : null}
+      {!allSigned ? (
+        <Stack gap="xs">
+          <Text size="sm">
+            {consents.isPending ? consentTexts.loading : consentTexts.incomplete}
+          </Text>
+          <Anchor component={Link} to={`${base}/4`}>
+            {r.toConsents}
+          </Anchor>
+        </Stack>
+      ) : null}
       {role === 'ACCOUNTANT' ? <Text size="sm">{r.accountantNote}</Text> : null}
 
       {submit.isError ? (
@@ -165,7 +186,7 @@ export function ReviewStep({
             onClick={() => {
               void onSubmit();
             }}
-            disabled={missing.length > 0}
+            disabled={missing.length > 0 || !allSigned}
             loading={busy || submit.isPending}
           >
             {r.submit}
