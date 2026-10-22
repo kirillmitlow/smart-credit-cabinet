@@ -4,6 +4,7 @@ import {
   applicationForm,
   applicationPage,
   consents,
+  companyProfile,
   contractTexts,
   decision,
   fill,
@@ -55,12 +56,28 @@ test('TS-001: Соколова проходит путь от входа до «
     await page.getByRole('button', { name: wizardResult.apply }).first().click();
   });
 
-  await test.step('Заявка по шагам: условия подставлены, шаги 2–3 проходим «Продолжить»', async () => {
+  await test.step('Заявка: условия, карточка компании и источник данных', async () => {
     await expect(page).toHaveURL(/\/applications\/[^/]+\/edit\/1$/);
     await expect(page.getByLabel(applicationForm.conditions.amount)).toHaveValue(
       /500[\s\u00a0\u202f]?000/,
     );
     await page.getByRole('button', { name: applicationForm.next }).click();
+    await expect(page.getByLabel(companyProfile.labels.inn)).toHaveValue('001234567887');
+    await expect(page.getByLabel(companyProfile.labels.name)).toHaveValue(
+      'Соколова Анна Сергеевна',
+    );
+    const source = page.getByRole('button', {
+      name: fill(companyProfile.source, { field: companyProfile.labels.name }),
+    });
+    await source.focus();
+    await page.keyboard.press('Enter');
+    const details = page.getByRole('dialog');
+    await expect(details).toBeVisible();
+    await expect(details).toContainText(companyProfile.sourceNames.registry);
+    await expect(details).toContainText('Получено');
+    await checkAccessibility(page, 'Данные компании и источник');
+    await page.keyboard.press('Escape');
+    await expect(details).not.toBeVisible();
     await page.getByRole('button', { name: applicationForm.next }).click();
     await page.getByRole('button', { name: applicationForm.next }).click();
   });
