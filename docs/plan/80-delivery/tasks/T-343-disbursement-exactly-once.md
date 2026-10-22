@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Статус | DONE — PR feat/api-disbursement; LOST_RESPONSE и двойная доставка проверены на живом моке; property на порядок и дубли; сверка ALREADY_DISBURSED в интеграционных тестах |
+| Статус | REVIEW — feat/api-disbursement; LOST_RESPONSE, повтор задач, откат подтверждения и просроченная аренда проверены; реальный kill процесса в e2e ещё нужен |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
-| Ветка | `feat/disbursement-exactly-once` |
+| Ветка | `feat/api-disbursement` |
 | Оценка | ~5 ч |
 | Приоритет | M (Must) |
 | Тонкий сквозной сценарий | нет |
