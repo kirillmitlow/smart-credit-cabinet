@@ -21,11 +21,20 @@ from app.modules.pipeline.models import Decision
 log = structlog.get_logger("app.pipeline.hooks")
 
 OFFER_OUTCOMES = frozenset({Outcome.APPROVED, Outcome.COUNTER_OFFER})
-_LABELS = {"CONDITIONAL_SECURITY": "С поручительством владельца или залогом"}
+# Подписи карточек (30-10, вариант Г); по виду варианта из ядра
+_OTHER = "Другой продукт или с залогом"
+_LABELS = {
+    "CONDITIONAL_SECURITY": "С поручительством владельца или залогом",
+    "LONGER_TERM": "Ваша сумма, дольше срок",
+    "OTHER_TERM": "Ваша сумма, другой срок",
+    "LESS_AMOUNT": "Ваш срок, меньше сумма",
+    "OTHER_PRODUCT": _OTHER,
+    "WITH_SECURITY": _OTHER,
+}
 
 
 def _changes(inp: DecisionInput, variant: Variant) -> dict[str, Any]:
-    """Чем вариант отличается от запроса клиента: пусто, если условия те же."""
+    """Чем вариант отличается от запроса клиента и что нужно от клиента (`requirements`)."""
     asked = inp.application
     changed: dict[str, Any] = {}
     if variant.product != asked.product:
@@ -36,6 +45,8 @@ def _changes(inp: DecisionInput, variant: Variant) -> dict[str, Any]:
         changed["termMonths"] = {"from": asked.term_months, "to": variant.term_months}
     if variant.security_required:
         changed["security"] = True
+    if variant.requirements:  # «что нужно от вас» по карточке
+        changed["requirements"] = list(variant.requirements)
     return changed
 
 
@@ -82,8 +93,9 @@ def create_offer(
 ) -> None:
     """Предложение по решению в той же транзакции (50-05, шаг 6, T-340).
 
-    `APPROVED` — один вариант «как просили». `COUNTER_OFFER` — варианты решения; пока
-    оптимизатор встречных не готов (T-297), их может не быть: предложение помечается `PENDING`.
+    `APPROVED` — один вариант «как просили». `COUNTER_OFFER` — карточки оптимизатора (T-297)
+    или условное встречное; вариантов в норме не меньше одного. `PENDING` остался запасным
+    состоянием на случай пустого набора: принять такое предложение нельзя.
     """
     drafts = _drafts(inp, result)
     counter = result.outcome == Outcome.COUNTER_OFFER

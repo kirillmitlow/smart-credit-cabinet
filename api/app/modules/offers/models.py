@@ -60,7 +60,7 @@ class Offer(IdMixin, Base):
     decision_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("decisions.id"))
     kind: Mapped[str] = mapped_column(String(16))
     status: Mapped[str] = mapped_column(String(16), default="OPEN")
-    # `PENDING`: встречные варианты ещё не посчитаны (оптимизатор T-297 не готов)
+    # `PENDING`: запасное состояние, вариантов нет (встречное решения в норме несёт карточки T-297)
     variants_status: Mapped[str] = mapped_column(String(16), default="READY")
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     # Без внешнего ключа: вариант создаётся после предложения, ссылку проверяет сервис

@@ -6,4 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Чем вариант отличается от запроса (`productCode`, `amountRub`, `termMonths`: `{from, to}`; `security`: нужен залог или поручительство) и «что нужно от вас» (`requirements`: список фраз; нет ключа — ничего)
+ */
 export type VariantOutWhatChanged = { [key: string]: unknown };

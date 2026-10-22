@@ -38,7 +38,7 @@ FEATS: Features = compute_features(BASE)
 APP: Application = BASE.application  # EXPRESS, 1 млн, 12 мес.
 RATE = D("0.215")
 FEASIBLE = CounterOfferSearch(
-    "PLACEHOLDER_T297", (), True, {"amount_rub": 100_000, "term_months": 36, "payment_rub": 3_700}
+    "READY", (), True, {"amount_rub": 100_000, "term_months": 36, "payment_rub": 3_700}
 )
 NO_OFFER = replace(FEASIBLE, feasible=False)
 FLAG = make("MASS_REGISTRATION", which="адрес")
@@ -93,7 +93,7 @@ def test_row_7_money_fails_but_offers_exist_is_counter_offer() -> None:
     r = go(aff=FAIL)
     assert (r.outcome, r.route, r.level) == (Outcome.COUNTER_OFFER, Route.AUTO, Level.L0)
     assert [x.code for x in r.reasons] == ["DSCR_LOW"]
-    assert r.variants_status == "PLACEHOLDER_T297"
+    assert r.variants_status == "READY"
     assert r.variants == ()
 
 
@@ -247,6 +247,22 @@ def test_money_gray_zone_goes_to_a_human() -> None:
     r = go(93, aff=gray)
     assert r.outcome == Outcome.MANUAL_REVIEW
     assert {x.params["metric"] for x in r.reasons} == {"DSCR", "STRESS_DSCR"}
+
+
+@pytest.mark.parametrize(
+    ("flow", "outcome", "dscr_gray"),
+    [
+        (124_990, Outcome.COUNTER_OFFER, False),  # DSCR 1,2499: не проходит, встречные
+        (125_000, Outcome.MANUAL_REVIEW, True),  # 1,25: проходит, серая зона
+        (129_990, Outcome.MANUAL_REVIEW, True),  # 1,2999: серая зона
+        (130_000, Outcome.MANUAL_REVIEW, False),  # 1,30: DSCR вышел, стресс (1,04) ещё в зоне
+    ],
+)
+def test_dscr_gray_zone_boundaries(flow: int, outcome: Outcome, dscr_gray: bool) -> None:
+    aff = afford(flow_model_rub=flow, existing_payments_rub=100_000 - 93_354)  # платежи 100 000
+    metrics = {x.params["metric"] for x in aff.near_threshold}
+    assert ("DSCR" in metrics) == dscr_gray
+    assert go(93, aff=aff).outcome == outcome
 
 
 def test_manual_review_on_failing_request_recommends_what_core_would_decide() -> None:

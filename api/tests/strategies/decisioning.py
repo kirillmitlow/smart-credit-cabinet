@@ -193,3 +193,30 @@ def healthy(p: RequestParams) -> RequestParams:
 
 def healthy_params() -> st.SearchStrategy[RequestParams]:
     return request_params().map(healthy)
+
+
+_BOUNDS = {
+    Product.EXPRESS: (100_000, 3_000_000, 6, 36),
+    Product.WORKING_CAPITAL: (500_000, 30_000_000, 3, 36),
+    Product.CREDIT_LINE: (1_000_000, 50_000_000, 12, 36),
+}
+
+
+@st.composite
+def counter_offer_params(draw: st.DrawFn) -> RequestParams:
+    """Хороший клиент просит больше, чем тянет: запрос часто не проходит, но встречные есть.
+
+    Без флагов, просрочек и стоп-факторов (иначе маршрут уводит в ручной разбор); сумма кратна
+    выручке, срок часто короткий, платежи по прежним кредитам разные.
+    """
+    p = draw(healthy_params())
+    product = draw(st.sampled_from(PRODUCTS))
+    lo, hi, tlo, thi = _BOUNDS[product]
+    amount = draw(st.integers(2, 40)) * p.revenue_rub // 50_000 * 50_000
+    return replace(
+        p,
+        product=product,
+        amount_rub=min(max(amount, lo), hi),
+        term_months=draw(st.integers(tlo, thi)),
+        monthly_payments_rub=draw(st.sampled_from([0, 20_000, 150_000])),
+    )

@@ -172,6 +172,9 @@ def route(  # noqa: PLR0913, PLR0914 — сборка исхода по табл
                 ),
             )
         )
+    if hard and search.above_authority and grade in (Grade.A, Grade.B):
+        # C-04: автоматических встречных нет, проходящие есть только выше полномочий
+        manual.append(make("AMOUNT_ABOVE_AUTO_LIMIT", **search.authority))
     gray_points = _points_gray(policy, score)
     if gray_points is not None:
         manual.append(gray_points)
@@ -191,7 +194,7 @@ def route(  # noqa: PLR0913, PLR0914 — сборка исхода по табл
             reasons=reasons,
             recommendation=Recommendation(base, _hint(app, young_with_security, base, flags)),
             variants=(),
-            variants_status=search.status,
+            variants_status="NOT_APPLICABLE",
             manual_reasons=tuple(manual),
         )
 
