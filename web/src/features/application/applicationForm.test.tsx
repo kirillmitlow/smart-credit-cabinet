@@ -132,7 +132,7 @@ describe('заявка по шагам: Условия и автосохране
     expect(termField()).toHaveValue('18');
   });
 
-  it('шаги 2–3 — заглушки; на шаге 4 загружены согласия', async () => {
+  it('шаг 2 — карточка компании; на шаге 4 загружены согласия', async () => {
     const user = userEvent.setup();
     mockSessions({ client: makeMe() });
     mockDraft(makeApplication());

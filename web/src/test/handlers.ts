@@ -4,6 +4,7 @@ import {
   getHealthLiveMockHandler,
   getHealthReadyMockHandler,
 } from '@/api/generated/api.msw';
+import { makeCompanyProfile } from './companyProfileFactory';
 import { makePublicConfig, problemResponse } from './factories';
 
 /**
@@ -16,6 +17,7 @@ export const defaultHandlers = [
   getHealthDepsMockHandler(),
   http.get('*/api/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
   http.get('*/api/applications', () => Response.json({ items: [], nextCursor: null })),
+  http.get('*/api/companies/:id', () => Response.json(makeCompanyProfile())),
   http.get('*/api/loans', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/public-config', () => Response.json(makePublicConfig({ demoMode: false }))),
 ];

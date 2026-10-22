@@ -1,0 +1,15 @@
+meta {
+  name: Получить карточку компании
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{apiUrl}}/companies/{{companyId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: sid_client={{sidClient}}
+}
