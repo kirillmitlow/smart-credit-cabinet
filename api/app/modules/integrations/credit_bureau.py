@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
 from typing import Any, Literal
+from urllib.parse import quote
 from uuid import UUID
 
 import structlog
@@ -446,13 +447,18 @@ def _event_body(event: BureauEvent) -> dict[str, Any]:
     return body
 
 
+def _ascii(ref: str) -> str:
+    """Заголовки HTTP — только ASCII: номер «АЗ-2026-000001» кодируем процентами, однозначно."""
+    return quote(ref, safe="-_.")
+
+
 def report_idempotency_key(application_ref: str, subject_inn: str) -> str:
     """`bki-report:{заявка}:{ИНН субъекта}`: из бизнес-данных, не случайный (50-08)."""
-    return f"bki-report:{application_ref}:{subject_inn}"
+    return f"bki-report:{_ascii(application_ref)}:{subject_inn}"
 
 
 def submission_idempotency_key(application_ref: str, event_type: BureauEventType) -> str:
-    return f"sub:{application_ref}:{event_type.value}"
+    return f"sub:{_ascii(application_ref)}:{event_type.value}"
 
 
 def check_consent(consent: BkiConsent, subject: BureauSubject, purpose: str) -> str | None:
