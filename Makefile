@@ -65,4 +65,4 @@ openapi: ## Выгрузить OpenAPI в docs/api и перегенериров
 	@echo "Появится вместе с api и моками (T-543)"
 
 reset: ## Сброс демо-стенда
-	@echo "Появится вместе с демо-API (T-371)"
+	curl -fsS -X POST http://127.0.0.1:8100/demo/reset && echo

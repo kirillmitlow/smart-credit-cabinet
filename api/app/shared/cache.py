@@ -17,3 +17,21 @@ def get_redis() -> redis.Redis:
 
 
 WORKER_HEARTBEAT_KEY = "scc:worker:heartbeat"
+
+
+def delete_prefixes(prefixes: list[str]) -> int:
+    """Удалить все ключи с данными префиксами; вернуть число удалённых. Безопасно повторять.
+
+    Служебный ключ воркера (`WORKER_HEARTBEAT_KEY`) под префиксы не попадает.
+    """
+    client = get_redis()
+    deleted = 0
+    for prefix in prefixes:
+        batch = [
+            key
+            for key in client.scan_iter(match=f"{prefix}*", count=500)
+            if key != WORKER_HEARTBEAT_KEY
+        ]
+        for start in range(0, len(batch), 500):
+            deleted += int(client.unlink(*batch[start : start + 500]))
+    return deleted

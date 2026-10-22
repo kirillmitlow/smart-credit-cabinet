@@ -57,6 +57,7 @@ import type {
   ProductList,
   ProductOut,
   PublicConfig,
+  ResetOut,
   RolesResponse,
   SignChallenge,
   SignChallengeOut,
@@ -3980,4 +3981,108 @@ export const useSignContract = <TError = HTTPValidationError,
         TContext
       > => {
       return useMutation(getSignContractMutationOptions(options), queryClient);
+    }
+
+export type demoResetResponse200 = {
+  data: ResetOut
+  status: 200
+}
+
+export type demoResetResponse403 = {
+  data: void
+  status: 403
+}
+
+export type demoResetResponse409 = {
+  data: void
+  status: 409
+}
+
+export type demoResetResponse502 = {
+  data: void
+  status: 502
+}
+
+export type demoResetResponseSuccess = (demoResetResponse200) & {
+  headers: Headers;
+};
+export type demoResetResponseError = (demoResetResponse403 | demoResetResponse409 | demoResetResponse502) & {
+  headers: Headers;
+};
+
+export type demoResetResponse = (demoResetResponseSuccess | demoResetResponseError)
+
+export const getDemoResetUrl = () => {
+
+
+
+
+  return `/demo/reset`
+}
+
+/**
+ * Отвечает по факту завершения, а не по таймеру. При ошибке `502 DEMO_RESET_FAILED` в `errors[0].step` стоит шаг (`MOCKS`, `DATABASE`, `SESSIONS`); повторный вызов безопасно доводит сброс. Параллельный вызов: `409 DEMO_RESET_IN_PROGRESS`.
+ * @summary Единый сброс стенда: моки, база api, сессии и кэш
+ */
+export const demoReset = async ( options?: Parameters<typeof customFetch>[1]): Promise<demoResetResponse> => {
+
+  return customFetch<demoResetResponse>(getDemoResetUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDemoResetMutationKey = () => ['demoReset'] as const;
+
+export const getDemoResetMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext> => {
+
+const mutationKey = getDemoResetMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoReset>>, void> = () => {
+
+
+          return  demoReset(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoResetMutationResult = NonNullable<Awaited<ReturnType<typeof demoReset>>>
+
+    export type DemoResetMutationError = void
+
+
+    /**
+ * @summary Единый сброс стенда: моки, база api, сессии и кэш
+ */
+export const useDemoReset = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoReset>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDemoResetMutationOptions(options), queryClient);
     }

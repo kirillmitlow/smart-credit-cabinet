@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
 from app import health
-from app.modules import applications, catalog, companies, loans, offers, pipeline
+from app.modules import applications, catalog, companies, demo, loans, offers, pipeline
 from app.shared import clock, db
 from app.shared.errors import install_error_handlers
 from app.shared.logs import configure_logging
@@ -91,6 +91,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(loans.router)
     app.include_router(pipeline.router)
     app.include_router(offers.router)
+    app.include_router(demo.router)
     return app
 
 

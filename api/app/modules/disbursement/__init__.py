@@ -4,6 +4,7 @@
 (условия кредита; подключает `app/wiring.py`), обработчики outbox (`register`) и аудит тупиков.
 """
 
+from app.modules.disbursement import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.disbursement.delivery import audit_dead_letter, register
 from app.modules.disbursement.keys import account_key, disbursement_key, obligation_key
 from app.modules.disbursement.models import Disbursement

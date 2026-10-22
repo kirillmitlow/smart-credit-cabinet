@@ -48,3 +48,32 @@ def get_scenario(code: str) -> dict[str, Any]:
             return result
     except httpx.HTTPError as exc:
         raise ScenariosUnavailableError(str(exc)) from exc
+
+
+RESET_TIMEOUT_SECONDS = 120.0  # сброс чистит четыре мока и применяет все сценарии заново
+
+
+def reset_all(mode: str = "KEEP_CUSTOM") -> dict[str, Any]:
+    """Общий сброс моков (`POST /scenarios/reset`, 8.4): очистка, chaos в OK, сценарии заново.
+
+    Только для модуля `demo` (D-081). Ошибку мока (в том числе 502 RESET_FAILED) отдаём как
+    `ScenariosUnavailableError` с текстом причины: `demo` назовёт шаг «моки».
+    """
+    settings = get_settings()
+    try:
+        with httpx.Client(
+            base_url=settings.scenarios_url,
+            headers={"X-Admin-Key": settings.mock_admin_key},
+            timeout=RESET_TIMEOUT_SECONDS * settings.integration_timeout_scale,
+        ) as client:
+            response = client.post("/api/v1/scenarios/reset", json={"mode": mode})
+    except httpx.HTTPError as exc:
+        raise ScenariosUnavailableError(f"{type(exc).__name__}: {exc}") from exc
+    if response.status_code != 200:
+        try:
+            detail = str(response.json().get("detail") or "")
+        except ValueError:
+            detail = ""
+        raise ScenariosUnavailableError(f"HTTP {response.status_code}: {detail[:500]}")
+    result: dict[str, Any] = response.json()
+    return result

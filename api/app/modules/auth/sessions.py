@@ -21,11 +21,11 @@ from app.shared.errors import AppError
 from app.shared.settings import get_settings
 
 COOKIE = {Zone.CLIENT: "sid_client", Zone.BANK: "sid_bank"}
-_PREFIX = "scc:session:"
+KEY_PREFIX = "scc:session:"
 
 
 def _key(zone: Zone, sid: str) -> str:
-    return f"{_PREFIX}{zone.value}:{sid}"
+    return f"{KEY_PREFIX}{zone.value}:{sid}"
 
 
 def store_unavailable(exc: Exception) -> AppError:

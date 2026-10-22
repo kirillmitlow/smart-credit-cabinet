@@ -22,6 +22,7 @@ import {
   AutoDecisionMode,
   DecisionTime,
   PaymentKind,
+  ResetStep,
   WizardOutcome
 } from './model';
 import type {
@@ -47,6 +48,7 @@ import type {
   ProductList,
   ProductOut,
   PublicConfig,
+  ResetOut,
   RolesResponse,
   SignChallenge,
   SignChallengeOut,
@@ -119,6 +121,8 @@ export const getRequestContractSignatureResponseMock = (overrideResponse: Partia
 export const getRequestContractSigningCodeResponseMock = (overrideResponse: Partial<Extract<SignChallengeOut, object>> = {}): SignChallengeOut => ({requestId: faker.string.alpha({length: {min: 10, max: 20}}), expiresInSeconds: faker.number.int(), demoCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
 
 export const getSignContractResponseMock = (overrideResponse: Partial<Extract<ContractSignedOut, object>> = {}): ContractSignedOut => ({contract: {id: faker.string.uuid(), applicationId: faker.string.uuid(), applicationStatus: faker.string.alpha({length: {min: 10, max: 20}}), contractUid: faker.string.alpha({length: {min: 10, max: 20}}), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), contentHash: faker.string.alpha({length: {min: 10, max: 20}}), templateVersion: faker.string.alpha({length: {min: 10, max: 20}}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), productCode: faker.string.alpha({length: {min: 10, max: 20}}), amountRub: faker.number.int(), termMonths: faker.number.int(), ratePercent: faker.number.float({fractionDigits: 2}), paymentRub: faker.number.int(), signers: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({role: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), signed: faker.datatype.boolean(), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), progress: {signed: faker.number.int(), required: faker.number.int()}, canSign: faker.datatype.boolean(), canPassToDirector: faker.datatype.boolean()}, justSigned: faker.datatype.boolean(), ...overrideResponse})
+
+export const getDemoResetResponseMock = (overrideResponse: Partial<Extract<ResetOut, object>> = {}): ResetOut => ({status: "DONE", steps: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({step: faker.helpers.arrayElement(Object.values(ResetStep)), title: faker.string.alpha({length: {min: 10, max: 20}}), status: "DONE"})), durationMs: faker.number.int(), finishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 
 export const getHealthLiveMockHandler = (overrideResponse?: HealthLive200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthLive200> | HealthLive200), options?: RequestHandlerOptions) => {
@@ -534,6 +538,18 @@ export const getSignContractMockHandler = (overrideResponse?: ContractSignedOut 
       })
   }, options)
 }
+
+export const getDemoResetMockHandler = (overrideResponse?: ResetOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ResetOut> | ResetOut), options?: RequestHandlerOptions) => {
+  return http.post('*/demo/reset', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDemoResetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getApiMock = () => [
   getHealthLiveMockHandler(),
   getHealthReadyMockHandler(),
@@ -569,5 +585,6 @@ export const getApiMock = () => [
   getGetContractDocumentMockHandler(),
   getRequestContractSignatureMockHandler(),
   getRequestContractSigningCodeMockHandler(),
-  getSignContractMockHandler()
+  getSignContractMockHandler(),
+  getDemoResetMockHandler()
 ]

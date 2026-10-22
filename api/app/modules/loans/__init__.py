@@ -3,6 +3,7 @@
 Публичный интерфейс: `open_loan` (вызывает выдача, одна транзакция с `DISBURSED`) и ручки `router`.
 """
 
+from app.modules.loans import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.loans.models import Loan, PaymentScheduleRow
 from app.modules.loans.router import router
 from app.modules.loans.service import NewLoan, next_payment, open_loan, schedule_rows

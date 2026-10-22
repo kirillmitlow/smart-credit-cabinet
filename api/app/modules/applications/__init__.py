@@ -1,5 +1,6 @@
 """Заявка и её стейт-машина, черновик, журнал, согласия, задачи клиенту, залог. Документ: 20-02, 20-03, 20-04, D-055."""
 
+from app.modules.applications import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.applications import wizard_draft as _wizard_draft  # noqa: F401  (регистрирует слушателя)
 from app.modules.applications.consent_proof import SIGN_METHOD, proof_for
 from app.modules.applications.consents import (
