@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Card, Stack, Text, Title } from '@mantine/core';
 import type { ApplicationOut } from '@/api/generated/model';
 import { outcomes } from '@/texts';
+import { ContractSigning } from '@/features/offers/ContractSigning';
 import { DecisionPanel } from './DecisionPanel';
 
 function OutcomeCard({ title, children }: { title: string; children: ReactNode }) {
@@ -43,7 +44,10 @@ export function OutcomeBlock({ application }: { application: ApplicationOut }) {
     case 'MANUAL_REVIEW':
       return <NoticeBlock title={outcomes.manual.title} body={outcomes.manual.body} />;
     case 'OFFER_ACCEPTED':
-      return <NoticeBlock title={outcomes.signing.title} body={outcomes.signing.body} />;
+    case 'SIGNED':
+    case 'DISBURSING':
+    case 'DISBURSED':
+      return <ContractSigning applicationId={application.id} />;
     default:
       return null;
   }

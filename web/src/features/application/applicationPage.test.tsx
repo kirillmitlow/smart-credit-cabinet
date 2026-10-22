@@ -180,7 +180,9 @@ describe('блоки исхода', () => {
     expect(
       await screen.findByRole('heading', { level: 2, name: outcomes.approved.title }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: outcomes.approved.accept })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: outcomes.approved.accept }),
+    ).not.toBeInTheDocument();
     expect(await blockingA11yViolations(container)).toEqual([]);
 
     await user.click(screen.getByRole('button', { name: applicationPage.withdraw.decline }));
@@ -242,7 +244,6 @@ describe('блоки исхода', () => {
     ['COUNTER_OFFER', outcomes.counter.title],
     ['NEEDS_INFO', outcomes.needsInfo.title],
     ['MANUAL_REVIEW', outcomes.manual.title],
-    ['OFFER_ACCEPTED', outcomes.signing.title],
   ])('%s: блок по статусу', async (status, title) => {
     mockSessions({ client: makeMe() });
     serve(sent(status));

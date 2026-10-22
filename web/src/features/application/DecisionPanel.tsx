@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useGetApplicationDecision } from '@/api/generated/api';
 import type { ApplicationOut, ClientDecisionOut, VariantOut } from '@/api/generated/model';
 import { ProblemAlert } from '@/components/ProblemAlert';
+import { OfferActions } from '@/features/offers/OfferActions';
 import { formatDateTime, formatMoney, formatPercent, formatTermMonths } from '@/lib/format';
 import { decision as t, fill, outcomes } from '@/texts';
 
@@ -65,7 +66,7 @@ function Preview({ terms }: { terms: VariantOut }) {
   );
 }
 
-function Approved({ data }: { data: ClientDecisionOut }) {
+function Approved({ data, canAccept }: { data: ClientDecisionOut; canAccept: boolean }) {
   const terms = data.terms;
   if (!terms) return <Alert color="yellow">{t.noTerms}</Alert>;
   return (
@@ -98,12 +99,7 @@ function Approved({ data }: { data: ClientDecisionOut }) {
         <Text size="sm">{fill(t.expires, { date: formatDateTime(data.offer.expiresAt) })}</Text>
       ) : null}
       <Text>{outcomes.approved.next}</Text>
-      <Button disabled aria-describedby="accept-later">
-        {outcomes.approved.accept}
-      </Button>
-      <Text id="accept-later" size="sm" c="dimmed">
-        {outcomes.approved.acceptLater}
-      </Text>
+      {data.offer && canAccept ? <OfferActions offer={data.offer} /> : null}
     </>
   );
 }
@@ -139,7 +135,10 @@ export function DecisionPanel({ application }: { application: ApplicationOut }) 
         {data && data.outcome !== expected ? <Alert color="yellow">{t.unavailable}</Alert> : null}
         {data?.outcome === expected ? (
           approved ? (
-            <Approved data={data} />
+            <Approved
+              data={data}
+              canAccept={!query.isError && application.allowedActions.includes('ACCEPT_OFFER')}
+            />
           ) : (
             <>
               <TextList
