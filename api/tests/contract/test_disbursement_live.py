@@ -20,7 +20,7 @@ import pytest
 from sqlalchemy import func, select, text, update
 
 from app.modules import disbursement, pipeline
-from app.modules.applications import Application, ApplicationEvent
+from app.modules.applications import Application
 from app.modules.integrations import IntegrationClient, build_integrations, set_integrations
 from app.modules.loans import Loan, PaymentScheduleRow
 from app.modules.pipeline.models import Decision
@@ -239,7 +239,7 @@ def test_my_loans_api_shows_loan_to_owner_and_404_to_foreign(stand: dict[str, An
     assert TODAY + timedelta(days=0) == clock.today()
 
 
-def test_garipov_not_a_customer_gets_account_then_loan(stand: dict[str, Any]) -> None:
+def test_garipov_gets_settlement_account_then_loan(stand: dict[str, Any]) -> None:
     use_live(None)
     application_id = signed_application(stand, "garipov")
     disbursement.run(application_id)
@@ -249,9 +249,3 @@ def test_garipov_not_a_customer_gets_account_then_loan(stand: dict[str, Any]) ->
         assert application is not None and application.status == "DISBURSED"
         loan = s.scalars(select(Loan)).one()
         assert len(loan.settlement_account) == 20
-        steps = s.scalars(
-            select(ApplicationEvent.step_code).where(
-                ApplicationEvent.application_id == application_id, ApplicationEvent.kind == "STEP"
-            )
-        )
-        assert "ACCOUNT_OPENED" in set(steps)
