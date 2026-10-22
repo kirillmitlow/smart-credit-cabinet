@@ -208,6 +208,18 @@ async def client(app: FastAPI, admin: httpx.AsyncClient) -> AsyncIterator[httpx.
         yield c
 
 
+def msk_date(moment: str) -> str:
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    return (
+        datetime.fromisoformat(moment.replace("Z", "+00:00"))
+        .astimezone(ZoneInfo("Europe/Moscow"))
+        .date()
+        .isoformat()
+    )
+
+
 async def put(
     admin: httpx.AsyncClient, inn: str, body: dict[str, Any], scenario: str | None = "demo"
 ) -> httpx.Response:
@@ -226,7 +238,8 @@ async def test_legal_entity_round_trip_matches_spec_example(
     assert meta["source"] == "EGRUL"
     assert meta["simulated"] is True
     assert meta["dataActualAt"] == "2026-10-19"
-    assert meta["retrievedAt"].startswith("2026-10-20T")
+    # Сутки стенда — по Москве: в UTC дата бывает вчерашней (00:00–03:00 МСК)
+    assert msk_date(meta["retrievedAt"]) == "2026-10-20"
     assert meta["requestId"]
     assert body == stankoprom()
 
