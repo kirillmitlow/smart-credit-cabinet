@@ -365,3 +365,21 @@ class PresetView(CamelModel):
     code: Preset
     title: str
     defaults: dict[str, Any]
+
+
+class ResetMode(StrEnum):
+    KEEP_CUSTOM = "KEEP_CUSTOM"
+    BUILTIN_ONLY = "BUILTIN_ONLY"
+
+
+class ResetRequest(Strict):
+    mode: ResetMode = ResetMode.KEEP_CUSTOM
+
+
+class ResetView(CamelModel):
+    """Итог общего сброса: режим, сбои после сброса (всегда OK), удалённые и применённые сценарии."""
+
+    mode: ResetMode
+    chaos: dict[str, Literal["OK"]]
+    deleted: list[str]
+    scenarios: list[ScenarioListItem]

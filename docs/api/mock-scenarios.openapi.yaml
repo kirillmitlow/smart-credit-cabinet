@@ -956,6 +956,118 @@
           }
         }
       }
+    },
+    "/api/v1/scenarios/reset": {
+      "post": {
+        "tags": [
+          "сценарии"
+        ],
+        "summary": "Вернуть все моки в исходное состояние: очистка, chaos в OK, сценарии заново",
+        "operationId": "resetScenarios",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ResetRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -2418,6 +2530,63 @@
           "code"
         ],
         "title": "Problem"
+      },
+      "ResetMode": {
+        "type": "string",
+        "enum": [
+          "KEEP_CUSTOM",
+          "BUILTIN_ONLY"
+        ],
+        "title": "ResetMode"
+      },
+      "ResetRequest": {
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ResetMode",
+            "default": "KEEP_CUSTOM"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ResetRequest"
+      },
+      "ResetView": {
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ResetMode"
+          },
+          "chaos": {
+            "additionalProperties": {
+              "type": "string",
+              "const": "OK"
+            },
+            "type": "object",
+            "title": "Chaos"
+          },
+          "deleted": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Deleted"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioListItem"
+            },
+            "type": "array",
+            "title": "Scenarios"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "chaos",
+          "deleted",
+          "scenarios"
+        ],
+        "title": "ResetView",
+        "description": "Итог общего сброса: режим, сбои после сброса (всегда OK), удалённые и применённые сценарии."
       },
       "ScenarioListItem": {
         "properties": {

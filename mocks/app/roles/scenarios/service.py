@@ -108,6 +108,29 @@ async def create(
     return row
 
 
+async def restore_builtin(
+    session: AsyncSession, row: Scenario, spec: ScenarioSpec, clock: Clock, bank_bik: str
+) -> Scenario:
+    """Вернуть встроенный сценарий к исходнику из кода (reset): снимок строится заново.
+
+    Ошибка проверки поднимается до изменения строки, поэтому прежнее состояние сохраняется.
+    """
+    snapshot = await preview(session, spec, clock, bank_bik)
+    row.title = spec.title
+    row.builtin_version = spec.builtin_version
+    row.modified = False
+    row.expected_outcome = spec.expected_outcome
+    row.expected_final_outcome = spec.expected_final_outcome
+    row.expected_reason_codes = list(spec.expected_reason_codes)
+    row.inn = snapshot["identity"]["inn"]
+    row.spec = {**spec_dump(spec), "code": row.code}
+    row.expanded = snapshot
+    row.needs_reapply = True
+    row.updated_at = clock.now()
+    await session.flush()
+    return row
+
+
 async def get(session: AsyncSession, code: str) -> Scenario:
     row = await session.get(Scenario, code)
     if row is None:
