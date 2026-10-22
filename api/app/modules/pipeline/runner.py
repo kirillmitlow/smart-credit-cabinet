@@ -360,7 +360,7 @@ def _abandon(claim: Claimed, reason: str) -> None:
         )
 
 
-def run_pipeline(application_id: UUID, *, integrations: Integrations | None = None) -> RunResult:
+def _run_pipeline(application_id: UUID, *, integrations: Integrations | None = None) -> RunResult:
     """Выполнить (или продолжить) конвейер заявки. Безопасно вызывать повторно и параллельно."""
     claim = claim_run(application_id)
     if claim is None:
@@ -395,3 +395,17 @@ def run_pipeline(application_id: UUID, *, integrations: Integrations | None = No
             return RunResult.ABANDONED
     log.info("pipeline_done")
     return RunResult.DONE
+
+
+def run_pipeline(application_id: UUID, *, integrations: Integrations | None = None) -> RunResult:
+    from app.modules.applications import hold_operation
+    from app.shared.operations import ResetInProgress
+
+    try:
+        with hold_operation(application_id) as scope:
+            if scope is None:
+                return RunResult.SKIPPED
+            return _run_pipeline(application_id, integrations=integrations)
+    except ResetInProgress:
+        log.info("pipeline_reset_fenced", application=str(application_id))
+        return RunResult.SKIPPED

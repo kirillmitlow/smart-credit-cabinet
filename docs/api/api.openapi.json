@@ -1698,6 +1698,62 @@
           }
         }
       }
+    },
+    "/demo/personas/{code}/reset": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Вернуть одну компанию к исходному сценарию",
+        "description": "Не затрагивает соседние компании. Сохраняет идентификатор компании и вход пользователя. При частичном сбое компания закрыта для изменений до успешного повтора. 409 DEMO_RESET_IN_PROGRESS: операция компании или сброс ещё выполняется. 502 DEMO_RESET_FAILED: errors[0].step содержит MOCKS, CACHE или DATABASE.",
+        "operationId": "demoResetPersona",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonaResetOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Демо-режим выключен"
+          },
+          "404": {
+            "description": "Компания сценария не найдена"
+          },
+          "409": {
+            "description": "Операция компании или сброс ещё выполняется"
+          },
+          "502": {
+            "description": "Частичный сбой; повторите сброс компании"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3494,6 +3550,73 @@
         ],
         "title": "PersonOption"
       },
+      "PersonaResetOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "DONE",
+            "title": "Status",
+            "default": "DONE"
+          },
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Companyid"
+          },
+          "generation": {
+            "type": "integer",
+            "title": "Generation"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/PersonaResetStepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "durationMs": {
+            "type": "integer",
+            "title": "Durationms"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Finishedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "companyId",
+          "generation",
+          "steps",
+          "durationMs",
+          "finishedAt"
+        ],
+        "title": "PersonaResetOut"
+      },
+      "PersonaResetStepOut": {
+        "properties": {
+          "step": {
+            "$ref": "#/components/schemas/Step"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "const": "DONE",
+            "title": "Status",
+            "default": "DONE"
+          }
+        },
+        "type": "object",
+        "required": [
+          "step",
+          "title"
+        ],
+        "title": "PersonaResetStepOut"
+      },
       "ProductList": {
         "properties": {
           "items": {
@@ -4278,6 +4401,15 @@
           "signedAt"
         ],
         "title": "SignerOut"
+      },
+      "Step": {
+        "type": "string",
+        "enum": [
+          "MOCKS",
+          "CACHE",
+          "DATABASE"
+        ],
+        "title": "Step"
       },
       "System": {
         "type": "string",

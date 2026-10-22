@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import threading
 from collections.abc import Iterator
 from datetime import date
@@ -114,20 +115,20 @@ def stand(
     database.dispose()
 
 
-def fill(policy_id: Any) -> None:
+def fill(policy_id: Any, *, inn: str = INN, suffix: str = "") -> None:
     """Заявка, решение, договор, выдача, кредит, согласие, аудит, outbox и прочие журналы."""
     with db.transaction() as s:
-        company = Company(inn=INN, kind="IP", name="Старая запись", status="ACTIVE")
+        company = Company(inn=inn, kind="IP", name="Старая запись", status="ACTIVE")
         s.add(company)
         user = auth.upsert_client(
-            s, login_ref="t:old", display_name="Старый", person_inn=INN, scenario_code=None
+            s, login_ref="t:old" + suffix, display_name="Старый", person_inn=inn, scenario_code=None
         )
         s.flush()
         s.add(
             CompanyMember(company_id=company.id, user_id=user.id, role="DIRECTOR", status="ACTIVE")
         )
         application = Application(
-            number="АЗ-2026-000001", company_id=company.id, created_by=user.id, status="DISBURSED",
+            number="АЗ-2026-000001" + suffix, company_id=company.id, created_by=user.id, status="DISBURSED",
             version=3, product_code="EXPRESS", amount_rub=500_000, term_months=12, draft={}, flags=[],
         )  # fmt: skip
         s.add(application)
@@ -143,7 +144,7 @@ def fill(policy_id: Any) -> None:
         s.add(version)
         s.flush()
         run = PipelineRun(
-            application_id=application.id, version_id=version.id, run_key="run-1",
+            application_id=application.id, version_id=version.id, run_key="run-1" + suffix,
             trigger="SUBMIT", status="DONE", policy_version_id=policy_id,
         )  # fmt: skip
         s.add(run)
@@ -151,7 +152,7 @@ def fill(policy_id: Any) -> None:
         s.add(
             SourceSnapshot(
                 run_id=run.id, application_id=application.id, system="REGISTRY",
-                resource="company", subject_inn=INN, status="OK", payload={}, payload_hash="h",
+                resource="company", subject_inn=inn, status="OK", payload={}, payload_hash="h",
                 retrieved_at=clock.now(),
             )
         )  # fmt: skip
@@ -168,22 +169,22 @@ def fill(policy_id: Any) -> None:
         s.add(
             Signature(
                 contract_id=contract.id, signer_user_id=user.id, signer_role="DIRECTOR",
-                proof="p", method="SIMPLE_ESIGN", attempt_id="att-1",
+                proof="p", method="SIMPLE_ESIGN", attempt_id="att-1" + suffix,
                 consent_text_version="pep-rules-v1", content_hash="h",
             )
         )  # fmt: skip
         disbursement = Disbursement(
-            application_id=application.id, company_id=company.id, application_ref="A-1",
-            customer_inn=INN, contract_number=contract.number, contract_uid=contract.contract_uid,
+            application_id=application.id, company_id=company.id, application_ref="A-1" + suffix,
+            customer_inn=inn, contract_number=contract.number, contract_uid=contract.contract_uid,
             signed_at=clock.now(), product_code="EXPRESS", kind="LOAN", repayment_type="ANNUITY",
             amount_rub=500_000, term_months=12, rate_percent=Decimal(24), status="CONFIRMED",
-            idempotency_key="k1",
+            idempotency_key="k1" + suffix,
         )  # fmt: skip
         s.add(disbursement)
         s.flush()
         loan = Loan(
             company_id=company.id, application_id=application.id, disbursement_id=disbursement.id,
-            bank_core_loan_id="loan_1", contract_number=contract.number,
+            bank_core_loan_id="loan_1" + suffix, contract_number=contract.number,
             contract_uid=contract.contract_uid, product_code="EXPRESS", kind="LOAN",
             repayment_type="ANNUITY", principal_rub=500_000, outstanding_rub=500_000,
             rate_percent=Decimal(24), term_months=12, loan_account="45506810000000000001",
@@ -198,21 +199,23 @@ def fill(policy_id: Any) -> None:
         )
         s.add(
             OutboxMessage(
-                aggregate_id="a1", event_type="E", target_system="BKI", payload={},
-                idempotency_key="outbox-1",
+                aggregate_id=str(application.id), event_type="E", target_system="BKI", payload={},
+                idempotency_key="outbox-1" + suffix,
             )
         )  # fmt: skip
         s.add(
             IdempotencyKey(
-                scope="u:POST:/x", key="k", request_hash="h", expires_at=clock.now(),
+                scope="u:POST:/x", key="k" + suffix, request_hash="h", expires_at=clock.now(),
+                response_body=json.dumps({"id": str(application.id)}).encode(),
             )
         )  # fmt: skip
         s.add(
             IntegrationCall(
                 system="REGISTRY", method="GET", path="/x", duration_ms=1, attempt=1,
+                application_id=application.id,
             )
         )  # fmt: skip
-        audit.record(s, "LOGIN", actor_id=user.id)
+        audit.record(s, "LOGIN", actor_id=user.id, company_id=company.id)
         application_id = application.id
     grant_company_bki(str(application_id))
 

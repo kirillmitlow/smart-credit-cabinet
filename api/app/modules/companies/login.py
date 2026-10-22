@@ -132,8 +132,7 @@ def _lookup(inn: str) -> RolesResponse | None:
 
 def _sync() -> None:
     try:
-        with db.transaction() as session:
-            sync.sync_all(session)
+        sync.refresh_directory()
     except scenarios.ScenariosUnavailableError as exc:
         raise AppError(503, "DIRECTORY_UNAVAILABLE", "Справочник демо-компаний недоступен") from exc
 
@@ -167,7 +166,9 @@ def _issue(body: CodeRequest) -> CodeIssued:
         ):
             raise AppError(404, "NOT_FOUND", "Компания не найдена")
         subject = f"{user.id}|{body.company_id or ''}"
-        issued = auth.codes.issue(user.person_inn or str(user.id), LOGIN, subject)
+        issued = auth.codes.issue(
+            user.person_inn or str(user.id), LOGIN, subject, company_id=body.company_id
+        )
     demo = get_settings().demo_mode
     return CodeIssued(
         request_id=issued.request_id,

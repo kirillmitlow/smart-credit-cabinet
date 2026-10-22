@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.shared.resets import register_reset, truncate
+from app.shared.resets import (
+    Persona,
+    delete_owned,
+    owned_ids,
+    register_persona_reset,
+    register_reset,
+    truncate,
+)
 
 TABLES = (
     "pipeline_runs",
@@ -19,3 +26,22 @@ def reset_demo_data(session: Session) -> None:
 
 
 register_reset("pipeline", reset_demo_data)
+
+
+def prepare_persona(session: Session, scope: Persona) -> None:
+    scope.add(
+        "decisions",
+        owned_ids(session, "pipeline", "decisions", "application_id", scope.ids("applications")),
+    )
+
+
+def reset_persona(session: Session, scope: Persona) -> None:
+    delete_owned(session, "pipeline", "decision_reasons", "decision_id", scope.ids("decisions"))
+    delete_owned(session, "pipeline", "decisions", "application_id", scope.ids("applications"))
+    delete_owned(
+        session, "pipeline", "source_snapshots", "application_id", scope.ids("applications")
+    )
+    delete_owned(session, "pipeline", "pipeline_runs", "application_id", scope.ids("applications"))
+
+
+register_persona_reset("pipeline", reset_persona, priority=60, prepare=prepare_persona)

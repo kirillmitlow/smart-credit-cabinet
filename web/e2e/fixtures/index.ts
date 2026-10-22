@@ -22,9 +22,9 @@ interface Fixtures {
 export const test = base.extend<Fixtures>({
   persona: [personas.sokolova, { option: true }],
 
-  clientPage: async ({ page, persona }, provide, testInfo) => {
+  clientPage: async ({ page, persona }, provide) => {
     await loginAsClient(page, persona.inn);
-    await resetPersona(page.request, persona.code, testInfo);
+    await resetPersona(page.request, persona.code);
     await provide(page);
   },
 

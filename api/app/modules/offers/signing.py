@@ -166,7 +166,12 @@ def request_code(
     offer = _offer_of(session, contract)
     _ensure_signable(contract, application, offer)
     ensure_pep_rules(session, principal, application, accepted=accept_pep_rules)
-    issued = auth.codes.issue(signer_identity(principal), SIGN_PURPOSE, _fingerprint(contract))
+    issued = auth.codes.issue(
+        signer_identity(principal),
+        SIGN_PURPOSE,
+        _fingerprint(contract),
+        company_id=application.company_id,
+    )
     return Challenge(issued.request_id, issued.expires_in, issued.code)
 
 

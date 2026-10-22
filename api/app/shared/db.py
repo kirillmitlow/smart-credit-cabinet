@@ -58,6 +58,9 @@ class TimestampMixin:
 class Database:
     def __init__(self, url: str, **engine_kwargs: Any) -> None:
         self.engine: Engine = create_engine(url, pool_pre_ping=True, **engine_kwargs)
+        # Session locks держатся и во время сети. Отдельный пул не даёт им занять
+        # все соединения, необходимые коротким бизнес-транзакциям той же операции.
+        self.operation_engine: Engine = create_engine(url, pool_pre_ping=True, **engine_kwargs)
         self.sessions = sessionmaker(self.engine, expire_on_commit=False)
 
     @contextmanager
@@ -68,6 +71,7 @@ class Database:
 
     def dispose(self) -> None:
         self.engine.dispose()
+        self.operation_engine.dispose()
 
 
 _database: Database | None = None

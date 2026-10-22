@@ -11,6 +11,7 @@ import hmac
 import json
 import secrets
 from dataclasses import dataclass
+from uuid import UUID
 
 import redis
 
@@ -37,7 +38,9 @@ def _digest(request_id: str, person_inn: str, purpose: str, subject: str, code: 
     return hmac.new(secret, message, hashlib.sha256).hexdigest()
 
 
-def issue(person_inn: str, purpose: str, subject: str = "") -> IssuedCode:
+def issue(
+    person_inn: str, purpose: str, subject: str = "", *, company_id: UUID | None = None
+) -> IssuedCode:
     request_id = "otp_" + secrets.token_urlsafe(16)
     code = f"{secrets.randbelow(10**6):06d}"
     record = {
@@ -46,6 +49,7 @@ def issue(person_inn: str, purpose: str, subject: str = "") -> IssuedCode:
         "subject": subject,
         "digest": _digest(request_id, person_inn, purpose, subject, code),
         "attempts": 0,
+        "company_id": str(company_id) if company_id else None,
     }
     try:
         get_redis().set(KEY_PREFIX + request_id, json.dumps(record), ex=CODE_TTL_SECONDS)
@@ -59,6 +63,21 @@ class VerifiedCode:
     person_inn: str
     purpose: str
     subject: str
+
+
+def company_for(request_id: str) -> UUID | None:
+    """Техническая область кода для ограждения входа; не проверяет и не погашает код."""
+    try:
+        raw = get_redis().get(KEY_PREFIX + request_id)
+    except redis.RedisError as exc:
+        raise store_unavailable(exc) from exc
+    if raw is None:
+        return None
+    try:
+        value = json.loads(str(raw)).get("company_id")
+        return UUID(value) if isinstance(value, str) else None
+    except (ValueError, AttributeError):
+        return None
 
 
 def verify(request_id: str, code: str, *, purpose: str) -> VerifiedCode:
