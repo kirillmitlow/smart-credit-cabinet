@@ -19,6 +19,7 @@ from app.modules.decisioning import (
     add_months,
     auto_limit,
     check_product,
+    lowest_rate,
     render,
 )
 from app.modules.decisioning.policy import ProductConfig
@@ -136,7 +137,7 @@ def product_view(
         term_min_months=cfg.term_min_months,
         term_max_months=cfg.term_max_months,
         collateral_required_above_rub=cfg.collateral_required_above_rub,
-        rate_percent_from=cfg.base_rate * 100,
+        rate_percent_from=lowest_rate(policy, Product(code)) * 100,
         auto_decision_mode=mode,
         auto_decision_up_to_rub=up_to,
         requires_bank_customer=cfg.requires_bank_customer,

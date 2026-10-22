@@ -220,7 +220,9 @@ function ResultView({
         <Title order={1} ref={headingRef} tabIndex={-1}>
           {hasVariants ? t.title : t.noneTitle}
         </Title>
-        {hasVariants ? <Text c="dimmed">{t.intro}</Text> : null}
+        {hasVariants ? (
+          <Text c="dimmed">{result.alternative ? t.intro : t.introSingle}</Text>
+        ) : null}
       </Stack>
 
       {result.startPath ? (

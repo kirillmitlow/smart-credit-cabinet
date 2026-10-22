@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
 
-from app.modules.decisioning.policy import Policy
+from app.modules.decisioning.policy import GradeAccess, Policy
 from app.modules.decisioning.types import Grade, Product, RateBreakdown
 
 _CTX = Context(prec=40, rounding=ROUND_HALF_UP)
@@ -69,4 +69,20 @@ def rate_for(policy: Policy, product: Product, grade: Grade, collateral: bool) -
         corridor_min=low,
         corridor_max=high,
         rate_with_collateral=hint,
+    )
+
+
+def lowest_rate(policy: Policy, product: Product) -> Decimal:
+    """Нижняя граница ставки продукта для «ставка от X%»: лучший доступный грейд, с залогом и без.
+
+    Базовая ставка — середина коридора, а не минимум: одобренная ставка бывает ниже неё
+    (у Соколовой 21,5% при базе 24%). «От» не должно обещать меньше, чем даст расчёт, и не должно
+    быть выше реальной ставки (D-018).
+    """
+    access = policy.product_config(product.value).grade_access
+    return min(
+        rate_for(policy, product, grade, collateral).rate
+        for grade in Grade
+        if access[grade.value] is not GradeAccess.NO
+        for collateral in (False, True)
     )

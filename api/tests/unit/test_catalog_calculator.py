@@ -21,7 +21,7 @@ def test_sokolova_base_rate_vector_30_16_example_1() -> None:
     assert (result.total_payment_rub, result.overpayment_rub) == (567_358, 67_358)
     assert result.payment_kind is PaymentKind.ANNUITY
     assert result.rate_percent == Decimal("24")
-    assert result.rate_percent_from == Decimal("24")
+    assert result.rate_percent_from == Decimal("21.5")  # «от» — лучший грейд, не база
     assert result.approximate is True
 
 

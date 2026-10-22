@@ -17,6 +17,7 @@ from app.modules.decisioning.loan_math import (
     payment_for,
 )
 from app.modules.decisioning.policy import Policy, PolicyError, parse_policy
+from app.modules.decisioning.pricing import lowest_rate
 from app.modules.decisioning.products import ProductContext, auto_limit, check_product
 from app.modules.decisioning.serialization import (
     input_from_json,
@@ -35,6 +36,7 @@ from app.modules.decisioning.types import (
 )
 
 __all__ = [
+    "lowest_rate",
     "DecisionInput",
     "DecisionResult",
     "Explanation",

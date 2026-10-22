@@ -79,7 +79,7 @@ async def test_catalog_for_sokolova_all_six_available(stand: dict[str, Any]) -> 
     assert all(p["available"] for p in body["items"])
     express = body["items"][0]
     assert express["amountMinRub"] == 100_000
-    assert express["ratePercentFrom"] == 24.0
+    assert express["ratePercentFrom"] == 21.5
     assert express["autoDecisionMode"] == "UP_TO"
     assert express["autoDecisionUpToRub"] == 3_000_000
 
@@ -131,7 +131,7 @@ async def test_calculator_matches_oracle_and_reports_field_errors(stand: dict[st
     assert (body["paymentRub"], body["overpaymentRub"], body["ratePercentFrom"]) == (
         47_280,
         67_358,
-        24.0,
+        21.5,
     )
     assert body["approximate"] is True
     assert body["paymentKind"] == "ANNUITY"
