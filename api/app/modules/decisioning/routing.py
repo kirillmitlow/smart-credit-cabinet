@@ -67,11 +67,15 @@ def _collateral_review(policy: Policy, app: Application) -> bool:
     return app.collateral is not None or required
 
 
-def _hint(app: Application, young_with_security: bool, base: Outcome) -> str:
+def _hint(
+    app: Application, young_with_security: bool, base: Outcome, flags: tuple[ReasonCode, ...]
+) -> str:
     if app.product == Product.INVESTMENT:
         return "REQUEST_SELLER_DOCUMENT"
     if young_with_security:
         return "APPROVE_WITH_GUARANTEE" if app.guarantor is not None else "APPROVE_WITH_COLLATERAL"
+    if base == Outcome.APPROVED and any(r.code == "OVERDUE_30_89" for r in flags):
+        return "REQUEST_REPAYMENT_PROOF"  # 30-17: t-overdue-45 — запросить подтверждение погашения
     return "APPROVE" if base == Outcome.APPROVED else ""
 
 
@@ -185,7 +189,7 @@ def route(  # noqa: PLR0913, PLR0914 — сборка исхода по табл
             route=Route.MANUAL,
             level=authority_level(policy, app.amount_rub, grade),
             reasons=reasons,
-            recommendation=Recommendation(base, _hint(app, young_with_security, base)),
+            recommendation=Recommendation(base, _hint(app, young_with_security, base, flags)),
             variants=(),
             variants_status=search.status,
             manual_reasons=tuple(manual),

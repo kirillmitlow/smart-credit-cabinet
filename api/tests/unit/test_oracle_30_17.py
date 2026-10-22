@@ -4,9 +4,10 @@
 баллы, грейд, ставка, исход, уровень и коды — точно. «Главный код равен первому, остальные входят
 в набор» — проверяем строже: последовательность кодов совпадает с оракулом.
 
-Что оракул требует от шагов, которых в этой поставке ещё нет (флаги T-288/T-290, оптимизатор
-встречных T-297), помечено `xfail(strict=True)` с номером задачи: когда шаг появится, тест
-упадёт и пометку придётся снять, а не забыть.
+Что оракул требует от шагов, которых ещё нет (оптимизатор встречных T-297), помечено
+`xfail(strict=True)` с номером задачи: когда шаг появится, тест упадёт и пометку придётся
+снять, а не забыть. Флаги (T-288, T-290) готовы: все четыре технических сценария с флагами
+проверяются целиком.
 """
 
 from __future__ import annotations
@@ -207,7 +208,7 @@ ORACLE: dict[str, Expect] = {
     ),
 }
 
-# Что оракул считает по числам, но исход и коды которых зависят от флагов T-288/T-290
+# Технические сценарии с флагами (T-288, T-290): ручной разбор без стоп-факторов
 FLAG_PERSONAS: dict[str, Expect] = {
     "t-mass": Expect(
         Outcome.MANUAL_REVIEW,
@@ -320,22 +321,19 @@ def test_oracle_persona(name: str) -> None:
 
 @pytest.mark.parametrize("name", sorted(FLAG_PERSONAS))
 def test_oracle_flag_persona_numbers(name: str) -> None:
-    """Числа этих сценариев ядро уже считает; исход и коды ждут флагов (см. ниже)."""
+    """Флаги не меняют расчёт: числа сценария те же, что у T-BASE с одним отличием."""
     exp = FLAG_PERSONAS[name]
     result = decide(PERSONAS[name]())
     check_numbers(result, exp)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="флаги MASS_REGISTRATION, DATA_MISMATCH, TURNOVER_ANOMALY, OVERDUE_30_89: T-288, T-290",
-)
 @pytest.mark.parametrize("name", sorted(FLAG_PERSONAS))
 def test_oracle_flag_persona_outcome_and_codes(name: str) -> None:
     exp = FLAG_PERSONAS[name]
     result = decide(PERSONAS[name]())
     assert result.outcome == exp.outcome
     assert result.reason_codes == exp.codes
+    assert result.route == exp.route
     assert result.required_level == exp.level
 
 
@@ -413,6 +411,48 @@ def test_manual_reviews_carry_a_recommendation() -> None:
     pass2 = decide(PERSONAS["quick-start-guarantor"]())
     assert pass2.recommendation is not None
     assert pass2.recommendation.hint == "APPROVE_WITH_GUARANTEE"
+
+
+def test_flag_personas_recommend_what_the_core_would_decide_without_the_flag() -> None:
+    """30-17: t-mass, t-mismatch, t-anomaly — одобрить; t-overdue-45 — подтверждение погашения."""
+    for name in ("t-mass", "t-mismatch", "t-anomaly"):
+        rec = decide(PERSONAS[name]()).recommendation
+        assert rec is not None
+        assert (rec.outcome, rec.hint) == (Outcome.APPROVED, "APPROVE"), name
+    overdue = decide(PERSONAS["t-overdue-45"]()).recommendation
+    assert overdue is not None
+    assert (overdue.outcome, overdue.hint) == (Outcome.APPROVED, "REQUEST_REPAYMENT_PROOF")
+
+
+def test_t_mismatch_sees_sixty_six_point_seven_percent_against_the_report() -> None:
+    (reason,) = decide(PERSONAS["t-mismatch"]()).reasons
+    assert reason.params["rule"] == "TURNOVER_VS_FINANCIALS"
+    assert reason.params["year"] == 2025
+    assert str(reason.params["value"])[:6] == "0.6666"  # |60 − 36| / 36 (30-17)
+    assert reason.params["a"] == "60\u00a0000\u00a0000\u00a0₽"
+    assert reason.params["b"] == "36\u00a0000\u00a0000\u00a0₽"
+
+
+def test_t_anomaly_pump_numbers_are_the_oracle_ones() -> None:
+    """Накачка: ×1,80 и z = 10,79 на ряду 18 мес.; сезонное исключение не применяется (< 24 мес.)."""
+    (reason,) = decide(PERSONAS["t-anomaly"]()).reasons
+    assert reason.params["rule"] == "PUMP"
+    assert reason.params["ratio"] == D("1.8")
+    assert abs(D(str(reason.params["modified_z"])) - D("10.79")) < D("0.005")
+    assert (reason.params["recent_rub"], reason.params["base_rub"]) == (9_000_000, 5_000_000)
+    features = decide(PERSONAS["t-anomaly"]()).features
+    assert features is not None
+    assert features.pump is not None
+    assert features.pump.prior_year_ratio is None
+
+
+def test_zarya_pump_has_ratio_two_point_one_but_z_below_threshold() -> None:
+    """30-17: отношение 2,10, z = 1,74 < 3,5 — флага нет, исключение сезона здесь не нужно."""
+    features = decide(PERSONAS["zarya"]()).features
+    assert features is not None
+    assert features.pump is not None
+    assert abs(features.pump.ratio - D("2.10")) < D("0.005")
+    assert abs(features.pump.modified_z - D("1.74")) < D("0.005")
 
 
 def test_zarya_line_payment_is_interest_on_the_whole_limit() -> None:

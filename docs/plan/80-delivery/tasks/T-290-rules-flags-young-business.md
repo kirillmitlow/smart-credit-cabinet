@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE (ядро; запись `PIPELINE_ERROR` делает сторож `pipeline`, [T-271](T-271-pipeline-reaper-lease.md): ядро в этом случае не вызывается) |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
-| Ветка | `feat/rules-flags-young-business` |
+| Ветка | `feat/decisioning-flags` (вместе с [T-288](T-288-features-consistency-antifraud.md)) |
 | Оценка | ~4 ч |
 | Приоритет | M (Must) |
 | Тонкий сквозной сценарий | нет |
@@ -28,12 +28,12 @@
 
 ## Критерии приёмки
 
-- [ ] `quick-start` → условное `COUNTER_OFFER` с `security_required`; `t-young-collateral` → `MANUAL_REVIEW`
-- [ ] INV-61: флаг без стоп-фактора не даёт автоодобрения; INV-62: бизнес моложе 6 мес без обеспечения никогда `APPROVED`
-- [ ] `t-mass`, `t-overdue-45`, `t-mismatch` дают ожидаемые флаги
-- [ ] Тесты написаны и зелёные (`make check`)
-- [ ] Документация и OpenAPI обновлены, если менялся контракт
-- [ ] Запись в журнале
+- [x] `quick-start` → условное `COUNTER_OFFER` с `security_required`; `t-young-collateral` → `MANUAL_REVIEW`
+- [x] INV-61: флаг без стоп-фактора не даёт автоодобрения; INV-62: бизнес моложе 6 мес без обеспечения никогда `APPROVED`
+- [x] `t-mass`, `t-overdue-45`, `t-mismatch` дают ожидаемые флаги
+- [x] Тесты написаны и зелёные (`make check`)
+- [x] Документация и OpenAPI обновлены, если менялся контракт (схема ответа не менялась; клиентский вид скрывает коды антифрода, [R-004](../../reviews/R-004-core-implementation-notes.md), пункт 12)
+- [x] Запись в журнале
 
 ## Тесты
 
@@ -42,3 +42,5 @@ unit: все флаги и граница 6 мес.; property INV-61, INV-62.
 ## Заметки для реализации
 
 - Какая сторона отвечает за `PIPELINE_ERROR`: ядро не вызывается, решение пишет pipeline ([30-04](../../30-decisioning/04-stop-factors-and-flags.md)).
+- Флаги `MASS_REGISTRATION`, `OVERDUE_30_89`, `DATA_MISMATCH`, `TURNOVER_ANOMALY` — `api/app/modules/decisioning/flags.py`; `SOURCE_UNAVAILABLE` — `eligibility.unavailable_sources` (список обязательных источников сверен с 30-04); `BUSINESS_TOO_YOUNG` и его приоритет над колонками каталога, флагами и стопами — `routing.route` ([T-296](T-296-routing-authority.md)).
+- Приоритет проверен тестами: стоп-фактор → `NEEDS_INFO` → условное встречное → ручные причины. Флаг без стопа не даёт автоодобрения (INV-61 на настоящих флагах), молодой бизнес без обеспечения не получает `APPROVED` (INV-62).

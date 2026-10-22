@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import uuid
+from dataclasses import replace
 from decimal import Decimal
 from typing import Any
 
@@ -13,7 +14,7 @@ from app.modules.decisioning import client_factor_phrases, decide, payment_for
 from app.modules.decisioning.types import Outcome
 from app.modules.offers import contracts, terms
 from app.modules.pipeline import decision_view, hooks
-from tests.fixtures.core_personas import quick_start, snabkontrakt, sokolova
+from tests.fixtures.core_personas import quick_start, snabkontrakt, sokolova, t_base
 
 pytestmark = pytest.mark.unit
 
@@ -135,6 +136,63 @@ def test_aml_reason_is_not_disclosed_to_client() -> None:
     assert [r.code for r in reasons] == [decision_view.GENERIC_CODE]  # служебный код отброшен
     assert "AML" not in reasons[0].text
     assert "список" not in reasons[0].text.lower()
+
+
+def _flagged_young_input():  # type: ignore[no-untyped-def]
+    """T-BASE с массовым адресом и директором в анкете, которого нет в реестре."""
+    base = t_base()
+    tax = replace(base.snapshot.tax, mass_address=True)
+    return replace(
+        base,
+        application=replace(base.application, director_name_in_form="Иванов Иван Иванович"),
+        snapshot=replace(base.snapshot, tax=tax),
+    )
+
+
+def test_antifraud_flags_are_not_disclosed_to_client_but_data_mismatch_is() -> None:
+    """Правило антифрода не подсказываем: ни код, ни шаг андеррайтера. Расхождение клиент уточнит сам."""
+    specialist = "Заявку смотрит специалист. Обычно до 1 рабочего дня"
+    result = decide(_flagged_young_input())  # настоящие тексты ядра: флаг массовости и расхождение
+    explain: dict[str, Any] = {
+        "reasons": [{"code": r.code, "kind": r.kind.value} for r in result.reasons],
+        "explanations": [
+            {"code": e.code, "client": e.client, "underwriter": e.underwriter, "action": e.action}
+            for e in result.explanations
+        ],
+    }
+    assert [r.code for r in result.reasons][:2] == ["MASS_REGISTRATION", "DATA_MISMATCH"]
+
+    reasons = decision_view._reasons(explain)
+
+    by_code = {r.code: r for r in reasons}
+    assert specialist in by_code[decision_view.GENERIC_CODE].text
+    assert by_code[decision_view.GENERIC_CODE].action == ""
+    assert by_code["DATA_MISMATCH"].text.startswith("Мы нашли расхождение")
+    assert by_code["DATA_MISMATCH"].action == ""  # «Запросить выписку» — шаг андеррайтера
+    blob = " ".join(r.code + r.text + r.action for r in reasons)
+    assert not re.search(r"MASS|ANOMALY|накачк|транзит|договор|Запросить", blob)
+
+
+def test_stop_factor_action_is_still_shown_to_the_client() -> None:
+    explain: dict[str, Any] = {
+        "reasons": [{"code": "TAX_ARREARS_HIGH", "kind": "STOP"}],
+        "explanations": [
+            {
+                "code": "TAX_ARREARS_HIGH",
+                "client": "Долг по налогам",
+                "action": "Погасить 358 334 ₽",
+            }
+        ],
+    }
+    (reason,) = decision_view._reasons(explain)
+    assert reason.action == "Погасить 358 334 ₽"
+
+
+def test_client_sees_one_line_per_distinct_text_when_a_code_repeats() -> None:
+    line = {"code": "TURNOVER_ANOMALY", "client": "Заявку смотрит специалист", "action": "x"}
+    other = {"code": "DATA_MISMATCH", "client": "Мы нашли расхождение", "action": ""}
+    reasons = decision_view._reasons({"explanations": [line, line, other, other]})
+    assert [r.code for r in reasons] == [decision_view.GENERIC_CODE, "DATA_MISMATCH"]
 
 
 def test_rate_breakdown_adds_up_to_the_rate() -> None:
