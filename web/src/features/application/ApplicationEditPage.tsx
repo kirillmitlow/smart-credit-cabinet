@@ -10,6 +10,7 @@ import { ProblemAlert } from '@/components/ProblemAlert';
 import { usePageHeading } from '@/lib/usePageHeading';
 import { applicationForm, errorView, fill, guards } from '@/texts';
 import { ConditionsStep } from './ConditionsStep';
+import { ConsentsStep } from './ConsentsStep';
 import { conditionsSchema, toForm, type ConditionsForm } from './conditionsSchema';
 import { LaterStep } from './LaterStep';
 import { ReviewStep } from './ReviewStep';
@@ -112,9 +113,7 @@ function EditForm({
       {step === 3 ? (
         <LaterStep title={applicationForm.steps.product} body={applicationForm.later.product} />
       ) : null}
-      {step === 4 ? (
-        <LaterStep title={applicationForm.steps.consents} body={applicationForm.later.consents} />
-      ) : null}
+      {step === 4 ? <ConsentsStep key={application.id} applicationId={application.id} /> : null}
       {step === 5 ? (
         <ReviewStep application={application} autosave={autosave} onGoToStep={goToStep} />
       ) : null}
