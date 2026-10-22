@@ -22,7 +22,11 @@ def _uuid(raw: str) -> UUID | None:
 
 
 def _principal(request: Request) -> auth.Principal | None:
-    zone = auth.Zone.BANK if request.url.path.startswith("/bank/") else auth.Zone.CLIENT
+    zone = (
+        auth.Zone.BANK
+        if request.url.path.startswith(("/bank/", "/backoffice/", "/auth/bank-"))
+        else auth.Zone.CLIENT
+    )
     sid = request.cookies.get(auth.sessions.COOKIE[zone])
     return auth.sessions.load(zone, sid) if sid else None
 
@@ -30,6 +34,8 @@ def _principal(request: Request) -> auth.Principal | None:
 def _scope(
     request: Request, principal: auth.Principal | None, body: dict[str, Any]
 ) -> operations.Scope | None:
+    if request.url.path.startswith("/auth/bank-"):
+        return None  # вход/выход банка независим от активной компании клиентской вкладки
     if request.url.path == "/auth/request-code":
         company_id = _uuid(str(body.get("companyId", "")))
         return companies.operation_scope(company_id) if company_id else None
