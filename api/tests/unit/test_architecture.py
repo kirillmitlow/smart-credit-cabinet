@@ -56,7 +56,7 @@ def test_rule_catches_foreign_repo_import(tmp_path: Path) -> None:
 
 
 def test_every_table_has_exactly_one_owner() -> None:
-    import app.shared.models  # noqa: F401 — регистрирует таблицы
+    import app.db_models  # noqa: F401 — регистрирует таблицы
 
     tables = set(Base.metadata.tables)
     assert tables == set(TABLE_OWNERS), (

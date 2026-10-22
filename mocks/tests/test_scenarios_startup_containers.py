@@ -40,7 +40,9 @@ def test_ready_contains_builtin_and_restart_preserves_runtime(
         headers={"Idempotency-Key": "container-startup-preserve"},
     )
     assert issued.status_code == 201, issued.text
-    report = clients["bki"].post(
+    report = clients[
+        "bki"
+    ].post(
         "/api/v1/credit-reports",
         json={
             "subject": before["expanded"]["bki"][0]["body"]["subject"],
@@ -48,7 +50,7 @@ def test_ready_contains_builtin_and_restart_preserves_runtime(
             "consent": {
                 "consentId": "startup",
                 "subjectInn": before["inn"],
-                "signedAt": "2026-10-21T10:00:00Z",
+                "signedAt": "2026-10-20T10:00:00Z",  # заведомо в прошлом при APP_TODAY 21.10 в любое время суток
                 "validUntil": "2026-11-21",
                 "purpose": "LOAN_APPLICATION",
             },

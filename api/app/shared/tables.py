@@ -9,4 +9,9 @@ from __future__ import annotations
 TABLE_OWNERS: dict[str, str] = {
     "outbox": "shared",
     "idempotency_keys": "shared",
+    "users": "auth",
+    "companies": "companies",
+    "company_members": "companies",
+    "audit_log": "audit",
+    "integration_calls": "integrations",
 }
