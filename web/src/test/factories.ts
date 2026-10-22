@@ -94,6 +94,7 @@ export function problemResponse(init: ProblemInit): Response {
 export function makeApplication(overrides: Partial<ApplicationOut> = {}): ApplicationOut {
   return {
     id: 'app-1',
+    companyId: 'company-1',
     number: 'АЗ-2026-000001',
     status: 'DRAFT',
     productCode: 'EXPRESS',

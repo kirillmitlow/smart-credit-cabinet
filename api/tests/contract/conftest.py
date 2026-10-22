@@ -56,6 +56,10 @@ ADMIN = {"X-Admin-Key": "dev-admin-key"}
 
 # Параметры временных сценариев (спецификация моков 10.2/10.5), имена как у персон
 CUSTOM_SPECS: dict[str, dict[str, Any]] = {
+    "stankoprom": {
+        "preset": "LLC_HEALTHY",
+        "company": {"form": "LLC", "name": "СтанкоПром", "ageMonths": 84},
+    },
     "romashka": {
         "preset": "LLC_HEALTHY",
         "company": {"form": "LLC", "name": "Ромашка", "ageMonths": 84, "okved": "46.73"},

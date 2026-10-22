@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Center, Loader, Stack, Stepper, Text, Title } from '@mantine/core';
 import { useForm, type Resolver } from 'react-hook-form';
@@ -11,6 +11,7 @@ import { usePageHeading } from '@/lib/usePageHeading';
 import { applicationForm, errorView, fill, guards } from '@/texts';
 import { ConditionsStep } from './ConditionsStep';
 import { ConsentsStep } from './ConsentsStep';
+import { CompanyDataStep } from './CompanyDataStep';
 import { conditionsSchema, toForm, type ConditionsForm } from './conditionsSchema';
 import { LaterStep } from './LaterStep';
 import { ReviewStep } from './ReviewStep';
@@ -53,6 +54,7 @@ function EditForm({
     defaultValues: toForm(application),
   });
   const autosave = useDraftAutosave(application);
+  const [formRevision, setFormRevision] = useState({ revision: 0, snapshot: application });
   const { flush, clearConflict } = autosave;
   const title = fill(applicationForm.stepOf, {
     current: step,
@@ -63,15 +65,21 @@ function EditForm({
 
   const goToStep = useCallback(
     (next: number) => {
-      void flush().then(() => navigate(`/applications/${application.id}/edit/${next}`));
+      void flush().then((saved) => {
+        if (saved) void navigate(`/applications/${application.id}/edit/${next}`);
+      });
     },
     [flush, navigate, application.id],
   );
 
   const onRefresh = () => {
     void refresh().then((fresh) => {
-      if (fresh) form.reset(toForm(fresh));
-      clearConflict();
+      if (fresh) {
+        form.reset(toForm(fresh));
+        // refetch resolves before React Query notifies the parent; initialize fields from its actual answer.
+        setFormRevision((old) => ({ revision: old.revision + 1, snapshot: fresh }));
+        clearConflict();
+      }
     });
   };
 
@@ -108,7 +116,15 @@ function EditForm({
 
       {step === 1 ? <ConditionsStep form={form} autosave={autosave} /> : null}
       {step === 2 ? (
-        <LaterStep title={applicationForm.steps.company} body={applicationForm.later.company} />
+        <CompanyDataStep
+          key={`${application.id}:${formRevision.revision}`}
+          application={
+            formRevision.snapshot.version > application.version
+              ? formRevision.snapshot
+              : application
+          }
+          autosave={autosave}
+        />
       ) : null}
       {step === 3 ? (
         <LaterStep title={applicationForm.steps.product} body={applicationForm.later.product} />
@@ -152,7 +168,7 @@ export function ApplicationEditPage() {
 
   const refresh = useCallback(async () => {
     const result = await refetch();
-    return result.data;
+    return result.isSuccess ? result.data : undefined;
   }, [refetch]);
 
   if (step === null) return <NotFoundScreen />;

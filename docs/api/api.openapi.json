@@ -344,6 +344,180 @@
         }
       }
     },
+    "/companies/{company_id}/gov-contracts": {
+      "get": {
+        "tags": [
+          "компании"
+        ],
+        "summary": "List Contracts",
+        "operationId": "listCompanyGovContracts",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Company Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{19}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ContractStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovContractPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/lookup/{inn}": {
+      "get": {
+        "tags": [
+          "компании"
+        ],
+        "summary": "Lookup Company",
+        "operationId": "lookupCompany",
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{10}$|^\\d{12}$",
+              "title": "Inn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}": {
+      "get": {
+        "tags": [
+          "компании"
+        ],
+        "summary": "Company Profile",
+        "operationId": "getCompanyProfile",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/applications": {
       "post": {
         "tags": [
@@ -1645,6 +1819,11 @@
             "format": "uuid",
             "title": "Id"
           },
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Companyid"
+          },
           "number": {
             "type": "string",
             "title": "Number"
@@ -1734,6 +1913,7 @@
         "type": "object",
         "required": [
           "id",
+          "companyId",
           "number",
           "status",
           "productCode",
@@ -2060,6 +2240,77 @@
         ],
         "title": "CompanyChoice"
       },
+      "CompanyForm": {
+        "type": "string",
+        "enum": [
+          "LEGAL",
+          "IP",
+          "SELF_EMPLOYED"
+        ]
+      },
+      "CompanyProfile": {
+        "properties": {
+          "companyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Companyid"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "form": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyForm"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eligibility": {
+            "$ref": "#/components/schemas/Eligibility"
+          },
+          "fields": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProfileField"
+            },
+            "type": "object",
+            "title": "Fields"
+          },
+          "relatedCompanies": {
+            "items": {
+              "$ref": "#/components/schemas/RelatedCompany"
+            },
+            "type": "array",
+            "title": "Relatedcompanies"
+          },
+          "fetchedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fetchedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "companyId",
+          "inn",
+          "form",
+          "eligibility",
+          "fields",
+          "relatedCompanies",
+          "fetchedAt"
+        ],
+        "title": "CompanyProfile"
+      },
       "ConsentItemOut": {
         "properties": {
           "kind": {
@@ -2379,6 +2630,14 @@
         ],
         "title": "ContractSignedOut"
       },
+      "ContractStatus": {
+        "type": "string",
+        "enum": [
+          "IN_PROGRESS",
+          "EXECUTED",
+          "TERMINATED"
+        ]
+      },
       "DecisionReasonOut": {
         "properties": {
           "code": {
@@ -2496,6 +2755,106 @@
           "version"
         ],
         "title": "DraftPatch"
+      },
+      "Eligibility": {
+        "type": "string",
+        "enum": [
+          "ELIGIBLE",
+          "UNCONFIRMED",
+          "NOT_ELIGIBLE",
+          "COMPANY_NOT_ACTIVE",
+          "PERSON_ROLES"
+        ]
+      },
+      "GovContractOut": {
+        "properties": {
+          "registryNumber": {
+            "type": "string",
+            "title": "Registrynumber"
+          },
+          "customerName": {
+            "type": "string",
+            "title": "Customername"
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject"
+          },
+          "priceRub": {
+            "type": "integer",
+            "title": "Pricerub"
+          },
+          "unpaidRub": {
+            "type": "integer",
+            "title": "Unpaidrub"
+          },
+          "concludedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Concludedat"
+          },
+          "paymentDeadline": {
+            "type": "string",
+            "format": "date",
+            "title": "Paymentdeadline"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "registryNumber",
+          "customerName",
+          "subject",
+          "priceRub",
+          "unpaidRub",
+          "concludedAt",
+          "paymentDeadline",
+          "status"
+        ],
+        "title": "GovContractOut"
+      },
+      "GovContractPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GovContractOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrievedat"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          },
+          "source": {
+            "type": "string",
+            "const": "EIS",
+            "title": "Source",
+            "default": "EIS"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "retrievedAt",
+          "nextCursor"
+        ],
+        "title": "GovContractPage"
       },
       "HTTPValidationError": {
         "properties": {
@@ -3316,6 +3675,52 @@
         "title": "ProductReasonOut",
         "description": "Причина по-человечески; машинный код нужен фронту для словаря (60-06)."
       },
+      "ProfileField": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "source": {
+            "$ref": "#/components/schemas/System"
+          },
+          "retrievedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrievedat"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "title": "Confirmed",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "title": "ProfileField"
+      },
       "ProgressOut": {
         "properties": {
           "signed": {
@@ -3496,6 +3901,30 @@
           "reasons"
         ],
         "title": "RejectedCandidate"
+      },
+      "RelatedCompany": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "inn",
+          "name"
+        ],
+        "title": "RelatedCompany"
       },
       "ResetOut": {
         "properties": {
@@ -3849,6 +4278,17 @@
           "signedAt"
         ],
         "title": "SignerOut"
+      },
+      "System": {
+        "type": "string",
+        "enum": [
+          "registry",
+          "tax",
+          "credit_bureau",
+          "bank_core"
+        ],
+        "title": "System",
+        "description": "Внешние системы. Значение попадает в `integration_calls.system` и метрики."
       },
       "ValidationError": {
         "properties": {
