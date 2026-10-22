@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from app.modules.pipeline import tasks as pipeline_tasks  # noqa: F401 — регистрирует pipeline.run
 from app.shared import clock, db
 from app.shared.cache import WORKER_HEARTBEAT_KEY, get_redis
 from app.shared.logs import configure_logging

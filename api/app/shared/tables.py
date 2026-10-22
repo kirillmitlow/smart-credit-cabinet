@@ -17,4 +17,9 @@ TABLE_OWNERS: dict[str, str] = {
     "applications": "applications",
     "application_versions": "applications",
     "application_events": "applications",
+    "pipeline_runs": "pipeline",
+    "policy_versions": "pipeline",
+    "source_snapshots": "pipeline",
+    "decisions": "pipeline",
+    "decision_reasons": "pipeline",
 }

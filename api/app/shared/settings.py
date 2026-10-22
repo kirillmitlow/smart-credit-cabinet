@@ -64,6 +64,8 @@ class Settings(BaseSettings):
 
     # Процесс и правила
     policy_file: str = "policy/v1.yaml"
+    # Хеш коммита сборки образа (ENGINE_VERSION); не из часов (30-13). TODO: передавать build-arg в compose
+    engine_version: str = "dev"
     policy_edit_enabled: bool = False
     expiry_enabled: bool = False
     needs_info_ttl_days: int = Field(default=5, ge=1)
