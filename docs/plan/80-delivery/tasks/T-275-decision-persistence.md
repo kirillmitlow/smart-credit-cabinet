@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE — PR feat/api-pipeline; предложение пока заглушка (T-340), outbox и задачи клиенту — TODO в hooks.py |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/decision-persistence` |
 | Оценка | ~6 ч |

@@ -48,6 +48,7 @@ from app.modules.integrations.results import (
     SourceUnavailable,
     System,
 )
+from app.modules.integrations.snapshots import known_resources, parse_snapshot
 from app.modules.integrations.tax import (
     AccountBlock,
     Financials,
@@ -113,6 +114,8 @@ __all__ = [
     "TurnoverMonth",
     "build_integrations",
     "get_integrations",
+    "known_resources",
+    "parse_snapshot",
     "report_idempotency_key",
     "scenarios",
     "set_integrations",
