@@ -1,11 +1,13 @@
 """T-129 (часть): POST /scenarios/reset — очистка четырёх моков, chaos в OK, встроенные из кода."""
 
 import asyncio
+from datetime import date
 from typing import Any
 
 import httpx
 import pytest
 
+from app.roles.scenarios.builtin import builtin_scenarios
 from tests.scenarios_network import Harness
 from tests.test_bank_core import disbursement
 from tests.test_scenarios_apply import assert_empty, create
@@ -14,6 +16,7 @@ from tests.test_scenarios_apply import urls as urls
 
 pytestmark = pytest.mark.integration
 ROLES = ("registry", "tax", "bki", "bank_core")
+BUILTIN_CODES = sorted(s.code for s in builtin_scenarios(date(2026, 10, 21)))
 
 
 async def reset(h: Harness, mode: str | None = None) -> Any:
@@ -64,7 +67,9 @@ async def test_reset_removes_runtime_loan_and_returns_chaos_to_ok(h: Harness) ->
     assert await loans(h, inn) == []
     after = (await h.clients["bank_core"].get(f"/api/v1/accounts/{account}")).json()
     assert after["balanceRub"] == balance
-    assert [(s["code"], s["status"]) for s in body["scenarios"]] == [("sokolova", "APPLIED")]
+    assert sorted((s["code"], s["status"]) for s in body["scenarios"]) == [
+        (code, "APPLIED") for code in BUILTIN_CODES
+    ]
     # ключ идемпотентности выдачи стёрт вместе с данными: повтор создаёт новый кредит
     again = await issue_loan(h, inn, account, "reset-loan")
     assert len(await loans(h, inn)) == 1
@@ -88,7 +93,7 @@ async def test_builtin_only_deletes_custom_scenarios_and_their_data(h: Harness) 
     response = await reset(h, "BUILTIN_ONLY")
     assert response.status_code == 200, response.text
     assert response.json()["deleted"] == ["gone-custom"]
-    assert [s["code"] for s in response.json()["scenarios"]] == ["sokolova"]
+    assert sorted(s["code"] for s in response.json()["scenarios"]) == BUILTIN_CODES
     assert (await h.api.get("/api/v1/scenarios/gone-custom")).status_code == 404
     await assert_empty(h, "gone-custom")
     assert (

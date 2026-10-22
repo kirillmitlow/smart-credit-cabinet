@@ -1,14 +1,19 @@
 """T-128: первое наполнение и восстановление только пустой роли без стирания RUNTIME."""
 
+from datetime import date
+
 import httpx
 import pytest
 
+from app.roles.scenarios.builtin import builtin_scenarios
 from app.roles.scenarios.gateway import AdminGateway
 from app.roles.scenarios.startup import initialize
 from tests.scenarios_network import Harness
 from tests.test_bank_core import disbursement
 from tests.test_scenarios_apply import h as h
 from tests.test_scenarios_apply import urls as urls
+
+BUILTIN_CODES = sorted(s.code for s in builtin_scenarios(date(2026, 10, 21)))
 
 pytestmark = pytest.mark.integration
 
@@ -67,9 +72,10 @@ async def test_only_empty_role_is_restored_from_stored_snapshot(h: Harness) -> N
     assert (await h.clients["tax"].post("/admin/wipe")).status_code == 204
     count = len(h.network.calls)
     await fill(h)
+    # налоговая запись по каждой встроенной персоне: восстанавливается только пустая роль
     assert [(role, action) for role, action, _ in h.network.calls[count:] if action != "GET"] == [
         ("tax", "PUT")
-    ]
+    ] * len(BUILTIN_CODES)
     restored = await h.clients["tax"].get(f"/api/v1/tax-profile/{before['inn']}")
     assert restored.status_code == 200
     assert (await view(h))["expanded"] == before["expanded"]
