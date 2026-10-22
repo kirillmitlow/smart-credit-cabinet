@@ -1,0 +1,66 @@
+/** Тексты «Мои кредиты» (60-03 №15, T-427) */
+
+export const loansTexts = {
+  title: 'Мои кредиты',
+  loading: 'Загружаем кредиты…',
+  loadingOne: 'Загружаем кредит…',
+  emptyAction: 'Подобрать кредит',
+  moreShown: 'Показаны последние {count}',
+  home: {
+    all: 'Все кредиты',
+  },
+  card: {
+    number: 'Договор № {number}',
+    openedOn: 'Открыт {date}',
+    amount: 'Сумма',
+    limit: 'Лимит',
+    outstanding: 'Остаток долга',
+    rate: 'Ставка',
+    term: 'Срок',
+    nextPayment: 'Ближайший платёж',
+    nextPaymentValue: '{amount}, {date}',
+    noNextPayment: 'Платежей по графику больше нет',
+    limitNote: 'Берёте деньги, когда нужно. Графика платежей нет',
+    open: 'Открыть',
+  },
+  status: {
+    ACTIVE: 'Действует',
+  },
+  repayment: {
+    ANNUITY: 'Одинаковый платёж каждый месяц',
+    BULLET: 'Проценты каждый месяц, весь долг одной суммой в конце срока',
+    REVOLVING: 'Лимит: берёте деньги, когда нужно',
+  },
+  detail: {
+    back: 'Все кредиты',
+    conditions: 'Условия',
+    payment: 'Платёж в месяц',
+    interestPayment: 'Проценты в месяц',
+    principalAtEnd: 'Основной долг в конце срока',
+    repaymentType: 'Как возвращать',
+    openedOn: 'Дата открытия',
+    settlementAccount: 'Расчётный счёт',
+    loanAccount: 'Ссудный счёт',
+    document: 'Скачать договор',
+    notModelled: 'Оплата в этом прототипе не моделируется. Остаток долга равен выданной сумме',
+    limitNote:
+      'По кредитной линии и овердрафту у нас виден только лимит и ставка. Графика платежей нет',
+    schedule: 'График платежей',
+    scheduleCaption: 'График платежей по договору № {number}',
+    nextBadge: 'Ближайший',
+    columns: {
+      number: '№',
+      date: 'Дата',
+      payment: 'Платёж',
+      principal: 'Основной долг',
+      interest: 'Проценты',
+      balance: 'Остаток долга',
+    },
+    total: 'Итого',
+  },
+  notFound: {
+    title: 'Не нашли такой кредит',
+    body: 'Возможно, ссылка устарела или кредит принадлежит другой компании',
+    toList: 'К моим кредитам',
+  },
+} as const;
