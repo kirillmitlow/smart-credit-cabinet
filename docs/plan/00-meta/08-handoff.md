@@ -26,7 +26,7 @@
 ## В работе (каждый правит свою строку)
 
 - **A:** T-297, ветка `feat/counter-offers-optimizer`; T-133, ветка `feat/mocks-personas-large` (субагенты).
-- **B:** —
+- **B:** T-213 (вход банка), ветка `feat/bank-demo-login`; затем T-360/T-361 (очередь и карточка), зона банка/демо по D-111. Worktree `worktrees/gov-contracts-list`.
 
 ## Что уже в main
 
