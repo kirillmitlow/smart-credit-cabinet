@@ -344,6 +344,94 @@
         }
       }
     },
+    "/companies/{company_id}/gov-contracts": {
+      "get": {
+        "tags": [
+          "компании"
+        ],
+        "summary": "List Contracts",
+        "operationId": "listCompanyGovContracts",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Company Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{19}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ContractStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovContractPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/applications": {
       "post": {
         "tags": [
@@ -2379,6 +2467,14 @@
         ],
         "title": "ContractSignedOut"
       },
+      "ContractStatus": {
+        "type": "string",
+        "enum": [
+          "IN_PROGRESS",
+          "EXECUTED",
+          "TERMINATED"
+        ]
+      },
       "DecisionReasonOut": {
         "properties": {
           "code": {
@@ -2496,6 +2592,96 @@
           "version"
         ],
         "title": "DraftPatch"
+      },
+      "GovContractOut": {
+        "properties": {
+          "registryNumber": {
+            "type": "string",
+            "title": "Registrynumber"
+          },
+          "customerName": {
+            "type": "string",
+            "title": "Customername"
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject"
+          },
+          "priceRub": {
+            "type": "integer",
+            "title": "Pricerub"
+          },
+          "unpaidRub": {
+            "type": "integer",
+            "title": "Unpaidrub"
+          },
+          "concludedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Concludedat"
+          },
+          "paymentDeadline": {
+            "type": "string",
+            "format": "date",
+            "title": "Paymentdeadline"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "registryNumber",
+          "customerName",
+          "subject",
+          "priceRub",
+          "unpaidRub",
+          "concludedAt",
+          "paymentDeadline",
+          "status"
+        ],
+        "title": "GovContractOut"
+      },
+      "GovContractPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GovContractOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrievedat"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          },
+          "source": {
+            "type": "string",
+            "const": "EIS",
+            "title": "Source",
+            "default": "EIS"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "retrievedAt",
+          "nextCursor"
+        ],
+        "title": "GovContractPage"
       },
       "HTTPValidationError": {
         "properties": {

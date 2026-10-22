@@ -41,10 +41,12 @@ import type {
   ContractSignedOut,
   DeclinedOut,
   DraftPatch,
+  GovContractPage,
   HTTPValidationError,
   HealthDeps200,
   HealthLive200,
   ListApplicationsParams,
+  ListCompanyGovContractsParams,
   ListLoansParams,
   LoanDetail,
   LoanPage,
@@ -1183,6 +1185,141 @@ export function useGetPublicConfig<TData = Awaited<ReturnType<typeof getPublicCo
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetPublicConfigQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type listCompanyGovContractsResponse200 = {
+  data: GovContractPage
+  status: 200
+}
+
+export type listCompanyGovContractsResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type listCompanyGovContractsResponseSuccess = (listCompanyGovContractsResponse200) & {
+  headers: Headers;
+};
+export type listCompanyGovContractsResponseError = (listCompanyGovContractsResponse422) & {
+  headers: Headers;
+};
+
+export type listCompanyGovContractsResponse = (listCompanyGovContractsResponseSuccess | listCompanyGovContractsResponseError)
+
+export const getListCompanyGovContractsUrl = (companyId: string,
+    params?: ListCompanyGovContractsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/companies/${companyId}/gov-contracts?${stringifiedParams}` : `/companies/${companyId}/gov-contracts`
+}
+
+/**
+ * @summary List Contracts
+ */
+export const listCompanyGovContracts = async (companyId: string,
+    params?: ListCompanyGovContractsParams, options?: Parameters<typeof customFetch>[1]): Promise<listCompanyGovContractsResponse> => {
+
+  return customFetch<listCompanyGovContractsResponse>(getListCompanyGovContractsUrl(companyId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCompanyGovContractsQueryKey = (companyId: string,
+    params?: ListCompanyGovContractsParams,) => {
+    return [
+    `/companies/${companyId}/gov-contracts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCompanyGovContractsQueryOptions = <TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCompanyGovContractsQueryKey(companyId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCompanyGovContracts>>> = ({ signal }) => listCompanyGovContracts(companyId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: companyId !== null && companyId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCompanyGovContractsQueryResult = NonNullable<Awaited<ReturnType<typeof listCompanyGovContracts>>>
+export type ListCompanyGovContractsQueryError = HTTPValidationError
+
+
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params: undefined |  ListCompanyGovContractsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCompanyGovContracts>>,
+          TError,
+          Awaited<ReturnType<typeof listCompanyGovContracts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCompanyGovContracts>>,
+          TError,
+          Awaited<ReturnType<typeof listCompanyGovContracts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Contracts
+ */
+
+export function useListCompanyGovContracts<TData = Awaited<ReturnType<typeof listCompanyGovContracts>>, TError = HTTPValidationError>(
+ companyId: string,
+    params?: ListCompanyGovContractsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCompanyGovContracts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCompanyGovContractsQueryOptions(companyId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
