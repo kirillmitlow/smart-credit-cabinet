@@ -210,6 +210,7 @@ def test_sokolova_is_approved_with_oracle_numbers(database: db.Database, sokolov
         ("STEP", "BUREAU", None),
         ("TRANSITION", "CHECKING", "APPROVED"),
         ("STEP", "DECISION", None),
+        ("STEP", "OFFER_CREATED", None),
     ]
     # Платный отчёт запрошен ровно один раз; обороты, реестр и ФНС спрошены свежо
     assert sokolova.world.count("credit_bureau:report") == 1
@@ -380,7 +381,13 @@ def test_expired_lease_resumes_from_checkpoint(
     # Выполненные шаги не повторялись: реестр спрошен один раз
     assert sokolova.world.count("registry:company") == 1
     steps = [e for e in events_of(database, sokolova.application_id) if e[0] == "STEP"]
-    assert [s[1] for s in steps] == ["COMPLETENESS", "SOURCES", "BUREAU", "DECISION"]
+    assert [s[1] for s in steps] == [
+        "COMPLETENESS",
+        "SOURCES",
+        "BUREAU",
+        "DECISION",
+        "OFFER_CREATED",
+    ]
     with db.transaction() as s:
         assert s.scalars(select(PipelineRun)).one().attempts == 2
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE — PR feat/api-offer-signing; вместо PDF — детерминированный JSON и его SHA-256 (T-336 не входит), `document_id` пока пуст |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/contracts-entity` |
 | Оценка | ~3 ч |

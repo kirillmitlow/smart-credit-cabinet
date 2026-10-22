@@ -270,6 +270,42 @@ def bundle_fingerprint(application_id: UUID, refs: Iterable[Key]) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
+def pep_rules_version() -> str:
+    return texts.pep_rules().key
+
+
+def ensure_pep_rules(
+    session: Session,
+    principal: auth.Principal,
+    application: Application,
+    *,
+    accepted: bool,
+) -> str:
+    """Правила простой подписи принимаются один раз на человека (аудит); возвращает версию правил.
+
+    Общая для согласий и договора: «соглашение сторон» одно (20-04, 63-ФЗ ст. 9).
+    """
+    rules = texts.pep_rules()
+    if not audit.exists(session, PEP_ACCEPTED, actor_id=principal.user_id):
+        if not accepted:
+            raise AppError(
+                422,
+                "PEP_RULES_NOT_ACCEPTED",
+                "Нужно принять правила использования простой подписи",
+            )
+        audit.record(
+            session,
+            PEP_ACCEPTED,
+            actor_id=principal.user_id,
+            actor_role=principal.role,
+            object_type="user",
+            object_id=str(principal.user_id),
+            company_id=application.company_id,
+            details={"rulesVersion": rules.key},
+        )
+    return rules.key
+
+
 def request_signing(
     session: Session,
     principal: auth.Principal,
@@ -287,23 +323,7 @@ def request_signing(
     active = _active(session, application.id)
     if all(_status(active.get(r.key), today) == "SIGNED" for r in chosen):
         raise AppError(409, "CONSENT_ALREADY_SIGNED", "Эти согласия уже подписаны")
-    if not audit.exists(session, PEP_ACCEPTED, actor_id=principal.user_id):
-        if not accept_pep_rules:
-            raise AppError(
-                422,
-                "PEP_RULES_NOT_ACCEPTED",
-                "Нужно принять правила использования простой подписи",
-            )
-        audit.record(
-            session,
-            PEP_ACCEPTED,
-            actor_id=principal.user_id,
-            actor_role=principal.role,
-            object_type="user",
-            object_id=str(principal.user_id),
-            company_id=application.company_id,
-            details={"rulesVersion": texts.pep_rules().key},
-        )
+    ensure_pep_rules(session, principal, application, accepted=accept_pep_rules)
     issued = auth.codes.issue(
         signer_identity(principal),
         SIGN_PURPOSE,

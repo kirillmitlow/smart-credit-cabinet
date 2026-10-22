@@ -360,3 +360,17 @@ web/src ещё нет, decide — заглушка, V2 ещё не закрыт�
 **Подсказки следующему:** тестовые «миры» источников лежат в `api/tests/fixtures/pipeline_world.py`; согласия в тестах подставляет `set_consents_provider`. Миграция `0005_pipeline` может совпасть по номеру с миграцией согласий: при слиянии перенумеровать.
 
 **Файлы:** api/app/modules/pipeline/, api/app/modules/integrations/snapshots.py, api/alembic/versions/0005_pipeline.py, api/tests/{unit,integration}/test_pipeline*.py.
+
+---
+
+**22.10 · Агент A (Claude Code) · Решение клиенту, предложение, договор и подпись (T-259, T-340, T-341, T-263)**
+
+**Сделано:** ветка `feat/api-offer-signing`. `GET /applications/{id}/decision` (исход, условия, ставка с разбивкой, причины и шаги из снимка решения, «что помогло/повлияло», без баллов и DSCR, `AML_LIST` не раскрывается). Модуль `offers`: предложение и варианты создаются конвейером в одной транзакции с решением; `GET /applications/{id}/offer`, `POST /offers/{id}/accept|decline`; договор (`contract_uid` в формате БКИ, номер, JSON-тело и SHA-256), `GET /contracts/{id}`, `/document`, `POST /contracts/{id}/request-signature` («передать руководителю»), `/sign/request` (код) и `/sign` (HMAC-доказательство через `applications.proof_for`). Все подписи собраны: `OFFER_ACCEPTED → SIGNED` один раз и `disbursement.run` после коммита. Миграция `0007_offers`, подписи и варианты неизменяемы.
+
+**Решено:** без изменений в реестре решений.
+
+**Осталось:** встречные варианты (T-297: сейчас `variantsStatus = PENDING`), вариант с обеспечением (T-257: пока 409 `SECURITY_REQUIRED` вместо `COUNTER_OFFER → CHECKING`), PDF (T-336), поручитель и заявление на счёт как обязательные подписи, отправка `APPROVED` в БКИ при принятии (Q-022, outbox T-278), заголовок `Idempotency-Key` (сейчас идемпотентность естественная), таблица задач вместо события `TASK`, истечение предложений по таймеру.
+
+**Подсказки следующему:** подписание в два шага (`sign/request`, затем `sign`), как у согласий; код привязан к хешу договора. `applications` теперь экспортирует `proof_for`, `ensure_pep_rules`, `signer_identity`, `get_for`. Сценарий Соколовой: `api/tests/integration/test_offers_signing.py`.
+
+**Файлы:** api/app/modules/offers/, api/app/modules/pipeline/{decision_view,hooks,persist}.py, api/alembic/versions/0007_offers.py, api/tests/{unit/test_offers_unit.py,integration/test_offers_signing.py}.
