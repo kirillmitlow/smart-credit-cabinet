@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | DONE |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/rules-product-requirements` |
 | Оценка | ~5 ч |

@@ -1,0 +1,401 @@
+# Политика решения v1 (30-13). Все числа синтетические, демо-допущения, не реальная политика банка.
+# Правила файла:
+#   * у каждого узла с числами есть source (номер в 30-18, раздел 30-NN/10-NN, решение D-NNN
+#     или «допущение: …») и note (короткий комментарий) — без них схема файл не принимает;
+#   * доли и ставки — строки ("0.24"), не float; деньги — целые рубли;
+#   * слово NO в YAML — булево значение, поэтому «нет доступа» всегда пишем в кавычках;
+#   * менять число в существующем файле нельзя: любая правка параметра — новый файл v2 (30-13).
+meta:
+  version: 1
+  effective_from: "2026-10-21"
+  key_rate_date: "2026-10-20"
+  description: "Первая версия: ключевая ставка ЦБ 14% на 20.10.2026 (30-18 №1); заседание ЦБ 23.10.2026 даст v2"
+
+catalog:
+  rate_corridor:
+    value: "0.04"
+    source: "30-18 №16"
+    note: "коридор ставки продукта: базовая ± 4 п.п. (допущение R-003)"
+  products:
+    EXPRESS:
+      source: "10-06"
+      note: "экспресс: 100 тыс.–3 млн, 6–36 мес.; требование возраста ≥ 6 мес. заменено общим правилом молодого бизнеса (restrictions, D-077)"
+      repayment: ANNUITY
+      amount_min_rub: 100000
+      amount_max_rub: 3000000
+      term_min_months: 6
+      term_max_months: 36
+      collateral_required_above_rub: null
+      min_business_age_months: 0
+      requires_bank_customer: false
+      min_customer_turnover_months: 0
+      requires_contract: false
+      base_rate: "0.24"
+      expense_rate: "0.04"
+      auto_limit_b_rub: 3000000
+      grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "MANUAL", E: "NO"}
+      grade_d_requires: SECURITY
+      grade_d_max_share_of_max: "0.5"
+    WORKING_CAPITAL:
+      source: "10-06, D-084"
+      note: "оборотный: 0,5–30 млн, срок 3–36 мес. (D-084), залог выше 10 млн, бизнесу ≥ 1 года"
+      repayment: ANNUITY
+      amount_min_rub: 500000
+      amount_max_rub: 30000000
+      term_min_months: 3
+      term_max_months: 36
+      collateral_required_above_rub: 10000000
+      min_business_age_months: 12
+      requires_bank_customer: false
+      min_customer_turnover_months: 0
+      requires_contract: false
+      base_rate: "0.21"
+      expense_rate: "0.02"
+      auto_limit_b_rub: 5000000
+      grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "MANUAL", E: "NO"}
+      grade_d_requires: COLLATERAL
+      grade_d_max_share_of_max: "0.5"
+    CONTRACT:
+      source: "10-06, допущение: границы суммы и срока не заданы в каталоге"
+      note: "под контракт: проценты ежемесячно; верхняя граница — 80% неоплаченной части контракта (affordability)"
+      repayment: BULLET
+      amount_min_rub: 100000
+      amount_max_rub: 100000000
+      term_min_months: 1
+      term_max_months: 12
+      collateral_required_above_rub: null
+      min_business_age_months: 0
+      requires_bank_customer: false
+      min_customer_turnover_months: 0
+      requires_contract: true
+      base_rate: "0.20"
+      expense_rate: "0.02"
+      auto_limit_b_rub: 10000000
+      grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "NO", E: "NO"}
+    CREDIT_LINE:
+      source: "10-06"
+      note: "линия: 1–50 млн, 12–36 мес., залог выше 15 млн, бизнесу ≥ 2 лет"
+      repayment: LINE
+      amount_min_rub: 1000000
+      amount_max_rub: 50000000
+      term_min_months: 12
+      term_max_months: 36
+      collateral_required_above_rub: 15000000
+      min_business_age_months: 24
+      requires_bank_customer: false
+      min_customer_turnover_months: 0
+      requires_contract: false
+      base_rate: "0.20"
+      expense_rate: "0.02"
+      auto_limit_b_rub: 5000000
+      grade_access: {A: "AUTO", B: "AUTO", C: "MANUAL", D: "NO", E: "NO"}
+    OVERDRAFT:
+      source: "10-06, допущение: границы суммы в каталоге заданы только долей поступлений"
+      note: "овердрафт: только клиент банка с оборотами ≥ 6 мес.; предел — 30% поступлений (affordability), авто без суммы"
+      repayment: OVERDRAFT
+      amount_min_rub: 10000
+      amount_max_rub: 10000000
+      term_min_months: 12
+      term_max_months: 12
+      collateral_required_above_rub: null
+      min_business_age_months: 0
+      requires_bank_customer: true
+      min_customer_turnover_months: 6
+      requires_contract: false
+      base_rate: "0.25"
+      expense_rate: "0.02"
+      auto_limit_b_rub: null
+      grade_access: {A: "AUTO", B: "AUTO", C: "NO", D: "NO", E: "NO"}
+    INVESTMENT:
+      source: "10-06"
+      note: "инвестиционный: 1–100 млн, 12–84 мес., залог обязателен, всегда вручную (авто-лимит 0)"
+      repayment: ANNUITY
+      amount_min_rub: 1000000
+      amount_max_rub: 100000000
+      term_min_months: 12
+      term_max_months: 84
+      collateral_required_above_rub: 0
+      min_business_age_months: 12
+      requires_bank_customer: false
+      min_customer_turnover_months: 0
+      requires_contract: false
+      base_rate: "0.19"
+      expense_rate: "0.02"
+      auto_limit_b_rub: 0
+      grade_access: {A: "MANUAL", B: "MANUAL", C: "MANUAL", D: "MANUAL", E: "NO"}
+
+eligibility:
+  self_employed:
+    enabled: true
+    source: "30-01"
+    note: "самозанятый (НПД) не клиент кредита для бизнеса → NOT_ELIGIBLE"
+
+stop_factors:
+  company_not_active:
+    enabled: true
+    source: "30-04"
+    note: "статусы реестра, при которых компания не действует; REORGANIZING не стоп (автомат не уверен)"
+    legal_entity_statuses: [LIQUIDATING, LIQUIDATED, BANKRUPT]
+    entrepreneur_statuses: [CEASED, BANKRUPT]
+  aml_list:
+    enabled: true
+    source: "30-04"
+    note: "совпадение компании, директора или учредителя со списком"
+  bankruptcy:
+    enabled: true
+    source: "D-035"
+    note: "дело не завершено или завершено менее 60 мес. назад; доля учредителя ≥ 25% (115-ФЗ, допущение 30-04)"
+    window_months: 60
+    founder_share_percent: "25"
+  forbidden_industry:
+    enabled: true
+    source: "допущение: перечень типичных ограничений банков (30-04)"
+    note: "азартные игры 92, оружие 25.4, займы 64.92; совпадение по целым сегментам кода"
+    okved_prefixes: ["92", "25.4", "64.92"]
+  duplicate_application:
+    enabled: true
+    source: "30-04"
+    note: "вторая заявка компании в работе; защита от гонки двух отправок"
+  tax_arrears_high:
+    enabled: true
+    source: "D-035"
+    note: "налоговый долг больше 10% осторожной месячной выручки (пени и штрафы не считаются)"
+    max_ratio: "0.10"
+  current_overdue_90:
+    enabled: true
+    source: "30-18 №4"
+    note: "определение дефолта 90+ дней (483-П п. 13.3, Базель CRE36.68), берём ≥ 90; существенность 10 000 ₽ — допущение"
+    days: 90
+    min_rub: 10000
+
+restrictions:
+  business_too_young:
+    value: 6
+    source: "D-035"
+    note: "возраст бизнеса меньше 6 мес. — только с обеспечением; сильнее колонок каталога (D-077)"
+
+features:
+  vat:
+    regime_code: OSNO
+    source: "30-18 №7"
+    note: "НДС 20% до 31.12.2025, 22% с 01.01.2026 (425-ФЗ); только режим ОСНО"
+    schedule:
+      - {since: "2000-01-01", rate: "0.20"}
+      - {since: "2026-01-01", rate: "0.22"}
+  industry:
+    source: "30-18 №5, D-079"
+    note: "маржа отрасли по первым двум цифрам ОКВЭД (ФНС за 2025 с поправкой на выручку); строительства в статистике нет — как производство"
+    default_group: SERVICES
+    margins: {TRADE: "0.05", FOOD: "0.10", MANUFACTURING: "0.12", IT: "0.15", AGRO: "0.15", SERVICES: "0.13"}
+    ranges:
+      - {group: AGRO, from_prefix: 1, to_prefix: 3}
+      - {group: MANUFACTURING, from_prefix: 10, to_prefix: 33}
+      - {group: MANUFACTURING, from_prefix: 41, to_prefix: 43}
+      - {group: TRADE, from_prefix: 45, to_prefix: 47}
+      - {group: FOOD, from_prefix: 55, to_prefix: 56}
+      - {group: IT, from_prefix: 62, to_prefix: 63}
+  revenue:
+    source: "D-069"
+    note: "осторожная выручка: минимум из средних за 12 и 6 мес.; короче 6 мес. — ×0,7 (30-03); отчётность свежа 18 мес. (30-02)"
+    window_long_months: 12
+    window_short_months: 6
+    short_history_months: 6
+    short_history_factor: "0.7"
+    fresh_financials_months: 18
+  seasonality:
+    source: "30-02"
+    note: "сезонный ряд: ≥ 24 мес., корреляция половин ≥ 0,7 и CV ≥ 0,35; короче — ОКВЭД 01–03"
+    min_months: 24
+    min_correlation: "0.7"
+    min_cv: "0.35"
+    okved_prefixes: ["01", "02", "03"]
+  trend:
+    source: "30-02"
+    note: "Тейл–Сен по точкам ряда: не меньше 6 и до 24"
+    min_points: 6
+    max_points: 24
+  stress:
+    source: "D-084"
+    note: "шок стресса max(20%, CV), не более 40%; нижняя граница — сценарий ЦБ EBITDA −20% (30-18 №10)"
+    shock_min: "0.20"
+    shock_max: "0.40"
+  debt:
+    source: "30-02"
+    note: "условные обязательства (гарантии, поручительства) — 50% (допущение по Базелю); просрочка ниже 10 000 ₽ техническая"
+    contingent_weight: "0.5"
+    overdue_min_rub: 10000
+  history:
+    source: "30-18 №15а"
+    note: "CLEAN — без просрочек, ≥ 2 обязательств и история ≥ 24 мес.; иначе THIN_CLEAN (допущение R-003)"
+    thin_min_obligations: 2
+    clean_min_history_months: 24
+  bad_month:
+    source: "30-02"
+    note: "плохой месяц — выручка меньше 50% медианы"
+    share_of_median: "0.5"
+
+scorecard:
+  age:
+    source: "D-074"
+    note: "SC_AGE: возраст бизнеса, мес."
+    max_points: 12
+    no_data: 0
+    bands: [{upto: "6", points: 0}, {upto: "12", points: 3}, {upto: "24", points: 6}, {upto: "36", points: 8}, {upto: "60", points: 10}, {points: 12}]
+  credit_history:
+    source: "D-074"
+    note: "SC_CREDIT_HISTORY: класс истории; реструктуризация за 24 мес. — не больше 10; preview (30-07) = 16"
+    max_points: 24
+    no_data: 13
+    preview: 16
+    restructuring_cap: 10
+    points: {CLEAN: 24, MINOR: 18, THIN_CLEAN: 16, NO_HISTORY: 13, PAST_30: 10, PAST_60: 5, CURRENT_30_89: 2, PAST_90: 0}
+  inquiries:
+    source: "D-074"
+    note: "SC_INQUIRIES: чужие запросы за 30 дн. (до 5) + отказы за 90 дн. (до 3); preview = 5"
+    max_points: 8
+    no_data: 5
+    preview: 5
+    inquiry_bands: [{upto: "2", points: 5}, {upto: "4", points: 3}, {upto: "7", points: 1}, {points: 0}]
+    reject_bands: [{upto: "1", points: 3}, {upto: "2", points: 2}, {upto: "3", points: 1}, {points: 0}]
+  debt_load:
+    source: "D-074"
+    note: "SC_DEBT_LOAD: общий долг / годовая выручка; долга нет — 16; нет данных и preview — 7"
+    max_points: 16
+    no_data: 7
+    preview: 7
+    zero_points: 16
+    bands: [{upto: "0.10", points: 14}, {upto: "0.25", points: 11}, {upto: "0.50", points: 7}, {upto: "0.75", points: 3}, {points: 0}]
+  trend:
+    source: "D-074"
+    note: "SC_TREND: годовой тренд выручки"
+    max_points: 10
+    no_data: 5
+    bands: [{upto: "-0.30", points: 0}, {upto: "-0.15", points: 1}, {upto: "-0.05", points: 3}, {upto: "0.05", points: 6}, {upto: "0.15", points: 8}, {points: 10}]
+  volatility:
+    source: "D-074"
+    note: "SC_VOLATILITY: CV выручки; сезонным — 5"
+    max_points: 8
+    no_data: 4
+    seasonal_points: 5
+    bands: [{upto: "0.10", points: 8}, {upto: "0.20", points: 6}, {upto: "0.35", points: 4}, {upto: "0.50", points: 2}, {points: 0}]
+  tax:
+    source: "D-074"
+    note: "SC_TAX: (долг + пени) / месячная выручка; правонарушений ≥ 2 — минус 2; блокировка счёта — 0"
+    max_points: 8
+    no_data: 4
+    clean_points: 8
+    offenses_threshold: 2
+    offenses_penalty: 2
+    blocked_points: 0
+    bands: [{max_ratio: "0.02", points: 6}, {max_ratio: "0.05", points: 4}, {max_ratio: "0.10", points: 2}, {points: 0}]
+  client:
+    source: "D-074"
+    note: "SC_CLIENT: месяцев обслуживания; не клиент — 2"
+    max_points: 6
+    not_client_points: 2
+    no_data: 2
+    bands: [{upto: "12", points: 3}, {upto: "36", points: 5}, {points: 6}]
+  coverage:
+    source: "D-074"
+    note: "SC_COVERAGE: поток / текущие платежи; платежей нет — максимум"
+    max_points: 8
+    no_data: 8
+    bands: [{upto: "1.2", points: 0}, {upto: "1.5", points: 2}, {upto: "2", points: 4}, {upto: "3", points: 6}, {points: 8}]
+  caps:
+    source: "30-07"
+    note: "потолок грейда C: возраст < 6 мес., просрочка ≥ 60 дн. за 24 мес. или реструктуризация"
+    max_grade: C
+    min_business_age_months: 6
+    overdue_days: 60
+
+master_scale:
+  grades:
+    - {grade: A, min_points: 86, max_points: 100, pd: "0.01", source: "30-07", note: "надёжный; цель портфеля около 6% дефолтов (30-18 №11)"}
+    - {grade: B, min_points: 74, max_points: 85, pd: "0.03", source: "30-07", note: "хороший"}
+    - {grade: C, min_points: 60, max_points: 73, pd: "0.07", source: "30-07", note: "средний, только вручную"}
+    - {grade: D, min_points: 46, max_points: 59, pd: "0.15", source: "30-07", note: "повышенный риск, только с обеспечением"}
+    - {grade: E, min_points: 0, max_points: 45, pd: "0.30", source: "30-07", note: "не кредитуем"}
+
+pricing:
+  key_rate:
+    value: "0.14"
+    source: "30-18 №1"
+    note: "ключевая ставка ЦБ на 20.10.2026; после заседания 23.10.2026 выпускается v2"
+  spread:
+    value: "0.01"
+    source: "30-18 №1а"
+    note: "стоимость денег = ключевая + 1 п.п. (допущение, запас на резервы и ликвидность)"
+  lgd_unsecured:
+    value: "0.45"
+    source: "30-18 №3"
+    note: "осторожное значение; в 483-П для корпоративных 40%, 45% — Базель II и финансовые организации"
+  lgd_secured:
+    value: "0.35"
+    source: "30-18 №3а"
+    note: "с залогом; консервативнее Базеля; поручительство LGD не меняет"
+  capital_charge:
+    value: "0.02"
+    source: "30-18 №14а"
+    note: "плата за капитал: нижняя граница диапазона 2,0–2,6%"
+  rounding_step:
+    value: "0.005"
+    source: "D-071"
+    note: "ставка округляется до 0,5 п.п. «половина вверх»"
+
+affordability:
+  dscr_min: {value: "1.25", source: "30-18 №9", note: "типичный порог рынка; пол SBA 1,15"}
+  stress_dscr_min: {value: "1.0", source: "30-18 №10", note: "при шоке выручки; нижняя граница шока — сценарий ЦБ EBITDA −20%"}
+  debt_to_revenue_max: {value: "1.0", source: "D-070", note: "весь долг вместе с новым не больше годовой выручки"}
+  line_share_of_monthly_revenue: {value: "0.5", source: "30-08", note: "лимит линии ≤ 0,5 месячной выручки (способ 3б); проценты на весь лимит"}
+  overdraft_share_of_inflows: {value: "0.3", source: "10-06", note: "лимит овердрафта ≤ 30% средних чистых поступлений"}
+  contract_share_of_unpaid: {value: "0.8", source: "10-06", note: "сумма под контракт ≤ 80% неоплаченной части"}
+  investment_share_of_collateral: {value: "0.7", source: "30-08", note: "инвестиционный ≤ 70% оценки залога (пример коэффициента 0,7)"}
+  amount_step_rub: {value: 50000, source: "D-072", note: "шаг суммы при обратной задаче и во встречных"}
+  p_def12_yellow: {value: "0.10", source: "D-084", note: "P_def12 > 10% — без автоодобрения (жёлтая зона, 30-19)"}
+  p_def12_red: {value: "0.20", source: "D-084", note: "P_def12 > 20% — вариант не проходит (красная зона, 30-19)"}
+
+routing:
+  grade_a_auto_multiplier:
+    value: 2
+    source: "D-084"
+    note: "авто-лимит грейда A вдвое выше колонки каталога (грейд B), не выше максимума продукта"
+  gray:
+    source: "допущение: ширина серых зон 2 балла и 0,05 (30-11)"
+    note: "узкая полоса около порога: ошибка данных 2–4% меняла бы исход, поэтому решает человек"
+    points_b_low: 74
+    points_b_high: 75
+    points_e_low: 44
+    points_e_high: 45
+    dscr_upto: "1.30"
+    stress_upto: "1.05"
+    debt_from: "0.95"
+  authority:
+    - {up_to_rub: 3000000, grade_ab: L1, grade_c: L1, grade_d: L1, source: "30-11", note: "до 3 млн — андеррайтер"}
+    - {up_to_rub: 15000000, grade_ab: L1, grade_c: L1, grade_d: L2, source: "30-11", note: "до 15 млн; грейд D — старший"}
+    - {up_to_rub: 50000000, grade_ab: L2, grade_c: L2, grade_d: L2, source: "30-11", note: "до 50 млн — старший"}
+    - {up_to_rub: null, grade_ab: L2, grade_c: L2, grade_d: L2, source: "30-11", note: "выше 50 млн: комитет не моделируем, L2"}
+
+counter_offers:
+  term_grid_months:
+    value: [6, 12, 18, 24, 30, 36]
+    source: "30-18 №17"
+    note: "сетка сроков встречных (R-003)"
+  amount_step_rub: {value: 50000, source: "D-072", note: "шаг суммы встречных"}
+  dscr_min: {value: "1.30", source: "D-084", note: "запас над серой зоной DSCR [1,25; 1,30)"}
+  stress_dscr_min: {value: "1.05", source: "30-18 №17", note: "запас над серой зоной стресса [1,00; 1,05)"}
+  debt_to_revenue_below: {value: "0.95", source: "30-18 №17", note: "запас над серой зоной долга [0,95; 1,00]"}
+  max_cards: {value: 3, source: "D-072", note: "до трёх карточек"}
+  weights:
+    source: "30-18 №17"
+    note: "веса расстояния до запроса (R-003): сумма 3, срок 1, переплата 0,5, смена продукта 1, обеспечение 1,5"
+    amount: "3"
+    term: "1"
+    overpayment: "0.5"
+    product_change: "1"
+    security: "1.5"
+
+timing:
+  client_reply_days: {value: 5, source: "20-02", note: "срок ответа клиента на запрос данных"}
+  offer_valid_days: {value: 10, source: "20-02", note: "срок действия предложения"}
+  bki_reuse_days: {value: 30, source: "D-077", note: "повторное использование отчёта БКИ в пределах заявки"}
+  consent_months: {value: 6, source: "30-18 №12", note: "срок согласия на запрос в БКИ"}
