@@ -207,6 +207,95 @@ class Restrictions(_Strict):
     business_too_young: IntParam  # месяцев
 
 
+# ---------------------------------------------------------------- flags (T-288, T-290)
+
+
+class OverdueFlagRule(Toggle):
+    """Просрочка `min_days`…(порог стопа − 1) дней и не меньше `min_rub` у любого субъекта."""
+
+    min_days: StrictInt
+    min_rub: Rub
+
+
+class ShareLimitRule(Toggle):
+    """Расхождение двух чисел больше `max_share` от второго (знаменатель — отчётность)."""
+
+    max_share: Dec
+
+
+class RatioFloorRule(Toggle):
+    """Отношение ниже `min_ratio`."""
+
+    min_ratio: Dec
+
+
+class PumpRule(Toggle):
+    """Накачка: отношение среднего последних месяцев к медиане базы и модифицированный z."""
+
+    recent_months: StrictInt
+    base_months: StrictInt
+    min_ratio: Dec
+    min_modified_z: Dec
+    modified_z_constant: Dec
+    mad_fallback_share: Dec
+    seasonal_min_months: StrictInt
+    seasonal_repeat_ratio: Dec
+
+    @model_validator(mode="after")
+    def _windows(self) -> PumpRule:
+        if self.recent_months < 1 or self.base_months < 1:
+            raise ValueError("окна накачки должны быть не короче одного месяца")
+        if self.seasonal_min_months < self.recent_months + self.base_months + 12:
+            raise ValueError("для сезонного исключения нужен ряд не короче года и окон накачки")
+        return self
+
+
+class TransitRule(Toggle):
+    """Транзит: доля месяцев окна, где списания почти равны поступлениям."""
+
+    window_months: StrictInt
+    min_outgoing_share: Dec
+    min_months: StrictInt
+
+    @model_validator(mode="after")
+    def _window(self) -> TransitRule:
+        if not 1 <= self.min_months <= self.window_months:
+            raise ValueError("min_months транзита должен лежать в пределах окна")
+        return self
+
+
+class SinglePayerRule(Toggle):
+    """Один плательщик: мало контрагентов подряд при крупных поступлениях."""
+
+    window_months: StrictInt
+    max_payers: StrictInt
+    min_avg_income_rub: Rub
+    exempt_okved_prefixes: tuple[str, ...]
+
+
+class DataMismatchRules(_Strict):
+    turnover_vs_financials: ShareLimitRule
+    declared_vs_calculated: ShareLimitRule
+    statement_vs_financials: ShareLimitRule
+    flow_crosscheck: RatioFloorRule
+    director_vs_registry: Toggle
+
+
+class TurnoverAnomalyRules(_Strict):
+    pump: PumpRule
+    transit: TransitRule
+    single_payer: SinglePayerRule
+
+
+class Flags(_Strict):
+    """Флаги (30-04): подозрение или нехватка данных → ручной разбор, отказа нет (D-034)."""
+
+    mass_registration: Toggle
+    overdue_30_89: OverdueFlagRule
+    data_mismatch: DataMismatchRules
+    turnover_anomaly: TurnoverAnomalyRules
+
+
 # ---------------------------------------------------------------- features
 
 
@@ -601,6 +690,7 @@ class Policy(_Strict):
     wizard: Wizard
     eligibility: Eligibility
     stop_factors: StopFactors
+    flags: Flags
     restrictions: Restrictions
     features: FeatureParams
     scorecard: Scorecard

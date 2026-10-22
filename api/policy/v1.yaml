@@ -328,6 +328,71 @@ stop_factors:
     days: 90
     min_rub: 10000
 
+flags:
+  mass_registration:
+    enabled: true
+    source: "30-04"
+    note: "массовый адрес, руководитель или учредитель по «Прозрачному бизнесу» ФНС: только флаг, отказа нет"
+  overdue_30_89:
+    enabled: true
+    source: "30-04"
+    note: "текущая просрочка от 30 дней до порога стопа CURRENT_OVERDUE_90 (89 дней), сумма не меньше 10 000 ₽ (допущение: ниже техническая просрочка, 30-02); верхняя граница берётся из стопа, чтобы между флагом и стопом не было дня-щели"
+    min_days: 30
+    min_rub: 10000
+  data_mismatch:
+    turnover_vs_financials:
+      enabled: true
+      source: "D-035"
+      note: "обороты за календарный год без НДС против строки 2110 за тот же год; расхождение больше 30% от отчётности, год берётся только целиком из окна оборотов (30-02)"
+      max_share: "0.30"
+    declared_vs_calculated:
+      enabled: true
+      source: "D-035"
+      note: "заявленная выручка в месяц против осторожной расчётной; расхождение больше 30% от расчётной (30-02)"
+      max_share: "0.30"
+    statement_vs_financials:
+      enabled: true
+      source: "D-035"
+      note: "выписка клиента против отчётности за общий календарный год; расхождение больше 30% от отчётности (30-02)"
+      max_share: "0.30"
+    flow_crosscheck:
+      enabled: true
+      source: "допущение: порог мягче выручечных сверок, потому что поток по счёту шумнее выручки (30-03, 30-02)"
+      note: "поток по счёту против потока модели: отношение ниже 0,5"
+      min_ratio: "0.5"
+    director_vs_registry:
+      enabled: true
+      source: "30-04"
+      note: "директор в анкете не совпал с директором по реестру после нормализации ФИО (30-02)"
+  turnover_anomaly:
+    pump:
+      enabled: true
+      source: "D-076"
+      note: "накачка: среднее последних 3 мес. к медиане 9 мес. до них не меньше 1,6 и модифицированный z не меньше 3,5 (Iglewicz, Hoaglin 1993); 1,6 — допущение, уточняется на синтетике (30-14); нужен ряд не короче 12 мес."
+      recent_months: 3
+      base_months: 9
+      min_ratio: "1.6"
+      min_modified_z: "3.5"
+      modified_z_constant: "0.6745"
+      mad_fallback_share: "0.05"
+      seasonal_min_months: 24
+      seasonal_repeat_ratio: "1.3"
+    transit:
+      enabled: true
+      source: "D-076"
+      note: "транзит: не меньше 9 из последних 12 мес., где списания не меньше 98,5% поступлений (допущение, 30-02); у торговли с маржой 5% доля около 0,96, ложных срабатываний нет"
+      window_months: 12
+      min_outgoing_share: "0.985"
+      min_months: 9
+    single_payer:
+      enabled: true
+      source: "D-076"
+      note: "один плательщик: не больше 2 контрагентов в каждом из последних 6 мес. при средних поступлениях не меньше 3 млн ₽ в месяц (допущение, 30-02); только по оборотам нашего банка, у выписки контрагентов нет"
+      window_months: 6
+      max_payers: 2
+      min_avg_income_rub: 3000000
+      exempt_okved_prefixes: ["47", "55", "56", "96"]
+
 restrictions:
   business_too_young:
     value: 6

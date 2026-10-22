@@ -13,12 +13,15 @@ from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
 
 from app.modules.decisioning.dates import add_months, full_months_between
 from app.modules.decisioning.loan_math import to_rub
-from app.modules.decisioning.policy import Policy
+from app.modules.decisioning.policy import Policy, PumpRule, SinglePayerRule, TransitRule
 from app.modules.decisioning.types import (
     BkiReport,
     BkiSubject,
+    Comparison,
     DecisionInput,
     Features,
+    FinancialYear,
+    PumpStat,
     Quality,
     Snapshot,
     SourceStatus,
@@ -252,6 +255,110 @@ def _bki_reports(snapshot: Snapshot) -> list[tuple[BkiSubject, BkiReport]]:
     ]
 
 
+# ---------------------------------------------------------------- сверка и антифрод (T-288)
+
+_MONTHS_IN_YEAR = 12
+
+
+def compare_with_financials(
+    months: Sequence[TurnoverMonth], series: Sequence[Decimal], years: Sequence[FinancialYear]
+) -> Comparison | None:
+    """Обороты календарного года без НДС против строки 2110 за тот же год (30-02).
+
+    Берётся только год, у которого в окне оборотов есть все 12 месяцев. Если таких лет несколько,
+    остаётся год с наибольшим расхождением. Знаменатель — отчётность, чтобы +40% и −40% ловились
+    одинаково.
+    """
+    by_month = {m.month: v for m, v in zip(months, series, strict=True)}
+    best: Comparison | None = None
+    for fy in years:
+        keys = [date(fy.year, n, 1) for n in range(1, _MONTHS_IN_YEAR + 1)]
+        if fy.revenue_rub <= 0 or any(k not in by_month for k in keys):
+            continue
+        with localcontext(_CTX):
+            total = sum((by_month[k] for k in keys), _ZERO)
+            deviation = abs(total - fy.revenue_rub) / fy.revenue_rub
+        if best is None or deviation > best.deviation:
+            best = Comparison(to_rub(total), fy.revenue_rub, deviation, fy.year)
+    return best
+
+
+def compare_declared(declared_rub: int | None, calculated_rub: int | None) -> Comparison | None:
+    """Заявленная выручка в месяц против осторожной расчётной; знаменатель — расчётная (30-02).
+
+    Не заявлено (нет значения или оно не положительное) или расчётной нет — проверки нет.
+    """
+    if declared_rub is None or declared_rub <= 0 or not calculated_rub:
+        return None
+    with localcontext(_CTX):
+        deviation = abs(Decimal(declared_rub) - calculated_rub) / calculated_rub
+    return Comparison(declared_rub, calculated_rub, deviation)
+
+
+def _pump_window(
+    series: Sequence[Decimal], cfg: PumpRule
+) -> tuple[Decimal, Decimal, Decimal, Decimal] | None:
+    """`x`, `b`, `x / b` и модифицированный z для окна, которым заканчивается `series`."""
+    need = cfg.recent_months + cfg.base_months
+    if len(series) < need:
+        return None
+    base = list(series[-need : -cfg.recent_months])
+    recent = list(series[-cfg.recent_months :])
+    b = median(base)
+    if b <= 0:
+        return None
+    x = mean(recent)
+    with localcontext(_CTX):
+        mad = median([abs(v - b) for v in base])
+        if mad == 0:
+            mad = b * cfg.mad_fallback_share
+        return x, b, x / b, cfg.modified_z_constant * (x - b) / mad
+
+
+def pump_stat(series: Sequence[Decimal], cfg: PumpRule) -> PumpStat | None:
+    """Накачка: среднее последних месяцев против медианы базы (30-02, D-076).
+
+    Для ряда не короче `seasonal_min_months` считается и то же окно годом ранее: это отношение
+    «своё к своей базе», а не к текущему уровню. Буквальное `x / x_год_назад` подавило бы настоящую
+    накачку (9 / 5 = 1,8, `t-anomaly`), потому что любой рост за год выглядел бы повтором сезона.
+    """
+    now = _pump_window(series, cfg)
+    if now is None:
+        return None
+    x, b, ratio, modified_z = now
+    prior: Decimal | None = None
+    if len(series) >= cfg.seasonal_min_months:
+        ago = _pump_window(series[:-_MONTHS_IN_YEAR], cfg)
+        prior = ago[2] if ago is not None else None
+    return PumpStat(to_rub(x), to_rub(b), ratio, modified_z, prior)
+
+
+def transit_months(months: Sequence[TurnoverMonth], cfg: TransitRule) -> int | None:
+    """Месяцев окна, где списания не меньше доли поступлений (с НДС, как они на счёте)."""
+    if len(months) < cfg.window_months:
+        return None
+    return sum(
+        1
+        for m in months[-cfg.window_months :]
+        if m.incoming_net_rub > 0 and m.outgoing_rub >= cfg.min_outgoing_share * m.incoming_net_rub
+    )
+
+
+def payers_window(months: Sequence[TurnoverMonth], cfg: SinglePayerRule) -> tuple[int, int] | None:
+    """Максимум контрагентов-плательщиков и средние поступления за окно; `None`, если данных нет.
+
+    У выписки клиента число контрагентов неизвестно: правило на ней не работает.
+    """
+    if len(months) < cfg.window_months:
+        return None
+    window = months[-cfg.window_months :]
+    counts = [m.counterparties_in for m in window if m.counterparties_in is not None]
+    if len(counts) != len(window):
+        return None
+    average = mean([Decimal(m.incoming_net_rub) for m in window])
+    return max(counts), to_rub(average)
+
+
 # ---------------------------------------------------------------- главная функция
 
 
@@ -270,6 +377,7 @@ def compute_features(inp: DecisionInput) -> Features:  # noqa: PLR0914 — од�
     app = inp.application
     today = inp.context.app_today
     cfg = policy.features
+    cfg_flags = policy.flags
     reg = snap.registry
     okved = reg.okved_main
 
@@ -398,6 +506,19 @@ def compute_features(inp: DecisionInput) -> Features:  # noqa: PLR0914 — од�
             if flow:
                 crosscheck = Decimal(observed) / Decimal(flow)
 
+    # --- сверка и антифрод (T-288): только расчёт признаков, флаги ставит `flags.py`
+    tax_ok = snap.tax if snap.tax.meta.status == SourceStatus.OK else None
+    anomaly = cfg_flags.turnover_anomaly
+    bank_series = net_series(bank_months, osno, policy) if bank_months else ()
+    stmt_series = net_series(stmt_months, osno, policy) if stmt_months else ()
+    mismatch_fin = (
+        compare_with_financials(bank_months, bank_series, fin_years) if bank_months else None
+    )
+    mismatch_statement = (
+        compare_with_financials(stmt_months, stmt_series, fin_years) if stmt_months else None
+    )
+    payers = payers_window(used, anomaly.single_payer) if used else None
+
     # --- БКИ по всем субъектам
     all_reports = [r for _, r in reports]
     max_overdue = max((r.max_overdue_days_24m for r in all_reports), default=0)
@@ -481,4 +602,14 @@ def compute_features(inp: DecisionInput) -> Features:  # noqa: PLR0914 — од�
         guarantor_confirmed=guarantor,
         security_confirmed=collateral or guarantor,
         form_matches_registry=matches,
+        mismatch_turnover_fin=mismatch_fin,
+        mismatch_declared=compare_declared(app.declared_monthly_revenue_rub, revenue),
+        mismatch_statement=mismatch_statement,
+        pump=pump_stat(series, anomaly.pump) if series else None,
+        transit_months=transit_months(used, anomaly.transit) if used else None,
+        payers_in_6m_max=payers[0] if payers is not None else None,
+        payers_in_6m_avg_income_rub=payers[1] if payers is not None else None,
+        risk_mass_address=tax_ok.mass_address if tax_ok is not None else False,
+        risk_mass_director=tax_ok.mass_director if tax_ok is not None else False,
+        risk_mass_founder=tax_ok.mass_founder if tax_ok is not None else False,
     )
