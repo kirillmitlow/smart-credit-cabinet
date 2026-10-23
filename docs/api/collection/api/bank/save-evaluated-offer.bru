@@ -1,0 +1,26 @@
+meta {
+  name: Сохранить проверенное встречное
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{apiUrl}}/backoffice/applications/{{applicationId}}/decision
+  body: json
+  auth: none
+}
+
+headers {
+  Idempotency-Key: {{decisionActionKey}}
+}
+
+body:json {
+  {
+    "expectedVersion": {{applicationVersion}},
+    "engineDecisionId": "{{engineDecisionId}}",
+    "outcome": "COUNTER_OFFER",
+    "evaluationRef": "{{evaluationRef}}",
+    "reasonCode": "UW_RISK_HIGHER",
+    "comment": "По итогам изучения документов предложена меньшая сумма финансирования."
+  }
+}

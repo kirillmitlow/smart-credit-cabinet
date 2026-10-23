@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Literal
 from uuid import UUID
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from app.modules.backoffice.schemas import Camel, ProductCode
 
@@ -27,6 +27,13 @@ class BankDecisionRequest(Camel):
     terms: BankDecisionTerms | None = None
     reason_code: str | None = Field(default=None, max_length=100)
     comment: str | None = Field(default=None, max_length=4000)
+    evaluation_ref: str | None = Field(default=None, max_length=8192)
+
+    @model_validator(mode="after")
+    def one_terms_source(self) -> "BankDecisionRequest":
+        if self.evaluation_ref is not None and self.terms is not None:
+            raise ValueError("Передайте ссылку на расчёт или условия, а не оба источника")
+        return self
 
 
 class BankDecisionSaved(Camel):

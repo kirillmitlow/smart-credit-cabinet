@@ -8,10 +8,11 @@ from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
 from app.modules.applications import Status
-from app.modules.backoffice import card, decision_service, outbox_service, service
+from app.modules.backoffice import card, decision_service, manual_service, outbox_service, service
 from app.modules.backoffice.card_schemas import BankApplicationCard
 from app.modules.backoffice.decision_schemas import BankDecisionRequest, BankDecisionSaved
 from app.modules.backoffice.info_router import router as info_router
+from app.modules.backoffice.manual_schemas import BankOfferEvaluation, BankOfferEvaluationRequest
 from app.modules.backoffice.outbox_schemas import (
     BankOutboxPage,
     BankOutboxRetried,
@@ -21,6 +22,30 @@ from app.modules.backoffice.schemas import BankQueuePage, ProductCode
 
 router = APIRouter(prefix="/backoffice", tags=["банк"])
 router.include_router(info_router)
+
+
+@router.post(
+    "/applications/{application_id}/evaluate-offer",
+    operation_id="evaluateBackofficeOffer",
+    summary="Проверить ручные условия без сохранения",
+    response_model=BankOfferEvaluation,
+    response_model_by_alias=True,
+    responses={
+        401: {"description": "UNAUTHENTICATED"},
+        403: {"description": "FORBIDDEN"},
+        404: {"description": "NOT_FOUND"},
+        409: {
+            "description": "VERSION_CONFLICT / INVALID_TRANSITION / ENGINE_DECISION_STALE / DEMO_RESET_IN_PROGRESS"
+        },
+        422: {"description": "VALIDATION_ERROR"},
+    },
+)
+async def evaluate_offer(
+    application_id: UUID,
+    body: BankOfferEvaluationRequest,
+    principal: auth.BankPrincipal,
+) -> BankOfferEvaluation:
+    return await run_in_threadpool(manual_service.evaluate, principal, application_id, body)
 
 
 @router.post(

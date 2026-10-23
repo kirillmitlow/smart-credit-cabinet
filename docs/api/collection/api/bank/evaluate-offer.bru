@@ -1,0 +1,27 @@
+meta {
+  name: Проверить ручные условия без сохранения
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{apiUrl}}/backoffice/applications/{{applicationId}}/evaluate-offer
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "expectedVersion": {{applicationVersion}},
+    "engineDecisionId": "{{engineDecisionId}}",
+    "outcome": "COUNTER_OFFER",
+    "terms": {
+      "productCode": "INVESTMENT",
+      "amountRub": 10000000,
+      "termMonths": 60,
+      "ratePercent": 19.5
+    },
+    "reasonCode": "UW_RISK_HIGHER",
+    "comment": "По итогам изучения документов предложена меньшая сумма финансирования."
+  }
+}

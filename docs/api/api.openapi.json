@@ -624,6 +624,64 @@
         }
       }
     },
+    "/backoffice/applications/{application_id}/evaluate-offer": {
+      "post": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Проверить ручные условия без сохранения",
+        "operationId": "evaluateBackofficeOffer",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankOfferEvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankOfferEvaluation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT / INVALID_TRANSITION / ENGINE_DECISION_STALE / DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          }
+        }
+      }
+    },
     "/backoffice/applications/{application_id}/decision": {
       "post": {
         "tags": [
@@ -4112,6 +4170,18 @@
               }
             ],
             "title": "Comment"
+          },
+          "evaluationRef": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8192
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluationref"
           }
         },
         "additionalProperties": false,
@@ -4733,6 +4803,255 @@
           "passed"
         ],
         "title": "BankMetric"
+      },
+      "BankOfferEvaluation": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "engineDecisionId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Enginedecisionid"
+          },
+          "allowed": {
+            "type": "boolean",
+            "title": "Allowed"
+          },
+          "evaluationRef": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluationref",
+            "description": "Только допустимый расчёт; привязан к версии и сотруднику"
+          },
+          "requiredLevel": {
+            "type": "string",
+            "title": "Requiredlevel"
+          },
+          "minCommentChars": {
+            "type": "integer",
+            "title": "Mincommentchars"
+          },
+          "deviation": {
+            "type": "boolean",
+            "title": "Deviation"
+          },
+          "exceptionUsed": {
+            "type": "boolean",
+            "title": "Exceptionused"
+          },
+          "ratePercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratepercent"
+          },
+          "corridorMinPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corridorminpercent"
+          },
+          "corridorMaxPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corridormaxpercent"
+          },
+          "paymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paymentrub"
+          },
+          "lastPaymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lastpaymentrub"
+          },
+          "overpaymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overpaymentrub"
+          },
+          "dscr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dscr"
+          },
+          "stressDscr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stressdscr"
+          },
+          "violations": {
+            "items": {
+              "$ref": "#/components/schemas/BankOfferViolation"
+            },
+            "type": "array",
+            "title": "Violations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "version",
+          "engineDecisionId",
+          "allowed",
+          "evaluationRef",
+          "requiredLevel",
+          "minCommentChars",
+          "deviation",
+          "exceptionUsed",
+          "ratePercent",
+          "corridorMinPercent",
+          "corridorMaxPercent",
+          "paymentRub",
+          "lastPaymentRub",
+          "overpaymentRub",
+          "dscr",
+          "stressDscr",
+          "violations"
+        ],
+        "title": "BankOfferEvaluation"
+      },
+      "BankOfferEvaluationRequest": {
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expectedversion"
+          },
+          "engineDecisionId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Enginedecisionid"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "COUNTER_OFFER"
+            ],
+            "title": "Outcome",
+            "default": "COUNTER_OFFER"
+          },
+          "terms": {
+            "$ref": "#/components/schemas/BankDecisionTerms"
+          },
+          "reasonCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoncode"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expectedVersion",
+          "engineDecisionId",
+          "terms"
+        ],
+        "title": "BankOfferEvaluationRequest"
+      },
+      "BankOfferViolation": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "kind",
+          "params"
+        ],
+        "title": "BankOfferViolation"
       },
       "BankOutboxItem": {
         "properties": {
