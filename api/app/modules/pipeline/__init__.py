@@ -10,15 +10,18 @@ from app.modules.pipeline.policy_registry import (
     register_policy,
     reset_policy_cache,
 )
+from app.modules.pipeline.recheck import RecheckReceipt, request_recheck
 from app.modules.pipeline.runner import RunResult, run_pipeline
 
 __all__ = [
     "ConsentView",
+    "RecheckReceipt",
     "RunResult",
     "current_policy",
     "load_policy_file",
     "register_current",
     "register_policy",
+    "request_recheck",
     "reset_policy_cache",
     "router",
     "run_pipeline",

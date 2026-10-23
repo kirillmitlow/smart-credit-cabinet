@@ -13,7 +13,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
-from sqlalchemy import Sequence, select, update
+from sqlalchemy import Sequence, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -285,6 +285,50 @@ def submit(session: Session, principal: auth.Principal, application: Application
     session.flush()
     enqueue(session, PIPELINE_TASK, application_id=str(application.id))
     return application
+
+
+def current_version(session: Session, application: Application) -> ApplicationVersion | None:
+    if application.current_version_id is None:
+        return None
+    return session.get(ApplicationVersion, application.current_version_id)
+
+
+def add_version(
+    session: Session,
+    application: Application,
+    reason: str,
+    *,
+    data_patch: dict[str, Any] | None = None,
+) -> ApplicationVersion:
+    """Новая неизменяемая версия заявки (`INFO_PROVIDED`, `COLLATERAL_ADDED`) на основе текущей.
+
+    Данные копируются из текущей версии, поверх них кладётся `data_patch` (верхний уровень).
+    Транзакцию держит вызывающий (R7); версия сразу становится текущей.
+    """
+    previous = current_version(session, application)
+    if previous is None:
+        raise AppError(409, "INVALID_TRANSITION", "У заявки нет отправленной версии")
+    data = {**previous.data, **(data_patch or {})}
+    data_hash = hashlib.sha256(
+        json.dumps(data, sort_keys=True, ensure_ascii=False).encode()
+    ).hexdigest()
+    last_number = session.scalar(
+        select(func.max(ApplicationVersion.number)).where(
+            ApplicationVersion.application_id == application.id
+        )
+    )
+    version = ApplicationVersion(
+        application_id=application.id,
+        number=(last_number or 0) + 1,
+        reason=reason,
+        data=data,
+        data_hash=data_hash,
+    )
+    session.add(version)
+    session.flush()
+    application.current_version_id = version.id
+    session.flush()
+    return version
 
 
 def withdraw(session: Session, principal: auth.Principal, application: Application) -> Application:

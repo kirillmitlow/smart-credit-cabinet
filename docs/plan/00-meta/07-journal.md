@@ -799,3 +799,21 @@ POST /demo/personas/{code}/login — только хелпер интеграц�
 Добавлен `builtin_large.py` в моках, три персоны подключены в общий список (теперь 9). Живой стенд `scc-large` (порты 8088/8100/8105): решения в `decisions` совпали с 30-17 по грейду, потоку, DSCR, стрессу и платежу всех трёх (snabkontrakt A 92, 739 163; stankoprom A 90, 393 247; zarya A 91, 325 000). Ожидание вариантов встречного СнабКонтракта помечено `xfail` до T-297.
 
 Расхождение с фикстурой ядра: у `0018881113`, `001310000200` и `001310000888` неверные контрольные суммы, взяты валидные ИНН (подробно в карточке T-133). Контракты моков и api, ядро и `policy` не менялись.
+
+---
+
+### A, 23.10: `pipeline.request_recheck` готов (T-277, для B / T-363)
+
+PR `feat/pipeline-recheck`. Публичный импорт: `from app.modules import pipeline`.
+
+```python
+pipeline.request_recheck(session, application_id, *, expected_version, actor, actor_id=None,
+                         reason_code=None, version_reason=None, data_patch=None) -> pipeline.RecheckReceipt
+```
+
+- `expected_version` — `applications.version`, который видел вызывающий. `actor`: `Actor.UNDERWRITER` для `MANUAL_REVIEW → CHECKING`, `Actor.CLIENT` для `NEEDS_INFO` и `COUNTER_OFFER → CHECKING` (по таблице переходов). `version_reason="INFO_PROVIDED"` создаёт новую версию заявки (для ответа клиента); без него запуск идёт на текущей версии (перепроверка источников).
+- Ошибки, все 409: `RECHECK_ALREADY_RUNNING` (статус SUBMITTED/CHECKING, повторный вызов), `VERSION_CONFLICT`, `INVALID_TRANSITION` (не тот статус или роль). Несуществующая заявка: 404.
+- Гарантии: всё в транзакции вызывающего (`session`): блокировка строки заявки, переход CHECKING (CAS), новая версия (если нужна), новая строка `pipeline_runs` с новым `run_key` (`версия:причина:r<версия заявки>`), событие STEP `RECHECK_REQUESTED`, `pipeline.run` в очередь после коммита. Откат вызывающего убирает всё, задачи нет.
+- Отчёт БКИ заявки (до 30 дней) переиспользуется: платного запроса нет. Бесплатные источники опрашиваются заново. `claim_run` теперь сначала берёт заранее созданный запуск заявки.
+- Пример: `with db.transaction() as s: pipeline.request_recheck(s, app_id, expected_version=card.version, actor=Actor.UNDERWRITER, actor_id=user_id, reason_code="SOURCE_RECOVERED")`.
+- Не сделано в T-277: сообщение «правила обновлены» при смене политики, обязательный ручной разбор после 3-го раунда (в T-350).
