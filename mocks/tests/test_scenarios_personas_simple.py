@@ -58,7 +58,7 @@ def history_months(body: dict[str, Any], today: date = TODAY) -> int:
 
 def test_list_has_unique_codes_inns_and_stable_order() -> None:
     specs = builtin_scenarios(TODAY)
-    assert [s.code for s in specs] == ["sokolova", *CODES]
+    assert [s.code for s in specs] == ["sokolova", *CODES, "snabkontrakt", "stankoprom", "zarya"]
     assert len({s.code for s in specs}) == len(specs)
     inns = [s.company.inn for s in specs if s.company]
     assert len(inns) == len(set(inns))
