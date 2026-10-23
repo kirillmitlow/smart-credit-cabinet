@@ -242,7 +242,9 @@ function ActionForm({
       busy.current = false;
     }
   };
-  const locked = mutation.isPending || (isAppError(mutation.error) && mutation.error.status === 0);
+  const locked =
+    mutation.isPending ||
+    (isAppError(mutation.error) && (mutation.error.status === 0 || mutation.error.status >= 500));
   const edit = (change: () => void) => {
     if (locked) return;
     key.reset();

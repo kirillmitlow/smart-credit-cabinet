@@ -104,7 +104,8 @@ export function ManualOfferForm({
       void navigate('/bank', { state: { bankActionNotice: t.saved } });
     },
   });
-  const unresolvedSave = isAppError(save.error) && save.error.status === 0;
+  const unresolvedSave =
+    isAppError(save.error) && (save.error.status === 0 || save.error.status >= 500);
   const locked = preview.isPending || save.isPending || unresolvedSave || save.isSuccess;
   const valid =
     !stale &&

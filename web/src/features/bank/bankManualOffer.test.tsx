@@ -160,31 +160,36 @@ describe('ручные условия банка (T-433)', () => {
     expect(within(dialog).getByRole('button', { name: m.save })).toBeDisabled();
   });
 
-  it('повтор сохранения после сети сохраняет ключ/тело и запрещает менять неизвестный результат', async () => {
-    const calls: { key: string | null; body: unknown }[] = [];
-    server.use(
-      http.post('*/api/backoffice/applications/:id/evaluate-offer', () =>
-        Response.json(evaluation()),
-      ),
-      http.post('*/api/backoffice/applications/:id/decision', async ({ request }) => {
-        calls.push({ key: request.headers.get('Idempotency-Key'), body: await request.json() });
-        return calls.length === 1
-          ? HttpResponse.error()
-          : Response.json({ status: 'COUNTER_OFFER', version: 4 });
-      }),
-    );
-    const dialog = await setup();
-    await ready(dialog);
-    await userEvent.click(within(dialog).getByRole('button', { name: m.calculate }));
-    await within(dialog).findByTestId('bank-manual-result');
-    await userEvent.click(within(dialog).getByRole('button', { name: m.save }));
-    await waitFor(() => expect(within(dialog).getByLabelText(m.amount)).toBeDisabled());
-    await userEvent.click(within(dialog).getByRole('button', { name: m.save }));
-    expect(await screen.findByText(t.saved)).toBeInTheDocument();
-    expect(calls).toHaveLength(2);
-    expect(calls[0]).toEqual(calls[1]);
-    expect(calls[0]?.key).toBeTruthy();
-  });
+  it.each(['network', 'server'] as const)(
+    'повтор сохранения после %s сохраняет ключ/тело и запрещает менять неизвестный результат',
+    async (failure) => {
+      const calls: { key: string | null; body: unknown }[] = [];
+      server.use(
+        http.post('*/api/backoffice/applications/:id/evaluate-offer', () =>
+          Response.json(evaluation()),
+        ),
+        http.post('*/api/backoffice/applications/:id/decision', async ({ request }) => {
+          calls.push({ key: request.headers.get('Idempotency-Key'), body: await request.json() });
+          return calls.length === 1
+            ? failure === 'network'
+              ? HttpResponse.error()
+              : problemResponse({ status: 503, code: 'SERVICE_UNAVAILABLE' })
+            : Response.json({ status: 'COUNTER_OFFER', version: 4 });
+        }),
+      );
+      const dialog = await setup();
+      await ready(dialog);
+      await userEvent.click(within(dialog).getByRole('button', { name: m.calculate }));
+      await within(dialog).findByTestId('bank-manual-result');
+      await userEvent.click(within(dialog).getByRole('button', { name: m.save }));
+      await waitFor(() => expect(within(dialog).getByLabelText(m.amount)).toBeDisabled());
+      await userEvent.click(within(dialog).getByRole('button', { name: m.save }));
+      expect(await screen.findByText(t.saved)).toBeInTheDocument();
+      expect(calls).toHaveLength(2);
+      expect(calls[0]).toEqual(calls[1]);
+      expect(calls[0]?.key).toBeTruthy();
+    },
+  );
 
   it('форма и результат не содержат блокирующих нарушений доступности', async () => {
     server.use(
