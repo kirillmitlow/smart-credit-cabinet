@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | PARTIAL |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/pipeline-rerun-flows` |
 | Оценка | ~4 ч |
