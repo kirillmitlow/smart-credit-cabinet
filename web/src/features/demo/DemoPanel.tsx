@@ -70,7 +70,7 @@ function PersonaCard({ persona: p, onReset }: { persona: Persona; onReset: () =>
           </Text>
         ) : null}
         {p.status !== 'APPLIED' ? <Text c="dimmed">{t.unapplied}</Text> : null}
-        <Button variant="light" color="red" onClick={onReset} disabled={!p.companyId}>
+        <Button variant="outline" color="red.8" onClick={onReset} disabled={!p.companyId}>
           {t.resetOne}
         </Button>
       </Stack>
