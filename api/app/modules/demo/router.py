@@ -10,13 +10,13 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Path, Request
+from fastapi import APIRouter, Body, Depends, Header, Path, Request, Response
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 from starlette.concurrency import run_in_threadpool
 
-from app.modules.demo import catalog, chaos, reset_all, reset_persona
-from app.modules.demo.control_guard import require_control
+from app.modules.demo import catalog, chaos, create_scenario, reset_all, reset_persona
+from app.modules.demo.control_guard import limit_demo_request, require_control
 from app.modules.integrations import System
 from app.shared import clock
 from app.shared.errors import AppError
@@ -149,3 +149,55 @@ def get_chaos() -> list[chaos.ChaosView]:
 )
 def put_chaos(system: System, body: chaos.ChaosInput) -> chaos.ChaosView:
     return chaos.set_chaos(system, body)
+
+
+@router.post(
+    "/scenarios",
+    operation_id="demoCreateScenario",
+    status_code=201,
+    response_model=create_scenario.CreatedScenario,
+    summary="Создать тестовую компанию и применить сценарий",
+    description="Тело — ScenarioSpec сервиса сценариев; форма или preset обязательны. "
+    "Если code не задан, он стабильно определяется ключом запроса. Учётки — только клиентские роли. "
+    "Idempotency-Key сохраняйте при повторе после таймаута. "
+    "Моки и каталог api обновляются до подтверждения успеха; учётки/полный spec не возвращаются.",
+    dependencies=[Depends(limit_demo_request)],
+    responses={
+        400: {"description": "INN_INVALID"},
+        503: {"description": "DEMO_CONTROL_UNAVAILABLE"},
+        403: {"description": "DEMO_MODE_DISABLED"},
+        409: {
+            "description": (
+                "SCENARIO_EXISTS / SCENARIO_INN_EXISTS / IDEMPOTENCY_KEY_REUSED / "
+                "IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+            )
+        },
+        422: {"description": "VALIDATION_ERROR"},
+        429: {"description": "RATE_LIMITED"},
+        502: {"description": "DEMO_SCENARIOS_UNAVAILABLE / DEMO_SCENARIO_INVALID_RESPONSE"},
+    },
+)
+def create_demo_scenario(
+    body: Annotated[
+        create_scenario.ScenarioInput,
+        Body(
+            examples=[
+                {
+                    "title": "Тестовый ИП",
+                    "preset": "IP_HEALTHY",
+                    "users": [{"login": "owner", "role": "DIRECTOR", "personRef": "self"}],
+                }
+            ]
+        ),
+    ],
+    key: Annotated[
+        str, Header(alias="Idempotency-Key", min_length=1, max_length=200, pattern=r"^\S+$")
+    ],
+    response: Response,
+) -> create_scenario.CreatedScenario:
+    result = create_scenario.create(
+        body.model_dump(mode="json", by_alias=True, exclude_unset=True), key
+    )
+    if result.replayed:
+        response.headers["Idempotent-Replayed"] = "true"
+    return create_scenario.CreatedScenario.model_validate(result.body)

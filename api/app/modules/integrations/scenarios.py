@@ -96,3 +96,55 @@ def reset_all(mode: str = "KEEP_CUSTOM") -> dict[str, Any]:
         raise ScenariosUnavailableError(f"HTTP {response.status_code}: {detail[:500]}")
     result: dict[str, Any] = response.json()
     return result
+
+
+class ScenarioRejectedError(RuntimeError):
+    """Публичный отказ сценария, без внутренних адресов и тела ошибки сервиса."""
+
+    def __init__(self, status: int, code: str) -> None:
+        super().__init__(code)
+        self.status = status
+        self.code = code
+
+
+def create_scenario(spec: dict[str, Any], *, idempotency_key: str) -> dict[str, Any]:
+    """Создать и применить; повтор ключа возвращает тот же сценарий после потери ответа."""
+    settings = get_settings()
+    try:
+        with httpx.Client(
+            base_url=settings.scenarios_url,
+            headers={"X-Admin-Key": settings.mock_admin_key, "Idempotency-Key": idempotency_key},
+            timeout=RESET_TIMEOUT_SECONDS * settings.integration_timeout_scale,
+        ) as client:
+            response = client.post("/api/v1/scenarios", json=spec)
+        if response.status_code in {400, 409, 422}:
+            try:
+                code = response.json().get("code")
+            except (ValueError, AttributeError):
+                code = None
+            allowed = {
+                "INN_INVALID",
+                "VALIDATION_ERROR",
+                "SCENARIO_EXISTS",
+                "SCENARIO_INN_EXISTS",
+                "IDEMPOTENCY_IN_PROGRESS",
+                "IDEMPOTENCY_KEY_REUSED",
+            }
+            fallback = (
+                "VALIDATION_ERROR" if response.status_code in {400, 422} else "SCENARIO_EXISTS"
+            )
+            raise ScenarioRejectedError(
+                response.status_code,
+                code if isinstance(code, str) and code in allowed else fallback,
+            )
+        response.raise_for_status()
+        view = response.json()
+        if (
+            response.status_code != 201
+            or not isinstance(view, dict)
+            or view.get("status") != "APPLIED"
+        ):
+            raise ScenariosUnavailableError("Создание сценария не подтверждено")
+        return view
+    except (httpx.HTTPError, ValueError) as exc:
+        raise ScenariosUnavailableError("Сервис сценариев не подтвердил создание") from exc
