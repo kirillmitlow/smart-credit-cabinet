@@ -109,7 +109,17 @@ def claim_run(application_id: UUID) -> Claimed | None:
         version = session.get(ApplicationVersion, application.current_version_id)
         if version is None:
             return None
-        run_key = f"{version.id}:{version.reason}"
+        # Перепроверка (`recheck.request_recheck`) заранее кладёт запуск с собственным ключом
+        pending = session.scalars(
+            select(PipelineRun)
+            .where(
+                PipelineRun.application_id == application.id,
+                PipelineRun.status.in_(("QUEUED", "RUNNING")),
+            )
+            .order_by(PipelineRun.created_at.desc(), PipelineRun.id.desc())
+            .limit(1)
+        ).first()
+        run_key = pending.run_key if pending is not None else f"{version.id}:{version.reason}"
         session.execute(
             insert(PipelineRun)
             .values(

@@ -23,6 +23,8 @@ from app.modules.applications.operations import hold as hold_operation
 from app.modules.applications.operations import scope as operation_scope
 from app.modules.applications.router import router
 from app.modules.applications.service import (
+    add_version,
+    current_version,
     get_for,
     record_event,
     register_submit_check,
@@ -40,8 +42,10 @@ __all__ = [
     "SignedBkiConsent",
     "SignedConsent",
     "Status",
+    "add_version",
     "bki_consents",
     "consents_router",
+    "current_version",
     "ensure_pep_rules",
     "get_for",
     "get_valid_consent",

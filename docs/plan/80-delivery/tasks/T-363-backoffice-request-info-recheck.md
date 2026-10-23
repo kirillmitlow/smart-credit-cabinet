@@ -40,4 +40,6 @@ integration: цепочки stankoprom, сбой БКИ.
 
 ## Заметки для реализации
 
+- Интерфейсы A: `pipeline.request_recheck` готов (журнал, 23.10); `applications.request_information` — в PR `feat/client-tasks`.
+
 - Права: L1 может запрашивать информацию и перепроверять ([30-11](../../30-decisioning/11-routing-and-authority.md)).

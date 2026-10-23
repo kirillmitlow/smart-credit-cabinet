@@ -10,6 +10,7 @@ from app.modules.pipeline.policy_registry import (
     register_policy,
     reset_policy_cache,
 )
+from app.modules.pipeline.recheck import RecheckReceipt, request_recheck
 from app.modules.pipeline.runner import RunResult, run_pipeline
 from app.modules.pipeline.underwriter import (
     UnderwriterReceipt,
@@ -19,6 +20,7 @@ from app.modules.pipeline.underwriter import (
 
 __all__ = [
     "ConsentView",
+    "RecheckReceipt",
     "RunResult",
     "UnderwriterReceipt",
     "current_policy",
@@ -27,6 +29,7 @@ __all__ = [
     "record_underwriter_decision",
     "register_current",
     "register_policy",
+    "request_recheck",
     "reset_policy_cache",
     "router",
     "run_pipeline",
