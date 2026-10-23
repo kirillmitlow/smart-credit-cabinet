@@ -2438,6 +2438,84 @@
           }
         }
       }
+    },
+    "/demo/personas/{code}/login": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Служебный вход персоны для интеграционных тестов",
+        "description": "Только при DEMO_MODE. Логин существующей активной учётки указывается явно. Пользовательский UI и e2e используют обычный вход по ИНН и коду. Создаёт только sid_client; банковская сессия не меняется.",
+        "operationId": "demoLoginPersona",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+              "title": "Code"
+            }
+          },
+          {
+            "name": "sid_client",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Client"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED / FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND: персона или активное членство отсутствуют"
+          },
+          "409": {
+            "description": "DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE / DEMO_CONTROL_UNAVAILABLE"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5786,6 +5864,62 @@
           "status"
         ],
         "title": "LoanPaymentOut"
+      },
+      "LoginInput": {
+        "properties": {
+          "login": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{1,63}$",
+            "title": "Login"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "login"
+        ],
+        "title": "LoginInput"
+      },
+      "LoginResult": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Companyid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "const": "CLIENT",
+            "title": "Role",
+            "default": "CLIENT"
+          },
+          "membershipRole": {
+            "type": "string",
+            "enum": [
+              "DIRECTOR",
+              "ACCOUNTANT",
+              "GUARANTOR"
+            ],
+            "title": "Membershiprole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId",
+          "companyId",
+          "displayName",
+          "membershipRole"
+        ],
+        "title": "LoginResult"
       },
       "MeResponse": {
         "properties": {

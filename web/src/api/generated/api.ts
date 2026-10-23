@@ -65,6 +65,8 @@ import type {
   LoanDetail,
   LoanPage,
   LoanPaymentOut,
+  LoginInput,
+  LoginResult,
   MeResponse,
   OfferOut,
   PassedOut,
@@ -5968,4 +5970,138 @@ export const useDemoCreateScenario = <TError = void,
         TContext
       > => {
       return useMutation(getDemoCreateScenarioMutationOptions(options), queryClient);
+    }
+
+export type demoLoginPersonaResponse200 = {
+  data: LoginResult
+  status: 200
+}
+
+export type demoLoginPersonaResponse403 = {
+  data: void
+  status: 403
+}
+
+export type demoLoginPersonaResponse404 = {
+  data: void
+  status: 404
+}
+
+export type demoLoginPersonaResponse409 = {
+  data: void
+  status: 409
+}
+
+export type demoLoginPersonaResponse422 = {
+  data: void
+  status: 422
+}
+
+export type demoLoginPersonaResponse429 = {
+  data: void
+  status: 429
+}
+
+export type demoLoginPersonaResponse503 = {
+  data: void
+  status: 503
+}
+
+export type demoLoginPersonaResponseSuccess = (demoLoginPersonaResponse200) & {
+  headers: Headers;
+};
+export type demoLoginPersonaResponseError = (demoLoginPersonaResponse403 | demoLoginPersonaResponse404 | demoLoginPersonaResponse409 | demoLoginPersonaResponse422 | demoLoginPersonaResponse429 | demoLoginPersonaResponse503) & {
+  headers: Headers;
+};
+
+export type demoLoginPersonaResponse = (demoLoginPersonaResponseSuccess | demoLoginPersonaResponseError)
+
+export const getDemoLoginPersonaUrl = (code: string,) => {
+
+
+
+
+  return `/demo/personas/${code}/login`
+}
+
+/**
+ * Только при DEMO_MODE. Логин существующей активной учётки указывается явно. Пользовательский UI и e2e используют обычный вход по ИНН и коду. Создаёт только sid_client; банковская сессия не меняется.
+ * @summary Служебный вход персоны для интеграционных тестов
+ */
+export const demoLoginPersona = async (code: string,
+    loginInput: LoginInput, options?: Parameters<typeof customFetch>[1]): Promise<demoLoginPersonaResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<demoLoginPersonaResponse>(getDemoLoginPersonaUrl(code),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(loginInput)
+  }
+);}
+
+
+
+
+
+export const getDemoLoginPersonaMutationKey = () => ['demoLoginPersona'] as const;
+
+export const getDemoLoginPersonaMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoLoginPersona>>, TError,DemoLoginPersonaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoLoginPersona>>, TError,DemoLoginPersonaMutationVariables, TContext> => {
+
+const mutationKey = getDemoLoginPersonaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoLoginPersona>>, DemoLoginPersonaMutationVariables> = (props) => {
+          const {code,data} = props ?? {};
+
+          return  demoLoginPersona(code,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoLoginPersonaMutationResult = NonNullable<Awaited<ReturnType<typeof demoLoginPersona>>>
+    export type DemoLoginPersonaMutationBody = LoginInput
+    export type DemoLoginPersonaMutationError = void
+    export type DemoLoginPersonaMutationVariables = {code: string;data: LoginInput}
+
+    /**
+ * @summary Служебный вход персоны для интеграционных тестов
+ */
+export const useDemoLoginPersona = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoLoginPersona>>, TError,DemoLoginPersonaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoLoginPersona>>,
+        TError,
+        DemoLoginPersonaMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoLoginPersonaMutationOptions(options), queryClient);
     }

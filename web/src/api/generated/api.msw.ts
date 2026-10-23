@@ -54,6 +54,7 @@ import type {
   LoanDetail,
   LoanPage,
   LoanPaymentOut,
+  LoginResult,
   MeResponse,
   OfferOut,
   PassedOut,
@@ -172,6 +173,8 @@ export const getDemoGetChaosResponseMock = (): ChaosView[] => (Array.from({ leng
 export const getDemoSetChaosResponseMock = (overrideResponse: Partial<Extract<ChaosView, object>> = {}): ChaosView => ({system: faker.helpers.arrayElement(Object.values(System)), available: faker.datatype.boolean(), mode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), latencyMs: faker.helpers.arrayElement([faker.number.int(),null,]), ...overrideResponse})
 
 export const getDemoCreateScenarioResponseMock = (overrideResponse: Partial<Extract<CreatedScenario, object>> = {}): CreatedScenario => ({persona: {code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), inn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), companyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), technical: faker.datatype.boolean(), application: faker.helpers.arrayElement([{productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.string.alpha({length: {min: 10, max: 20}}), termMonths: faker.helpers.arrayElement([faker.number.int(),null,])},null,]), expectedOutcome: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), expectedFinalOutcome: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), expectedReasonCodes: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), undefined])}, applied: {registry: faker.helpers.arrayElement(['OK','SKIPPED'] as const), tax: faker.helpers.arrayElement(['OK','SKIPPED'] as const), bki: faker.helpers.arrayElement(['OK','SKIPPED'] as const), bankCore: faker.helpers.arrayElement(['OK','SKIPPED'] as const)}, ...overrideResponse})
+
+export const getDemoLoginPersonaResponseMock = (overrideResponse: Partial<Extract<LoginResult, object>> = {}): LoginResult => ({userId: faker.string.uuid(), companyId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: "CLIENT", membershipRole: faker.helpers.arrayElement(['DIRECTOR','ACCOUNTANT','GUARANTOR'] as const), ...overrideResponse})
 
 
 export const getHealthLiveMockHandler = (overrideResponse?: HealthLive200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthLive200> | HealthLive200), options?: RequestHandlerOptions) => {
@@ -777,6 +780,18 @@ export const getDemoCreateScenarioMockHandler = (overrideResponse?: CreatedScena
       })
   }, options)
 }
+
+export const getDemoLoginPersonaMockHandler = (overrideResponse?: LoginResult | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<LoginResult> | LoginResult), options?: RequestHandlerOptions) => {
+  return http.post('*/demo/personas/:code/login', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDemoLoginPersonaResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getApiMock = () => [
   getHealthLiveMockHandler(),
   getHealthReadyMockHandler(),
@@ -828,5 +843,6 @@ export const getApiMock = () => [
   getDemoListPersonasMockHandler(),
   getDemoGetChaosMockHandler(),
   getDemoSetChaosMockHandler(),
-  getDemoCreateScenarioMockHandler()
+  getDemoCreateScenarioMockHandler(),
+  getDemoLoginPersonaMockHandler()
 ]
