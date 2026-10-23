@@ -68,3 +68,9 @@ def test_arbitrary_bytes_have_only_controlled_errors(content: bytes) -> None:
         read_statement(content)
     except AppError:
         pass
+
+
+def test_negative_overdraft_balance_is_not_a_negative_payment() -> None:
+    assert money("-100.50", allow_negative=True) == Decimal("-100.50")
+    with pytest.raises(AppError):
+        money("-100.50")

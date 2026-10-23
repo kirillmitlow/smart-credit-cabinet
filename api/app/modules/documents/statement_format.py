@@ -29,12 +29,13 @@ def _invalid(code: str = "MALFORMED_STATEMENT") -> AppError:
     return AppError(422, code, "Выписка не прошла проверку формата")
 
 
-def money(value: str) -> Decimal:
-    """Finite nonnegative amounts, at most two fractional digits; never binary floats."""
-    if not _MONEY.fullmatch(value):
+def money(value: str, *, allow_negative: bool = False) -> Decimal:
+    """Exact kopecks. Payments are nonnegative; overdraft account balances may be negative."""
+    unsigned = value.removeprefix("-") if allow_negative else value
+    if not _MONEY.fullmatch(unsigned):
         raise _invalid("INVALID_AMOUNT")
     amount = Decimal(value.replace(",", "."))
-    if amount > _MAX_MONEY:
+    if abs(amount) > _MAX_MONEY:
         raise _invalid("INVALID_AMOUNT")
     return amount
 
@@ -112,10 +113,12 @@ def _account(fields: Mapping[str, str]) -> AccountSection:
         account_number(_required(fields, "РасчСчет")),
         start,
         end,
-        money(_required(fields, "НачальныйОстаток")),
+        money(_required(fields, "НачальныйОстаток"), allow_negative=True),
         money(fields["ВсегоПоступило"]) if fields.get("ВсегоПоступило") else None,
         money(fields["ВсегоСписано"]) if fields.get("ВсегоСписано") else None,
-        money(fields["КонечныйОстаток"]) if fields.get("КонечныйОстаток") else None,
+        money(fields["КонечныйОстаток"], allow_negative=True)
+        if fields.get("КонечныйОстаток")
+        else None,
     )
 
 
