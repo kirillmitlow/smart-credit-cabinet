@@ -914,3 +914,18 @@ applications.TaskSpec(kind, title, why_text, details={}, assignee_user_id=None, 
 **Не хватило в API:** рычагов «как получить» (формула 30-10/30-12, T-299): нет нужного потока выручки, нет кнопок «Добавить залог / Подтвердить выручку» и возврата `COUNTER_OFFER → CHECKING`; нет `paymentKind` в `VariantOut` (признак «только проценты» берём из графика: основной долг в первом платеже равен нулю); `whatChanged` — свободный словарь без схемы.
 
 **Файлы:** web/src/features/application/{CounterOfferPanel,counterOfferModel,SchedulePreview,counterOffer.test}, web/src/features/offers/OfferActions.tsx, web/src/texts/{counterOffer,errors}.ts, web/src/test/counterOfferFactory.ts.
+
+---
+
+**23.10 · Агент A (Claude Code) · T-424: блок «Нужна информация» и «Что нужно от вас» (PARTIAL)**
+
+**Сделано:**
+- Страница заявки в `NEEDS_INFO`: `NeedsInfoPanel` с задачами раунда («Запрос 1 из 3», зачем, что именно, где взять, срок, кто отвечает), поле текста на каждую, «Сохранить черновик», «Отправить ответы» (доступна, когда заполнено всё; двойное нажатие даёт один запрос). После отправки страница показывает «Проверяем заново» и сама идёт дальше по таймлайну.
+- Поручитель видит только свою задачу и «Сохранить ответ», раунд отправлять не может. Чужую задачу участник видит без поля; пока её не ответили, отправить нельзя.
+- Главная: «Что нужно от вас» показывает открытые задачи запросов банка со ссылкой на заявку.
+- Тексты в `texts/clientTasks.ts`, коды `ROUND_ALREADY_SENT`, `ROUND_INCOMPLETE`, `TASK_CLOSED` в `errors.ts`; заголовок блока теперь «Нужна информация».
+- Тесты: `needsInfo.test.tsx` (14) и три в `home.test.tsx`.
+
+**Не хватило:** файлового хранилища (T-332, T-333, T-336), поэтому нет загрузки выписки 1С, ошибок файла и замены; нет «Сгенерировать тестовую выписку» (T-373). В интерфейсе написано, что загрузка файлов появится позже. Ответ на задачу пока только текстом. Ручки «отказ поручителя» и «Сделать позже» в API нет.
+
+**Файлы:** web/src/features/application/{NeedsInfoPanel,tasksModel,useTasks,OutcomeBlock,ApplicationPage}, web/src/features/home/{HomePage,tasks}, web/src/texts/{clientTasks,errors,application,index}.ts, web/src/test/tasksFactory.ts.
