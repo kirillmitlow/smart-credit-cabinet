@@ -1,6 +1,8 @@
 import { test, expect } from './fixtures';
 import { checkAccessibility } from './support/axe';
 import { demo as t } from '../src/texts/demo';
+import type { Persona } from '../src/api/generated/model';
+import { outcome } from '../src/features/demo/formatting';
 
 // Своё демо-окружение: общий сброс завершает тест, не затрагивает другие compose-проекты.
 test('TS-101: демо-панель: реальная шпаргалка, сбой, восстановление и сброс', async ({
@@ -10,15 +12,16 @@ test('TS-101: демо-панель: реальная шпаргалка, сбо
   await client.goto('/demo');
   const response = await client.request.get('/api/demo/personas');
   expect(response.status()).toBe(200);
-  const personas = (await response.json()) as {
-    code: string;
-    title: string;
-    inn: string;
-    companyId: string;
-  }[];
+  const personas = (await response.json()) as Persona[];
   const p = personas.find((p) => p.code === 'sokolova');
   expect(p).toBeDefined();
-  await expect(client.getByRole('heading', { name: p!.title })).toBeVisible();
+  for (const persona of personas.filter((item) => !item.technical)) {
+    const heading = client.getByRole('heading', { name: persona.title, exact: true });
+    await expect(heading).toBeVisible();
+    await expect(heading.locator('..').locator('..')).toContainText(
+      outcome(persona.expectedOutcome),
+    );
+  }
   await checkAccessibility(client, 'демо-панель');
   const source = client
     .getByRole('heading', { name: t.systems.tax, exact: true })
