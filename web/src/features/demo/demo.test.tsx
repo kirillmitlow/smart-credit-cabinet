@@ -86,6 +86,59 @@ describe('демо-панель', () => {
     expect(await screen.findByText(t.resetDone, { exact: false })).toBeInTheDocument();
     expect(calls).toEqual(['stand-code']);
   });
+  it('сбой повторного сброса очищает прошлый успех; повтор ждёт ответа сервера', async () => {
+    mockSessions({ config: { demoMode: true } });
+    scenarios();
+    let calls = 0;
+    let finish: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    server.use(
+      http.post('*/api/demo/personas/sokolova/reset', async () => {
+        calls += 1;
+        if (calls === 2)
+          return problemResponse({
+            status: 502,
+            code: 'DEMO_RESET_FAILED',
+            detail: 'private upstream detail',
+            errors: [{ field: 'reset', code: 'MOCKS' }],
+          });
+        if (calls === 3) await gate;
+        return Response.json({
+          status: 'DONE',
+          companyId: 'co-1',
+          generation: calls,
+          steps: [{ step: 'MOCKS', title: 'моки', status: 'DONE' }],
+          durationMs: 30,
+          finishedAt: '2026-10-23T00:00:00Z',
+        });
+      }),
+    );
+    renderApp('/demo');
+    await screen.findByText(persona.title);
+    await userEvent.click(screen.getAllByRole('button', { name: t.resetOne })[0]!);
+    await userEvent.click(
+      within(await screen.findByRole('dialog')).getByRole('button', { name: t.confirm }),
+    );
+    await screen.findByText(t.resetDone, { exact: false });
+    await userEvent.click(screen.getAllByRole('button', { name: t.resetOne })[0]!);
+    const modal = await screen.findByRole('dialog');
+    await userEvent.click(within(modal).getByRole('button', { name: t.confirm }));
+    await within(modal).findByText(`${t.failedAt}: ${t.resetSteps.MOCKS}`);
+    expect(screen.queryByText(t.resetDone, { exact: false })).not.toBeInTheDocument();
+    expect(screen.queryByText('private upstream detail')).not.toBeInTheDocument();
+    const retry = within(modal).getByRole('button', { name: t.retryReset });
+    await userEvent.click(retry);
+    await within(modal).findByText(t.resetting);
+    expect(retry).toBeDisabled();
+    expect(within(modal).getByRole('button', { name: t.cancel })).toBeDisabled();
+    expect(calls).toBe(3);
+    finish?.();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await screen.findByText(t.resetDone, { exact: false });
+    expect(calls).toBe(3);
+  });
   it('облачная ошибка кода не выдаёт успешный сброс', async () => {
     mockSessions({ config: { demoMode: true, demoCodeRequired: true } });
     scenarios();
