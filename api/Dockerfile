@@ -14,6 +14,9 @@ COPY policy ./policy
 
 FROM python:3.13.16-slim-bookworm AS runtime
 ENV PATH="/srv/.venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
+    && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system app && useradd --system --gid app --no-create-home app
 WORKDIR /srv
 COPY --from=build /srv /srv

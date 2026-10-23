@@ -132,7 +132,9 @@ def _authorize(
     return mine
 
 
-def _ensure_signable(contract: Contract, application: Application, offer: Offer) -> None:
+def _ensure_signable(
+    session: Session, contract: Contract, application: Application, offer: Offer
+) -> None:
     if contract.status != "READY" or Status(application.status) is not Status.OFFER_ACCEPTED:
         raise AppError(
             409,
@@ -143,11 +145,15 @@ def _ensure_signable(contract: Contract, application: Application, offer: Offer)
     if clock.now() > offer.expires_at:
         raise AppError(409, "OFFER_EXPIRED", "Срок предложения истёк")
     contracts.verify_integrity(contract)
+    contracts.signing_hash(session, contract)
 
 
-def _fingerprint(contract: Contract) -> str:
+def _fingerprint(session: Session, contract: Contract) -> str:
     """Предмет кода: тот же код не подпишет другой договор или другой файл."""
-    return hashlib.sha256(f"{contract.id}:{contract.content_hash}".encode()).hexdigest()
+    digest = contracts.signing_hash(session, contract)
+    if contract.document_id is None:
+        return hashlib.sha256(f"{contract.id}:{contract.content_hash}".encode()).hexdigest()
+    return hashlib.sha256(f"{contract.id}:{contract.content_hash}:{digest}".encode()).hexdigest()
 
 
 def request_code(
@@ -164,12 +170,12 @@ def request_code(
     if mine.signature is not None:
         raise AppError(409, "CONTRACT_ALREADY_SIGNED", "Вы уже подписали этот договор")
     offer = _offer_of(session, contract)
-    _ensure_signable(contract, application, offer)
+    _ensure_signable(session, contract, application, offer)
     ensure_pep_rules(session, principal, application, accepted=accept_pep_rules)
     issued = auth.codes.issue(
         signer_identity(principal),
         SIGN_PURPOSE,
-        _fingerprint(contract),
+        _fingerprint(session, contract),
         company_id=application.company_id,
     )
     return Challenge(issued.request_id, issued.expires_in, issued.code)
@@ -194,17 +200,18 @@ def sign(
     if mine.signature is not None:
         return contract, application, False
     offer = _offer_of(session, contract)
-    _ensure_signable(contract, application, offer)
+    _ensure_signable(session, contract, application, offer)
 
     verified = auth.codes.verify(request_id, code, purpose=SIGN_PURPOSE)
     if verified.person_inn != signer_identity(principal) or verified.subject != _fingerprint(
-        contract
+        session, contract
     ):
         raise AppError(403, "SIGNER_MISMATCH", "Код выдан другому человеку или на другой документ")
     company = companies.by_id(session, application.company_id)
     if company is None:
         raise not_found("Компания")
     now = clock.now()
+    digest = contracts.signing_hash(session, contract)
     session.add(
         Signature(
             contract_id=contract.id,
@@ -213,7 +220,7 @@ def sign(
             signer_role=mine.role,
             proof=proof_for(
                 code=code,
-                text_hash=contract.content_hash,
+                text_hash=digest,
                 signer_inn=signer_identity(principal),
                 attempt_id=request_id,
                 subject_inn=company.inn,
@@ -222,7 +229,7 @@ def sign(
             method=SIGN_METHOD,
             attempt_id=request_id,
             consent_text_version=pep_rules_version(),
-            content_hash=contract.content_hash,
+            content_hash=digest,
             signed_at=now,
         )
     )
@@ -281,7 +288,7 @@ def pass_to_director(
     if member.role == "DIRECTOR":
         raise AppError(409, "CAN_SIGN_YOURSELF", "Вы руководитель: подпишите договор сами")
     offer = _offer_of(session, contract)
-    _ensure_signable(contract, application, offer)
+    _ensure_signable(session, contract, application, offer)
     existing = session.scalars(
         select(ApplicationEvent).where(
             ApplicationEvent.application_id == application.id,

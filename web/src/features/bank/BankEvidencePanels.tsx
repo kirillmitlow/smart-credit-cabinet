@@ -1,6 +1,9 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { Alert, Anchor, Badge, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import type { BankApplicationCard } from '@/api/generated/model';
-import { formatDate, formatDateTime } from '@/lib/format';
+import { getDownloadDocumentUrl } from '@/api/generated/api';
+import { resolveUrl } from '@/api/client';
+import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { applicationStatusLabels } from '@/texts';
 import { bankCard as t } from '@/texts/bank';
 import { BankSnapshotData } from './BankSnapshotData';
@@ -128,13 +131,49 @@ export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
         <Title order={2} size="h3">
           {t.documents}
         </Title>
-        <Text mt="sm">
-          {card.documents === null
-            ? t.documentsUnavailable
-            : card.documents.length
-              ? t.documentsPreviewUnavailable
-              : t.noDocuments}
-        </Text>
+        {card.documents === null ? (
+          <Text mt="sm">{t.documentsUnavailable}</Text>
+        ) : card.documents.length === 0 ? (
+          <Text mt="sm">{t.noDocuments}</Text>
+        ) : (
+          <Stack gap="sm" mt="sm">
+            {card.documents.map((document) => (
+              <Paper key={document.id} withBorder p="sm">
+                <Anchor
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={resolveUrl(
+                    getDownloadDocumentUrl(document.id, { zone: 'bank', preview: true }),
+                  )}
+                >
+                  {document.filename}
+                </Anchor>
+                <Text size="sm">
+                  {document.origin === 'SYSTEM_GENERATED' ? dt.generated : dt.uploaded} ·{' '}
+                  {formatDateTime(document.createdAt)} · {dt.size(document.sizeBytes)}
+                </Text>
+                {document.cancelledAt ? <Badge color="gray">{dt.replaced}</Badge> : null}
+                {document.parseStatus === 'PENDING' ? <Text size="sm">{dt.unparsed}</Text> : null}
+              </Paper>
+            ))}
+          </Stack>
+        )}
+      </Paper>
+      <Paper withBorder p="md" data-testid="bank-collateral">
+        <Title order={2} size="h3">
+          {dt.collateralTitle}
+        </Title>
+        {card.collateral ? (
+          <Stack gap="xs" mt="sm">
+            <Text>{card.collateral.description}</Text>
+            <Text>{dt.declaredValue(formatMoney(card.collateral.valueRub))}</Text>
+            <Text size="sm" c="dimmed">
+              {dt.collateralSource}
+            </Text>
+          </Stack>
+        ) : (
+          <Text mt="sm">{dt.noCollateral}</Text>
+        )}
       </Paper>
     </>
   );

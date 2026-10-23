@@ -148,6 +148,24 @@ async def test_submit_creates_version_event_and_task_once(
     assert [v[0] for v in versions] == ["SUBMIT"]
 
 
+@pytest.mark.parametrize("value", [True, -1, 0, "25000000", 1_000_000_001])
+async def test_invalid_collateral_does_not_change_draft(
+    sokolova: httpx.AsyncClient, value: Any
+) -> None:
+    application = (await sokolova.post("/applications", json={})).json()
+    response = await sokolova.patch(
+        f"/applications/{application['id']}/draft",
+        json={
+            "version": application["version"],
+            "answers": {"collateral": {"description": "Линия оборудования", "valueRub": value}},
+        },
+    )
+    assert (response.status_code, response.json()["code"]) == (422, "INVALID_COLLATERAL")
+    current = (await sokolova.get(f"/applications/{application['id']}")).json()
+    assert current["version"] == application["version"]
+    assert "collateral" not in current["draft"]
+
+
 async def test_submit_without_terms_is_422(sokolova: httpx.AsyncClient) -> None:
     app_id = (await sokolova.post("/applications", json={"productCode": "EXPRESS"})).json()["id"]
     response = await submit(sokolova, app_id)

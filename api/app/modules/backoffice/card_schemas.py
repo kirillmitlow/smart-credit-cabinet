@@ -164,6 +164,26 @@ class BankSubmittedBy(Camel):
     company_role: str | None
 
 
+class BankDocument(Camel):
+    id: UUID
+    task_id: UUID | None
+    kind: str
+    origin: str
+    filename: str
+    mime: str
+    size_bytes: int
+    sha256: str
+    parse_status: str
+    created_at: datetime
+    cancelled_at: datetime | None
+
+
+class BankCollateral(Camel):
+    description: str
+    value_rub: int
+    source: Literal["CLIENT_DECLARED"] = "CLIENT_DECLARED"
+
+
 class BankApplicationCard(Camel):
     id: UUID
     number: str
@@ -185,7 +205,8 @@ class BankApplicationCard(Camel):
     decisions: list[BankDecisionSummary]
     source_snapshots: list[BankSourceSnapshot]
     history: list[BankHistoryEvent]
-    documents: list[dict[str, Any]] | None = Field(description="null — сервис T-332 не подключён")
+    documents: list[BankDocument] | None
+    collateral: BankCollateral | None = None
     client_tasks: list[BankClientTask] = Field(default_factory=list)
     latest_answered_round: int | None = Field(
         default=None, description="Последний отправленный клиентом раунд, не черновик"

@@ -6,7 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * null — сервис T-332 не подключён
- */
-export type BankApplicationCardDocuments = { [key: string]: unknown }[] | null;
+export type UploadDocumentBodyKind = typeof UploadDocumentBodyKind[keyof typeof UploadDocumentBodyKind];
+
+
+export const UploadDocumentBodyKind = {
+  BANK_STATEMENT_1C: 'BANK_STATEMENT_1C',
+  FINANCIALS: 'FINANCIALS',
+  CONTRACT: 'CONTRACT',
+  OTHER: 'OTHER',
+} as const;

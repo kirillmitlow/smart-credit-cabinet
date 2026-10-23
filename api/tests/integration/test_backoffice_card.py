@@ -32,7 +32,7 @@ async def test_stankoprom_card_has_assessment_and_policy_evidence(bank: httpx.As
     assert body["version"] == 3
     assert body["stale"] is False
     assert body["submittedBy"]["name"] == "Клиент"
-    assert body["documents"] is None
+    assert body["documents"] == []
     assert body["engineDecisionId"] == assessment["id"]
     assert assessment["score"] == 90
     assert assessment["grade"] == "A"

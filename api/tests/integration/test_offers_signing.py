@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import io
 import json
 import re
 from collections.abc import Iterator
@@ -12,6 +14,7 @@ from uuid import UUID
 
 import httpx
 import pytest
+from pypdf import PdfReader
 from sqlalchemy import text
 
 from app.modules import disbursement, pipeline
@@ -171,7 +174,11 @@ async def test_sokolova_decision_accept_sign_and_disbursement_handoff(
         assert re.fullmatch(r"[0-9a-f-]{36}-[0-9a-f]", contract["contractUid"])
         document = await boss.get(f"/contracts/{contract_id}/document")
         assert document.headers["x-content-sha256"] == contract["contentHash"]
-        assert json.loads(document.text)["amountRub"] == 500_000
+        assert document.headers["content-type"] == "application/pdf"
+        assert hashlib.sha256(document.content).hexdigest() == contract["contentHash"]
+        pdf_text = "".join(p.extract_text() for p in PdfReader(io.BytesIO(document.content)).pages)
+        assert "500000₽" in re.sub(r"\s", "", pdf_text)
+        assert "Соколова" in pdf_text
 
         # --- бухгалтер не подписывает, но передаёт руководителю (D-014)
         assert (await start_signing(clerk, contract_id)).status_code == 403
@@ -330,13 +337,25 @@ async def test_pending_variants_are_marked_and_not_acceptable(stand: dict[str, A
     assert (response.status_code, response.json()["code"]) == (409, "OFFER_VARIANTS_PENDING")
 
 
-async def test_tampered_document_is_not_signed(stand: dict[str, Any]) -> None:
+@pytest.mark.parametrize("repair_hash", [False, True])
+async def test_tampered_document_is_not_signed(stand: dict[str, Any], repair_hash: bool) -> None:
     app_id = approve_sokolova(stand)
     async with client_for(stand, "sokolova:sokolova") as boss:
         contract_id = (await accept(boss, app_id)).json()["contract"]["id"]
         challenge = (await start_signing(boss, contract_id)).json()
         with db.transaction() as s:
             s.execute(text("UPDATE contracts SET body = replace(body, '500000', '900000')"))
+            if repair_hash:
+                body = s.execute(
+                    text("SELECT body FROM contracts WHERE id=:id"), {"id": contract_id}
+                ).scalar_one()
+                s.execute(
+                    text("UPDATE contracts SET content_hash=:digest WHERE id=:id"),
+                    {
+                        "id": contract_id,
+                        "digest": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                    },
+                )
         response = await boss.post(
             f"/contracts/{contract_id}/sign",
             json={"requestId": challenge["requestId"], "code": challenge["demoCode"]},
@@ -364,3 +383,106 @@ async def test_signatures_and_variants_are_immutable(stand: dict[str, Any]) -> N
         with pytest.raises(Exception, match="(?i)immutable|запрещ|journal"), db.transaction() as s:
             s.execute(text(statement))
     assert UUID(contract_id)
+
+
+@pytest.mark.parametrize("replacement", ["offer_application", "pdf_original"])
+async def test_signed_original_cannot_be_rebound_before_issuance(
+    stand: dict[str, Any], replacement: str
+) -> None:
+    """Even consistent mutable references cannot change the terms already signed."""
+    from app.modules import documents
+    from app.modules.offers import contracts
+    from app.modules.offers.models import Contract, Offer
+    from app.shared.errors import AppError
+
+    app_id = approve_sokolova(stand)
+    async with client_for(stand, "sokolova:sokolova") as boss:
+        contract_id = (await accept(boss, app_id)).json()["contract"]["id"]
+        challenge = (await start_signing(boss, contract_id)).json()
+        signed = await boss.post(
+            f"/contracts/{contract_id}/sign",
+            json={"requestId": challenge["requestId"], "code": challenge["demoCode"]},
+        )
+        assert signed.status_code == 200
+        with db.transaction() as session:
+            contract = session.get(Contract, UUID(contract_id))
+            assert contract is not None
+            application = session.get(Application, UUID(app_id))
+            assert application is not None
+            if replacement == "offer_application":
+                other = Application(
+                    number="АЗ-2026-999999",
+                    company_id=application.company_id,
+                    created_by=application.created_by,
+                    status="REJECTED",
+                    version=1,
+                    product_code="EXPRESS",
+                    amount_rub=900_000,
+                    term_months=12,
+                    draft={},
+                    flags=[],
+                )
+                session.add(other)
+                session.flush()
+                offer = session.get(Offer, contract.offer_id)
+                assert offer is not None
+                offer.application_id = other.id
+            else:
+                body = json.loads(contract.body)
+                body["amountRub"] = 700_000
+                contract.body = json.dumps(body, ensure_ascii=False)
+                contract.content_hash = contracts.content_hash_of(contract.body)
+                original = documents.store_generated(
+                    session,
+                    documents.UploadContext(application.company_id, application.id),
+                    application.created_by,
+                    content=documents.render_credit(contract.body),
+                    kind="CREDIT_AGREEMENT",
+                    filename="replacement.pdf",
+                    template_version=contract.template_version,
+                )
+                contract.document_id = original.id
+        if replacement == "pdf_original":
+            response = await boss.get(f"/contracts/{contract_id}/document")
+            assert (response.status_code, response.json()["code"]) == (409, "CONTRACT_TAMPERED")
+    with db.transaction() as session:
+        if replacement == "offer_application":
+            assert contracts.signed_terms(session, UUID(app_id)) is None
+        else:
+            with pytest.raises(AppError, match="сохранённой подписи"):
+                contracts.signed_terms(session, UUID(app_id))
+    assert not sql("SELECT id FROM disbursements WHERE application_id = :i", i=app_id)
+
+
+async def test_legacy_json_original_can_still_be_read_signed_and_issued(
+    stand: dict[str, Any],
+) -> None:
+    """Deploying PDF support must not replace an existing JSON original or invalidate its OTP."""
+    from app.modules.offers.contracts import content_hash_of
+    from app.modules.offers.models import Contract
+
+    app_id = approve_sokolova(stand)
+    async with client_for(stand, "sokolova:sokolova") as boss:
+        contract_id = (await accept(boss, app_id)).json()["contract"]["id"]
+        with db.transaction() as session:
+            contract = session.get(Contract, UUID(contract_id))
+            assert contract is not None
+            contract.template_version = "credit-agreement-json-v1"
+            body = json.loads(contract.body)
+            body["template"] = contract.template_version
+            contract.body = json.dumps(body, ensure_ascii=False, sort_keys=True)
+            contract.content_hash = content_hash_of(contract.body)
+            contract.document_id = None
+            expected = contract.body.encode("utf-8")
+        original = await boss.get(f"/contracts/{contract_id}/document")
+        assert original.headers["content-type"] == "application/json"
+        assert original.content == expected
+        challenge = (await start_signing(boss, contract_id)).json()
+        signed = await boss.post(
+            f"/contracts/{contract_id}/sign",
+            json={"requestId": challenge["requestId"], "code": challenge["demoCode"]},
+        )
+        assert signed.status_code == 200
+        assert signed.json()["contract"]["status"] == "SIGNED"
+        assert (await boss.get(f"/contracts/{contract_id}/document")).content == expected
+    assert disbursement.run(UUID(app_id)) == "STARTED"

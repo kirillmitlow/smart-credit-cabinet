@@ -13,7 +13,7 @@ import { ConditionsStep } from './ConditionsStep';
 import { ConsentsStep } from './ConsentsStep';
 import { CompanyDataStep } from './CompanyDataStep';
 import { conditionsSchema, toForm, type ConditionsForm } from './conditionsSchema';
-import { LaterStep } from './LaterStep';
+import { ProductStep } from './ProductStep';
 import { ReviewStep } from './ReviewStep';
 import { SaveStatusLine } from './SaveStatusLine';
 import { useApplication } from './useApplication';
@@ -55,6 +55,7 @@ function EditForm({
   });
   const autosave = useDraftAutosave(application);
   const [formRevision, setFormRevision] = useState({ revision: 0, snapshot: application });
+  const [productValid, setProductValid] = useState(true);
   const { flush, clearConflict } = autosave;
   const title = fill(applicationForm.stepOf, {
     current: step,
@@ -65,11 +66,12 @@ function EditForm({
 
   const goToStep = useCallback(
     (next: number) => {
+      if (step === 3 && next > step && !productValid) return;
       void flush().then((saved) => {
         if (saved) void navigate(`/applications/${application.id}/edit/${next}`);
       });
     },
-    [flush, navigate, application.id],
+    [flush, navigate, application.id, step, productValid],
   );
 
   const onRefresh = () => {
@@ -127,7 +129,16 @@ function EditForm({
         />
       ) : null}
       {step === 3 ? (
-        <LaterStep title={applicationForm.steps.product} body={applicationForm.later.product} />
+        <ProductStep
+          key={`${application.id}:${formRevision.revision}`}
+          application={
+            formRevision.snapshot.version > application.version
+              ? formRevision.snapshot
+              : application
+          }
+          autosave={autosave}
+          onValidityChange={setProductValid}
+        />
       ) : null}
       {step === 4 ? <ConsentsStep key={application.id} applicationId={application.id} /> : null}
       {step === 5 ? (
@@ -148,7 +159,9 @@ function EditForm({
           </Button>
         ) : null}
         {step < STEP_COUNT ? (
-          <Button onClick={() => goToStep(step + 1)}>{applicationForm.next}</Button>
+          <Button disabled={step === 3 && !productValid} onClick={() => goToStep(step + 1)}>
+            {applicationForm.next}
+          </Button>
         ) : null}
       </div>
     </Stack>

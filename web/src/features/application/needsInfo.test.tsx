@@ -88,9 +88,9 @@ describe('блок «Нужна информация» (T-424)', () => {
     expect(item.getByText(/Выписка → Выгрузка в 1С/)).toBeInTheDocument();
     expect(item.getByText(t.deadlineNone, { exact: false })).toBeInTheDocument();
     expect(item.getByText(t.assignees.any, { exact: false })).toBeInTheDocument();
-    // файлов нет: честно говорим об этом и не рисуем кнопку-пустышку
-    expect(item.getByText(t.fileLater)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /загрузить|выбрать файл/i })).toBeNull();
+    expect(item.queryByText(t.fileLater)).not.toBeInTheDocument();
+    expect(item.getByRole('button', { name: 'Загрузить файл' })).toBeDisabled();
+    expect(item.getByLabelText('Прикрепить документ')).toBeInTheDocument();
     // таймлайн на этом же экране показывает паузу «Нужна ваша помощь»
     expect(screen.getByTestId('timeline')).toHaveTextContent('Нужна ваша помощь');
 

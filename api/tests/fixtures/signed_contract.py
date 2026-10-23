@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.modules import offers
 from app.modules.applications import Application
-from app.modules.offers.contracts import create_contract
+from app.modules.offers.contracts import create_contract, signing_hash
+from app.modules.offers.models import Signature
 from app.modules.pipeline.models import Decision
 from app.shared import clock
 
@@ -47,6 +48,19 @@ def add_signed_contract(
     offer.status = "ACCEPTED"
     offer.accepted_variant_id = variant.id
     contract = create_contract(session, application, offer, variant)
+    session.add(
+        Signature(
+            contract_id=contract.id,
+            signer_user_id=application.created_by,
+            signer_role="DIRECTOR",
+            proof="test-fixture-proof",
+            method="SIMPLE_ESIGN",
+            attempt_id=f"fixture-{contract.id}",
+            consent_text_version="pep-rules-v1",
+            content_hash=signing_hash(session, contract),
+            signed_at=clock.now(),
+        )
+    )
     contract.status = "SIGNED"
     contract.signed_at = clock.now()
     session.flush()

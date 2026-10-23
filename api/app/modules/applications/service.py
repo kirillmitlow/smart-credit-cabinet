@@ -195,6 +195,22 @@ def allowed_actions(application: Application, principal: auth.Principal) -> list
 DRAFT_FIELDS = ("product_code", "amount_rub", "term_months", "purpose_code")
 
 
+def validate_collateral(answers: dict[str, Any]) -> None:
+    raw = answers.get("collateral")
+    if raw is None:
+        return
+    if (
+        not isinstance(raw, dict)
+        or not isinstance(raw.get("description"), str)
+        or not 1 <= len(raw["description"].strip()) <= 500
+        or type(raw.get("valueRub")) is not int
+        or not 0 < raw["valueRub"] <= 1_000_000_000
+    ):
+        raise AppError(
+            422, "INVALID_COLLATERAL", "Укажите описание залога и положительную стоимость в рублях"
+        )
+
+
 def update_draft(
     session: Session,
     application: Application,
@@ -216,6 +232,7 @@ def update_draft(
             "Черновик изменён в другой вкладке",
             errors=[{"version": application.version}],
         )
+    validate_collateral(answers)
     values: dict[str, Any] = {k: v for k, v in fields.items() if k in DRAFT_FIELDS}
     values["draft"] = {**application.draft, **answers}
     values["version"] = application.version + 1
@@ -249,6 +266,7 @@ def _snapshot(application: Application) -> dict[str, Any]:
 
 
 def submit(session: Session, principal: auth.Principal, application: Application) -> Application:
+    validate_collateral(application.draft)
     missing = [
         f for f in ("product_code", "amount_rub", "term_months") if getattr(application, f) is None
     ]
