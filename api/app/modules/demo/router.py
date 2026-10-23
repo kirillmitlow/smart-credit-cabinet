@@ -1,7 +1,7 @@
 """Демо-ручки (T-370, T-371, 60-05, D-081, D-086): только при `DEMO_MODE=true`.
 
 Локально открыты без входа (D-086, Q-090): панель — для жюри, а не для сотрудников банка. Код стенда
-для облака добавит T-374. На админ-API моков и рабочее место банка это исключение не распространяется.
+для облака проверяет T-374. На админ-API моков и рабочее место банка это исключение не распространяется.
 """
 
 from __future__ import annotations
@@ -10,20 +10,22 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Request
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 from starlette.concurrency import run_in_threadpool
 
-from app.modules.demo import reset_all, reset_persona
+from app.modules.demo import catalog, chaos, reset_all, reset_persona
+from app.modules.demo.control_guard import require_control
+from app.modules.integrations import System
 from app.shared import clock
 from app.shared.errors import AppError
 from app.shared.settings import get_settings
 
 
-def require_demo_mode() -> None:
+def require_demo_mode(request: Request) -> None:
     """Вне `DEMO_MODE` все `/demo/*` отвечают `403 DEMO_MODE_DISABLED` (50-07)."""
-    if not get_settings().demo_mode:
+    if not request.app.state.settings.demo_mode or not get_settings().demo_mode:
         raise AppError(403, "DEMO_MODE_DISABLED", "Демо-режим выключен")
 
 
@@ -58,6 +60,7 @@ def _reset() -> ResetOut:
 
 @router.post(
     "/reset",
+    dependencies=[Depends(require_control)],
     operation_id="demoReset",
     summary="Единый сброс стенда: моки, база api, сессии и кэш",
     description=(
@@ -94,6 +97,7 @@ class PersonaResetOut(Camel):
 
 @router.post(
     "/personas/{code}/reset",
+    dependencies=[Depends(require_control)],
     operation_id="demoResetPersona",
     summary="Вернуть одну компанию к исходному сценарию",
     description=(
@@ -125,3 +129,23 @@ async def reset_one_persona(
         duration_ms=done.duration_ms,
         finished_at=clock.system_now(),
     )
+
+
+@router.get("/personas", operation_id="demoListPersonas", response_model=list[catalog.Persona])
+def personas() -> list[catalog.Persona]:
+    return catalog.list_personas()
+
+
+@router.get("/chaos", operation_id="demoGetChaos", response_model=list[chaos.ChaosView])
+def get_chaos() -> list[chaos.ChaosView]:
+    return chaos.list_chaos()
+
+
+@router.put(
+    "/chaos/{system}",
+    operation_id="demoSetChaos",
+    response_model=chaos.ChaosView,
+    dependencies=[Depends(require_control)],
+)
+def put_chaos(system: System, body: chaos.ChaosInput) -> chaos.ChaosView:
+    return chaos.set_chaos(system, body)

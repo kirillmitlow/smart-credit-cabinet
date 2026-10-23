@@ -2119,6 +2119,24 @@
         "summary": "Единый сброс стенда: моки, база api, сессии и кэш",
         "description": "Отвечает по факту завершения, а не по таймеру. При ошибке `502 DEMO_RESET_FAILED` в `errors[0].step` стоит шаг (`MOCKS`, `DATABASE`, `SESSIONS`); повторный вызов безопасно доводит сброс. Параллельный вызов: `409 DEMO_RESET_IN_PROGRESS`.",
         "operationId": "demoReset",
+        "parameters": [
+          {
+            "name": "X-Demo-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Code"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2138,6 +2156,16 @@
           },
           "502": {
             "description": "Сброс остановился на одном из шагов (`DEMO_RESET_FAILED`)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
       }
@@ -2159,6 +2187,22 @@
               "type": "string",
               "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
               "title": "Code"
+            }
+          },
+          {
+            "name": "X-Demo-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Code"
             }
           }
         ],
@@ -2184,6 +2228,123 @@
           },
           "502": {
             "description": "Частичный сбой; повторите сброс компании"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/personas": {
+      "get": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Personas",
+        "operationId": "demoListPersonas",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Persona"
+                  },
+                  "type": "array",
+                  "title": "Response Demolistpersonas"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/chaos": {
+      "get": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Get Chaos",
+        "operationId": "demoGetChaos",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChaosView"
+                  },
+                  "type": "array",
+                  "title": "Response Demogetchaos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/chaos/{system}": {
+      "put": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Put Chaos",
+        "operationId": "demoSetChaos",
+        "parameters": [
+          {
+            "name": "system",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/System"
+            }
+          },
+          {
+            "name": "X-Demo-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChaosInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaosView"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -4204,6 +4365,78 @@
         ],
         "title": "BankVariant"
       },
+      "ChaosInput": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SLOW",
+              "ERROR",
+              "DOWN",
+              "LOST_RESPONSE"
+            ],
+            "title": "Mode"
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 120000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "title": "ChaosInput"
+      },
+      "ChaosView": {
+        "properties": {
+          "system": {
+            "$ref": "#/components/schemas/System"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "system",
+          "available"
+        ],
+        "title": "ChaosView"
+      },
       "ClientDecisionOut": {
         "properties": {
           "applicationId": {
@@ -5732,6 +5965,133 @@
         ],
         "title": "PersonOption"
       },
+      "Persona": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "inn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inn"
+          },
+          "companyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Companyid"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "technical": {
+            "type": "boolean",
+            "title": "Technical"
+          },
+          "application": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonaRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expectedOutcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expectedoutcome"
+          },
+          "expectedFinalOutcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expectedfinaloutcome"
+          },
+          "expectedReasonCodes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Expectedreasoncodes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "status",
+          "technical"
+        ],
+        "title": "Persona"
+      },
+      "PersonaRequest": {
+        "properties": {
+          "productCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "string",
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termmonths"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productCode",
+          "amountRub",
+          "termMonths"
+        ],
+        "title": "PersonaRequest"
+      },
       "PersonaResetOut": {
         "properties": {
           "status": {
@@ -6061,6 +6421,18 @@
           "nluAvailable": {
             "type": "boolean",
             "title": "Nluavailable"
+          },
+          "demoCodeRequired": {
+            "type": "boolean",
+            "title": "Democoderequired",
+            "default": false
+          },
+          "docsLinks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Docslinks"
           }
         },
         "type": "object",

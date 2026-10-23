@@ -38,6 +38,7 @@ import type {
   BankOutboxPage,
   BankOutboxRetried,
   BankQueuePage,
+  ChaosView,
   ClientDecisionOut,
   CodeIssued,
   CompanyProfile,
@@ -56,6 +57,7 @@ import type {
   OfferOut,
   PassedOut,
   PaymentOut,
+  Persona,
   PersonaResetOut,
   ProductList,
   ProductOut,
@@ -84,7 +86,9 @@ export const getGetMeResponseMock = (overrideResponse: Partial<Extract<MeRespons
 
 export const getSetActiveCompanyResponseMock = (overrideResponse: Partial<Extract<MeResponse, object>> = {}): MeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), activeCompanyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), companies: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({company: {id: faker.string.uuid(), inn: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canApply: faker.datatype.boolean()}, role: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
-export const getGetPublicConfigResponseMock = (overrideResponse: Partial<Extract<PublicConfig, object>> = {}): PublicConfig => ({demoMode: faker.datatype.boolean(), productName: faker.string.alpha({length: {min: 10, max: 20}}), version: faker.string.alpha({length: {min: 10, max: 20}}), nluAvailable: faker.datatype.boolean(), ...overrideResponse})
+export const getGetPublicConfigResponseMock = (overrideResponse: Partial<Extract<PublicConfig, object>> = {}): PublicConfig => ({demoMode: faker.datatype.boolean(), productName: faker.string.alpha({length: {min: 10, max: 20}}), version: faker.string.alpha({length: {min: 10, max: 20}}), nluAvailable: faker.datatype.boolean(), demoCodeRequired: faker.datatype.boolean(), docsLinks: faker.helpers.arrayElement([{
+        [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
+      }, undefined]), ...overrideResponse})
 
 export const getBankDemoLoginResponseMock = (overrideResponse: Partial<Extract<BankMeResponse, object>> = {}): BankMeResponse => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.helpers.arrayElement(['UNDERWRITER','ADMIN'] as const), level: faker.helpers.arrayElement(['L1','L2'] as const), ...overrideResponse})
 
@@ -159,6 +163,12 @@ export const getSignContractResponseMock = (overrideResponse: Partial<Extract<Co
 export const getDemoResetResponseMock = (overrideResponse: Partial<Extract<ResetOut, object>> = {}): ResetOut => ({status: "DONE", steps: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({step: faker.helpers.arrayElement(Object.values(ResetStep)), title: faker.string.alpha({length: {min: 10, max: 20}}), status: "DONE"})), durationMs: faker.number.int(), finishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getDemoResetPersonaResponseMock = (overrideResponse: Partial<Extract<PersonaResetOut, object>> = {}): PersonaResetOut => ({status: "DONE", companyId: faker.string.uuid(), generation: faker.number.int(), steps: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({step: faker.helpers.arrayElement(Object.values(Step)), title: faker.string.alpha({length: {min: 10, max: 20}}), status: "DONE"})), durationMs: faker.number.int(), finishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getDemoListPersonasResponseMock = (): Persona[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), inn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), companyId: faker.helpers.arrayElement([faker.string.uuid(),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), technical: faker.datatype.boolean(), application: faker.helpers.arrayElement([{productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.string.alpha({length: {min: 10, max: 20}}), termMonths: faker.helpers.arrayElement([faker.number.int(),null,])},null,]), expectedOutcome: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), expectedFinalOutcome: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), expectedReasonCodes: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), undefined])})))
+
+export const getDemoGetChaosResponseMock = (): ChaosView[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({system: faker.helpers.arrayElement(Object.values(System)), available: faker.datatype.boolean(), mode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), latencyMs: faker.helpers.arrayElement([faker.number.int(),null,])})))
+
+export const getDemoSetChaosResponseMock = (overrideResponse: Partial<Extract<ChaosView, object>> = {}): ChaosView => ({system: faker.helpers.arrayElement(Object.values(System)), available: faker.datatype.boolean(), mode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), latencyMs: faker.helpers.arrayElement([faker.number.int(),null,]), ...overrideResponse})
 
 
 export const getHealthLiveMockHandler = (overrideResponse?: HealthLive200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthLive200> | HealthLive200), options?: RequestHandlerOptions) => {
@@ -716,6 +726,42 @@ export const getDemoResetPersonaMockHandler = (overrideResponse?: PersonaResetOu
       })
   }, options)
 }
+
+export const getDemoListPersonasMockHandler = (overrideResponse?: Persona[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Persona[]> | Persona[]), options?: RequestHandlerOptions) => {
+  return http.get('*/demo/personas', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDemoListPersonasResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDemoGetChaosMockHandler = (overrideResponse?: ChaosView[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ChaosView[]> | ChaosView[]), options?: RequestHandlerOptions) => {
+  return http.get('*/demo/chaos', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDemoGetChaosResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDemoSetChaosMockHandler = (overrideResponse?: ChaosView | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<ChaosView> | ChaosView), options?: RequestHandlerOptions) => {
+  return http.put('*/demo/chaos/:system', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDemoSetChaosResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getApiMock = () => [
   getHealthLiveMockHandler(),
   getHealthReadyMockHandler(),
@@ -763,5 +809,8 @@ export const getApiMock = () => [
   getRequestContractSigningCodeMockHandler(),
   getSignContractMockHandler(),
   getDemoResetMockHandler(),
-  getDemoResetPersonaMockHandler()
+  getDemoResetPersonaMockHandler(),
+  getDemoListPersonasMockHandler(),
+  getDemoGetChaosMockHandler(),
+  getDemoSetChaosMockHandler()
 ]

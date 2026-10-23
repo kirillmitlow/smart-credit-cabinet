@@ -11,7 +11,7 @@ from enum import StrEnum
 from functools import lru_cache
 from typing import Self
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     app_env: AppEnv = AppEnv.LOCAL
     app_today: date | None = None
     demo_mode: bool = True
+    demo_stand_code: SecretStr = Field(default=SecretStr(""), repr=False)
+    demo_controls_per_minute: int = Field(default=300, ge=1)
+    docs_links: dict[str, str] = Field(default_factory=lambda: {"api": "/docs"})
     log_level: str = "INFO"
     cookie_secure: bool = False
     cors_origins: str = ""

@@ -11,6 +11,25 @@ export interface ErrorText {
 }
 
 export const errorTexts = {
+  DEMO_RESET_FAILED: {
+    text: 'Сброс не завершён. Повторите его для восстановления данных',
+    action: 'Повторить',
+  },
+  DEMO_CODE_REQUIRED: {
+    text: 'Нужен верный код стенда. Уточните его у организатора и повторите действие',
+  },
+  DEMO_CONTROL_UNAVAILABLE: {
+    text: 'Не удалось проверить доступ к управлению стендом. Повторите позже',
+    action: 'Повторить',
+  },
+  DEMO_SCENARIOS_UNAVAILABLE: {
+    text: 'Сервис сценариев недоступен. Повторите загрузку',
+    action: 'Повторить',
+  },
+  DEMO_CHAOS_UNAVAILABLE: {
+    text: 'Источник не подтвердил режим. Обновите состояние и повторите действие',
+    action: 'Повторить',
+  },
   UNAUTHENTICATED: { text: 'Сессия закончилась. Войдите снова', action: 'Войти' },
   ROLE_CANNOT_SIGN: {
     text: 'Подписать может только руководитель. Передайте ему заявку',

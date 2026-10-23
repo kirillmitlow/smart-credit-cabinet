@@ -76,6 +76,13 @@ def run(code: str) -> Done:
                 502,
                 "DEMO_RESET_FAILED",
                 f"Сброс остановился на шаге «{TITLES[step]}». Повторите сброс компании.",
-                errors=[{"step": step.value, "title": TITLES[step]}],
+                errors=[
+                    {
+                        "field": "reset",
+                        "code": step.value,
+                        "step": step.value,
+                        "title": TITLES[step],
+                    }
+                ],
             ) from exc
     return Done(scope.company_id, generation, int((time.perf_counter() - started) * 1000))
