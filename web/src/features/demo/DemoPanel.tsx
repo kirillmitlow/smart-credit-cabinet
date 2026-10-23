@@ -88,6 +88,7 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
   const [receipt, setReceipt] = useState<string[]>([]);
   const [popupError, setPopupError] = useState(false);
   const reset = useMutation({
+    onMutate: () => setReceipt([]),
     mutationFn: async (value: Persona | 'all') => {
       const options = { headers: { 'X-Demo-Code': code } };
       const r =
@@ -272,7 +273,7 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
                 if (target) reset.mutate(target);
               }}
             >
-              {t.confirm}
+              {reset.isError ? t.retryReset : t.confirm}
             </Button>
           </Group>
         </Stack>
