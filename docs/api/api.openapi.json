@@ -484,6 +484,93 @@
         }
       }
     },
+    "/backoffice/queue": {
+      "get": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Очередь ручного рассмотрения, старые сверху",
+        "operationId": "getBackofficeQueue",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Status",
+              "default": "MANUAL_REVIEW"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(EXPRESS|WORKING_CAPITAL|CONTRACT|CREDIT_LINE|OVERDRAFT|INVESTMENT)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Productcode"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankQueuePage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR: фильтр или курсор"
+          }
+        }
+      }
+    },
     "/companies/{company_id}/gov-contracts": {
       "get": {
         "tags": [
@@ -2162,6 +2249,42 @@
         ],
         "title": "AutoDecisionMode"
       },
+      "BankCompany": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "isBankCustomer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isbankcustomer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "inn",
+          "isBankCustomer"
+        ],
+        "title": "BankCompany"
+      },
       "BankDemoLoginRequest": {
         "properties": {
           "role": {
@@ -2214,6 +2337,219 @@
           "level"
         ],
         "title": "BankMeResponse"
+      },
+      "BankQueueItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "company": {
+            "$ref": "#/components/schemas/BankCompany"
+          },
+          "productCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termmonths"
+          },
+          "waitingSince": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Waitingsince"
+          },
+          "waitingSeconds": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Waitingseconds"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue",
+            "description": "Ожидание больше 24 часов по будним дням; выходные исключены"
+          },
+          "manualReasons": {
+            "items": {
+              "$ref": "#/components/schemas/BankReason"
+            },
+            "type": "array",
+            "title": "Manualreasons"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requiredLevel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requiredlevel"
+          },
+          "badges": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "CLIENT_ANSWERED",
+                "SOURCE_UNAVAILABLE",
+                "PIPELINE_ERROR"
+              ]
+            },
+            "type": "array",
+            "title": "Badges"
+          },
+          "documentReceived": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documentreceived",
+            "description": "null: сервис документов ещё не подключён; наличие файла не предполагается"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "version",
+          "company",
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "waitingSince",
+          "waitingSeconds",
+          "overdue",
+          "manualReasons",
+          "recommendation",
+          "requiredLevel",
+          "badges",
+          "documentReceived"
+        ],
+        "title": "BankQueueItem"
+      },
+      "BankQueuePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BankQueueItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "BankQueuePage"
+      },
+      "BankReason": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "detail"
+        ],
+        "title": "BankReason"
+      },
+      "BankRecommendation": {
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "hint": {
+            "type": "string",
+            "title": "Hint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "hint"
+        ],
+        "title": "BankRecommendation"
       },
       "ClientDecisionOut": {
         "properties": {
@@ -4594,6 +4930,26 @@
           "signedAt"
         ],
         "title": "SignerOut"
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "SUBMITTED",
+          "CHECKING",
+          "NEEDS_INFO",
+          "MANUAL_REVIEW",
+          "APPROVED",
+          "COUNTER_OFFER",
+          "OFFER_ACCEPTED",
+          "SIGNED",
+          "DISBURSING",
+          "DISBURSED",
+          "REJECTED",
+          "WITHDRAWN",
+          "EXPIRED"
+        ],
+        "title": "Status"
       },
       "Step": {
         "type": "string",
