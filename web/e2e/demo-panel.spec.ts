@@ -48,6 +48,7 @@ test('TS-101: демо-панель: реальная шпаргалка, сбо
   await card.getByRole('button', { name: t.resetOne }).click();
   const modal = client.getByRole('dialog');
   await expect(modal.getByText(t.oneWarning)).toBeVisible();
+  await expect(modal).toHaveCSS('opacity', '1');
   await checkAccessibility(client, 'подтверждение сброса');
   await modal.getByRole('button', { name: t.confirm }).click();
   await expect(modal).not.toBeVisible({ timeout: 90000 });

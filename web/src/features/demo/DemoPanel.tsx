@@ -257,7 +257,7 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
               {t.cancel}
             </Button>
             <Button
-              color="red"
+              color="red.8"
               loading={reset.isPending}
               disabled={!target || (!!config?.demoCodeRequired && !code)}
               onClick={() => {
