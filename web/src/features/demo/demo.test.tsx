@@ -51,6 +51,54 @@ describe('демо-панель', () => {
     expect(screen.queryByRole('link', { name: 'bad' })).not.toBeInTheDocument();
     expect(await blockingA11yViolations(container)).toEqual([]);
   });
+  it('пустой каталог можно обновить после применения сценариев', async () => {
+    mockSessions({ config: { demoMode: true } });
+    let applied = false;
+    server.use(http.get('*/api/demo/personas', () => Response.json(applied ? [persona] : [])));
+    renderApp('/demo');
+    await screen.findByText(t.empty);
+    expect(screen.queryByText(persona.title)).not.toBeInTheDocument();
+    applied = true;
+    await userEvent.click(screen.getByRole('button', { name: t.refresh }));
+    await screen.findByText(persona.title);
+    expect(screen.queryByText(t.empty)).not.toBeInTheDocument();
+  });
+  it('ошибка каталога не скрывает сбои источников и допускает повтор загрузки', async () => {
+    mockSessions({ config: { demoMode: true } });
+    let available = false;
+    server.use(
+      http.get('*/api/demo/personas', () =>
+        available
+          ? Response.json([persona])
+          : problemResponse({
+              status: 502,
+              code: 'DEMO_SCENARIOS_UNAVAILABLE',
+            }),
+      ),
+      http.get('*/api/demo/chaos', () =>
+        Response.json([
+          { system: 'registry', available: false, mode: 'UNKNOWN' },
+          { system: 'tax', available: true, mode: 'OK' },
+        ]),
+      ),
+    );
+    renderApp('/demo');
+    const error = await screen.findByText('Сервис сценариев недоступен. Повторите загрузку');
+    expect(await screen.findAllByText(t.unavailable)).not.toHaveLength(0);
+    expect(
+      screen.getByRole('combobox', { name: `${t.chooseMode}: ${t.systems.tax}` }),
+    ).toBeEnabled();
+    available = true;
+    await userEvent.click(
+      within(error.closest('[role="alert"]') as HTMLElement).getByRole('button', {
+        name: 'Повторить',
+      }),
+    );
+    await screen.findByText(persona.title);
+    expect(
+      screen.queryByText('Сервис сценариев недоступен. Повторите загрузку'),
+    ).not.toBeInTheDocument();
+  });
   it('сброс персоны только после подтверждения, с кодом, ждёт реального ответа', async () => {
     mockSessions({ config: { demoMode: true, demoCodeRequired: true } });
     scenarios();

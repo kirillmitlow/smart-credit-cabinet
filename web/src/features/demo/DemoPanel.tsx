@@ -193,7 +193,18 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
       {personas.isError ? (
         <ProblemAlert error={personas.error} onAction={() => void personas.refetch()} />
       ) : null}
-      {personas.data?.length === 0 ? <Text>{t.empty}</Text> : null}
+      {personas.data?.length === 0 ? (
+        <Stack align="flex-start">
+          <Text>{t.empty}</Text>
+          <Button
+            variant="light"
+            loading={personas.isFetching}
+            onClick={() => void personas.refetch()}
+          >
+            {t.refresh}
+          </Button>
+        </Stack>
+      ) : null}
       {personas.data
         ?.filter((p) => !p.technical)
         .map((p) => (
