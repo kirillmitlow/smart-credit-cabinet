@@ -1391,6 +1391,145 @@
         }
       }
     },
+    "/applications/{application_id}/tasks": {
+      "get": {
+        "tags": [
+          "задачи клиенту"
+        ],
+        "summary": "Что нужно от вас: задачи заявки",
+        "operationId": "listApplicationTasks",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}/answer": {
+      "post": {
+        "tags": [
+          "задачи клиенту"
+        ],
+        "summary": "Ответить на задачу текстом (черновик; банк увидит после отправки раунда)",
+        "operationId": "answerTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications/{application_id}/tasks/submit": {
+      "post": {
+        "tags": [
+          "задачи клиенту"
+        ],
+        "summary": "Отправить ответ банку: все задачи раунда разом, заявка уходит на проверку",
+        "operationId": "submitTaskRound",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/products": {
       "get": {
         "tags": [
@@ -2573,6 +2712,27 @@
           "companyId"
         ],
         "title": "ActiveCompany"
+      },
+      "AnswerBody": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "submitRound": {
+            "type": "boolean",
+            "title": "Submitround",
+            "description": "Сразу отправить раунд, если это был последний ответ",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "AnswerBody"
       },
       "ApplicationFields": {
         "properties": {
@@ -7375,6 +7535,178 @@
         ],
         "title": "System",
         "description": "Внешние системы. Значение попадает в `integration_calls.system` и метрики."
+      },
+      "TaskList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TaskOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "currentRound": {
+            "type": "integer",
+            "title": "Currentround"
+          },
+          "roundsLimit": {
+            "type": "integer",
+            "title": "Roundslimit"
+          },
+          "canSubmit": {
+            "type": "boolean",
+            "title": "Cansubmit",
+            "description": "Раунд открыт и на все его задачи есть ответ"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "currentRound",
+          "roundsLimit",
+          "canSubmit"
+        ],
+        "title": "TaskList"
+      },
+      "TaskOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "round": {
+            "type": "integer",
+            "title": "Round"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "whyText": {
+            "type": "string",
+            "title": "Whytext"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          },
+          "assigneeUserId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigneeuserid"
+          },
+          "assigneePersonInn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigneepersoninn"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "OPEN | ANSWERED | EXPIRED | CANCELLED"
+          },
+          "expiresAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiresat"
+          },
+          "draftAnswer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draftanswer",
+            "description": "Черновик ответа, пока задача открыта; банк его не видит"
+          },
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer",
+            "description": "Отправленный ответ"
+          },
+          "canAnswer": {
+            "type": "boolean",
+            "title": "Cananswer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "answeredAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answeredat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "round",
+          "kind",
+          "title",
+          "whyText",
+          "details",
+          "assigneeUserId",
+          "assigneePersonInn",
+          "status",
+          "expiresAt",
+          "draftAnswer",
+          "answer",
+          "canAnswer",
+          "createdAt",
+          "answeredAt"
+        ],
+        "title": "TaskOut"
       },
       "ValidationError": {
         "properties": {

@@ -28,6 +28,7 @@ import type {
   AcceptIn,
   AcceptedOut,
   ActiveCompany,
+  AnswerBody,
   ApplicationFields,
   ApplicationOut,
   ApplicationPage,
@@ -87,6 +88,8 @@ import type {
   SignRequest,
   SignStartIn,
   System,
+  TaskList,
+  TaskOut,
   WizardRequest,
   WizardResult
 } from './model';
@@ -3471,6 +3474,327 @@ export const useSignConsentBundle = <TError = HTTPValidationError,
         TContext
       > => {
       return useMutation(getSignConsentBundleMutationOptions(options), queryClient);
+    }
+
+export type listApplicationTasksResponse200 = {
+  data: TaskList
+  status: 200
+}
+
+export type listApplicationTasksResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type listApplicationTasksResponseSuccess = (listApplicationTasksResponse200) & {
+  headers: Headers;
+};
+export type listApplicationTasksResponseError = (listApplicationTasksResponse422) & {
+  headers: Headers;
+};
+
+export type listApplicationTasksResponse = (listApplicationTasksResponseSuccess | listApplicationTasksResponseError)
+
+export const getListApplicationTasksUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/tasks`
+}
+
+/**
+ * @summary Что нужно от вас: задачи заявки
+ */
+export const listApplicationTasks = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<listApplicationTasksResponse> => {
+
+  return customFetch<listApplicationTasksResponse>(getListApplicationTasksUrl(applicationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListApplicationTasksQueryKey = (applicationId: string,) => {
+    return [
+    `/applications/${applicationId}/tasks`
+    ] as const;
+    }
+
+
+export const getListApplicationTasksQueryOptions = <TData = Awaited<ReturnType<typeof listApplicationTasks>>, TError = HTTPValidationError>(applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListApplicationTasksQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listApplicationTasks>>> = ({ signal }) => listApplicationTasks(applicationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listApplicationTasks>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListApplicationTasksQueryResult = NonNullable<Awaited<ReturnType<typeof listApplicationTasks>>>
+export type ListApplicationTasksQueryError = HTTPValidationError
+
+
+export function useListApplicationTasks<TData = Awaited<ReturnType<typeof listApplicationTasks>>, TError = HTTPValidationError>(
+ applicationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationTasks>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApplicationTasks>>,
+          TError,
+          Awaited<ReturnType<typeof listApplicationTasks>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApplicationTasks<TData = Awaited<ReturnType<typeof listApplicationTasks>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationTasks>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApplicationTasks>>,
+          TError,
+          Awaited<ReturnType<typeof listApplicationTasks>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApplicationTasks<TData = Awaited<ReturnType<typeof listApplicationTasks>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Что нужно от вас: задачи заявки
+ */
+
+export function useListApplicationTasks<TData = Awaited<ReturnType<typeof listApplicationTasks>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApplicationTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListApplicationTasksQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type answerTaskResponse200 = {
+  data: TaskOut
+  status: 200
+}
+
+export type answerTaskResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type answerTaskResponseSuccess = (answerTaskResponse200) & {
+  headers: Headers;
+};
+export type answerTaskResponseError = (answerTaskResponse422) & {
+  headers: Headers;
+};
+
+export type answerTaskResponse = (answerTaskResponseSuccess | answerTaskResponseError)
+
+export const getAnswerTaskUrl = (taskId: string,) => {
+
+
+
+
+  return `/tasks/${taskId}/answer`
+}
+
+/**
+ * @summary Ответить на задачу текстом (черновик; банк увидит после отправки раунда)
+ */
+export const answerTask = async (taskId: string,
+    answerBody: AnswerBody, options?: Parameters<typeof customFetch>[1]): Promise<answerTaskResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<answerTaskResponse>(getAnswerTaskUrl(taskId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(answerBody)
+  }
+);}
+
+
+
+
+
+export const getAnswerTaskMutationKey = () => ['answerTask'] as const;
+
+export const getAnswerTaskMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answerTask>>, TError,AnswerTaskMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof answerTask>>, TError,AnswerTaskMutationVariables, TContext> => {
+
+const mutationKey = getAnswerTaskMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answerTask>>, AnswerTaskMutationVariables> = (props) => {
+          const {taskId,data} = props ?? {};
+
+          return  answerTask(taskId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AnswerTaskMutationResult = NonNullable<Awaited<ReturnType<typeof answerTask>>>
+    export type AnswerTaskMutationBody = AnswerBody
+    export type AnswerTaskMutationError = HTTPValidationError
+    export type AnswerTaskMutationVariables = {taskId: string;data: AnswerBody}
+
+    /**
+ * @summary Ответить на задачу текстом (черновик; банк увидит после отправки раунда)
+ */
+export const useAnswerTask = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answerTask>>, TError,AnswerTaskMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof answerTask>>,
+        TError,
+        AnswerTaskMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAnswerTaskMutationOptions(options), queryClient);
+    }
+
+export type submitTaskRoundResponse200 = {
+  data: TaskList
+  status: 200
+}
+
+export type submitTaskRoundResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type submitTaskRoundResponseSuccess = (submitTaskRoundResponse200) & {
+  headers: Headers;
+};
+export type submitTaskRoundResponseError = (submitTaskRoundResponse422) & {
+  headers: Headers;
+};
+
+export type submitTaskRoundResponse = (submitTaskRoundResponseSuccess | submitTaskRoundResponseError)
+
+export const getSubmitTaskRoundUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/tasks/submit`
+}
+
+/**
+ * @summary Отправить ответ банку: все задачи раунда разом, заявка уходит на проверку
+ */
+export const submitTaskRound = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<submitTaskRoundResponse> => {
+
+  return customFetch<submitTaskRoundResponse>(getSubmitTaskRoundUrl(applicationId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getSubmitTaskRoundMutationKey = () => ['submitTaskRound'] as const;
+
+export const getSubmitTaskRoundMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitTaskRound>>, TError,SubmitTaskRoundMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitTaskRound>>, TError,SubmitTaskRoundMutationVariables, TContext> => {
+
+const mutationKey = getSubmitTaskRoundMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitTaskRound>>, SubmitTaskRoundMutationVariables> = (props) => {
+          const {applicationId} = props ?? {};
+
+          return  submitTaskRound(applicationId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitTaskRoundMutationResult = NonNullable<Awaited<ReturnType<typeof submitTaskRound>>>
+
+    export type SubmitTaskRoundMutationError = HTTPValidationError
+    export type SubmitTaskRoundMutationVariables = {applicationId: string}
+
+    /**
+ * @summary Отправить ответ банку: все задачи раунда разом, заявка уходит на проверку
+ */
+export const useSubmitTaskRound = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitTaskRound>>, TError,SubmitTaskRoundMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitTaskRound>>,
+        TError,
+        SubmitTaskRoundMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitTaskRoundMutationOptions(options), queryClient);
     }
 
 export type listProductsResponse200 = {

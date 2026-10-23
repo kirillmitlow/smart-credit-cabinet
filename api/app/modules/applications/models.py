@@ -16,6 +16,7 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    Text,
     UniqueConstraint,
     Uuid,
     text,
@@ -151,3 +152,54 @@ class Consent(IdMixin, Base):
     sign_method: Mapped[str] = mapped_column(String(32), default="SIMPLE_ESIGN")
     proof: Mapped[str] = mapped_column(String(64))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+TASK_KINDS = (
+    "DOCUMENT",
+    "EXPLANATION",
+    "COLLATERAL",
+    "CONFIRM_REVENUE",
+    "SIGNATURE",
+    "GUARANTOR",
+)
+TASK_STATUSES = ("OPEN", "ANSWERED", "EXPIRED", "CANCELLED")
+_TASK_KINDS = ", ".join(f"'{k}'" for k in TASK_KINDS)
+_TASK_STATUSES = ", ".join(f"'{s}'" for s in TASK_STATUSES)
+
+
+class Task(IdMixin, Base):
+    """Задача клиенту «что, зачем, срок» (20-03, 50-06): одна строка на задачу раунда.
+
+    Исполнитель: `assignee_person_inn` (поручитель, только он сам), `assignee_user_id` (конкретный
+    участник; руководитель может ответить за него) или оба пусты (любой участник компании,
+    кроме поручителя). Пока `status = OPEN`, `answer` — черновик, банк его не видит; отправка
+    раунда переводит все задачи в `ANSWERED`.
+    """
+
+    __tablename__ = "tasks"
+    __table_args__ = (
+        CheckConstraint(f"kind IN ({_TASK_KINDS})", name="kind"),
+        CheckConstraint(f"status IN ({_TASK_STATUSES})", name="status"),
+        CheckConstraint("round >= 1", name="round_positive"),
+        Index("ix_tasks_application_round", "application_id", "round"),
+    )
+
+    application_id: Mapped[UUID] = mapped_column(
+        Uuid, ForeignKey("applications.id", ondelete="CASCADE"), index=True
+    )
+    round: Mapped[int] = mapped_column(Integer)
+    kind: Mapped[str] = mapped_column(String(16))
+    title: Mapped[str] = mapped_column(String(200))
+    why_text: Mapped[str] = mapped_column(Text)
+    details: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    assignee_user_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("users.id"))
+    assignee_person_inn: Mapped[str | None] = mapped_column(String(12))
+    status: Mapped[str] = mapped_column(String(16), default="OPEN")
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    answer: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    answered_by: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("users.id"))
+    answered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cancel_reason: Mapped[str | None] = mapped_column(String(64))
+    created_by_actor: Mapped[str] = mapped_column(String(16))
+    created_by_id: Mapped[UUID | None] = mapped_column(Uuid)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=clock.now)

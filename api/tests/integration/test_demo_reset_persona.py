@@ -125,6 +125,7 @@ async def test_full_persona_reset_preserves_every_neighbour_journal_and_login(
         "application_versions",
         "application_events",
         "consents",
+        "tasks",
         "pipeline_runs",
         "decisions",
         "decision_reasons",
