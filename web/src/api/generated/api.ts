@@ -33,6 +33,7 @@ import type {
   ApplicationPage,
   BankDemoLoginRequest,
   BankMeResponse,
+  BankQueuePage,
   ClientDecisionOut,
   CodeCheck,
   CodeIssued,
@@ -44,6 +45,7 @@ import type {
   ContractSignedOut,
   DeclinedOut,
   DraftPatch,
+  GetBackofficeQueueParams,
   GovContractPage,
   HTTPValidationError,
   HealthDeps200,
@@ -1545,6 +1547,143 @@ export const useBankLogout = <TError = HTTPValidationError | void,
       > => {
       return useMutation(getBankLogoutMutationOptions(options), queryClient);
     }
+
+export type getBackofficeQueueResponse200 = {
+  data: BankQueuePage
+  status: 200
+}
+
+export type getBackofficeQueueResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getBackofficeQueueResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getBackofficeQueueResponse422 = {
+  data: void
+  status: 422
+}
+
+export type getBackofficeQueueResponseSuccess = (getBackofficeQueueResponse200) & {
+  headers: Headers;
+};
+export type getBackofficeQueueResponseError = (getBackofficeQueueResponse401 | getBackofficeQueueResponse403 | getBackofficeQueueResponse422) & {
+  headers: Headers;
+};
+
+export type getBackofficeQueueResponse = (getBackofficeQueueResponseSuccess | getBackofficeQueueResponseError)
+
+export const getGetBackofficeQueueUrl = (params?: GetBackofficeQueueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/backoffice/queue?${stringifiedParams}` : `/backoffice/queue`
+}
+
+/**
+ * @summary Очередь ручного рассмотрения, старые сверху
+ */
+export const getBackofficeQueue = async (params?: GetBackofficeQueueParams, options?: Parameters<typeof customFetch>[1]): Promise<getBackofficeQueueResponse> => {
+
+  return customFetch<getBackofficeQueueResponse>(getGetBackofficeQueueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBackofficeQueueQueryKey = (params?: GetBackofficeQueueParams,) => {
+    return [
+    `/backoffice/queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetBackofficeQueueQueryOptions = <TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBackofficeQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBackofficeQueue>>> = ({ signal }) => getBackofficeQueue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBackofficeQueueQueryResult = NonNullable<Awaited<ReturnType<typeof getBackofficeQueue>>>
+export type GetBackofficeQueueQueryError = void
+
+
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params: undefined |  GetBackofficeQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeQueue>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeQueue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeQueue>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeQueue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Очередь ручного рассмотрения, старые сверху
+ */
+
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBackofficeQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export type listCompanyGovContractsResponse200 = {
   data: GovContractPage
