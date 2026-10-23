@@ -51,6 +51,7 @@ import type {
   ContractSignedOut,
   CreatedScenario,
   DeclinedOut,
+  DocumentOut,
   GovContractPage,
   HealthDeps200,
   HealthLive200,
@@ -148,6 +149,12 @@ export const getListApplicationTasksResponseMock = (overrideResponse: Partial<Ex
 export const getAnswerTaskResponseMock = (overrideResponse: Partial<Extract<TaskOut, object>> = {}): TaskOut => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), round: faker.number.int(), kind: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), whyText: faker.string.alpha({length: {min: 10, max: 20}}), details: {}, assigneeUserId: faker.helpers.arrayElement([faker.string.uuid(),null,]), assigneePersonInn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), draftAnswer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), answer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canAnswer: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', answeredAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), ...overrideResponse})
 
 export const getSubmitTaskRoundResponseMock = (overrideResponse: Partial<Extract<TaskList, object>> = {}): TaskList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), round: faker.number.int(), kind: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), whyText: faker.string.alpha({length: {min: 10, max: 20}}), details: {}, assigneeUserId: faker.helpers.arrayElement([faker.string.uuid(),null,]), assigneePersonInn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), draftAnswer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), answer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canAnswer: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', answeredAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), currentRound: faker.number.int(), roundsLimit: faker.number.int(), canSubmit: faker.datatype.boolean(), ...overrideResponse})
+
+export const getUploadDocumentResponseMock = (overrideResponse: Partial<Extract<DocumentOut, object>> = {}): DocumentOut => ({id: faker.string.uuid(), companyId: faker.string.uuid(), applicationId: faker.string.uuid(), taskId: faker.helpers.arrayElement([faker.string.uuid(),null,]), kind: faker.string.alpha({length: {min: 10, max: 20}}), origin: faker.string.alpha({length: {min: 10, max: 20}}), filename: faker.string.alpha({length: {min: 10, max: 20}}), mime: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int(), sha256: faker.string.alpha({length: {min: 10, max: 20}}), parseStatus: faker.string.alpha({length: {min: 10, max: 20}}), parsed: faker.helpers.arrayElement([null,]), parseError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.string.alpha({length: {min: 10, max: 20}}), cancelledAt: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), confirmedAt: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
+
+export const getGetDocumentResponseMock = (overrideResponse: Partial<Extract<DocumentOut, object>> = {}): DocumentOut => ({id: faker.string.uuid(), companyId: faker.string.uuid(), applicationId: faker.string.uuid(), taskId: faker.helpers.arrayElement([faker.string.uuid(),null,]), kind: faker.string.alpha({length: {min: 10, max: 20}}), origin: faker.string.alpha({length: {min: 10, max: 20}}), filename: faker.string.alpha({length: {min: 10, max: 20}}), mime: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int(), sha256: faker.string.alpha({length: {min: 10, max: 20}}), parseStatus: faker.string.alpha({length: {min: 10, max: 20}}), parsed: faker.helpers.arrayElement([null,]), parseError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.string.alpha({length: {min: 10, max: 20}}), cancelledAt: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), confirmedAt: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
+
+export const getDownloadDocumentResponseMock = (): Blob => (new Blob([new Uint8Array(faker.number.int({ min: 1, max: 64 }))]))
 
 export const getListProductsResponseMock = (overrideResponse: Partial<Extract<ProductList, object>> = {}): ProductList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), purpose: faker.string.alpha({length: {min: 10, max: 20}}), repayment: faker.string.alpha({length: {min: 10, max: 20}}), amountMinRub: faker.number.int(), amountMaxRub: faker.number.int(), termMinMonths: faker.number.int(), termMaxMonths: faker.number.int(), collateralRequiredAboveRub: faker.helpers.arrayElement([faker.number.int(),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), autoDecisionMode: faker.helpers.arrayElement(Object.values(AutoDecisionMode)), autoDecisionUpToRub: faker.helpers.arrayElement([faker.number.int(),null,]), requiresBankCustomer: faker.datatype.boolean(), requiresContract: faker.datatype.boolean(), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), available: faker.datatype.boolean(), unavailableReasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiresSecurity: faker.datatype.boolean()})), ...overrideResponse})
 
@@ -608,6 +615,43 @@ export const getSubmitTaskRoundMockHandler = (overrideResponse?: TaskList | ((in
   }, options)
 }
 
+export const getUploadDocumentMockHandler = (overrideResponse?: DocumentOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<DocumentOut> | DocumentOut), options?: RequestHandlerOptions) => {
+  return http.post('*/documents', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUploadDocumentResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getGetDocumentMockHandler = (overrideResponse?: DocumentOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<DocumentOut> | DocumentOut), options?: RequestHandlerOptions) => {
+  return http.get('*/documents/:documentId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetDocumentResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDownloadDocumentMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob), options?: RequestHandlerOptions) => {
+  return http.get('*/documents/:documentId/download', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+  const binaryBody = overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDownloadDocumentResponseMock();
+    return new HttpResponse(binaryBody,
+      { status: 200,
+        headers: { 'Content-Type': 'application/octet-stream' }
+      })
+  }, options)
+}
+
 export const getListProductsMockHandler = (overrideResponse?: ProductList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProductList> | ProductList), options?: RequestHandlerOptions) => {
   return http.get('*/products', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
 
@@ -917,6 +961,9 @@ export const getApiMock = () => [
   getListApplicationTasksMockHandler(),
   getAnswerTaskMockHandler(),
   getSubmitTaskRoundMockHandler(),
+  getUploadDocumentMockHandler(),
+  getGetDocumentMockHandler(),
+  getDownloadDocumentMockHandler(),
   getListProductsMockHandler(),
   getGetProductMockHandler(),
   getCalculatePaymentMockHandler(),

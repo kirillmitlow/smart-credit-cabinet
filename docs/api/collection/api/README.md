@@ -1,5 +1,13 @@
 # Запросы к API кабинета
 
+[Загрузка файла](documents/upload.bru), [метаданные](documents/metadata.bru),
+[исходник](documents/download.bru): после клиентского входа задать applicationId,
+taskId, statementPath (путь к выписке) и новый documentActionKey. В ответе 201 взять
+documentId; повтор того же тела/ключа сохраняет тот же файл. Для банковского чтения
+добавить `?zone=bank`, предварительно войдя в банковскую сессию.
+Синтаксис multipart соответствует [upstream Bruno](https://github.com/usebruno/bruno/blob/main/packages/bruno-lang/v2/tests/fixtures/request.bru).
+CLI коллекции пока не подключён; эти ручки проверены интеграционными pytest.
+
 Открыть папку как коллекцию Bruno. Переменные окружения: `apiUrl` (например, `http://127.0.0.1:8088/api/v1` через web), `companyId`, `companyInn`, `sidClient` (cookie `sid_client` после демо-входа). Значения сессии не сохранять в Git.
 
 [Обновить по ИНН](companies/lookup.bru): `200`, карточка из реестра, налоговой и банка с `source`, `retrievedAt`, `confirmed` для каждого поля. Для примера Соколовой `companyInn=001234567887`.

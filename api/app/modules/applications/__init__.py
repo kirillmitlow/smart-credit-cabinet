@@ -20,6 +20,7 @@ from app.modules.applications.consents import (
     signer_identity,
 )
 from app.modules.applications.consents_router import router as consents_router
+from app.modules.applications.document_access import document_upload_context
 from app.modules.applications.models import (
     Application,
     ApplicationEvent,
@@ -55,6 +56,7 @@ __all__ = [
     "bki_consents",
     "consents_router",
     "current_version",
+    "document_upload_context",
     "ensure_pep_rules",
     "get_for",
     "get_valid_consent",

@@ -1,0 +1,22 @@
+meta {
+  name: Загрузить выписку для задачи клиента
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{apiUrl}}/documents
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Idempotency-Key: {{documentActionKey}}
+}
+
+body:multipart-form {
+  applicationId: {{applicationId}}
+  taskId: {{taskId}}
+  kind: BANK_STATEMENT_1C
+  file: @file({{statementPath}})
+}

@@ -9,7 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response
 
-from app.modules import applications, auth, backoffice, companies, offers
+from app.modules import applications, auth, backoffice, companies, documents, offers
 from app.shared import db, operations
 from app.shared.errors import AppError, problem
 
@@ -25,6 +25,11 @@ def _principal(request: Request) -> auth.Principal | None:
     zone = (
         auth.Zone.BANK
         if request.url.path.startswith(("/bank/", "/backoffice/", "/auth/bank-"))
+        or (
+            request.method == "GET"
+            and request.url.path.startswith("/documents/")
+            and request.query_params.get("zone") == "bank"
+        )
         else auth.Zone.CLIENT
     )
     sid = request.cookies.get(auth.sessions.COOKIE[zone])
@@ -46,7 +51,12 @@ def _scope(
         return None  # вход и выдача кода ограждены общим замком, а не доступом к чужой компании
     parts = request.url.path.strip("/").split("/")
     scope = None
-    if parts[0] == "backoffice" and len(parts) > 2 and parts[1] == "outbox":
+    if parts[0] == "documents" and len(parts) > 1:
+        document_id = _uuid(parts[1])
+        with db.transaction() as session:
+            company_id = documents.company_for(session, document_id) if document_id else None
+        scope = companies.operation_scope(company_id) if company_id else None
+    elif parts[0] == "backoffice" and len(parts) > 2 and parts[1] == "outbox":
         try:
             scope = backoffice.outbox_operation_scope(int(parts[2]))
         except ValueError:
@@ -75,6 +85,14 @@ def _scope(
             )
     elif principal.active_company_id is not None:
         scope = companies.operation_scope(principal.active_company_id)
+    if scope is not None and principal.role == "CLIENT" and parts[0] == "documents":
+        with db.transaction() as session:
+            members = companies.memberships_of(session, principal.user_id)
+            if not any(
+                m.company_id == scope.company_id and m.role != "GUARANTOR" for m, _ in members
+            ):
+                return None
+        return scope
     if (
         scope is not None
         and principal.role == "CLIENT"
@@ -97,12 +115,13 @@ class OperationFenceMiddleware(BaseHTTPMiddleware):
                     "/wizard",
                     "/companies",
                     "/backoffice",
+                    "/documents",
                 )
             )
             or path == "/me/active-company"
         )
         writes = request.method in {"POST", "PUT", "PATCH", "DELETE"} or path.startswith(
-            "/companies/"
+            ("/companies/", "/documents")
         )
         if not tracked or not writes:
             return await call_next(request)
