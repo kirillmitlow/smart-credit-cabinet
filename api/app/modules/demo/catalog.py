@@ -37,8 +37,12 @@ class Persona(Camel):
 
 def _persona(item: dict[str, Any]) -> Persona:
     view = scenarios.get_scenario(item["code"])
+    scope = companies.for_scenario(view["code"])
+    return project_persona(view, scope.company_id if scope else None)
+
+
+def project_persona(view: dict[str, Any], company_id: UUID | None) -> Persona:
     code = view["code"]
-    scope = companies.for_scenario(code)
     raw = view.get("application")
     application = None
     if raw:
@@ -51,7 +55,7 @@ def _persona(item: dict[str, Any]) -> Persona:
         code=code,
         title=view["title"],
         inn=view.get("inn"),
-        company_id=scope.company_id if scope else None,
+        company_id=company_id,
         status=view["status"],
         technical=code.startswith("t-"),
         application=application,

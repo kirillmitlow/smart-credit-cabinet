@@ -12,10 +12,7 @@ from app.shared.errors import AppError
 from app.shared.settings import AppEnv, Settings
 
 
-def require_control(
-    request: Request,
-    stand_code: Annotated[str | None, Header(alias="X-Demo-Code")] = None,
-) -> None:
+def limit_demo_request(request: Request) -> None:
     settings: Settings = request.app.state.settings
     if settings.app_env is not AppEnv.CLOUD:
         return
@@ -32,6 +29,16 @@ def require_control(
         raise AppError(503, "DEMO_CONTROL_UNAVAILABLE") from exc
     if hits > settings.demo_controls_per_minute:
         raise AppError(429, "RATE_LIMITED", headers={"Retry-After": "60"})
+
+
+def require_control(
+    request: Request,
+    stand_code: Annotated[str | None, Header(alias="X-Demo-Code")] = None,
+) -> None:
+    limit_demo_request(request)
+    settings: Settings = request.app.state.settings
+    if settings.app_env is not AppEnv.CLOUD:
+        return
     expected = settings.demo_stand_code.get_secret_value()
     if (
         not expected

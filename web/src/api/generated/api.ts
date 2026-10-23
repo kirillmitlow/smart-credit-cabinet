@@ -49,6 +49,7 @@ import type {
   ConsentsSignedOut,
   ContractOut,
   ContractSignedOut,
+  CreatedScenario,
   DeclinedOut,
   DraftPatch,
   GetBackofficeApplicationParams,
@@ -76,6 +77,7 @@ import type {
   PublicConfig,
   ResetOut,
   RolesResponse,
+  ScenarioInput,
   SignChallenge,
   SignChallengeOut,
   SignConfirm,
@@ -5828,4 +5830,142 @@ export const useDemoSetChaos = <TError = HTTPValidationError,
         TContext
       > => {
       return useMutation(getDemoSetChaosMutationOptions(options), queryClient);
+    }
+
+export type demoCreateScenarioResponse201 = {
+  data: CreatedScenario
+  status: 201
+}
+
+export type demoCreateScenarioResponse400 = {
+  data: void
+  status: 400
+}
+
+export type demoCreateScenarioResponse403 = {
+  data: void
+  status: 403
+}
+
+export type demoCreateScenarioResponse409 = {
+  data: void
+  status: 409
+}
+
+export type demoCreateScenarioResponse422 = {
+  data: void
+  status: 422
+}
+
+export type demoCreateScenarioResponse429 = {
+  data: void
+  status: 429
+}
+
+export type demoCreateScenarioResponse502 = {
+  data: void
+  status: 502
+}
+
+export type demoCreateScenarioResponse503 = {
+  data: void
+  status: 503
+}
+
+export type demoCreateScenarioResponseSuccess = (demoCreateScenarioResponse201) & {
+  headers: Headers;
+};
+export type demoCreateScenarioResponseError = (demoCreateScenarioResponse400 | demoCreateScenarioResponse403 | demoCreateScenarioResponse409 | demoCreateScenarioResponse422 | demoCreateScenarioResponse429 | demoCreateScenarioResponse502 | demoCreateScenarioResponse503) & {
+  headers: Headers;
+};
+
+export type demoCreateScenarioResponse = (demoCreateScenarioResponseSuccess | demoCreateScenarioResponseError)
+
+export const getDemoCreateScenarioUrl = () => {
+
+
+
+
+  return `/demo/scenarios`
+}
+
+/**
+ * Тело — ScenarioSpec сервиса сценариев; форма или preset обязательны. Если code не задан, он стабильно определяется ключом запроса. Учётки — только клиентские роли. Idempotency-Key сохраняйте при повторе после таймаута. Моки и каталог api обновляются до подтверждения успеха; учётки/полный spec не возвращаются.
+ * @summary Создать тестовую компанию и применить сценарий
+ */
+export const demoCreateScenario = async (scenarioInput: ScenarioInput, options?: Parameters<typeof customFetch>[1]): Promise<demoCreateScenarioResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<demoCreateScenarioResponse>(getDemoCreateScenarioUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(scenarioInput)
+  }
+);}
+
+
+
+
+
+export const getDemoCreateScenarioMutationKey = () => ['demoCreateScenario'] as const;
+
+export const getDemoCreateScenarioMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoCreateScenario>>, TError,DemoCreateScenarioMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoCreateScenario>>, TError,DemoCreateScenarioMutationVariables, TContext> => {
+
+const mutationKey = getDemoCreateScenarioMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoCreateScenario>>, DemoCreateScenarioMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  demoCreateScenario(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoCreateScenarioMutationResult = NonNullable<Awaited<ReturnType<typeof demoCreateScenario>>>
+    export type DemoCreateScenarioMutationBody = ScenarioInput
+    export type DemoCreateScenarioMutationError = void
+    export type DemoCreateScenarioMutationVariables = {data: ScenarioInput}
+
+    /**
+ * @summary Создать тестовую компанию и применить сценарий
+ */
+export const useDemoCreateScenario = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoCreateScenario>>, TError,DemoCreateScenarioMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoCreateScenario>>,
+        TError,
+        DemoCreateScenarioMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoCreateScenarioMutationOptions(options), queryClient);
     }
