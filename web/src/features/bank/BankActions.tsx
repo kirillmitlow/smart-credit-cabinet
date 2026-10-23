@@ -48,6 +48,13 @@ const reasons = [
   ...Object.entries(t.reasonOptions).map(([value, label]) => ({ value, label })),
 ];
 
+function softening(action: Action, baseline: string | null | undefined) {
+  return (
+    (action === 'APPROVED' && baseline !== 'APPROVED') ||
+    (action === 'COUNTER_OFFER' && baseline === 'REJECTED')
+  );
+}
+
 export function BankActions({ card }: { card: BankApplicationCard }) {
   const [opened, setOpened] = useState<{ action: Action; card: BankApplicationCard } | null>(null);
   const session = useSession('bank');
@@ -81,6 +88,7 @@ export function BankActions({ card }: { card: BankApplicationCard }) {
                 (action !== 'INFO' &&
                   action !== 'RECHECK' &&
                   (!engineReady || (lower && action !== 'MANUAL' && action !== 'COUNTER_OFFER'))) ||
+                (level === 'L1' && softening(action, card.engineRecommendation?.outcome)) ||
                 (action === 'COUNTER_OFFER' && !card.decision?.variants.length)
               }
               onClick={() => setOpened({ action, card })}
@@ -148,7 +156,12 @@ function ActionForm({
   const decisionAction =
     action === 'APPROVED' || action === 'REJECTED' || action === 'COUNTER_OFFER';
   const deviation = decisionAction && card.engineRecommendation?.outcome !== action;
-  const min = card.decision?.requiredLevel === 'L2' || reason === 'UW_OTHER' ? 50 : 20;
+  const min =
+    card.decision?.requiredLevel === 'L2' ||
+    reason === 'UW_OTHER' ||
+    softening(action, card.engineRecommendation?.outcome)
+      ? 50
+      : 20;
   const needsReason = deviation || action === 'INFO';
   const valid =
     !stale &&

@@ -143,6 +143,28 @@ describe('действия сотрудника банка (TS-032…TS-035)', (
     for (const button of within(actions).getAllByRole('button')) expect(button).toBeDisabled();
   });
 
+  it('послабление вопреки встречному требует50символов даже при базовом уровнеL1', async () => {
+    setup(makeBankCard({ engineRecommendation: { outcome: 'COUNTER_OFFER', hint: '' } }));
+    const dialog = await open(t.approve);
+    await userEvent.selectOptions(
+      within(dialog).getByLabelText(t.reason, { exact: false }),
+      'UW_POLICY_EXCEPTION',
+    );
+    await userEvent.type(
+      within(dialog).getByLabelText(t.comment, { exact: false }),
+      'x'.repeat(49),
+    );
+    expect(within(dialog).getByRole('button', { name: t.confirm })).toBeDisabled();
+    await userEvent.type(within(dialog).getByLabelText(t.comment, { exact: false }), 'x');
+    expect(within(dialog).getByRole('button', { name: t.confirm })).toBeEnabled();
+  });
+
+  it('L1 не может смягчить рекомендацию, но может проверить новые ручные условия', async () => {
+    setup(makeBankCard({ engineRecommendation: { outcome: 'COUNTER_OFFER', hint: '' } }), 'L1');
+    expect(await screen.findByRole('button', { name: t.approve })).toBeDisabled();
+    expect(screen.getByRole('button', { name: t.manual })).toBeEnabled();
+  });
+
   it('409 версии блокирует повторное подтверждение и сохраняет введённое пояснение', async () => {
     server.use(
       http.post('*/api/backoffice/applications/:id/decision', () =>
