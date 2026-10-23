@@ -10,12 +10,19 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, Header, Path, Request, Response
+from fastapi import APIRouter, Body, Cookie, Depends, Header, Path, Request, Response
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 from starlette.concurrency import run_in_threadpool
 
-from app.modules.demo import catalog, chaos, create_scenario, reset_all, reset_persona
+from app.modules.demo import (
+    catalog,
+    chaos,
+    create_scenario,
+    persona_login,
+    reset_all,
+    reset_persona,
+)
 from app.modules.demo.control_guard import limit_demo_request, require_control
 from app.modules.integrations import System
 from app.shared import clock
@@ -201,3 +208,40 @@ def create_demo_scenario(
     if result.replayed:
         response.headers["Idempotent-Replayed"] = "true"
     return create_scenario.CreatedScenario.model_validate(result.body)
+
+
+@router.post(
+    "/personas/{code}/login",
+    operation_id="demoLoginPersona",
+    response_model=persona_login.LoginResult,
+    summary="Служебный вход персоны для интеграционных тестов",
+    description="Только при DEMO_MODE. Логин существующей активной учётки указывается явно. "
+    "Пользовательский UI и e2e используют обычный вход по ИНН и коду. "
+    "Создаёт только sid_client; банковская сессия не меняется.",
+    dependencies=[Depends(limit_demo_request)],
+    responses={
+        403: {"description": "DEMO_MODE_DISABLED / FORBIDDEN"},
+        404: {"description": "NOT_FOUND: персона или активное членство отсутствуют"},
+        409: {"description": "DEMO_RESET_IN_PROGRESS"},
+        422: {"description": "VALIDATION_ERROR"},
+        429: {"description": "RATE_LIMITED"},
+        503: {"description": "SESSION_STORE_UNAVAILABLE / DEMO_CONTROL_UNAVAILABLE"},
+    },
+)
+def login_demo_persona(
+    code: Annotated[str, Path(pattern=r"^[a-z0-9][a-z0-9-]{1,63}$")],
+    body: persona_login.LoginInput,
+    request: Request,
+    response: Response,
+    sid_client: Annotated[str | None, Cookie()] = None,
+) -> persona_login.LoginResult:
+    done = persona_login.login(code, body.login, sid_client)
+    response.set_cookie(
+        "sid_client",
+        done.sid,
+        httponly=True,
+        secure=request.app.state.settings.cookie_secure,
+        samesite="lax",
+        path="/",
+    )
+    return done.result
