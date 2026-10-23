@@ -1,7 +1,6 @@
 """T-361: неизменяемые снимки, банковские поля и согласованное чтение при гонке."""
 
 from datetime import timedelta
-from decimal import Decimal
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -12,7 +11,7 @@ from sqlalchemy import event, select, update
 from app.modules import auth, pipeline
 from app.modules.applications import Application, ApplicationEvent
 from app.modules.companies.models import CompanyMember
-from app.modules.decisioning import decide
+from app.modules.decisioning import decide, parse_policy
 from app.modules.pipeline.models import PipelineRun, SourceSnapshot
 from app.modules.pipeline.persist import build_decision
 from app.shared import clock, db
@@ -94,11 +93,11 @@ async def test_thresholds_are_bound_to_decision_policy_not_latest_registered(
     bank: httpx.AsyncClient,
 ) -> None:
     app_id = seed("СтанкоПром")
-    later = pipeline.current_policy().model_copy(deep=True)
-    later.meta.version = 2
-    later.affordability.dscr_min.value = Decimal("8")
+    later = pipeline.current_policy().model_dump(mode="json")
+    later["meta"]["version"] = 2
+    later["affordability"]["dscr_min"]["value"] = "8"
     with db.transaction() as session:
-        assert pipeline.register_policy(session, later).version == 2
+        assert pipeline.register_policy(session, parse_policy(later)).version == 2
     body = (await bank.get(f"/backoffice/applications/{app_id}")).json()
     dscr = next(x for x in body["decision"]["checks"] if x["code"] == "DSCR")
     assert body["decision"]["policy"]["version"] == 1
