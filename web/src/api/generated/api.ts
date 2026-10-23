@@ -39,6 +39,8 @@ import type {
   BankInfoRequest,
   BankInfoRequested,
   BankMeResponse,
+  BankOfferEvaluation,
+  BankOfferEvaluationRequest,
   BankOutboxPage,
   BankOutboxRetried,
   BankOutboxRetryRequest,
@@ -1825,6 +1827,134 @@ export const useRecheckBackofficeApplication = <TError = void,
         TContext
       > => {
       return useMutation(getRecheckBackofficeApplicationMutationOptions(options), queryClient);
+    }
+
+export type evaluateBackofficeOfferResponse200 = {
+  data: BankOfferEvaluation
+  status: 200
+}
+
+export type evaluateBackofficeOfferResponse401 = {
+  data: void
+  status: 401
+}
+
+export type evaluateBackofficeOfferResponse403 = {
+  data: void
+  status: 403
+}
+
+export type evaluateBackofficeOfferResponse404 = {
+  data: void
+  status: 404
+}
+
+export type evaluateBackofficeOfferResponse409 = {
+  data: void
+  status: 409
+}
+
+export type evaluateBackofficeOfferResponse422 = {
+  data: void
+  status: 422
+}
+
+export type evaluateBackofficeOfferResponseSuccess = (evaluateBackofficeOfferResponse200) & {
+  headers: Headers;
+};
+export type evaluateBackofficeOfferResponseError = (evaluateBackofficeOfferResponse401 | evaluateBackofficeOfferResponse403 | evaluateBackofficeOfferResponse404 | evaluateBackofficeOfferResponse409 | evaluateBackofficeOfferResponse422) & {
+  headers: Headers;
+};
+
+export type evaluateBackofficeOfferResponse = (evaluateBackofficeOfferResponseSuccess | evaluateBackofficeOfferResponseError)
+
+export const getEvaluateBackofficeOfferUrl = (applicationId: string,) => {
+
+
+
+
+  return `/backoffice/applications/${applicationId}/evaluate-offer`
+}
+
+/**
+ * @summary Проверить ручные условия без сохранения
+ */
+export const evaluateBackofficeOffer = async (applicationId: string,
+    bankOfferEvaluationRequest: BankOfferEvaluationRequest, options?: Parameters<typeof customFetch>[1]): Promise<evaluateBackofficeOfferResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<evaluateBackofficeOfferResponse>(getEvaluateBackofficeOfferUrl(applicationId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(bankOfferEvaluationRequest)
+  }
+);}
+
+
+
+
+
+export const getEvaluateBackofficeOfferMutationKey = () => ['evaluateBackofficeOffer'] as const;
+
+export const getEvaluateBackofficeOfferMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof evaluateBackofficeOffer>>, TError,EvaluateBackofficeOfferMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof evaluateBackofficeOffer>>, TError,EvaluateBackofficeOfferMutationVariables, TContext> => {
+
+const mutationKey = getEvaluateBackofficeOfferMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof evaluateBackofficeOffer>>, EvaluateBackofficeOfferMutationVariables> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  evaluateBackofficeOffer(applicationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EvaluateBackofficeOfferMutationResult = NonNullable<Awaited<ReturnType<typeof evaluateBackofficeOffer>>>
+    export type EvaluateBackofficeOfferMutationBody = BankOfferEvaluationRequest
+    export type EvaluateBackofficeOfferMutationError = void
+    export type EvaluateBackofficeOfferMutationVariables = {applicationId: string;data: BankOfferEvaluationRequest}
+
+    /**
+ * @summary Проверить ручные условия без сохранения
+ */
+export const useEvaluateBackofficeOffer = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof evaluateBackofficeOffer>>, TError,EvaluateBackofficeOfferMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof evaluateBackofficeOffer>>,
+        TError,
+        EvaluateBackofficeOfferMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEvaluateBackofficeOfferMutationOptions(options), queryClient);
     }
 
 export type saveBackofficeDecisionResponse200 = {

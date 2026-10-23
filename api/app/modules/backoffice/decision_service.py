@@ -4,7 +4,12 @@ from decimal import Decimal
 from uuid import UUID
 
 from app.modules import audit, auth, decisioning, pipeline
-from app.modules.backoffice.decision_schemas import BankDecisionRequest, BankDecisionSaved
+from app.modules.backoffice.decision_schemas import (
+    BankDecisionRequest,
+    BankDecisionSaved,
+    BankDecisionTerms,
+)
+from app.modules.backoffice.manual_reference import resolve
 from app.modules.backoffice.service import require_bank
 from app.shared import db, idempotency
 from app.shared.errors import AppError
@@ -17,8 +22,7 @@ def actor_level(principal: auth.Principal) -> decisioning.Level:
     return decisioning.Level(principal.level)
 
 
-def decision_terms(body: BankDecisionRequest) -> decisioning.UnderwriterTerms | None:
-    terms = body.terms
+def decision_terms(terms: BankDecisionTerms | None) -> decisioning.UnderwriterTerms | None:
     if terms is None:
         return None
     return decisioning.UnderwriterTerms(
@@ -33,11 +37,16 @@ def decide(
     principal: auth.Principal, application_id: UUID, body: BankDecisionRequest, key: str
 ) -> idempotency.Reply:
     level = actor_level(principal)
+    request = body.model_dump(mode="json", by_alias=True)
+    if body.evaluation_ref is None:
+        # Новый необязательный атрибут не меняет hash запросов, сохранённых до T-364.
+        request.pop("evaluationRef", None)
     # HTTP OperationFence держит замок компании до commit/ответа, включая отказ с аудитом.
     try:
         with db.transaction() as session:
 
             def action() -> idempotency.Reply:
+                terms, engine_id = resolve(principal.user_id, application_id, body)
                 receipt = pipeline.record_underwriter_decision(
                     session,
                     application_id=application_id,
@@ -45,10 +54,10 @@ def decide(
                     actor_id=principal.user_id,
                     actor_level=level,
                     outcome=decisioning.Outcome(body.outcome),
-                    terms=decision_terms(body),
+                    terms=decision_terms(terms),
                     reason_code=body.reason_code,
                     comment=body.comment,
-                    engine_decision_id=body.engine_decision_id,
+                    engine_decision_id=engine_id,
                 )
                 audit.record(
                     session,
@@ -81,7 +90,7 @@ def decide(
                 session,
                 scope=f"{principal.user_id}:POST:/backoffice/applications/{application_id}/decision",
                 key=key,
-                request=body.model_dump(mode="json", by_alias=True),
+                request=request,
                 action=action,
             )
     except AppError as exc:

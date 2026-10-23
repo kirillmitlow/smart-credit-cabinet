@@ -37,6 +37,7 @@ import type {
   BankDecisionSaved,
   BankInfoRequested,
   BankMeResponse,
+  BankOfferEvaluation,
   BankOutboxPage,
   BankOutboxRetried,
   BankQueuePage,
@@ -104,6 +105,8 @@ export const getGetBankMeResponseMock = (overrideResponse: Partial<Extract<BankM
 export const getRequestBackofficeInformationResponseMock = (overrideResponse: Partial<Extract<BankInfoRequested, object>> = {}): BankInfoRequested => ({applicationId: faker.string.uuid(), version: faker.number.int(), status: "NEEDS_INFO", round: faker.number.int(), taskIds: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
 
 export const getRecheckBackofficeApplicationResponseMock = (overrideResponse: Partial<Extract<BankRecheckStarted, object>> = {}): BankRecheckStarted => ({applicationId: faker.string.uuid(), version: faker.number.int(), status: "CHECKING", runId: faker.string.uuid(), ...overrideResponse})
+
+export const getEvaluateBackofficeOfferResponseMock = (overrideResponse: Partial<Extract<BankOfferEvaluation, object>> = {}): BankOfferEvaluation => ({applicationId: faker.string.uuid(), version: faker.number.int(), engineDecisionId: faker.string.uuid(), allowed: faker.datatype.boolean(), evaluationRef: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiredLevel: faker.string.alpha({length: {min: 10, max: 20}}), minCommentChars: faker.number.int(), deviation: faker.datatype.boolean(), exceptionUsed: faker.datatype.boolean(), ratePercent: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), corridorMinPercent: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), corridorMaxPercent: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), paymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), lastPaymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), overpaymentRub: faker.helpers.arrayElement([faker.number.int(),null,]), dscr: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), stressDscr: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), violations: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), kind: faker.string.alpha({length: {min: 10, max: 20}}), params: {}})), ...overrideResponse})
 
 export const getSaveBackofficeDecisionResponseMock = (overrideResponse: Partial<Extract<BankDecisionSaved, object>> = {}): BankDecisionSaved => ({applicationId: faker.string.uuid(), decisionId: faker.string.uuid(), engineDecisionId: faker.string.uuid(), status: faker.helpers.arrayElement(['APPROVED','COUNTER_OFFER','REJECTED'] as const), version: faker.number.int(), outcome: faker.helpers.arrayElement(['APPROVED','COUNTER_OFFER','REJECTED'] as const), deviation: faker.datatype.boolean(), exceptionUsed: faker.datatype.boolean(), offerId: faker.helpers.arrayElement([faker.string.uuid(),null,]), ...overrideResponse})
 
@@ -363,6 +366,18 @@ export const getRecheckBackofficeApplicationMockHandler = (overrideResponse?: Ba
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getRecheckBackofficeApplicationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getEvaluateBackofficeOfferMockHandler = (overrideResponse?: BankOfferEvaluation | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<BankOfferEvaluation> | BankOfferEvaluation), options?: RequestHandlerOptions) => {
+  return http.post('*/backoffice/applications/:applicationId/evaluate-offer', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEvaluateBackofficeOfferResponseMock(),
       { status: 200
       })
   }, options)
@@ -897,6 +912,7 @@ export const getApiMock = () => [
   getBankLogoutMockHandler(),
   getRequestBackofficeInformationMockHandler(),
   getRecheckBackofficeApplicationMockHandler(),
+  getEvaluateBackofficeOfferMockHandler(),
   getSaveBackofficeDecisionMockHandler(),
   getGetBackofficeQueueMockHandler(),
   getGetBackofficeApplicationMockHandler(),

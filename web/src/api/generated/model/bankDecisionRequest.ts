@@ -16,4 +16,5 @@ export interface BankDecisionRequest {
   terms?: BankDecisionTerms | null;
   reasonCode?: string | null;
   comment?: string | null;
+  evaluationRef?: string | null;
 }
