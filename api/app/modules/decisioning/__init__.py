@@ -31,6 +31,8 @@ from app.modules.decisioning.types import (
     DecisionResult,
     Explanation,
     Grade,
+    Level,
+    Outcome,
     Product,
     ReasonCode,
 )
@@ -44,6 +46,8 @@ from app.modules.decisioning.underwriting import (
 )
 
 __all__ = [
+    "Level",
+    "Outcome",
     "lowest_rate",
     "DecisionInput",
     "DecisionResult",
