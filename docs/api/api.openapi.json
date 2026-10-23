@@ -2358,6 +2358,86 @@
           }
         }
       }
+    },
+    "/demo/scenarios": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Создать тестовую компанию и применить сценарий",
+        "description": "Тело — ScenarioSpec сервиса сценариев; форма или preset обязательны. Если code не задан, он стабильно определяется ключом запроса. Учётки — только клиентские роли. Idempotency-Key сохраняйте при повторе после таймаута. Моки и каталог api обновляются до подтверждения успеха; учётки/полный spec не возвращаются.",
+        "operationId": "demoCreateScenario",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^\\S+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioInput",
+                "examples": [
+                  {
+                    "title": "Тестовый ИП",
+                    "preset": "IP_HEALTHY",
+                    "users": [
+                      {
+                        "login": "owner",
+                        "role": "DIRECTOR",
+                        "personRef": "self"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedScenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INN_INVALID"
+          },
+          "503": {
+            "description": "DEMO_CONTROL_UNAVAILABLE"
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED"
+          },
+          "409": {
+            "description": "SCENARIO_EXISTS / SCENARIO_INN_EXISTS / IDEMPOTENCY_KEY_REUSED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          },
+          "502": {
+            "description": "DEMO_SCENARIOS_UNAVAILABLE / DEMO_SCENARIO_INVALID_RESPONSE"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2616,6 +2696,50 @@
           "nextCursor"
         ],
         "title": "ApplicationPage"
+      },
+      "AppliedSystems": {
+        "properties": {
+          "registry": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Registry"
+          },
+          "tax": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Tax"
+          },
+          "bki": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Bki"
+          },
+          "bankCore": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Bankcore"
+          }
+        },
+        "type": "object",
+        "required": [
+          "registry",
+          "tax",
+          "bki",
+          "bankCore"
+        ],
+        "title": "AppliedSystems"
       },
       "AutoDecisionMode": {
         "type": "string",
@@ -5109,6 +5233,22 @@
           "TERMINATED"
         ]
       },
+      "CreatedScenario": {
+        "properties": {
+          "persona": {
+            "$ref": "#/components/schemas/Persona"
+          },
+          "applied": {
+            "$ref": "#/components/schemas/AppliedSystems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "persona",
+          "applied"
+        ],
+        "title": "CreatedScenario"
+      },
       "DecisionReasonOut": {
         "properties": {
           "code": {
@@ -6722,6 +6862,112 @@
           "kind"
         ],
         "title": "RolesResponse"
+      },
+      "ScenarioAccount": {
+        "properties": {
+          "login": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{1,63}$",
+            "title": "Login"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "DIRECTOR",
+              "ACCOUNTANT",
+              "GUARANTOR"
+            ],
+            "title": "Role"
+          },
+          "personRef": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Personref"
+          },
+          "fullName": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fullname"
+          },
+          "inn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inn"
+          },
+          "powerOfAttorney": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Powerofattorney"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "login",
+          "role"
+        ],
+        "title": "ScenarioAccount"
+      },
+      "ScenarioInput": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioAccount"
+            },
+            "type": "array",
+            "title": "Users"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "ScenarioInput"
       },
       "ScheduleRowOut": {
         "properties": {
