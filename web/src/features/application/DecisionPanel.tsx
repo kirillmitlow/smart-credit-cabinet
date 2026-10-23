@@ -1,9 +1,10 @@
-import { Alert, Button, Card, Group, List, Loader, Stack, Table, Text, Title } from '@mantine/core';
+import { Alert, Button, Card, Group, List, Loader, Stack, Text, Title } from '@mantine/core';
 import { Link } from 'react-router';
 import { useGetApplicationDecision } from '@/api/generated/api';
-import type { ApplicationOut, ClientDecisionOut, VariantOut } from '@/api/generated/model';
+import type { ApplicationOut, ClientDecisionOut } from '@/api/generated/model';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { OfferActions } from '@/features/offers/OfferActions';
+import { SchedulePreview } from './SchedulePreview';
 import { formatDateTime, formatMoney, formatPercent, formatTermMonths } from '@/lib/format';
 import { decision as t, fill, outcomes } from '@/texts';
 
@@ -29,41 +30,6 @@ function TextList({ heading, items }: { heading: string; items: string[] }) {
       </List>
     </Stack>
   ) : null;
-}
-
-function Preview({ terms }: { terms: VariantOut }) {
-  if (!terms.schedulePreview.length) return null;
-  return (
-    <details>
-      <summary>{t.schedule}</summary>
-      <Text size="sm" c="dimmed" my="xs">
-        {t.scheduleHint}
-      </Text>
-      <Table.ScrollContainer minWidth={420}>
-        <Table captionSide="top">
-          <Table.Caption>{t.schedule}</Table.Caption>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t.paymentNumber}</Table.Th>
-              <Table.Th>{t.principal}</Table.Th>
-              <Table.Th>{t.interest}</Table.Th>
-              <Table.Th>{t.total}</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {terms.schedulePreview.map((row) => (
-              <Table.Tr key={row.number}>
-                <Table.Td>{row.number}</Table.Td>
-                <Table.Td>{formatMoney(row.principalRub)}</Table.Td>
-                <Table.Td>{formatMoney(row.interestRub)}</Table.Td>
-                <Table.Td>{formatMoney(row.paymentRub)}</Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-    </details>
-  );
 }
 
 function Approved({ data, canAccept }: { data: ClientDecisionOut; canAccept: boolean }) {
@@ -94,7 +60,7 @@ function Approved({ data, canAccept }: { data: ClientDecisionOut; canAccept: boo
         </details>
       ) : null}
       <TextList heading={t.helped} items={data.whatHelped} />
-      <Preview terms={terms} />
+      <SchedulePreview terms={terms} />
       {data.offer ? (
         <Text size="sm">{fill(t.expires, { date: formatDateTime(data.offer.expiresAt) })}</Text>
       ) : null}

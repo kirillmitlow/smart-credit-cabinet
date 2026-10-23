@@ -898,3 +898,19 @@ applications.TaskSpec(kind, title, why_text, details={}, assignee_user_id=None, 
 **Решено:** R-004 п. 31; Q-148 закрыт.
 
 **Файлы:** api/app/modules/decisioning/{decide,counter_offers}.py, api/app/modules/pipeline/{sources,facts}.py, api/tests/unit/decisioning/test_counter_offers.py, api/tests/personas/test_simple_personas.py.
+
+---
+
+**23.10 · Агент A (Claude Code) · T-423: блок «Три карточки» и «Как получить то, что просили» (PARTIAL)**
+
+**Сделано:**
+- `CounterOfferPanel`: до трёх карточек на общем `VariantCard` (на узком экране друг под другом), одна «Рекомендуем» (как отдал сервер), у каждой «почему», «что изменилось против запроса» и «что нужно от вас», график первых платежей.
+- «Выбрать этот вариант» идёт через тот же `OfferActions`, что и одобрение: один запрос на двойной клик, ключ действия, затем подпись договора. Пока идёт запрос, соседние карточки гасятся.
+- 409 `SECURITY_REQUIRED` показывается текстом на самой карточке (в `errors.ts`): оформить залог в кабинете пока нельзя, это делает специалист.
+- Блок «Как получить то, что просили»: запрос клиента, «что мешает» (`whatAffected` или причины) и «что можно сделать» (`nextSteps`). Нет данных, блока нет.
+- `SchedulePreview` вынесен из `DecisionPanel`; `VariantCard` получил `rateExact` (ставка без «от»). Страница заявки при `COUNTER_OFFER` на всю ширину.
+- Тесты: `counterOffer.test.tsx`, 9 штук (три карточки СнабКонтракта, выбор и подпись, 409, `PENDING`, нет права принять, нет внутренних слов, axe).
+
+**Не хватило в API:** рычагов «как получить» (формула 30-10/30-12, T-299): нет нужного потока выручки, нет кнопок «Добавить залог / Подтвердить выручку» и возврата `COUNTER_OFFER → CHECKING`; нет `paymentKind` в `VariantOut` (признак «только проценты» берём из графика: основной долг в первом платеже равен нулю); `whatChanged` — свободный словарь без схемы.
+
+**Файлы:** web/src/features/application/{CounterOfferPanel,counterOfferModel,SchedulePreview,counterOffer.test}, web/src/features/offers/OfferActions.tsx, web/src/texts/{counterOffer,errors}.ts, web/src/test/counterOfferFactory.ts.
