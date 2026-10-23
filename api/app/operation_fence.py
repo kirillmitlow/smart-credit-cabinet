@@ -51,6 +51,9 @@ def _scope(
             scope = backoffice.outbox_operation_scope(int(parts[2]))
         except ValueError:
             pass  # валидатор роутера вернёт422
+    elif parts[0] == "backoffice" and len(parts) > 2 and parts[1] == "applications":
+        application_id = _uuid(parts[2])
+        scope = applications.operation_scope(application_id) if application_id else None
     elif request.url.path == "/me/active-company":
         company_id = _uuid(str(body.get("companyId", "")))
         scope = companies.operation_scope(company_id) if company_id else None

@@ -7,7 +7,8 @@ import { makeApplication, makeCompanyChoice, makeMe, problemResponse } from '@/t
 import { renderApp } from '@/test/render';
 import { mockSessions } from '@/test/sessions';
 import { server } from '@/test/server';
-import { emptyStates, errorTexts, home, applicationForm } from '@/texts';
+import { makeTask, makeTaskList } from '@/test/tasksFactory';
+import { clientTasks, emptyStates, errorTexts, home, applicationForm } from '@/texts';
 
 function mockList(items: ReturnType<typeof makeApplication>[]) {
   server.use(http.get('*/api/applications', () => Response.json({ items, nextCursor: null })));
@@ -126,5 +127,92 @@ describe('главная', () => {
     await user.click(screen.getByRole('button', { name: 'Выйти' }));
     expect(await screen.findByLabelText(/ИНН компании или ИП/)).toBeInTheDocument();
     expect(window.location.pathname).toBe('/login');
+  });
+  describe('«Что нужно от вас» из запросов банка (T-424)', () => {
+    const waiting = () =>
+      makeApplication({
+        id: 'a-9',
+        status: 'NEEDS_INFO',
+        allowedActions: ['RESPOND', 'WITHDRAW'],
+      });
+
+    it('по строке на каждую открытую задачу, со ссылкой на заявку, без внутренних кодов', async () => {
+      mockSessions({ client: makeMe() });
+      mockList([waiting()]);
+      server.use(
+        http.get('*/api/applications/a-9/tasks', () =>
+          Response.json(
+            makeTaskList([
+              makeTask({ id: 't-1', applicationId: 'a-9' }),
+              makeTask({
+                id: 't-2',
+                applicationId: 'a-9',
+                kind: 'EXPLANATION',
+                title: 'Почему упала выручка в марте?',
+              }),
+              makeTask({
+                id: 't-3',
+                applicationId: 'a-9',
+                title: 'Задача поручителя',
+                assigneePersonInn: '770700000001',
+                canAnswer: false,
+              }),
+            ]),
+          ),
+        ),
+      );
+      const { container } = renderApp('/');
+      const section = within(
+        (await screen.findByRole('heading', { level: 2, name: home.tasks.heading })).closest(
+          'section',
+        )!,
+      );
+      expect(
+        await section.findByText(
+          clientTasks.home.answer
+            .replace('{title}', 'Загрузите выписку по счёту в другом банке')
+            .replace('{number}', 'АЗ-2026-000001'),
+        ),
+      ).toBeInTheDocument();
+      expect(section.getByText(/Почему упала выручка в марте\?/)).toBeInTheDocument();
+      // чужая задача (поручителя) в списке клиента не появляется
+      expect(section.queryByText(/Задача поручителя/)).toBeNull();
+      expect(section.queryByText(emptyStates.tasks)).toBeNull();
+      const links = section.getAllByRole('link', { name: home.tasks.open });
+      expect(links).toHaveLength(2);
+      for (const link of links) expect(link).toHaveAttribute('href', '/applications/a-9');
+      // общей строки «Ответить специалисту» уже нет
+      expect(section.queryByText(/Ответить специалисту/)).toBeNull();
+      for (const code of ['DOCUMENT', 'EXPLANATION', 'REVENUE_UNKNOWN', 'NEEDS_INFO']) {
+        expect(container.textContent).not.toContain(code);
+      }
+      expect(await blockingA11yViolations(container)).toEqual([]);
+    });
+
+    it('задачи не загрузились: остаётся общая строка со ссылкой на заявку', async () => {
+      mockSessions({ client: makeMe() });
+      mockList([waiting()]);
+      server.use(
+        http.get('*/api/applications/a-9/tasks', () =>
+          problemResponse({ status: 503, code: 'SERVICE_UNAVAILABLE' }),
+        ),
+      );
+      renderApp('/');
+      expect(
+        await screen.findByText(/Ответить специалисту по заявке № АЗ-2026-000001/),
+      ).toBeInTheDocument();
+    });
+
+    it('все задачи уже отвечены другим участником: нечего делать', async () => {
+      mockSessions({ client: makeMe() });
+      mockList([waiting()]);
+      server.use(
+        http.get('*/api/applications/a-9/tasks', () =>
+          Response.json(makeTaskList([makeTask({ applicationId: 'a-9', canAnswer: false })])),
+        ),
+      );
+      renderApp('/');
+      expect(await screen.findByText(emptyStates.tasks)).toBeInTheDocument();
+    });
   });
 });

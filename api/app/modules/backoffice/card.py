@@ -23,6 +23,7 @@ from app.modules.backoffice.card_schemas import (
     BankSubmittedBy,
     BankVariant,
 )
+from app.modules.backoffice.info_schemas import BankClientTask
 from app.modules.backoffice.schemas import BankRecommendation
 from app.modules.backoffice.service import _TITLES, manual_reasons, require_bank
 from app.shared import db
@@ -292,4 +293,19 @@ def card(
             ],
             history=[BankHistoryEvent.model_validate(r) for r in data["history"]],
             documents=None,
+            client_tasks=[
+                BankClientTask.model_validate(
+                    {
+                        **task,
+                        "what": str((task["details"] or {}).get("what", "")),
+                        "where": str((task["details"] or {}).get("where", "")),
+                        "answer": (task["answer"] or {}).get("text"),
+                    }
+                )
+                for task in data["client_tasks"]
+            ],
+            latest_answered_round=max(
+                (t["round"] for t in data["client_tasks"] if t["status"] == "ANSWERED"),
+                default=None,
+            ),
         )
