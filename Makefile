@@ -13,7 +13,7 @@ PY_PROJECTS := $(foreach p,api mocks nlu,$(if $(wildcard $(p)/pyproject.toml),$(
 HAS_WEB := $(if $(SKIP_WEB),,$(wildcard web/package.json))
 HAS_COMPOSE := $(wildcard docker-compose.yml)
 
-.PHONY: help up down check lint docs-check test fmt openapi reset hooks
+.PHONY: help up down check lint docs-check test fmt openapi openapi-check reset hooks
 
 help: ## Список команд
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-11s %s\n", $$1, $$2}'
@@ -44,6 +44,7 @@ docs-check: ## Ссылки в документах
 check: lint docs-check ## Всё, что должно быть зелёным перед PR: линтеры, типы, границы, быстрые тесты
 	$(PY_SCRIPTS) -m pytest -q scripts/tests
 	@for p in $(PY_PROJECTS); do $(MAKE) --no-print-directory -C $$p check; done
+	$(MAKE) --no-print-directory openapi-check
 ifneq ($(HAS_WEB),)
 	$(MAKE) --no-print-directory -C web check
 endif
@@ -62,7 +63,11 @@ ifneq ($(HAS_WEB),)
 endif
 
 openapi: ## Выгрузить OpenAPI в docs/api и перегенерировать TS-клиент
-	@echo "Появится вместе с api и моками (T-543)"
+	uv run --directory api python export_openapi.py
+	$(MAKE) --no-print-directory -C web gen-api
+
+openapi-check: ## Проверить, что все шесть схем совпадают с кодом (без БД и стенда)
+	uv run --directory api python export_openapi.py --check
 
 reset: ## Сброс демо-стенда
 	curl -fsS -X POST http://127.0.0.1:8100/demo/reset && echo

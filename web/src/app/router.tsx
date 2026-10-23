@@ -1,5 +1,4 @@
 import { createBrowserRouter, type RouteObject } from 'react-router';
-import { PlaceholderPage } from '@/components/PlaceholderPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ApplicationEditPage } from '@/features/application/ApplicationEditPage';
 import { ApplicationPage } from '@/features/application/ApplicationPage';
@@ -9,7 +8,6 @@ import { LoanPage } from '@/features/loans/LoanPage';
 import { LoansPage } from '@/features/loans/LoansPage';
 import { WizardPage } from '@/features/wizard/WizardPage';
 import { WizardResultPage } from '@/features/wizard/WizardResultPage';
-import { placeholders } from '@/texts';
 import { ClientLayout } from './ClientLayout';
 import { RequireBank, RequireClient, RequireDemo } from './guards';
 import { RootLayout } from './RootLayout';
@@ -85,34 +83,10 @@ export const appRoutes: RouteObject[] = [
                   { path: 'company', element: <CompanyPage /> },
                   { path: 'wizard', element: <WizardPage /> },
                   { path: 'wizard/result', element: <WizardResultPage /> },
-                  {
-                    path: 'products',
-                    element: <PlaceholderPage content={placeholders.products} />,
-                  },
-                  {
-                    path: 'products/:code',
-                    element: <PlaceholderPage content={placeholders.product} />,
-                  },
                   { path: 'applications/:id', element: <ApplicationPage /> },
                   { path: 'applications/:id/edit/:step', element: <ApplicationEditPage /> },
-                  {
-                    path: 'applications/:id/offer',
-                    element: <PlaceholderPage content={placeholders.offer} />,
-                  },
-                  {
-                    path: 'applications/:id/sign',
-                    element: <PlaceholderPage content={placeholders.sign} />,
-                  },
                   { path: 'loans', element: <LoansPage /> },
                   { path: 'loans/:id', element: <LoanPage /> },
-                  {
-                    path: 'notifications',
-                    element: <PlaceholderPage content={placeholders.notifications} />,
-                  },
-                  {
-                    path: 'guarantee',
-                    element: <PlaceholderPage content={placeholders.guarantee} />,
-                  },
                   { path: '*', element: <NotFoundScreen /> },
                 ],
               },

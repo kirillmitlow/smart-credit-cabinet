@@ -39,6 +39,10 @@ describe('оболочка клиента', () => {
     expect(screen.getByRole('link', { name: shell.productName })).toBeInTheDocument();
     const nav = screen.getByRole('navigation', { name: shell.mainNavLabel });
     expect(within(nav).getByRole('link', { name: shell.nav.loans })).toBeInTheDocument();
+    expect(within(nav).queryByRole('link', { name: shell.nav.products })).not.toBeInTheDocument();
+    expect(
+      within(nav).queryByRole('link', { name: shell.nav.notifications }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('ООО «Ромашка»')).toBeInTheDocument();
     expect(
       screen.getByText(fill(shell.user.signedInAs, { name: 'Анна Соколова' })),
@@ -78,17 +82,22 @@ describe('оболочка клиента', () => {
     );
   });
 
-  it('карта адресов клиента: страницы открываются', async () => {
+  it('неподдерживаемые адреса не показывают обещаний будущих экранов', async () => {
     mockSessions({ client: makeMe() });
     const paths = [
-      ['/products/overdraft', placeholders.product.title],
-      ['/applications/a1/offer', placeholders.offer.title],
-      ['/applications/a1/sign', placeholders.sign.title],
-      ['/notifications', placeholders.notifications.title],
-    ] as const;
-    for (const [path, title] of paths) {
+      '/products',
+      '/products/overdraft',
+      '/applications/a1/offer',
+      '/applications/a1/sign',
+      '/notifications',
+      '/guarantee',
+    ];
+    for (const path of paths) {
       const { unmount } = renderApp(path);
-      expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument();
+      expect(
+        await screen.findByRole('heading', { level: 1, name: guards.pageNotFound.title }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(placeholders.soon)).not.toBeInTheDocument();
       unmount();
     }
   });
@@ -153,15 +162,14 @@ describe('вход и защита маршрутов', () => {
     ).toBeInTheDocument();
   });
 
-  it('поручитель попадает только на экран поручителя', async () => {
+  it('поручителю не показывает несуществующий кабинет и клиентские данные', async () => {
     mockSessions({ client: makeMe({ role: 'GUARANTOR' }) });
     renderApp('/loans');
     expect(
-      await screen.findByRole('heading', { level: 1, name: placeholders.guarantee.title }),
+      await screen.findByRole('heading', { level: 1, name: guards.pageNotFound.title }),
     ).toBeInTheDocument();
-    expect(window.location.pathname).toBe('/guarantee');
-    const nav = screen.getByRole('navigation', { name: shell.mainNavLabel });
-    expect(within(nav).queryAllByRole('link')).toHaveLength(0);
+    expect(window.location.pathname).toBe('/loans');
+    expect(screen.queryByRole('navigation', { name: shell.mainNavLabel })).not.toBeInTheDocument();
   });
 
   it('несуществующий адрес: «Не нашли такую страницу» в оболочке', async () => {
