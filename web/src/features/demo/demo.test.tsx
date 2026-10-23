@@ -40,6 +40,7 @@ describe('демо-панель', () => {
     const { container } = renderApp('/demo');
     await screen.findByText(persona.title);
     expect(screen.getByText(persona.inn, { exact: false })).toBeInTheDocument();
+    expect(screen.getAllByText(t.nextSteps.APPROVED, { exact: false })[0]).toBeInTheDocument();
     expect(screen.getByRole('button', { name: t.technical })).toHaveAttribute(
       'aria-expanded',
       'false',

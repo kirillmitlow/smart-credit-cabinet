@@ -29,6 +29,9 @@ import { DemoChaos } from './DemoChaos';
 import { outcome } from './formatting';
 
 function PersonaCard({ persona: p, onReset }: { persona: Persona; onReset: () => void }) {
+  const nextStep = p.expectedOutcome
+    ? t.nextSteps[p.expectedOutcome as keyof typeof t.nextSteps]
+    : null;
   return (
     <Paper withBorder p="md">
       <Stack gap="xs">
@@ -51,6 +54,11 @@ function PersonaCard({ persona: p, onReset }: { persona: Persona; onReset: () =>
         <Text>
           {t.expected}: {outcome(p.expectedOutcome)}
         </Text>
+        {nextStep ? (
+          <Text size="sm">
+            {t.nextLabel}: {nextStep}
+          </Text>
+        ) : null}
         {p.expectedFinalOutcome ? (
           <Text size="sm">
             {t.final}: {outcome(p.expectedFinalOutcome)}
