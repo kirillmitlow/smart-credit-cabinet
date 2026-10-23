@@ -883,3 +883,18 @@ applications.TaskSpec(kind, title, why_text, details={}, assignee_user_id=None, 
 - Конвейер при `REVENUE_UNKNOWN` сам создаёт задачу «выписка» (раунд 1, `Actor.SYSTEM`).
 - Пример: `applications.request_information(s, app_id, expected_version=card.version, actor=Actor.UNDERWRITER, actor_id=uid, items=[TaskSpec("DOCUMENT", "Договор с поставщиком", "Нужен для оценки залога")])`.
 - Не сделано: вложения (файловое хранилище, T-332/T-333/T-336), шаблоны задач в политике (30-13), замена файла, отказ поручителя, таймер истечения (`EXPIRED`), «Новое с прошлого раза», задачи по `DATA_INCOMPLETE`. Если конвейер получит `REVENUE_UNKNOWN` после трёх раундов, задача не создаётся (лог), заявка остаётся в `NEEDS_INFO`: нужен вариант с обязательным ручным разбором (вопрос к плану).
+
+---
+
+**23.10 · Агент A (Claude Code) · Q-148: карточка «под контракт» у СнабКонтракта**
+
+**Сделано:**
+- `pipeline/sources.py` и `facts.py` запрашивают ЕИС при любом продукте; обязателен он только для `CONTRACT`, сбой у других продуктов заявку не стопорит.
+- `decide._contract` без номера в заявке берёт свой исполняемый контракт с наибольшей неоплаченной частью.
+- Номер контракта в «что нужно от вас» берётся из найденного контракта.
+
+На живом стенде СнабКонтракт (заявка `WORKING_CAPITAL`) получает третью карточку `CONTRACT` 8 млн на 4 мес., как в 30-17. xfail в `test_simple_personas.py` снят; все персоны зелёные, кроме второго прохода Гарипова (ждёт T-130).
+
+**Решено:** R-004 п. 31; Q-148 закрыт.
+
+**Файлы:** api/app/modules/decisioning/{decide,counter_offers}.py, api/app/modules/pipeline/{sources,facts}.py, api/tests/unit/decisioning/test_counter_offers.py, api/tests/personas/test_simple_personas.py.

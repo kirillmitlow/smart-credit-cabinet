@@ -43,7 +43,7 @@ def collect_free_sources(
     applicant_inn: str,
     product: Product,
 ) -> list[Collected]:
-    """Свежие ответы реестра, ЕФРСБ, ФНС, ЕИС (для CONTRACT), комплаенса и АБС (без кэша)."""
+    """Свежие ответы реестра, ЕФРСБ, ФНС, ЕИС, комплаенса и АБС (без кэша)."""
     aid, inn = application_id, applicant_inn
     reg, tax, core = integrations.registry, integrations.tax, integrations.bank_core
     first = _job(facts.REGISTRY, inn, lambda: reg.get_company(inn, application_id=aid))
@@ -61,10 +61,11 @@ def collect_free_sources(
         ),
         _job(facts.LOANS, inn, lambda: core.get_loans(inn, application_id=aid)),
     ]
-    if product == Product.CONTRACT:
-        independent.append(
-            _job(facts.CONTRACTS, inn, lambda: tax.get_gov_contracts(inn, application_id=aid))
-        )
+    # ЕИС спрашиваем при любом продукте: карточке встречного «под контракт» нужен свой контракт
+    # (Q-148). Обязателен он только для `CONTRACT` (eligibility), сбой у других не стопорит.
+    independent.append(
+        _job(facts.CONTRACTS, inn, lambda: tax.get_gov_contracts(inn, application_id=aid))
+    )
 
     collected: list[Collected] = []
     with ThreadPoolExecutor(max_workers=POOL_SIZE, thread_name_prefix="pipeline-src") as pool:

@@ -248,11 +248,6 @@ def test_snabkontrakt_counter_offer_has_the_three_cards_of_30_17(client: httpx.C
         assert any((v["amountRub"], v["termMonths"]) == (3_400_000, 12) for v in variants)
 
 
-@pytest.mark.xfail(
-    strict=False,
-    reason="Q-148: конвейер запрашивает ЕИС только при продукте CONTRACT, карточку «кредит под "
-    "контракт» из заявки WORKING_CAPITAL оптимизатор построить не может",
-)
 def test_snabkontrakt_counter_offer_has_the_contract_card(client: httpx.Client) -> None:
     """30-17: третья карточка — CONTRACT 8 млн на 4 мес (проценты 130 000, в конце 8 130 000)."""
     reset_persona(client, "snabkontrakt")
