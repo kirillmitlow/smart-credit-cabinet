@@ -27,6 +27,7 @@ export function BankRecommendationView({ value }: { value: BankRecommendation | 
       <Badge
         variant="light"
         color={colors[value.outcome] ?? 'gray'}
+        c="dark.9"
         style={{ height: 'auto', whiteSpace: 'normal' }}
       >
         {title}

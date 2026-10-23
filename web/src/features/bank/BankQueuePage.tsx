@@ -110,7 +110,7 @@ export function BankQueuePage() {
           <Text>{t.loading}</Text>
         </Stack>
       ) : null}
-      {items?.length === 0 ? (
+      {items?.length === 0 && !query.isError ? (
         <Alert color="gray">
           {status === Status.MANUAL_REVIEW && !productCode ? t.empty : t.emptyFilter}
         </Alert>
@@ -160,6 +160,7 @@ export function BankQueuePage() {
                           key={badge}
                           variant="light"
                           color={badge === 'CLIENT_ANSWERED' ? 'blue' : 'red'}
+                          c="dark.9"
                           style={{ height: 'auto', whiteSpace: 'normal' }}
                         >
                           {t.badges[badge]}
