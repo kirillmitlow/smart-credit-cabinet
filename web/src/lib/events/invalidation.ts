@@ -10,6 +10,7 @@ export const queryAreas = {
   home: '/home',
   tasks: '/tasks',
   notifications: '/notifications',
+  backoffice: '/backoffice',
 } as const;
 
 export type QueryArea = keyof typeof queryAreas;
@@ -21,9 +22,9 @@ export function keyMatchesArea(queryKey: QueryKey, area: QueryArea): boolean {
 
 /** Какие области сбрасывает каждое событие. `resync` и `auth_expired` разбираем отдельно */
 export const areasByEvent = {
-  status_changed: ['applications', 'home'],
-  step_done: ['applications', 'home'],
-  task_created: ['tasks', 'notifications', 'home'],
+  status_changed: ['applications', 'home', 'backoffice'],
+  step_done: ['applications', 'home', 'backoffice'],
+  task_created: ['tasks', 'notifications', 'home', 'backoffice'],
 } as const satisfies Record<string, readonly QueryArea[]>;
 
 export type AreaEventType = keyof typeof areasByEvent;

@@ -255,7 +255,9 @@ def card(
                 id=app["company_id"],
                 name=app["company_name"],
                 inn=app["inn"],
-                is_bank_customer=app["is_bank_customer"],
+                is_bank_customer=app["is_bank_customer"]
+                if app["is_bank_customer"] is not None
+                else ((engine or {}).get("features") or {}).get("is_bank_customer"),
                 registered_on=app["registered_on"],
                 status=app["company_status"],
                 okved=app["okved"],

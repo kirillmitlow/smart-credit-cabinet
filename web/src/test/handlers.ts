@@ -18,6 +18,7 @@ export const defaultHandlers = [
   http.get('*/api/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
   http.get('*/api/auth/bank-me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
   http.get('*/api/applications', () => Response.json({ items: [], nextCursor: null })),
+  http.get('*/api/backoffice/queue', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/companies/:id', () => Response.json(makeCompanyProfile())),
   http.get('*/api/loans', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/public-config', () => Response.json(makePublicConfig({ demoMode: false }))),
