@@ -49,6 +49,21 @@ def _contract(inp: DecisionInput) -> ContractInfo | None:
     return None
 
 
+def product_context(inp: DecisionInput, feats: Features, grade: Grade | None) -> ProductContext:
+    """Контекст правил продукта: общий для `decide` и ручного решения андеррайтера."""
+    return ProductContext(
+        app_today=inp.context.app_today,
+        business_age_months=feats.business_age_months,
+        registration_date=inp.snapshot.registry.registration_date,
+        is_bank_customer=feats.is_bank_customer,
+        customer_turnover_months=len(inp.snapshot.turnover.months),
+        collateral_provided=feats.collateral_provided,
+        security_confirmed=feats.security_confirmed,
+        grade=grade,
+        contract=_contract(inp),
+    )
+
+
 def _skipped(step: str, why: str) -> TraceStep:
     return TraceStep(step, False, {"reason": why})
 
@@ -220,17 +235,7 @@ def decide(inputs: DecisionInput) -> DecisionResult:
             },
         )
     )
-    product_ctx = ProductContext(
-        app_today=inp.context.app_today,
-        business_age_months=feats.business_age_months,
-        registration_date=inp.snapshot.registry.registration_date,
-        is_bank_customer=feats.is_bank_customer,
-        customer_turnover_months=len(inp.snapshot.turnover.months),
-        collateral_provided=feats.collateral_provided,
-        security_confirmed=feats.security_confirmed,
-        grade=result.grade,
-        contract=contract,
-    )
+    product_ctx = product_context(inp, feats, result.grade)
     product_violations = check_product(
         policy, app.product, app.amount_rub, app.term_months, product_ctx
     )

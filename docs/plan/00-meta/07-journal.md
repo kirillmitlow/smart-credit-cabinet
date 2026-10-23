@@ -817,3 +817,47 @@ pipeline.request_recheck(session, application_id, *, expected_version, actor, ac
 - Отчёт БКИ заявки (до 30 дней) переиспользуется: платного запроса нет. Бесплатные источники опрашиваются заново. `claim_run` теперь сначала берёт заранее созданный запуск заявки.
 - Пример: `with db.transaction() as s: pipeline.request_recheck(s, app_id, expected_version=card.version, actor=Actor.UNDERWRITER, actor_id=user_id, reason_code="SOURCE_RECOVERED")`.
 - Не сделано в T-277: сообщение «правила обновлены» при смене политики, обязательный ручной разбор после 3-го раунда (в T-350).
+
+---
+
+---
+
+**23.10 · Агент A (Claude Code, субагент) · интерфейсы ручного решения для B (T-362, T-364)**
+
+**PR:** ветка `feat/underwriter-decision-api` (ссылка в отчёте агента), в main не влит. Ответ на запрос B из записи «начало параллельной работы B».
+
+**Публичный импорт.**
+- `from app.modules.decisioning import evaluate_underwriter_decision, UnderwriterTerms, UnderwriterEvaluation, UwViolation, ViolationKind`
+- `from app.modules import pipeline`; `pipeline.record_underwriter_decision`, `pipeline.preview_underwriter_decision`, `pipeline.UnderwriterReceipt`
+
+**Сигнатуры.**
+- `evaluate_underwriter_decision(inputs: DecisionInput, engine_result: DecisionResult, outcome: Outcome, terms: UnderwriterTerms | None, actor_level: Level, reason_code: str | None, comment: str | None, *, application_version: int | None = None) -> UnderwriterEvaluation`. Чистая функция. Исходы: `APPROVED`, `COUNTER_OFFER`, `REJECTED`. `UnderwriterTerms(product, amount_rub, term_months, rate: Decimal | None)`; ставка долей (0,195), `None` — расчётная ставка ядра.
+- Результат: `allowed`, `violations` (код, `kind` INPUT / HARD / AUTHORITY / REASON, `params`), `required_level`, `deviation`, `exception_used`, `exception_codes`, `rate` и коридор, `payment_rub`, `last_payment_rub`, `overpayment_rub`, `dscr`, `stress_dscr`, `debt_to_revenue_with_new`, `min_comment_chars`, `checks` (проверенные условия), `inputs_hash`, `policy_version`, `policy_hash`, `application_version`.
+- `preview_underwriter_decision(session, *, application_id, actor_level, outcome, terms, reason_code=None, comment=None, expected_version=None, engine_decision_id=None) -> UnderwriterEvaluation`. Это `evaluate-offer` без записи: сама читает последнее ENGINE-решение и считает ядром.
+- `record_underwriter_decision(session, *, application_id, expected_version, actor_id, actor_level, outcome, terms=None, reason_code=None, comment=None, engine_decision_id=None) -> UnderwriterReceipt`. Receipt: `decision_id`, `engine_decision_id`, `application_id`, `previous_status`, `new_status`, `version` (после перехода), `outcome`, `deviation`, `exception_used`, `offer_id`, `evaluation`, `checked_conditions`.
+
+**Ошибки (`AppError`).**
+- 404 `NOT_FOUND`.
+- 409 `VERSION_CONFLICT` (версия не равна `expected_version`; так же ведёт себя повторный вызов после успеха, `errors=[{version}]`).
+- 409 `INVALID_TRANSITION` (не `MANUAL_REVIEW`, `errors=[{currentStatus}]`).
+- 409 `ENGINE_DECISION_MISSING`, `ENGINE_DECISION_STALE` (передан `engine_decision_id`, но есть более новое), `ENGINE_SNAPSHOT_INCOMPATIBLE`, `ENGINE_SNAPSHOT_MISMATCH`.
+- 403 `AUTHORITY_LEVEL_TOO_LOW`, `errors=[{requiredLevel, actorLevel}]`, только если других нарушений нет.
+- 422 `UNDERWRITER_DECISION_INVALID`, `errors=[{code, kind, params}]`. Коды: `RATE_OUT_OF_CORRIDOR`, `AMOUNT_OUT_OF_RANGE` и другие коды продукта, `DSCR_BELOW_EXCEPTION_FLOOR`, `STRESS_BELOW_EXCEPTION_FLOOR`, `DEBT_TOO_HIGH`, `LIMIT_ABOVE_CAP`, `REASON_REQUIRED`, `REASON_UNKNOWN`, `COMMENT_TOO_SHORT`, `TERMS_REQUIRED`, `TERMS_NOT_ALLOWED`, `APPROVED_TERMS_DIFFER`, `COUNTER_SAME_AS_REQUEST`, `OUTCOME_NOT_ALLOWED`, `ACTOR_LEVEL_INVALID`, `ENGINE_NOT_MANUAL_REVIEW`, `ENGINE_RESULT_MISMATCH`.
+
+**Транзакция и владелец перехода.**
+- Всё в транзакции вызывающего (`session`): блокировка заявки `FOR UPDATE`, проверка версии, пересчёт `decide()` по сохранённым inputs и `evaluate_underwriter_decision` (клиенту доверять нельзя), снимок `source=UNDERWRITER` (`overrides_decision_id` = ENGINE), причины, **переход `MANUAL_REVIEW → …` (`Actor.UNDERWRITER`), событие журнала и предложение клиенту делает `record_underwriter_decision`**. Backoffice их не пишет, иначе задвоятся.
+- Событие: при отклонении от рекомендации `OVERRIDE`, иначе `STEP UNDERWRITER_DECISION`; в payload нет комментария. Предложение: для `APPROVED` «как просили», для `COUNTER_OFFER` одна карточка (`pipeline/hooks.py::create_underwriter_offer`). Откат транзакции убирает всё.
+- Отказ по полномочиям с записью в `audit_log` backoffice пишет отдельной транзакцией после отката: ловит `AppError` 403 и берёт уровни из `errors`.
+- Снимок неизменяем (триггер БД). Миграция `0011_underwriter_decision` (колонки `actor_id`, `actor_level`, `override_reason_code`, `deviation`); комментарий андеррайтера лежит в `decisions.override_reason`.
+
+**Пример вызова.**
+```
+with db.transaction() as session:
+    receipt = pipeline.record_underwriter_decision(
+        session, application_id=app_id, expected_version=card.version,
+        actor_id=principal.user_id, actor_level=Level(principal.level), outcome=Outcome.APPROVED,
+        terms=UnderwriterTerms(Product.INVESTMENT, 15_000_000, 60, Decimal("0.195")),
+        reason_code=None, comment=None)
+```
+
+**Что учесть B.** `Level`, `Outcome`, `Product` — из `app.modules.decisioning.types`. Пороги исключения, длины комментария и коды причин теперь в `policy/v1.yaml` (`underwriter.*`); снимки ENGINE старой схемы политики не читаются (стенд сбрасывается). Методические допущения: R-004, пункты 23–30. Тесты: `tests/unit/decisioning/test_underwriting.py`, `tests/property/test_underwriting.py`, `tests/integration/test_underwriter_decision.py` (Станкопром, L2 одобряет). Интерфейс закрывает блокеры T-362 и T-364 со стороны A; `request_recheck` и `request_information` ещё не сделаны.

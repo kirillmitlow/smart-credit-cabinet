@@ -600,6 +600,16 @@ routing:
     - {up_to_rub: 50000000, grade_ab: L2, grade_c: L2, grade_d: L2, source: "30-11", note: "до 50 млн — старший"}
     - {up_to_rub: null, grade_ab: L2, grade_c: L2, grade_d: L2, source: "30-11", note: "выше 50 млн: комитет не моделируем, L2"}
 
+underwriter:
+  exception_dscr_min: {value: "1.15", source: "30-11", note: "исключение из политики: нижняя граница практики, порог SBA (30-18 №9)"}
+  exception_stress_min: {value: "0.9", source: "30-11", note: "исключение: стресс-DSCR не ниже 0,9 при шоке выручки"}
+  comment_min_chars: {value: 20, source: "D-086", note: "минимальная длина комментария при отклонении от рекомендации ядра"}
+  comment_min_chars_strict: {value: 50, source: "D-086", note: "для исключений, решений уровня L2 и кода UW_OTHER"}
+  reason_codes:
+    value: [UW_NEW_INFO, UW_COLLATERAL_ASSESSED, UW_FLAG_CLEARED, UW_POLICY_EXCEPTION, UW_RISK_HIGHER, UW_DOCUMENT_ISSUE, UW_OTHER]
+    source: "30-11"
+    note: "закрытый список кодов причин переопределения"
+
 counter_offers:
   term_grid_months:
     value: [6, 12, 18, 24, 30, 36]
