@@ -231,7 +231,16 @@ async def test_active_company_switch_checks_membership(client: httpx.AsyncClient
 async def test_public_config(client: httpx.AsyncClient) -> None:
     config = (await client.get("/public-config")).json()
     assert config["demoMode"] is True
-    assert set(config) == {"demoMode", "productName", "version", "nluAvailable"}
+    assert set(config) == {
+        "demoMode",
+        "productName",
+        "version",
+        "nluAvailable",
+        "demoCodeRequired",
+        "docsLinks",
+    }
+    assert config["demoCodeRequired"] is False
+    assert config["docsLinks"] == {"api": "/docs"}
 
 
 def test_session_store_down_is_503(monkeypatch: pytest.MonkeyPatch) -> None:
