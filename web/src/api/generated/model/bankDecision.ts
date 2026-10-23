@@ -5,6 +5,7 @@
  * Прототип цифрового кредитного конвейера для малого бизнеса. Данные синтетические.
  * OpenAPI spec version: 0.1.0
  */
+import type { BankComparison } from './bankComparison';
 import type { BankDecisionAssessedInput } from './bankDecisionAssessedInput';
 import type { BankDecisionFeatures } from './bankDecisionFeatures';
 import type { BankDecisionReason } from './bankDecisionReason';
@@ -38,6 +39,7 @@ export interface BankDecision {
   grade: string | null;
   pdPercent: number | null;
   factors: BankFactor[];
+  comparisons: BankComparison[];
   revenueMonthlyRub: number | null;
   freeCashFlowRub: number | null;
   existingPaymentsRub: number | null;

@@ -19,6 +19,7 @@ export * from './bankApplicationCard';
 export * from './bankApplicationCardDocuments';
 export * from './bankApplicationCardDraft';
 export * from './bankCompany';
+export * from './bankComparison';
 export * from './bankDecision';
 export * from './bankDecisionAssessedInput';
 export * from './bankDecisionFeatures';

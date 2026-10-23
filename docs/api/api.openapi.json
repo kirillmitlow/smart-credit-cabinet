@@ -2619,6 +2619,46 @@
         ],
         "title": "BankCompany"
       },
+      "BankComparison": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "aRub": {
+            "type": "integer",
+            "title": "Arub"
+          },
+          "bRub": {
+            "type": "integer",
+            "title": "Brub"
+          },
+          "deviationPercent": {
+            "type": "number",
+            "title": "Deviationpercent"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "aRub",
+          "bRub",
+          "deviationPercent",
+          "year"
+        ],
+        "title": "BankComparison"
+      },
       "BankDecision": {
         "properties": {
           "id": {
@@ -2753,6 +2793,13 @@
             },
             "type": "array",
             "title": "Factors"
+          },
+          "comparisons": {
+            "items": {
+              "$ref": "#/components/schemas/BankComparison"
+            },
+            "type": "array",
+            "title": "Comparisons"
           },
           "revenueMonthlyRub": {
             "anyOf": [
@@ -2913,6 +2960,7 @@
           "grade",
           "pdPercent",
           "factors",
+          "comparisons",
           "revenueMonthlyRub",
           "freeCashFlowRub",
           "existingPaymentsRub",
