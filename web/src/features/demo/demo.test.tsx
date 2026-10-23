@@ -173,6 +173,31 @@ describe('демо-панель', () => {
     expect(queryClient.getQueryData(['session', 'client'])).toEqual(clientSession);
     open.mockRestore();
   });
+  it('вне демо подсказка отсутствует и каталог персон не запрашивается', async () => {
+    mockSessions({ client: makeMe(), config: { demoMode: false } });
+    const catalog = vi.fn(() => Response.json([persona]));
+    server.use(
+      http.get('*/api/demo/personas', catalog),
+      http.get('*/api/applications/app-1', () =>
+        Response.json(
+          makeApplication({
+            companyId: 'co-1',
+            productCode: 'EXPRESS',
+            amountRub: 800000,
+            termMonths: 18,
+            status: 'MANUAL_REVIEW',
+            allowedActions: [],
+          }),
+        ),
+      ),
+      http.get('*/api/applications/app-1/decision', () => Response.json(makeDecision())),
+    );
+    renderApp('/applications/app-1');
+    await screen.findByRole('heading', { level: 1, name: /Заявка/ });
+    expect(screen.queryByTestId('demo-expected-hint')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t.open })).not.toBeInTheDocument();
+    expect(catalog).not.toHaveBeenCalled();
+  });
   it('подсказка ожидаемого исхода закрыта по умолчанию', async () => {
     mockSessions({ client: makeMe(), config: { demoMode: true } });
     scenarios();
