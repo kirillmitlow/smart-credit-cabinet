@@ -1,19 +1,19 @@
 # API: как проверить работающий стенд
 
-Сверено с main `78fda5e` 24.10.2026. [Назад к документации](../README.md).
+Сверено с main `46bc75f` 24.10.2026; API-маршруты не менялись относительно исполненного прогона `78fda5e`. [Назад к документации](../README.md).
 
 ## Адреса и схемы
 
 | Сервис | Прямой локальный адрес | Сохранённая схема |
 |---|---|---|
 | API | http://127.0.0.1:8100 | [api.openapi.json](api.openapi.json) |
-| registry | http://127.0.0.1:8101 | Живая `/openapi.json` |
-| tax / ЕИС | http://127.0.0.1:8102 | Живая `/openapi.json` |
-| credit-bureau | http://127.0.0.1:8103 | Живая `/openapi.json` |
-| bank-core | http://127.0.0.1:8104 | Живая `/openapi.json` |
+| registry | http://127.0.0.1:8101 | [mock-registry.openapi.yaml](mock-registry.openapi.yaml) |
+| tax / ЕИС | http://127.0.0.1:8102 | [mock-tax.openapi.yaml](mock-tax.openapi.yaml) |
+| credit-bureau | http://127.0.0.1:8103 | [mock-credit-bureau.openapi.yaml](mock-credit-bureau.openapi.yaml) |
+| bank-core | http://127.0.0.1:8104 | [mock-bank-core.openapi.yaml](mock-bank-core.openapi.yaml) |
 | scenarios | http://127.0.0.1:8105 | [mock-scenarios.openapi.yaml](mock-scenarios.openapi.yaml) |
 
-У каждого сервиса `/docs` — Swagger, `/openapi.json` — текущая схема, `/health/ready` — готовность. Swagger загружает оформление с CDN; сами JSON-схемы можно читать без CDN. Файл scenarios содержит JSON, допустимый в YAML 1.2. Выгрузка остальных схем и генератор `make openapi` принадлежат владельцу кода; этот пакет их не меняет.
+У каждого сервиса `/docs` — Swagger, `/openapi.json` — текущая схема, `/health/ready` — готовность. Swagger загружает оформление с CDN; сами JSON-схемы можно читать без CDN. Файл scenarios содержит JSON, допустимый в YAML 1.2. PR #111 добавил экспорт всех шести схем: `make openapi` также обновляет TS-клиент, `make openapi-check` сверяет сохранённые схемы с кодом. Требуются uv и Node/pnpm для генерации клиента. Этот документационный пакет не редактирует и не перегенерирует схемы.
 
 В браузере API вызывается через **http://localhost:8080/api**; nginx также принимает `/api/v1` и удаляет этот префикс. У прямого адреса `8100` маршруты идут от корня: `/applications`, а не `/api/v1/applications`. Изолированный стенд команды на **http://127.0.0.1:8090** — отдельная установка, не порт по умолчанию и не обещание его доступности на другом компьютере. Для него `apiUrl=http://127.0.0.1:8090/api`. Сохраняйте один hostname в пределах сессии: cookie от `localhost` не становится cookie для `127.0.0.1`.
 
