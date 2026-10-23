@@ -14,7 +14,7 @@ import {
  * (не показывать кнопку, которая вернёт 403), а не для безопасности.
  */
 
-/** Зона клиента: нужна клиентская сессия; поручитель видит только `/guarantee` (D-096) */
+/** Зона клиента: нужна клиентская сессия; отдельный кабинет поручителя пока не поддерживается. */
 export function RequireClient() {
   const location = useLocation();
   const session = useSession('client');
@@ -33,9 +33,7 @@ export function RequireClient() {
   const me = session.data;
   if (!me) return <Navigate to={loginUrl('client', location)} replace />;
   if (isBankRole(me.role)) return <ClientOnlyScreen />;
-  if (me.role === 'GUARANTOR' && location.pathname !== '/guarantee') {
-    return <Navigate to="/guarantee" replace />;
-  }
+  if (me.role === 'GUARANTOR') return <NotFoundScreen />;
   return <Outlet />;
 }
 

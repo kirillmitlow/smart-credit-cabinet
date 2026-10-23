@@ -1,0 +1,3686 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "mock-bank-core — АБС банка и комплаенс",
+    "description": "Имитация внешней системы для прототипа «Умный кредитный кабинет». Все данные синтетические (`meta.simulated: true`). Контракт: docs/specs/mocks.md.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Процесс жив",
+        "operationId": "healthLive",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthlive"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Готов принимать запросы",
+        "operationId": "healthReady",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "База недоступна или миграции не применены"
+          }
+        }
+      }
+    },
+    "/admin/chaos": {
+      "get": {
+        "tags": [
+          "admin: chaos"
+        ],
+        "summary": "Текущий режим сбоев",
+        "operationId": "getChaos",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaosConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admin: chaos"
+        ],
+        "summary": "Включить режим сбоев",
+        "operationId": "putChaos",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChaosConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaosConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/customers/{inn}": {
+      "get": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Клиент ли нашего банка",
+        "operationId": "getCustomer",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/customers/{inn}/turnover": {
+      "get": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Месячные обороты по расчётному счёту",
+        "operationId": "getTurnover",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          },
+          {
+            "name": "months",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 24,
+              "minimum": 1,
+              "description": "Сколько полных месяцев вернуть",
+              "default": 12,
+              "title": "Months"
+            },
+            "description": "Сколько полных месяцев вернуть"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnoverOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/customers/{inn}/loans": {
+      "get": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Кредиты нашего банка у клиента",
+        "operationId": "getCustomerLoans",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoansOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/customers/{inn}/accounts": {
+      "post": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Открыть расчётный счёт (мгновенно, идемпотентно)",
+        "operationId": "openAccount",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Обязателен",
+              "title": "Idempotency-Key"
+            },
+            "description": "Обязателен"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenAccountIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAccountOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/disbursements": {
+      "post": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Выдать кредит (деньги выдаются ровно один раз)",
+        "operationId": "createDisbursement",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Обязателен",
+              "title": "Idempotency-Key"
+            },
+            "description": "Обязателен"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisbursementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisbursementOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/loans/{loan_id}": {
+      "get": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Кредит нашего банка",
+        "operationId": "getLoan",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "loan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Например, loan_000041",
+              "title": "Loan Id"
+            },
+            "description": "Например, loan_000041"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoanDetailOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{number}": {
+      "get": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Счёт, остаток и последние проводки",
+        "operationId": "getAccount",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{20}$",
+              "description": "Номер счёта, 20 цифр",
+              "title": "Number"
+            },
+            "description": "Номер счёта, 20 цифр"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDetailOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/compliance/screening": {
+      "post": {
+        "tags": [
+          "bank-core"
+        ],
+        "summary": "Проверка участников заявки по спискам",
+        "operationId": "screenSubjects",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScreeningIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScreeningOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/subjects/{inn}": {
+      "put": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Создать или полностью заменить данные субъекта",
+        "operationId": "adminPutSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          },
+          {
+            "name": "X-Scenario-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Код сценария: записи получат origin = SCENARIO и этот scenario_code",
+              "title": "X-Scenario-Code"
+            },
+            "description": "Код сценария: записи получат origin = SCENARIO и этот scenario_code"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankCoreBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectView"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Частичная правка (JSON Merge Patch, массивы заменяются целиком)",
+        "operationId": "adminPatchSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Patch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectView"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Всё о субъекте, включая RUNTIME-записи",
+        "operationId": "adminGetSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectView"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Удалить субъекта со всеми записями",
+        "operationId": "adminDeleteSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/subjects": {
+      "get": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Список субъектов",
+        "operationId": "adminListSubjects",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scenario",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scenario"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Origin"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/scenarios": {
+      "get": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Какие сценарии есть и сколько у каждого субъектов",
+        "operationId": "adminListScenarios",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioCount"
+                  },
+                  "type": "array",
+                  "title": "Response Adminlistscenarios"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/scenarios/{code}": {
+      "delete": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Удалить всё, что создано сценарием, вместе с RUNTIME-записями",
+        "operationId": "adminDeleteScenario",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/wipe": {
+      "post": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Очистить данные мока (справочники остаются)",
+        "operationId": "adminWipe",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountBody": {
+        "properties": {
+          "number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{20}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number",
+            "description": "Можно не указывать: мок сгенерирует номер с верным ключом"
+          },
+          "type": {
+            "type": "string",
+            "const": "SETTLEMENT",
+            "title": "Type",
+            "default": "SETTLEMENT"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "BLOCKED",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "default": "OPEN"
+          },
+          "openedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Openedat"
+          },
+          "balanceRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Balancerub",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "openedAt"
+        ],
+        "title": "AccountBody"
+      },
+      "AccountDetailOut": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SETTLEMENT",
+              "LOAN"
+            ],
+            "title": "Type"
+          },
+          "currency": {
+            "type": "string",
+            "const": "RUB",
+            "title": "Currency",
+            "default": "RUB"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "BLOCKED",
+              "CLOSED"
+            ],
+            "title": "Status"
+          },
+          "openedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Openedat"
+          },
+          "balanceRub": {
+            "type": "integer",
+            "title": "Balancerub"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "recentPostings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingOut"
+            },
+            "type": "array",
+            "title": "Recentpostings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "type",
+          "status",
+          "openedAt",
+          "balanceRub",
+          "meta",
+          "recentPostings"
+        ],
+        "title": "AccountDetailOut",
+        "description": "`GET /accounts/{number}`: поля счёта как в 7.1 и последние проводки симулятора."
+      },
+      "AccountOut": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SETTLEMENT",
+              "LOAN"
+            ],
+            "title": "Type"
+          },
+          "currency": {
+            "type": "string",
+            "const": "RUB",
+            "title": "Currency",
+            "default": "RUB"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "BLOCKED",
+              "CLOSED"
+            ],
+            "title": "Status"
+          },
+          "openedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Openedat"
+          },
+          "balanceRub": {
+            "type": "integer",
+            "title": "Balancerub"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "type",
+          "status",
+          "openedAt",
+          "balanceRub"
+        ],
+        "title": "AccountOut"
+      },
+      "AmlBody": {
+        "properties": {
+          "listName": {
+            "type": "string",
+            "enum": [
+              "ROSFINMONITORING_TERRORISM_EXTREMISM",
+              "MVK_FREEZE"
+            ],
+            "title": "Listname"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "listName"
+        ],
+        "title": "AmlBody"
+      },
+      "AmlListOut": {
+        "properties": {
+          "listed": {
+            "type": "boolean",
+            "title": "Listed"
+          },
+          "listName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Listname"
+          }
+        },
+        "type": "object",
+        "required": [
+          "listed",
+          "listName"
+        ],
+        "title": "AmlListOut"
+      },
+      "BankCoreBody": {
+        "properties": {
+          "customer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomerBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/AccountBody"
+            },
+            "type": "array",
+            "title": "Accounts",
+            "default": []
+          },
+          "turnover": {
+            "items": {
+              "$ref": "#/components/schemas/TurnoverBody"
+            },
+            "type": "array",
+            "title": "Turnover",
+            "default": []
+          },
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/LoanBody"
+            },
+            "type": "array",
+            "title": "Loans",
+            "default": []
+          },
+          "compliance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ComplianceBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "BankCoreBody"
+      },
+      "ChaosConfig": {
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ChaosMode",
+            "default": "OK"
+          },
+          "errorRate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Errorrate",
+            "description": "Доля сломанных запросов",
+            "default": 1.0
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 120000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms",
+            "description": "Для SLOW"
+          },
+          "paths": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paths",
+            "description": "null — все /api/v1/*"
+          },
+          "rateLimitPerMinute": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratelimitperminute"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until",
+            "description": "Когда само вернётся в OK"
+          }
+        },
+        "type": "object",
+        "title": "ChaosConfig"
+      },
+      "ChaosMode": {
+        "type": "string",
+        "enum": [
+          "OK",
+          "SLOW",
+          "ERROR",
+          "DOWN",
+          "TIMEOUT",
+          "LOST_RESPONSE"
+        ],
+        "title": "ChaosMode"
+      },
+      "ComplianceBody": {
+        "properties": {
+          "aml": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AmlBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "zsk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZskBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "internalStopList": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StopListBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "ComplianceBody"
+      },
+      "ContractIn": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Number"
+          },
+          "uid": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Uid"
+          },
+          "signedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Signedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "uid",
+          "signedAt"
+        ],
+        "title": "ContractIn"
+      },
+      "CustomerBody": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "LEGAL_ENTITY",
+              "INDIVIDUAL_ENTREPRENEUR"
+            ],
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "customerSince": {
+            "type": "string",
+            "format": "date",
+            "title": "Customersince"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "customerSince"
+        ],
+        "title": "CustomerBody"
+      },
+      "CustomerOut": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "customerId": {
+            "type": "string",
+            "title": "Customerid"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "LEGAL_ENTITY",
+              "INDIVIDUAL_ENTREPRENEUR"
+            ],
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "customerSince": {
+            "type": "string",
+            "format": "date",
+            "title": "Customersince"
+          },
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/AccountOut"
+            },
+            "type": "array",
+            "title": "Accounts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "customerId",
+          "inn",
+          "type",
+          "name",
+          "customerSince",
+          "accounts"
+        ],
+        "title": "CustomerOut"
+      },
+      "Deleted": {
+        "properties": {
+          "deleted": {
+            "type": "integer",
+            "title": "Deleted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deleted"
+        ],
+        "title": "Deleted"
+      },
+      "DisbursementIn": {
+        "properties": {
+          "applicationRef": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Applicationref"
+          },
+          "customerInn": {
+            "type": "string",
+            "title": "Customerinn"
+          },
+          "contract": {
+            "$ref": "#/components/schemas/ContractIn"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductIn"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "LOAN",
+              "CREDIT_LINE",
+              "OVERDRAFT"
+            ],
+            "title": "Kind"
+          },
+          "amountRub": {
+            "type": "integer",
+            "maximum": 1000000000000.0,
+            "minimum": 0.0,
+            "title": "Amountrub"
+          },
+          "limitRub": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "maximum": 600.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Ratepercent"
+          },
+          "repaymentType": {
+            "type": "string",
+            "enum": [
+              "ANNUITY",
+              "BULLET",
+              "REVOLVING"
+            ],
+            "title": "Repaymenttype"
+          },
+          "settlementAccount": {
+            "type": "string",
+            "pattern": "^\\d{20}$",
+            "title": "Settlementaccount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationRef",
+          "customerInn",
+          "contract",
+          "product",
+          "kind",
+          "amountRub",
+          "termMonths",
+          "ratePercent",
+          "repaymentType",
+          "settlementAccount"
+        ],
+        "title": "DisbursementIn"
+      },
+      "DisbursementOut": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "disbursementId": {
+            "type": "string",
+            "title": "Disbursementid"
+          },
+          "status": {
+            "type": "string",
+            "const": "COMPLETED",
+            "title": "Status",
+            "default": "COMPLETED"
+          },
+          "loanId": {
+            "type": "string",
+            "title": "Loanid"
+          },
+          "loanAccount": {
+            "type": "string",
+            "title": "Loanaccount"
+          },
+          "settlementAccount": {
+            "type": "string",
+            "title": "Settlementaccount"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "valueDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Valuedate"
+          },
+          "postings": {
+            "items": {
+              "$ref": "#/components/schemas/DisbursementPosting"
+            },
+            "type": "array",
+            "title": "Postings"
+          },
+          "settlementBalanceRub": {
+            "type": "integer",
+            "title": "Settlementbalancerub"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "disbursementId",
+          "loanId",
+          "loanAccount",
+          "settlementAccount",
+          "amountRub",
+          "valueDate",
+          "postings",
+          "settlementBalanceRub"
+        ],
+        "title": "DisbursementOut"
+      },
+      "DisbursementPosting": {
+        "properties": {
+          "debit": {
+            "type": "string",
+            "title": "Debit"
+          },
+          "credit": {
+            "type": "string",
+            "title": "Credit"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "Purpose"
+          }
+        },
+        "type": "object",
+        "required": [
+          "debit",
+          "credit",
+          "amountRub",
+          "purpose"
+        ],
+        "title": "DisbursementPosting"
+      },
+      "LoanBody": {
+        "properties": {
+          "applicationRef": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Applicationref"
+          },
+          "contractNumber": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Contractnumber"
+          },
+          "contractUid": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Contractuid"
+          },
+          "productCode": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Productcode"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "LOAN",
+              "CREDIT_LINE",
+              "OVERDRAFT"
+            ],
+            "title": "Kind",
+            "default": "LOAN"
+          },
+          "amountRub": {
+            "type": "integer",
+            "maximum": 1000000000000.0,
+            "minimum": 0.0,
+            "title": "Amountrub"
+          },
+          "limitRub": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "maximum": 600.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Ratepercent"
+          },
+          "repaymentType": {
+            "type": "string",
+            "enum": [
+              "ANNUITY",
+              "BULLET",
+              "REVOLVING"
+            ],
+            "title": "Repaymenttype",
+            "default": "ANNUITY"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "default": "ACTIVE"
+          },
+          "disbursedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Disbursedat"
+          },
+          "settlementAccount": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{20}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Settlementaccount",
+            "description": "По умолчанию — первый расчётный счёт клиента из тела"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationRef",
+          "contractNumber",
+          "contractUid",
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "ratePercent",
+          "disbursedAt"
+        ],
+        "title": "LoanBody"
+      },
+      "LoanDetailOut": {
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "title": "Loanid"
+          },
+          "applicationRef": {
+            "type": "string",
+            "title": "Applicationref"
+          },
+          "contractNumber": {
+            "type": "string",
+            "title": "Contractnumber"
+          },
+          "contractUid": {
+            "type": "string",
+            "title": "Contractuid"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "LOAN",
+              "CREDIT_LINE",
+              "OVERDRAFT"
+            ],
+            "title": "Kind"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "limitRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitrub"
+          },
+          "outstandingRub": {
+            "type": "integer",
+            "title": "Outstandingrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "title": "Ratepercent"
+          },
+          "repaymentType": {
+            "type": "string",
+            "enum": [
+              "ANNUITY",
+              "BULLET",
+              "REVOLVING"
+            ],
+            "title": "Repaymenttype"
+          },
+          "loanAccount": {
+            "type": "string",
+            "title": "Loanaccount"
+          },
+          "settlementAccount": {
+            "type": "string",
+            "title": "Settlementaccount"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "title": "Status"
+          },
+          "disbursedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Disbursedat"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loanId",
+          "applicationRef",
+          "contractNumber",
+          "contractUid",
+          "productCode",
+          "kind",
+          "amountRub",
+          "limitRub",
+          "outstandingRub",
+          "termMonths",
+          "ratePercent",
+          "repaymentType",
+          "loanAccount",
+          "settlementAccount",
+          "status",
+          "disbursedAt",
+          "meta"
+        ],
+        "title": "LoanDetailOut"
+      },
+      "LoanOut": {
+        "properties": {
+          "loanId": {
+            "type": "string",
+            "title": "Loanid"
+          },
+          "applicationRef": {
+            "type": "string",
+            "title": "Applicationref"
+          },
+          "contractNumber": {
+            "type": "string",
+            "title": "Contractnumber"
+          },
+          "contractUid": {
+            "type": "string",
+            "title": "Contractuid"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "LOAN",
+              "CREDIT_LINE",
+              "OVERDRAFT"
+            ],
+            "title": "Kind"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "limitRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limitrub"
+          },
+          "outstandingRub": {
+            "type": "integer",
+            "title": "Outstandingrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "title": "Ratepercent"
+          },
+          "repaymentType": {
+            "type": "string",
+            "enum": [
+              "ANNUITY",
+              "BULLET",
+              "REVOLVING"
+            ],
+            "title": "Repaymenttype"
+          },
+          "loanAccount": {
+            "type": "string",
+            "title": "Loanaccount"
+          },
+          "settlementAccount": {
+            "type": "string",
+            "title": "Settlementaccount"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "title": "Status"
+          },
+          "disbursedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Disbursedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loanId",
+          "applicationRef",
+          "contractNumber",
+          "contractUid",
+          "productCode",
+          "kind",
+          "amountRub",
+          "limitRub",
+          "outstandingRub",
+          "termMonths",
+          "ratePercent",
+          "repaymentType",
+          "loanAccount",
+          "settlementAccount",
+          "status",
+          "disbursedAt"
+        ],
+        "title": "LoanOut"
+      },
+      "LoansOut": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "loans": {
+            "items": {
+              "$ref": "#/components/schemas/LoanOut"
+            },
+            "type": "array",
+            "title": "Loans"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "inn",
+          "loans"
+        ],
+        "title": "LoansOut"
+      },
+      "Meta": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "EGRUL",
+              "EGRIP",
+              "FEDRESURS",
+              "FNS_TRANSPARENT_BUSINESS",
+              "FNS_GIR_BO",
+              "FNS_RMSP",
+              "FNS_BLOCKS",
+              "EIS",
+              "CREDIT_BUREAU",
+              "BANK_CORE",
+              "COMPLIANCE"
+            ],
+            "title": "Source"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true,
+            "title": "Simulated",
+            "default": true
+          },
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrievedat"
+          },
+          "dataActualAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataactualat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "requestId",
+          "retrievedAt"
+        ],
+        "title": "Meta"
+      },
+      "OpenAccountCustomer": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "LEGAL_ENTITY",
+              "INDIVIDUAL_ENTREPRENEUR"
+            ],
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "name"
+        ],
+        "title": "OpenAccountCustomer"
+      },
+      "OpenAccountIn": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "SETTLEMENT",
+            "title": "Type",
+            "default": "SETTLEMENT"
+          },
+          "currency": {
+            "type": "string",
+            "const": "RUB",
+            "title": "Currency",
+            "default": "RUB"
+          },
+          "customer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAccountCustomer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Обязателен, если клиента ещё нет: он создаётся вместе со счётом"
+          }
+        },
+        "type": "object",
+        "title": "OpenAccountIn"
+      },
+      "OpenAccountOut": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SETTLEMENT",
+              "LOAN"
+            ],
+            "title": "Type"
+          },
+          "currency": {
+            "type": "string",
+            "const": "RUB",
+            "title": "Currency",
+            "default": "RUB"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "BLOCKED",
+              "CLOSED"
+            ],
+            "title": "Status"
+          },
+          "openedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Openedat"
+          },
+          "balanceRub": {
+            "type": "integer",
+            "title": "Balancerub"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "customerId": {
+            "type": "string",
+            "title": "Customerid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "type",
+          "status",
+          "openedAt",
+          "balanceRub",
+          "meta",
+          "customerId"
+        ],
+        "title": "OpenAccountOut"
+      },
+      "Origin": {
+        "type": "string",
+        "enum": [
+          "SCENARIO",
+          "RUNTIME"
+        ],
+        "title": "Origin"
+      },
+      "PostingOut": {
+        "properties": {
+          "debit": {
+            "type": "string",
+            "title": "Debit"
+          },
+          "credit": {
+            "type": "string",
+            "title": "Credit"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "Purpose"
+          },
+          "valueDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Valuedate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "debit",
+          "credit",
+          "amountRub",
+          "purpose",
+          "valueDate"
+        ],
+        "title": "PostingOut"
+      },
+      "Problem": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "integer",
+            "title": "Status"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "requestId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requestid"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "title": "Problem"
+      },
+      "ProductIn": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Code"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "ProductIn"
+      },
+      "ScenarioCount": {
+        "properties": {
+          "scenarioCode": {
+            "type": "string",
+            "title": "Scenariocode"
+          },
+          "subjects": {
+            "type": "integer",
+            "title": "Subjects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenarioCode",
+          "subjects"
+        ],
+        "title": "ScenarioCount"
+      },
+      "ScreeningIn": {
+        "properties": {
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/ScreeningSubject"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Subjects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subjects"
+        ],
+        "title": "ScreeningIn"
+      },
+      "ScreeningOut": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "screeningId": {
+            "type": "string",
+            "title": "Screeningid"
+          },
+          "overall": {
+            "type": "string",
+            "enum": [
+              "CLEAR",
+              "HIT"
+            ],
+            "title": "Overall"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ScreeningResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "screeningId",
+          "overall",
+          "results"
+        ],
+        "title": "ScreeningOut"
+      },
+      "ScreeningResult": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "COMPANY",
+              "DIRECTOR",
+              "FOUNDER",
+              "IE"
+            ],
+            "title": "Role"
+          },
+          "amlList": {
+            "$ref": "#/components/schemas/AmlListOut"
+          },
+          "zsk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ZskOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "internalStopList": {
+            "$ref": "#/components/schemas/StopListOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "role",
+          "amlList",
+          "zsk",
+          "internalStopList"
+        ],
+        "title": "ScreeningResult"
+      },
+      "ScreeningSubject": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "COMPANY",
+              "DIRECTOR",
+              "FOUNDER",
+              "IE"
+            ],
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "role"
+        ],
+        "title": "ScreeningSubject"
+      },
+      "StopListBody": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "title": "StopListBody"
+      },
+      "StopListOut": {
+        "properties": {
+          "listed": {
+            "type": "boolean",
+            "title": "Listed"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "listed",
+          "reason"
+        ],
+        "title": "StopListOut"
+      },
+      "SubjectPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "SubjectPage"
+      },
+      "SubjectSummary": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "scenarioCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenariocode"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "SCENARIO",
+              "RUNTIME"
+            ],
+            "title": "Origin"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "scenarioCode",
+          "origin"
+        ],
+        "title": "SubjectSummary"
+      },
+      "SubjectView": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "scenarioCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenariocode"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "SCENARIO",
+              "RUNTIME"
+            ],
+            "title": "Origin"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          },
+          "runtime": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Runtime",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "scenarioCode",
+          "origin",
+          "data"
+        ],
+        "title": "SubjectView",
+        "description": "Всё, что система знает о субъекте: данные сценария и записи, появившиеся в работе."
+      },
+      "TurnoverBody": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+            "title": "Month"
+          },
+          "incomingRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Incomingrub"
+          },
+          "incomingNetRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Incomingnetrub"
+          },
+          "outgoingRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Outgoingrub"
+          },
+          "counterpartiesIn": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Counterpartiesin"
+          },
+          "counterpartiesOut": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Counterpartiesout"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "incomingRub",
+          "incomingNetRub",
+          "outgoingRub",
+          "counterpartiesIn",
+          "counterpartiesOut"
+        ],
+        "title": "TurnoverBody"
+      },
+      "TurnoverMonthOut": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "title": "Month"
+          },
+          "incomingRub": {
+            "type": "integer",
+            "title": "Incomingrub"
+          },
+          "incomingNetRub": {
+            "type": "integer",
+            "title": "Incomingnetrub"
+          },
+          "outgoingRub": {
+            "type": "integer",
+            "title": "Outgoingrub"
+          },
+          "counterpartiesIn": {
+            "type": "integer",
+            "title": "Counterpartiesin"
+          },
+          "counterpartiesOut": {
+            "type": "integer",
+            "title": "Counterpartiesout"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "incomingRub",
+          "incomingNetRub",
+          "outgoingRub",
+          "counterpartiesIn",
+          "counterpartiesOut"
+        ],
+        "title": "TurnoverMonthOut"
+      },
+      "TurnoverOut": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "accountNumbers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Accountnumbers"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/TurnoverMonthOut"
+            },
+            "type": "array",
+            "title": "Months"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "inn",
+          "accountNumbers",
+          "months"
+        ],
+        "title": "TurnoverOut"
+      },
+      "ZskBody": {
+        "properties": {
+          "riskLevel": {
+            "type": "string",
+            "enum": [
+              "GREEN",
+              "YELLOW",
+              "RED"
+            ],
+            "title": "Risklevel"
+          },
+          "assessedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Assessedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "riskLevel",
+          "assessedAt"
+        ],
+        "title": "ZskBody"
+      },
+      "ZskOut": {
+        "properties": {
+          "riskLevel": {
+            "type": "string",
+            "enum": [
+              "GREEN",
+              "YELLOW",
+              "RED"
+            ],
+            "title": "Risklevel"
+          },
+          "assessedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Assessedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "riskLevel",
+          "assessedAt"
+        ],
+        "title": "ZskOut"
+      }
+    },
+    "securitySchemes": {
+      "AdminKeyAuth": {
+        "type": "apiKey",
+        "description": "Админ-ключ для /admin/* и сервиса сценариев",
+        "in": "header",
+        "name": "X-Admin-Key"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "description": "Ключ потребителя бизнес-API (у каждой системы свой)",
+        "in": "header",
+        "name": "X-Api-Key"
+      }
+    }
+  }
+}

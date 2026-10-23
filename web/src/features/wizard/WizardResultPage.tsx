@@ -281,9 +281,6 @@ function ResultView({
         <Button variant="default" onClick={changeAnswers}>
           {t.changeAnswers}
         </Button>
-        <Button component={Link} to="/products" variant="subtle">
-          {t.openCatalog}
-        </Button>
       </Group>
     </Stack>
   );
