@@ -2,6 +2,12 @@
 
 from app.modules.applications import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.applications import wizard_draft as _wizard_draft  # noqa: F401  (регистрирует слушателя)
+from app.modules.applications.client_tasks import (
+    InfoRequestReceipt,
+    TaskSpec,
+    register_recheck,
+    request_information,
+)
 from app.modules.applications.consent_proof import SIGN_METHOD, proof_for
 from app.modules.applications.consents import (
     BANK_NAME,
@@ -31,17 +37,20 @@ from app.modules.applications.service import (
     transition,
 )
 from app.modules.applications.states import Actor, Status
+from app.modules.applications.tasks_router import router as tasks_router
 
 __all__ = [
     "BANK_NAME",
     "SIGN_METHOD",
     "Actor",
     "Application",
+    "InfoRequestReceipt",
     "ApplicationEvent",
     "ApplicationVersion",
     "SignedBkiConsent",
     "SignedConsent",
     "Status",
+    "TaskSpec",
     "add_version",
     "bki_consents",
     "consents_router",
@@ -54,8 +63,11 @@ __all__ = [
     "pep_rules_version",
     "proof_for",
     "record_event",
+    "register_recheck",
     "register_submit_check",
+    "request_information",
     "router",
     "signer_identity",
+    "tasks_router",
     "transition",
 ]

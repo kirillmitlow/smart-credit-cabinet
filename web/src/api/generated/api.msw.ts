@@ -68,6 +68,8 @@ import type {
   RolesResponse,
   SignChallenge,
   SignChallengeOut,
+  TaskList,
+  TaskOut,
   WizardResult
 } from './model';
 
@@ -131,6 +133,12 @@ export const getListApplicationConsentsResponseMock = (overrideResponse: Partial
 export const getRequestConsentSigningResponseMock = (overrideResponse: Partial<Extract<SignChallenge, object>> = {}): SignChallenge => ({requestId: faker.string.alpha({length: {min: 10, max: 20}}), expiresInSeconds: faker.number.int(), demoCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.helpers.arrayElement(['BKI','TURNOVER','PERSONAL_DATA'] as const), subjectInn: faker.helpers.fromRegExp("^\\d{10}$|^\\d{12}$")})), ...overrideResponse})
 
 export const getSignConsentBundleResponseMock = (overrideResponse: Partial<Extract<ConsentsSignedOut, object>> = {}): ConsentsSignedOut => ({applicationId: faker.string.uuid(), signed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({kind: faker.string.alpha({length: {min: 10, max: 20}}), subjectInn: faker.string.alpha({length: {min: 10, max: 20}}), subjectName: faker.string.alpha({length: {min: 10, max: 20}}), subjectType: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['PENDING','SIGNED','EXPIRED'] as const), canSign: faker.datatype.boolean(), textVersion: faker.string.alpha({length: {min: 10, max: 20}}), textHash: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), signedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), validUntil: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,]), consentId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,])})), allSigned: faker.datatype.boolean(), ...overrideResponse})
+
+export const getListApplicationTasksResponseMock = (overrideResponse: Partial<Extract<TaskList, object>> = {}): TaskList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), round: faker.number.int(), kind: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), whyText: faker.string.alpha({length: {min: 10, max: 20}}), details: {}, assigneeUserId: faker.helpers.arrayElement([faker.string.uuid(),null,]), assigneePersonInn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), draftAnswer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), answer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canAnswer: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', answeredAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), currentRound: faker.number.int(), roundsLimit: faker.number.int(), canSubmit: faker.datatype.boolean(), ...overrideResponse})
+
+export const getAnswerTaskResponseMock = (overrideResponse: Partial<Extract<TaskOut, object>> = {}): TaskOut => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), round: faker.number.int(), kind: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), whyText: faker.string.alpha({length: {min: 10, max: 20}}), details: {}, assigneeUserId: faker.helpers.arrayElement([faker.string.uuid(),null,]), assigneePersonInn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), draftAnswer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), answer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canAnswer: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', answeredAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), ...overrideResponse})
+
+export const getSubmitTaskRoundResponseMock = (overrideResponse: Partial<Extract<TaskList, object>> = {}): TaskList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), applicationId: faker.string.uuid(), round: faker.number.int(), kind: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), whyText: faker.string.alpha({length: {min: 10, max: 20}}), details: {}, assigneeUserId: faker.helpers.arrayElement([faker.string.uuid(),null,]), assigneePersonInn: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), status: faker.string.alpha({length: {min: 10, max: 20}}), expiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), draftAnswer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), answer: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canAnswer: faker.datatype.boolean(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', answeredAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), currentRound: faker.number.int(), roundsLimit: faker.number.int(), canSubmit: faker.datatype.boolean(), ...overrideResponse})
 
 export const getListProductsResponseMock = (overrideResponse: Partial<Extract<ProductList, object>> = {}): ProductList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), purpose: faker.string.alpha({length: {min: 10, max: 20}}), repayment: faker.string.alpha({length: {min: 10, max: 20}}), amountMinRub: faker.number.int(), amountMaxRub: faker.number.int(), termMinMonths: faker.number.int(), termMaxMonths: faker.number.int(), collateralRequiredAboveRub: faker.helpers.arrayElement([faker.number.int(),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), autoDecisionMode: faker.helpers.arrayElement(Object.values(AutoDecisionMode)), autoDecisionUpToRub: faker.helpers.arrayElement([faker.number.int(),null,]), requiresBankCustomer: faker.datatype.boolean(), requiresContract: faker.datatype.boolean(), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), available: faker.datatype.boolean(), unavailableReasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiresSecurity: faker.datatype.boolean()})), ...overrideResponse})
 
@@ -519,6 +527,42 @@ export const getSignConsentBundleMockHandler = (overrideResponse?: ConsentsSigne
   }, options)
 }
 
+export const getListApplicationTasksMockHandler = (overrideResponse?: TaskList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TaskList> | TaskList), options?: RequestHandlerOptions) => {
+  return http.get('*/applications/:applicationId/tasks', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListApplicationTasksResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAnswerTaskMockHandler = (overrideResponse?: TaskOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TaskOut> | TaskOut), options?: RequestHandlerOptions) => {
+  return http.post('*/tasks/:taskId/answer', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAnswerTaskResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getSubmitTaskRoundMockHandler = (overrideResponse?: TaskList | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<TaskList> | TaskList), options?: RequestHandlerOptions) => {
+  return http.post('*/applications/:applicationId/tasks/submit', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getSubmitTaskRoundResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getListProductsMockHandler = (overrideResponse?: ProductList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProductList> | ProductList), options?: RequestHandlerOptions) => {
   return http.get('*/products', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
 
@@ -822,6 +866,9 @@ export const getApiMock = () => [
   getListApplicationConsentsMockHandler(),
   getRequestConsentSigningMockHandler(),
   getSignConsentBundleMockHandler(),
+  getListApplicationTasksMockHandler(),
+  getAnswerTaskMockHandler(),
+  getSubmitTaskRoundMockHandler(),
   getListProductsMockHandler(),
   getGetProductMockHandler(),
   getCalculatePaymentMockHandler(),

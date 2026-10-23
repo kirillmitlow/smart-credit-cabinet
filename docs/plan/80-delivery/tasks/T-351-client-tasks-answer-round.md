@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | PARTIAL |
 | Владелец | не назначен (Claude Code или Codex, по очереди смен) |
 | Ветка | `feat/client-tasks-answer-round` |
 | Оценка | ~5 ч |

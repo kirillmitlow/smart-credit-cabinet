@@ -9,6 +9,7 @@
 export * from './acceptedOut';
 export * from './acceptIn';
 export * from './activeCompany';
+export * from './answerBody';
 export * from './applicationFields';
 export * from './applicationOut';
 export * from './applicationOutDraft';
@@ -148,6 +149,9 @@ export * from './signStartIn';
 export * from './status';
 export * from './step';
 export * from './system';
+export * from './taskList';
+export * from './taskOut';
+export * from './taskOutDetails';
 export * from './validationError';
 export * from './validationErrorCtx';
 export * from './variantOut';

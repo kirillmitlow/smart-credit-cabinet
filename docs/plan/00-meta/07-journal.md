@@ -861,3 +861,25 @@ with db.transaction() as session:
 ```
 
 **Что учесть B.** `Level`, `Outcome`, `Product` — из `app.modules.decisioning.types`. Пороги исключения, длины комментария и коды причин теперь в `policy/v1.yaml` (`underwriter.*`); снимки ENGINE старой схемы политики не читаются (стенд сбрасывается). Методические допущения: R-004, пункты 23–30. Тесты: `tests/unit/decisioning/test_underwriting.py`, `tests/property/test_underwriting.py`, `tests/integration/test_underwriter_decision.py` (Станкопром, L2 одобряет). Интерфейс закрывает блокеры T-362 и T-364 со стороны A; `request_recheck` и `request_information` ещё не сделаны.
+
+---
+
+
+### A, 23.10: `applications.request_information` и ответ клиента готовы (T-350/T-351, для B / T-363)
+
+PR `feat/client-tasks` (ветка построена от `feat/pipeline-recheck`, миграция `0012_client_tasks` после `0011_underwriter_decision` (перенумерована при слиянии)). Публичный импорт: `from app.modules import applications`.
+
+```python
+applications.request_information(session, application_id, *, expected_version, actor, actor_id=None,
+                                 items: Sequence[applications.TaskSpec], reason_code=None) -> applications.InfoRequestReceipt
+applications.TaskSpec(kind, title, why_text, details={}, assignee_user_id=None, assignee_person_inn=None)
+```
+
+- `kind`: `DOCUMENT | EXPLANATION | COLLATERAL | CONFIRM_REVENUE | SIGNATURE | GUARANTOR`. `details` — «что именно» и «где взять» (произвольные ключи, показываются клиенту). Исполнитель: пусто = любой участник (кроме поручителя); `assignee_user_id` = участник (руководитель тоже может ответить); `assignee_person_inn` = поручитель, отвечает только он сам.
+- `actor=Actor.UNDERWRITER`: `MANUAL_REVIEW → NEEDS_INFO` делается внутри. `Actor.SYSTEM` (конвейер): заявка уже в `NEEDS_INFO`, перехода нет. Права L1/L2 проверяет вызывающий (B).
+- Ошибки: 404; 409 `VERSION_CONFLICT`, `INVALID_TRANSITION`, `ROUND_OPEN` (прошлый раунд не закрыт), `ROUNDS_LIMIT_REACHED` (уже 3 раунда: решение за андеррайтером, D-091); 422 `VALIDATION_ERROR` (пустые задачи, чужой исполнитель); 403 для актёра не из банка.
+- Гарантии: задачи, события `TASK_CREATED` и переход пишутся в транзакции вызывающего; ошибка или откат убирают всё. Срок `expires_at` ставится только при включённом таймере (`expiry_enabled`).
+- Клиентские ручки: `GET /applications/{id}/tasks`, `POST /tasks/{id}/answer` (`{text, submitRound}`: черновик ответа), `POST /applications/{id}/tasks/submit` («Отправить ответ банку»). Отправка: все задачи раунда `ANSWERED`, версия заявки `INFO_PROVIDED`, `NEEDS_INFO → CHECKING` и `pipeline.request_recheck` одной транзакцией; двойное нажатие даёт 409 `ROUND_ALREADY_SENT`, неполный раунд 409 `ROUND_INCOMPLETE`. Отзыв заявки закрывает открытые задачи (`CANCELLED`).
+- Конвейер при `REVENUE_UNKNOWN` сам создаёт задачу «выписка» (раунд 1, `Actor.SYSTEM`).
+- Пример: `applications.request_information(s, app_id, expected_version=card.version, actor=Actor.UNDERWRITER, actor_id=uid, items=[TaskSpec("DOCUMENT", "Договор с поставщиком", "Нужен для оценки залога")])`.
+- Не сделано: вложения (файловое хранилище, T-332/T-333/T-336), шаблоны задач в политике (30-13), замена файла, отказ поручителя, таймер истечения (`EXPIRED`), «Новое с прошлого раза», задачи по `DATA_INCOMPLETE`. Если конвейер получит `REVENUE_UNKNOWN` после трёх раундов, задача не создаётся (лог), заявка остаётся в `NEEDS_INFO`: нужен вариант с обязательным ручным разбором (вопрос к плану).

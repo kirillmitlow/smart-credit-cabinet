@@ -332,6 +332,16 @@ def add_version(
 
 
 def withdraw(session: Session, principal: auth.Principal, application: Application) -> Application:
-    return transition(
+    from app.modules.applications import client_tasks  # отложенно: client_tasks импортирует service
+
+    transition(
         session, application, Status.WITHDRAWN, actor=Actor.CLIENT, actor_id=principal.user_id
     )
+    client_tasks.cancel_open_tasks(
+        session,
+        application,
+        reason="APPLICATION_WITHDRAWN",
+        actor=Actor.CLIENT,
+        actor_id=principal.user_id,
+    )
+    return application

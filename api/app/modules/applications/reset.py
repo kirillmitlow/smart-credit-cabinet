@@ -18,6 +18,7 @@ TABLES = (
     "application_versions",
     "application_events",
     "consents",
+    "tasks",
 )
 
 
@@ -36,7 +37,7 @@ def prepare_persona(session: Session, scope: Persona) -> None:
 
 
 def reset_persona(session: Session, scope: Persona) -> None:
-    for table in ("consents", "application_events", "application_versions"):
+    for table in ("tasks", "consents", "application_events", "application_versions"):
         delete_owned(session, "applications", table, "application_id", scope.ids("applications"))
     delete_owned(session, "applications", "applications", "id", scope.ids("applications"))
 

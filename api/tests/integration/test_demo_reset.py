@@ -21,6 +21,7 @@ from sqlalchemy import select, text
 from app.main import create_app
 from app.modules import audit, auth, pipeline
 from app.modules.applications import Application, ApplicationEvent, ApplicationVersion
+from app.modules.applications.models import Task
 from app.modules.companies.models import Company, CompanyMember
 from app.modules.disbursement.models import Disbursement
 from app.modules.integrations import scenarios
@@ -138,6 +139,12 @@ def fill(policy_id: Any, *, inn: str = INN, suffix: str = "") -> None:
                 application_id=application.id, kind="NOTE", actor_type="SYSTEM", payload={}
             )
         )
+        s.add(
+            Task(
+                application_id=application.id, round=1, kind="DOCUMENT", title="Выписка",
+                why_text="Нужна", details={}, status="CANCELLED", created_by_actor="SYSTEM",
+            )
+        )  # fmt: skip
         version = ApplicationVersion(
             application_id=application.id, number=1, reason="SUBMIT", data={}, data_hash="h"
         )
