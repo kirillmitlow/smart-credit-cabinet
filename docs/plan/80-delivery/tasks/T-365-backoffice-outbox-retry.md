@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Статус | TODO |
-| Владелец | не назначен (Claude Code или Codex, по очереди смен) |
+| Статус | IN_PROGRESS |
+| Владелец | Агент B (Codex), D-111 |
 | Ветка | `feat/backoffice-outbox-retry` |
 | Оценка | ~2 ч |
 | Приоритет | S (Should) |
