@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import String, and_, func, or_, select, text, tuple_
+from sqlalchemy import String, and_, case, func, or_, select, text, tuple_
 from sqlalchemy.orm import Session
 
 from app.shared.db import Base
@@ -198,7 +198,38 @@ def card_rows(session: Session, application_id: UUID) -> dict[str, Any] | None:
         "decisions": [dict(x) for x in decision_rows],
         "snapshots": [dict(x) for x in source_rows],
         "history": [dict(x) for x in history],
+        "client_tasks": client_task_rows(session, application_id),
     }
+
+
+def client_task_rows(session: Session, application_id: UUID) -> list[dict[str, Any]]:
+    """Банк не получает черновики ответов даже в промежуточной проекции (20-03)."""
+    tasks = Base.metadata.tables["tasks"]
+    rows = session.execute(
+        select(
+            tasks.c.id,
+            tasks.c.round,
+            tasks.c.kind,
+            tasks.c.title,
+            tasks.c.why_text,
+            tasks.c.details,
+            tasks.c.status,
+            tasks.c.expires_at,
+            tasks.c.assignee_user_id,
+            tasks.c.assignee_person_inn,
+            case((tasks.c.status == "ANSWERED", tasks.c.answer), else_=None).label("answer"),
+            case((tasks.c.status == "ANSWERED", tasks.c.answered_by), else_=None).label(
+                "answered_by"
+            ),
+            case((tasks.c.status == "ANSWERED", tasks.c.answered_at), else_=None).label(
+                "answered_at"
+            ),
+            tasks.c.created_at,
+        )
+        .where(tasks.c.application_id == application_id)
+        .order_by(tasks.c.round, tasks.c.created_at, tasks.c.id)
+    ).mappings()
+    return [dict(row) for row in rows]
 
 
 def outbox_reference(session: Session, message_id: int) -> dict[str, Any] | None:

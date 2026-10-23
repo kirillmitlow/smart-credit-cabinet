@@ -7,6 +7,7 @@ from uuid import UUID
 
 from pydantic import Field, PlainSerializer
 
+from app.modules.backoffice.info_schemas import BankClientTask
 from app.modules.backoffice.schemas import BankCompany, BankReason, BankRecommendation, Camel
 
 Number = Annotated[
@@ -185,3 +186,7 @@ class BankApplicationCard(Camel):
     source_snapshots: list[BankSourceSnapshot]
     history: list[BankHistoryEvent]
     documents: list[dict[str, Any]] | None = Field(description="null — сервис T-332 не подключён")
+    client_tasks: list[BankClientTask] = Field(default_factory=list)
+    latest_answered_round: int | None = Field(
+        default=None, description="Последний отправленный клиентом раунд, не черновик"
+    )
