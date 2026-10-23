@@ -23,6 +23,7 @@ import { usePageHeading } from '@/lib/usePageHeading';
 import { fill, productName, productNames } from '@/texts';
 import { bankWorkspace as t } from '@/texts/bank';
 import { BankRecommendationView } from './BankRecommendationView';
+import { BankOutboxPanel } from './BankOutboxPanel';
 
 const statusOptions = Object.entries(t.statusOptions).map(([value, label]) => ({ value, label }));
 const products = [
@@ -219,6 +220,7 @@ export function BankQueuePage() {
           {t.more}
         </Button>
       ) : null}
+      <BankOutboxPanel />
     </Stack>
   );
 }
