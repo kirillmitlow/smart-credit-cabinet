@@ -74,6 +74,7 @@ class Settings(BaseSettings):
     needs_info_ttl_days: int = Field(default=5, ge=1)
     offer_ttl_days: int = Field(default=10, ge=1)
     upload_max_mb: int = Field(default=10, ge=1, le=50)
+    upload_max_files_per_application: int = Field(default=10, ge=1, le=10)
     session_idle_minutes: int = Field(default=30, ge=1)
     session_absolute_hours: int = Field(default=8, ge=1)
     rate_limit_enabled: bool = True

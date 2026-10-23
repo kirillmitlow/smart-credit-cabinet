@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import io
 import json
 import re
 from collections.abc import Iterator
@@ -12,6 +14,7 @@ from uuid import UUID
 
 import httpx
 import pytest
+from pypdf import PdfReader
 from sqlalchemy import text
 
 from app.modules import disbursement, pipeline
@@ -171,7 +174,11 @@ async def test_sokolova_decision_accept_sign_and_disbursement_handoff(
         assert re.fullmatch(r"[0-9a-f-]{36}-[0-9a-f]", contract["contractUid"])
         document = await boss.get(f"/contracts/{contract_id}/document")
         assert document.headers["x-content-sha256"] == contract["contentHash"]
-        assert json.loads(document.text)["amountRub"] == 500_000
+        assert document.headers["content-type"] == "application/pdf"
+        assert hashlib.sha256(document.content).hexdigest() == contract["contentHash"]
+        pdf_text = "".join(p.extract_text() for p in PdfReader(io.BytesIO(document.content)).pages)
+        assert "500000₽" in re.sub(r"\s", "", pdf_text)
+        assert "Соколова" in pdf_text
 
         # --- бухгалтер не подписывает, но передаёт руководителю (D-014)
         assert (await start_signing(clerk, contract_id)).status_code == 403

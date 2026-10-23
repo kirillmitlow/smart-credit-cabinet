@@ -10,7 +10,7 @@ import structlog
 from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
-from app import health
+from app import documents_http, health
 from app.modules import (
     applications,
     auth,
@@ -104,6 +104,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(applications.router)
     app.include_router(applications.consents_router)
     app.include_router(applications.tasks_router)
+    app.include_router(documents_http.router)
     app.include_router(catalog.router)
     app.include_router(loans.router)
     app.include_router(pipeline.router)

@@ -56,7 +56,7 @@ def stand(
                 stand["application_id"],
                 expected_version=5,
                 actor=Actor.UNDERWRITER,
-                items=[TaskSpec("DOCUMENT", "Договор поставщика", "Нужен для оценки")],
+                items=[TaskSpec("EXPLANATION", "Пояснение по поставке", "Нужно для оценки")],
             )
         yield stand
 

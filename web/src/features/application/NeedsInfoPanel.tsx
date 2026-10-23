@@ -37,6 +37,7 @@ import {
   type RoundView,
 } from './tasksModel';
 import { putTask, putTaskList, useApplicationTasks } from './useTasks';
+import { DocumentFiles } from './DocumentFiles';
 
 const MAX_ANSWER = 4000;
 
@@ -98,7 +99,11 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
           <Stack gap={4}>
             <Textarea
               label={fill(t.answerLabel, { title: task.title })}
-              description={task.kind === 'DOCUMENT' ? t.fileLater : undefined}
+              description={
+                task.kind === 'DOCUMENT'
+                  ? 'Прикрепите файл ниже и добавьте пояснение к нему'
+                  : undefined
+              }
               placeholder={t.answerPlaceholder}
               value={text}
               maxLength={MAX_ANSWER}
@@ -109,6 +114,14 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
                 onEdit(task.id, event.currentTarget.value);
               }}
             />
+            {task.kind === 'DOCUMENT' ? (
+              <DocumentFiles
+                applicationId={task.applicationId}
+                taskId={task.id}
+                disabled={locked}
+                onUploaded={(file) => onEdit(task.id, `Загружен документ: ${file.filename}`)}
+              />
+            ) : null}
             {saved ? (
               <Text size="sm" c="green.9">
                 {t.draftSaved}

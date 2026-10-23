@@ -17,7 +17,7 @@ from uuid import UUID
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
-from app.modules import auth, companies
+from app.modules import auth, companies, documents
 from app.modules.applications.models import TASK_KINDS, Application, Task
 from app.modules.applications.service import get_for, record_event, transition
 from app.modules.applications.states import Actor, Status
@@ -313,6 +313,13 @@ def submit_round(
         )
     )
     missing = [t for t in open_tasks if t.answer is None]
+    document_tasks = [t for t in open_tasks if t.kind == "DOCUMENT"]
+    if document_tasks:
+        files = documents.list_metadata(
+            session, documents.Access(principal.user_id, (application.company_id,)), application.id
+        )
+        attached_tasks = {f.task_id for f in files if f.cancelled_at is None}
+        missing.extend(t for t in document_tasks if t.id not in attached_tasks and t not in missing)
     if missing:
         raise AppError(
             409,

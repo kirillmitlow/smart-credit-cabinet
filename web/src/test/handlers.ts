@@ -12,6 +12,7 @@ import { makePublicConfig, problemResponse } from './factories';
  * Обработчики ручек из схемы берутся из сгенерированных файлов `*.msw.ts` и обновляются вместе с клиентом.
  */
 export const defaultHandlers = [
+  http.get('*/api/documents', () => Response.json([])),
   http.get('*/api/demo/personas', () => Response.json([])),
   http.get('*/api/demo/chaos', () => Response.json([])),
   getHealthLiveMockHandler(),

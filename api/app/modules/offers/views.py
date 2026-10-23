@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.modules import auth
 from app.modules.applications import Application
-from app.modules.offers import signing, terms
+from app.modules.offers import contracts, signing, terms
 from app.modules.offers.models import Contract, Offer, OfferVariant
 from app.modules.offers.schemas import (
     ContractOut,
@@ -88,7 +88,7 @@ def contract_out(
         contract_uid=contract.contract_uid,
         number=contract.number,
         status=contract.status,
-        content_hash=contract.content_hash,
+        content_hash=contracts.signing_hash(session, contract),
         template_version=contract.template_version,
         created_at=contract.created_at,
         signed_at=contract.signed_at,

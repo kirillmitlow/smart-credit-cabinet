@@ -4,15 +4,17 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from app.modules import auth
+from app.modules import auth, documents
 from app.modules.backoffice import queries
 from app.modules.backoffice.card_schemas import (
     BankApplicant,
     BankApplicationCard,
+    BankCollateral,
     BankComparison,
     BankDecision,
     BankDecisionReason,
     BankDecisionSummary,
+    BankDocument,
     BankFactor,
     BankHistoryEvent,
     BankMetric,
@@ -292,7 +294,20 @@ def card(
                 for r in data["snapshots"]
             ],
             history=[BankHistoryEvent.model_validate(r) for r in data["history"]],
-            documents=None,
+            documents=[
+                BankDocument.model_validate(documents.as_dict(row))
+                for row in documents.list_metadata(
+                    session, documents.Access(principal.user_id, bank=True), application_id
+                )
+            ],
+            collateral=BankCollateral(
+                description=str(app["draft"]["collateral"].get("description", "")),
+                value_rub=app["draft"]["collateral"]["valueRub"],
+            )
+            if isinstance(app["draft"].get("collateral"), dict)
+            and type(app["draft"]["collateral"].get("valueRub")) is int
+            and app["draft"]["collateral"]["valueRub"] > 0
+            else None,
             client_tasks=[
                 BankClientTask.model_validate(
                     {

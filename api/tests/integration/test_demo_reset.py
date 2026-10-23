@@ -19,7 +19,7 @@ import redis
 from sqlalchemy import select, text
 
 from app.main import create_app
-from app.modules import audit, auth, pipeline
+from app.modules import audit, auth, documents, pipeline
 from app.modules.applications import Application, ApplicationEvent, ApplicationVersion
 from app.modules.applications.models import Task
 from app.modules.companies.models import Company, CompanyMember
@@ -224,6 +224,14 @@ def fill(policy_id: Any, *, inn: str = INN, suffix: str = "") -> None:
         )  # fmt: skip
         audit.record(s, "LOGIN", actor_id=user.id, company_id=company.id)
         application_id = application.id
+        documents.store(
+            s,
+            documents.Access(user.id, (company.id,)),
+            documents.UploadContext(company.id, application.id),
+            content=b"1CClientBankExchange\n",
+            filename="seed.txt",
+            kind="BANK_STATEMENT_1C",
+        )
     grant_company_bki(str(application_id))
 
 
