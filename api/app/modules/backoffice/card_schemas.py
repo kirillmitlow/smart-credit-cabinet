@@ -72,6 +72,14 @@ class BankDecisionReason(BankReason):
     params: dict[str, Any]
 
 
+class BankComparison(Camel):
+    code: str
+    a_rub: int
+    b_rub: int
+    deviation_percent: Number
+    year: int | None
+
+
 class BankDecisionSummary(Camel):
     id: UUID
     source: str
@@ -95,6 +103,7 @@ class BankDecision(BankDecisionSummary):
     grade: str | None
     pd_percent: Number | None
     factors: list[BankFactor]
+    comparisons: list[BankComparison]
     revenue_monthly_rub: int | None
     free_cash_flow_rub: int | None
     existing_payments_rub: int | None

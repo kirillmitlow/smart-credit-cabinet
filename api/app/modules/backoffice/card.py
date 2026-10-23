@@ -9,6 +9,7 @@ from app.modules.backoffice import queries
 from app.modules.backoffice.card_schemas import (
     BankApplicant,
     BankApplicationCard,
+    BankComparison,
     BankDecision,
     BankDecisionReason,
     BankDecisionSummary,
@@ -185,6 +186,17 @@ def decision_view(row: dict[str, Any]) -> BankDecision:
         grade=row["grade"],
         pd_percent=_percent(row["pd"]),
         factors=factors,
+        comparisons=[
+            BankComparison(
+                code=key,
+                a_rub=value["a_rub"],
+                b_rub=value["b_rub"],
+                deviation_percent=Decimal(str(value["deviation"])) * 100,
+                year=value.get("year"),
+            )
+            for key in ("mismatch_turnover_fin", "mismatch_declared", "mismatch_statement")
+            if (value := (row["features"] or {}).get(key)) is not None
+        ],
         revenue_monthly_rub=row["revenue_monthly_rub"],
         free_cash_flow_rub=row["free_cash_flow_rub"],
         existing_payments_rub=numbers.get("existing_payments_rub"),

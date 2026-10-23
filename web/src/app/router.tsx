@@ -49,7 +49,7 @@ export const appRoutes: RouteObject[] = [
                   {
                     path: 'applications/:id',
                     lazy: async () => ({
-                      Component: (await import('@/features/backoffice/BankPages'))
+                      Component: (await import('@/features/bank/BankApplicationPage'))
                         .BankApplicationPage,
                     }),
                   },

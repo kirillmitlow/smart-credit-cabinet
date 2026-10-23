@@ -79,6 +79,18 @@ async def test_line_card_has_saved_limit_comparison(bank: httpx.AsyncClient) -> 
     assert metric["passed"] is True
 
 
+async def test_data_mismatch_has_two_values_and_percentage_from_saved_features(
+    bank: httpx.AsyncClient,
+) -> None:
+    app_id = seed("Сверка", cases.t_mismatch())
+    body = (await bank.get(f"/backoffice/applications/{app_id}")).json()["decision"]
+    comparison = next(x for x in body["comparisons"] if x["code"] == "mismatch_turnover_fin")
+    assert comparison["aRub"] == 60_000_000
+    assert comparison["bRub"] == 36_000_000
+    assert comparison["year"] == 2025
+    assert comparison["deviationPercent"] == pytest.approx(66.6667, abs=0.001)
+
+
 @pytest.mark.parametrize(("factory", "expected"), [(cases.stankoprom, False), (cases.zarya, True)])
 async def test_bank_customer_falls_back_to_collected_evidence_when_profile_is_unknown(
     bank: httpx.AsyncClient,
