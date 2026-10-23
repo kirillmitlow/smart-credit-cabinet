@@ -39,7 +39,7 @@ describe('демо-панель', () => {
     scenarios();
     const { container } = renderApp('/demo');
     await screen.findByText(persona.title);
-    expect(screen.getByText(persona.inn, { exact: false })).toBeInTheDocument();
+    expect(screen.getAllByText(persona.inn, { exact: false })[0]).toBeVisible();
     expect(screen.getAllByText(t.nextSteps.APPROVED, { exact: false })[0]).toBeInTheDocument();
     expect(screen.getByRole('button', { name: t.technical })).toHaveAttribute(
       'aria-expanded',
@@ -50,6 +50,54 @@ describe('демо-панель', () => {
     expect(screen.getByRole('link', { name: 'api' })).toHaveAttribute('href', '/docs');
     expect(screen.queryByRole('link', { name: 'bad' })).not.toBeInTheDocument();
     expect(await blockingA11yViolations(container)).toEqual([]);
+  });
+  it('пустой каталог можно обновить после применения сценариев', async () => {
+    mockSessions({ config: { demoMode: true } });
+    let applied = false;
+    server.use(http.get('*/api/demo/personas', () => Response.json(applied ? [persona] : [])));
+    renderApp('/demo');
+    await screen.findByText(t.empty);
+    expect(screen.queryByText(persona.title)).not.toBeInTheDocument();
+    applied = true;
+    await userEvent.click(screen.getByRole('button', { name: t.refresh }));
+    await screen.findByText(persona.title);
+    expect(screen.queryByText(t.empty)).not.toBeInTheDocument();
+  });
+  it('ошибка каталога не скрывает сбои источников и допускает повтор загрузки', async () => {
+    mockSessions({ config: { demoMode: true } });
+    let available = false;
+    server.use(
+      http.get('*/api/demo/personas', () =>
+        available
+          ? Response.json([persona])
+          : problemResponse({
+              status: 502,
+              code: 'DEMO_SCENARIOS_UNAVAILABLE',
+            }),
+      ),
+      http.get('*/api/demo/chaos', () =>
+        Response.json([
+          { system: 'registry', available: false, mode: 'UNKNOWN' },
+          { system: 'tax', available: true, mode: 'OK' },
+        ]),
+      ),
+    );
+    renderApp('/demo');
+    const error = await screen.findByText('Сервис сценариев недоступен. Повторите загрузку');
+    expect(await screen.findAllByText(t.unavailable)).not.toHaveLength(0);
+    expect(
+      screen.getByRole('combobox', { name: `${t.chooseMode}: ${t.systems.tax}` }),
+    ).toBeEnabled();
+    available = true;
+    await userEvent.click(
+      within(error.closest('[role="alert"]') as HTMLElement).getByRole('button', {
+        name: 'Повторить',
+      }),
+    );
+    await screen.findByText(persona.title);
+    expect(
+      screen.queryByText('Сервис сценариев недоступен. Повторите загрузку'),
+    ).not.toBeInTheDocument();
   });
   it('сброс персоны только после подтверждения, с кодом, ждёт реального ответа', async () => {
     mockSessions({ config: { demoMode: true, demoCodeRequired: true } });
@@ -85,6 +133,59 @@ describe('демо-панель', () => {
     finish?.();
     expect(await screen.findByText(t.resetDone, { exact: false })).toBeInTheDocument();
     expect(calls).toEqual(['stand-code']);
+  });
+  it('сбой повторного сброса очищает прошлый успех; повтор ждёт ответа сервера', async () => {
+    mockSessions({ config: { demoMode: true } });
+    scenarios();
+    let calls = 0;
+    let finish: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    server.use(
+      http.post('*/api/demo/personas/sokolova/reset', async () => {
+        calls += 1;
+        if (calls === 2)
+          return problemResponse({
+            status: 502,
+            code: 'DEMO_RESET_FAILED',
+            detail: 'private upstream detail',
+            errors: [{ field: 'reset', code: 'MOCKS' }],
+          });
+        if (calls === 3) await gate;
+        return Response.json({
+          status: 'DONE',
+          companyId: 'co-1',
+          generation: calls,
+          steps: [{ step: 'MOCKS', title: 'моки', status: 'DONE' }],
+          durationMs: 30,
+          finishedAt: '2026-10-23T00:00:00Z',
+        });
+      }),
+    );
+    renderApp('/demo');
+    await screen.findByText(persona.title);
+    await userEvent.click(screen.getAllByRole('button', { name: t.resetOne })[0]!);
+    await userEvent.click(
+      within(await screen.findByRole('dialog')).getByRole('button', { name: t.confirm }),
+    );
+    await screen.findByText(t.resetDone, { exact: false });
+    await userEvent.click(screen.getAllByRole('button', { name: t.resetOne })[0]!);
+    const modal = await screen.findByRole('dialog');
+    await userEvent.click(within(modal).getByRole('button', { name: t.confirm }));
+    await within(modal).findByText(`${t.failedAt}: ${t.resetSteps.MOCKS}`);
+    expect(screen.queryByText(t.resetDone, { exact: false })).not.toBeInTheDocument();
+    expect(screen.queryByText('private upstream detail')).not.toBeInTheDocument();
+    const retry = within(modal).getByRole('button', { name: t.retryReset });
+    await userEvent.click(retry);
+    await within(modal).findByText(t.resetting);
+    expect(retry).toBeDisabled();
+    expect(within(modal).getByRole('button', { name: t.cancel })).toBeDisabled();
+    expect(calls).toBe(3);
+    finish?.();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await screen.findByText(t.resetDone, { exact: false });
+    expect(calls).toBe(3);
   });
   it('облачная ошибка кода не выдаёт успешный сброс', async () => {
     mockSessions({ config: { demoMode: true, demoCodeRequired: true } });
@@ -172,6 +273,31 @@ describe('демо-панель', () => {
     expect(queryClient.getQueryData(['session', 'bank'])).toBeDefined();
     expect(queryClient.getQueryData(['session', 'client'])).toEqual(clientSession);
     open.mockRestore();
+  });
+  it('вне демо подсказка отсутствует и каталог персон не запрашивается', async () => {
+    mockSessions({ client: makeMe(), config: { demoMode: false } });
+    const catalog = vi.fn(() => Response.json([persona]));
+    server.use(
+      http.get('*/api/demo/personas', catalog),
+      http.get('*/api/applications/app-1', () =>
+        Response.json(
+          makeApplication({
+            companyId: 'co-1',
+            productCode: 'EXPRESS',
+            amountRub: 800000,
+            termMonths: 18,
+            status: 'MANUAL_REVIEW',
+            allowedActions: [],
+          }),
+        ),
+      ),
+      http.get('*/api/applications/app-1/decision', () => Response.json(makeDecision())),
+    );
+    renderApp('/applications/app-1');
+    await screen.findByRole('heading', { level: 1, name: /Заявка/ });
+    expect(screen.queryByTestId('demo-expected-hint')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t.open })).not.toBeInTheDocument();
+    expect(catalog).not.toHaveBeenCalled();
   });
   it('подсказка ожидаемого исхода закрыта по умолчанию', async () => {
     mockSessions({ client: makeMe(), config: { demoMode: true } });
