@@ -1,0 +1,3227 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "mock-tax — Открытые сервисы ФНС и госзакупки (ЕИС)",
+    "description": "Имитация внешней системы для прототипа «Умный кредитный кабинет». Все данные синтетические (`meta.simulated: true`). Контракт: docs/specs/mocks.md.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Процесс жив",
+        "operationId": "healthLive",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthlive"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Готов принимать запросы",
+        "operationId": "healthReady",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "База недоступна или миграции не применены"
+          }
+        }
+      }
+    },
+    "/admin/chaos": {
+      "get": {
+        "tags": [
+          "admin: chaos"
+        ],
+        "summary": "Текущий режим сбоев",
+        "operationId": "getChaos",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaosConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admin: chaos"
+        ],
+        "summary": "Включить режим сбоев",
+        "operationId": "putChaos",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChaosConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaosConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tax-profile/{inn}": {
+      "get": {
+        "tags": [
+          "mock-tax"
+        ],
+        "summary": "Налоговый профиль («Прозрачный бизнес»)",
+        "description": "Режимы налогообложения, долги, доходы, численность, флаги риска. `404 ENTITY_NOT_FOUND`, если такого налогоплательщика-бизнеса нет.",
+        "operationId": "getTaxProfile",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/financials/{inn}": {
+      "get": {
+        "tags": [
+          "mock-tax"
+        ],
+        "summary": "Бухгалтерская отчётность (ГИР БО)",
+        "description": "Десять строк баланса и отчёта о финрезультатах плюс сводка. `year` не указан — последний доступный год. `404 STATEMENTS_NOT_FOUND`: у ИП (любой верный 12-значный ИНН), у самозанятого, у компании моложе года и за неподанный год.",
+        "operationId": "getFinancials",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 2100,
+                  "minimum": 1990
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Отчётный год",
+              "title": "Year"
+            },
+            "description": "Отчётный год"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinancialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/api/v1/sme-status/{inn}": {
+      "get": {
+        "tags": [
+          "mock-tax"
+        ],
+        "summary": "Единый реестр МСП",
+        "description": "Нет в реестре — это `200` с `inRegistry: false`, а не `404`.",
+        "operationId": "getSmeStatus",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmeStatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/self-employed/status": {
+      "post": {
+        "tags": [
+          "mock-tax"
+        ],
+        "summary": "Статус плательщика НПД (самозанятый)",
+        "description": "Повторяет контракт открытого API ФНС один в один, поэтому `meta` в теле нет: признак симуляции — заголовок `X-Mock-Simulated: true`.",
+        "operationId": "getSelfEmployedStatus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NpdRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NpdResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/account-blocks/{inn}": {
+      "get": {
+        "tags": [
+          "mock-tax"
+        ],
+        "summary": "Решения о приостановлении операций по счетам (сервис «БИ»)",
+        "description": "Без `bik` — действующие решения по всем банкам; с `bik` — только по этому банку. Нет блокировок — `200` с пустым списком. Снятые решения не показываются.",
+        "operationId": "getAccountBlocks",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          },
+          {
+            "name": "bik",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{9}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "БИК банка, например 040000999",
+              "title": "Bik"
+            },
+            "description": "БИК банка, например 040000999"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountBlocksResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/api/v1/contracts": {
+      "get": {
+        "tags": [
+          "mock-tax"
+        ],
+        "summary": "Госконтракты поставщика (ЕИС)",
+        "description": "Контрактов нет — `200` с пустым списком. От новых к старым. `422`: нет `supplierInn` или неизвестный `status`.",
+        "operationId": "getContracts",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "AdminKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "supplierInn",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН поставщика, 10 или 12 цифр",
+              "title": "Supplierinn"
+            },
+            "description": "ИНН поставщика, 10 или 12 цифр"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "IN_PROGRESS",
+                    "EXECUTED",
+                    "TERMINATED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по статусу",
+              "title": "Status"
+            },
+            "description": "Фильтр по статусу"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/subjects/{inn}": {
+      "put": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Создать или полностью заменить данные субъекта",
+        "operationId": "adminPutSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          },
+          {
+            "name": "X-Scenario-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Код сценария: записи получат origin = SCENARIO и этот scenario_code",
+              "title": "X-Scenario-Code"
+            },
+            "description": "Код сценария: записи получат origin = SCENARIO и этот scenario_code"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaxBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectView"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Частичная правка (JSON Merge Patch, массивы заменяются целиком)",
+        "operationId": "adminPatchSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/merge-patch+json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Patch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectView"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Всё о субъекте, включая RUNTIME-записи",
+        "operationId": "adminGetSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectView"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Удалить субъекта со всеми записями",
+        "operationId": "adminDeleteSubject",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)",
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 цифр (ЮЛ) или 12 (ИП, физлицо)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/subjects": {
+      "get": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Список субъектов",
+        "operationId": "adminListSubjects",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scenario",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scenario"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Origin"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/scenarios": {
+      "get": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Какие сценарии есть и сколько у каждого субъектов",
+        "operationId": "adminListScenarios",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioCount"
+                  },
+                  "type": "array",
+                  "title": "Response Adminlistscenarios"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/scenarios/{code}": {
+      "delete": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Удалить всё, что создано сценарием, вместе с RUNTIME-записями",
+        "operationId": "adminDeleteScenario",
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deleted"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/admin/wipe": {
+      "post": {
+        "tags": [
+          "admin: данные"
+        ],
+        "summary": "Очистить данные мока (справочники остаются)",
+        "operationId": "adminWipe",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminKeyAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountBlockRecord": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "taxAuthorityCode": {
+            "type": "string",
+            "pattern": "^\\d{4}$",
+            "title": "Taxauthoritycode"
+          },
+          "bik": {
+            "type": "string",
+            "pattern": "^\\d{9}$",
+            "title": "Bik"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "NON_SUBMISSION_OF_DECLARATION",
+              "TAX_DEBT_COLLECTION",
+              "OTHER"
+            ],
+            "title": "Reason"
+          },
+          "liftedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Liftedat"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "number",
+          "date",
+          "taxAuthorityCode",
+          "bik",
+          "reason"
+        ],
+        "title": "AccountBlockRecord"
+      },
+      "AccountBlocksResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "checkedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checkedat"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/BlockDecision"
+            },
+            "type": "array",
+            "title": "Decisions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "inn",
+          "checkedAt",
+          "decisions"
+        ],
+        "title": "AccountBlocksResponse"
+      },
+      "AvgHeadcount": {
+        "properties": {
+          "value": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Value"
+          },
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1990.0,
+            "title": "Year"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "value",
+          "year"
+        ],
+        "title": "AvgHeadcount"
+      },
+      "BlockDecision": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "taxAuthorityCode": {
+            "type": "string",
+            "title": "Taxauthoritycode"
+          },
+          "bik": {
+            "type": "string",
+            "title": "Bik"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "NON_SUBMISSION_OF_DECLARATION",
+              "TAX_DEBT_COLLECTION",
+              "OTHER"
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "date",
+          "taxAuthorityCode",
+          "bik",
+          "reason"
+        ],
+        "title": "BlockDecision"
+      },
+      "ChaosConfig": {
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ChaosMode",
+            "default": "OK"
+          },
+          "errorRate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Errorrate",
+            "description": "Доля сломанных запросов",
+            "default": 1.0
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 120000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms",
+            "description": "Для SLOW"
+          },
+          "paths": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paths",
+            "description": "null — все /api/v1/*"
+          },
+          "rateLimitPerMinute": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratelimitperminute"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until",
+            "description": "Когда само вернётся в OK"
+          }
+        },
+        "type": "object",
+        "title": "ChaosConfig"
+      },
+      "ChaosMode": {
+        "type": "string",
+        "enum": [
+          "OK",
+          "SLOW",
+          "ERROR",
+          "DOWN",
+          "TIMEOUT",
+          "LOST_RESPONSE"
+        ],
+        "title": "ChaosMode"
+      },
+      "Contract": {
+        "properties": {
+          "registryNumber": {
+            "type": "string",
+            "pattern": "^\\d{19}$",
+            "title": "Registrynumber"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Subject"
+          },
+          "priceRub": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Pricerub"
+          },
+          "concludedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Concludedat"
+          },
+          "executionDeadline": {
+            "type": "string",
+            "format": "date",
+            "title": "Executiondeadline"
+          },
+          "paymentDeadline": {
+            "type": "string",
+            "format": "date",
+            "title": "Paymentdeadline"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "EXECUTED",
+              "TERMINATED"
+            ],
+            "title": "Status"
+          },
+          "paidRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Paidrub"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registryNumber",
+          "customer",
+          "subject",
+          "priceRub",
+          "concludedAt",
+          "executionDeadline",
+          "paymentDeadline",
+          "status",
+          "paidRub"
+        ],
+        "title": "Contract",
+        "description": "Контракт ЕИС; `supplierInn` берётся из пути админ-запроса."
+      },
+      "ContractsResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "supplierInn": {
+            "type": "string",
+            "title": "Supplierinn"
+          },
+          "contracts": {
+            "items": {
+              "$ref": "#/components/schemas/Contract"
+            },
+            "type": "array",
+            "title": "Contracts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "supplierInn",
+          "contracts"
+        ],
+        "title": "ContractsResponse"
+      },
+      "Customer": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "inn"
+        ],
+        "title": "Customer"
+      },
+      "Debts": {
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "format": "date",
+            "title": "Asof"
+          },
+          "taxDebtRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Taxdebtrub"
+          },
+          "penaltiesRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Penaltiesrub"
+          },
+          "finesRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Finesrub"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "asOf",
+          "taxDebtRub",
+          "penaltiesRub",
+          "finesRub"
+        ],
+        "title": "Debts"
+      },
+      "Deleted": {
+        "properties": {
+          "deleted": {
+            "type": "integer",
+            "title": "Deleted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deleted"
+        ],
+        "title": "Deleted"
+      },
+      "FinancialRecord": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1990.0,
+            "title": "Year"
+          },
+          "formType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "SIMPLIFIED"
+            ],
+            "title": "Formtype"
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Submittedat"
+          },
+          "lines": {
+            "$ref": "#/components/schemas/StatementLines"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "year",
+          "formType",
+          "submittedAt",
+          "lines"
+        ],
+        "title": "FinancialRecord"
+      },
+      "FinancialSummary": {
+        "properties": {
+          "revenueRub": {
+            "type": "integer",
+            "title": "Revenuerub"
+          },
+          "salesProfitRub": {
+            "type": "integer",
+            "title": "Salesprofitrub"
+          },
+          "interestPayableRub": {
+            "type": "integer",
+            "title": "Interestpayablerub"
+          },
+          "netProfitRub": {
+            "type": "integer",
+            "title": "Netprofitrub"
+          },
+          "totalAssetsRub": {
+            "type": "integer",
+            "title": "Totalassetsrub"
+          },
+          "equityRub": {
+            "type": "integer",
+            "title": "Equityrub"
+          },
+          "longTermLiabilitiesRub": {
+            "type": "integer",
+            "title": "Longtermliabilitiesrub"
+          },
+          "shortTermLiabilitiesRub": {
+            "type": "integer",
+            "title": "Shorttermliabilitiesrub"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revenueRub",
+          "salesProfitRub",
+          "interestPayableRub",
+          "netProfitRub",
+          "totalAssetsRub",
+          "equityRub",
+          "longTermLiabilitiesRub",
+          "shortTermLiabilitiesRub"
+        ],
+        "title": "FinancialSummary"
+      },
+      "FinancialsResponse": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "availableYears": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Availableyears"
+          },
+          "formType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "SIMPLIFIED"
+            ],
+            "title": "Formtype"
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Submittedat"
+          },
+          "lines": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LinePair"
+            },
+            "type": "object",
+            "title": "Lines"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/FinancialSummary"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "year",
+          "availableYears",
+          "formType",
+          "submittedAt",
+          "lines",
+          "summary",
+          "meta"
+        ],
+        "title": "FinancialsResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IncomeExpenses": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1990.0,
+            "title": "Year"
+          },
+          "incomeRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Incomerub"
+          },
+          "expensesRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expensesrub"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "year",
+          "incomeRub",
+          "expensesRub"
+        ],
+        "title": "IncomeExpenses"
+      },
+      "LinePair": {
+        "properties": {
+          "current": {
+            "type": "integer",
+            "title": "Current"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current",
+          "previous"
+        ],
+        "title": "LinePair"
+      },
+      "Meta": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "EGRUL",
+              "EGRIP",
+              "FEDRESURS",
+              "FNS_TRANSPARENT_BUSINESS",
+              "FNS_GIR_BO",
+              "FNS_RMSP",
+              "FNS_BLOCKS",
+              "EIS",
+              "CREDIT_BUREAU",
+              "BANK_CORE",
+              "COMPLIANCE"
+            ],
+            "title": "Source"
+          },
+          "simulated": {
+            "type": "boolean",
+            "const": true,
+            "title": "Simulated",
+            "default": true
+          },
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrievedat"
+          },
+          "dataActualAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataactualat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "requestId",
+          "retrievedAt"
+        ],
+        "title": "Meta"
+      },
+      "NpdRecord": {
+        "properties": {
+          "registeredAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Registeredat"
+          },
+          "deregisteredAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deregisteredat"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "registeredAt"
+        ],
+        "title": "NpdRecord"
+      },
+      "NpdRequest": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "requestDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Requestdate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "requestDate"
+        ],
+        "title": "NpdRequest"
+      },
+      "NpdResponse": {
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "NpdResponse",
+        "description": "Как у настоящего API ФНС: без `meta`."
+      },
+      "Origin": {
+        "type": "string",
+        "enum": [
+          "SCENARIO",
+          "RUNTIME"
+        ],
+        "title": "Origin"
+      },
+      "Problem": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "integer",
+            "title": "Status"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "requestId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requestid"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "title": "Problem"
+      },
+      "RiskFlags": {
+        "properties": {
+          "massAddress": {
+            "type": "boolean",
+            "title": "Massaddress",
+            "default": false
+          },
+          "massDirector": {
+            "type": "boolean",
+            "title": "Massdirector",
+            "default": false
+          },
+          "massFounder": {
+            "type": "boolean",
+            "title": "Massfounder",
+            "default": false
+          },
+          "disqualifiedManagement": {
+            "type": "boolean",
+            "title": "Disqualifiedmanagement",
+            "default": false
+          },
+          "noReportsOverYear": {
+            "type": "boolean",
+            "title": "Noreportsoveryear",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RiskFlags"
+      },
+      "ScenarioCount": {
+        "properties": {
+          "scenarioCode": {
+            "type": "string",
+            "title": "Scenariocode"
+          },
+          "subjects": {
+            "type": "integer",
+            "title": "Subjects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenarioCode",
+          "subjects"
+        ],
+        "title": "ScenarioCount"
+      },
+      "SmeRecord": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "MICRO",
+              "SMALL",
+              "MEDIUM"
+            ],
+            "title": "Category"
+          },
+          "includedAt": {
+            "type": "string",
+            "format": "date",
+            "title": "Includedat"
+          },
+          "isNewlyCreated": {
+            "type": "boolean",
+            "title": "Isnewlycreated"
+          },
+          "isSocialEnterprise": {
+            "type": "boolean",
+            "title": "Issocialenterprise"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "category",
+          "includedAt",
+          "isNewlyCreated",
+          "isSocialEnterprise"
+        ],
+        "title": "SmeRecord"
+      },
+      "SmeStatusResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "inRegistry": {
+            "type": "boolean",
+            "title": "Inregistry"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "MICRO",
+                  "SMALL",
+                  "MEDIUM"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "includedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Includedat"
+          },
+          "isNewlyCreated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isnewlycreated"
+          },
+          "isSocialEnterprise": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issocialenterprise"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "inn",
+          "inRegistry",
+          "category",
+          "includedAt",
+          "isNewlyCreated",
+          "isSocialEnterprise"
+        ],
+        "title": "SmeStatusResponse"
+      },
+      "StatementLines": {
+        "properties": {
+          "1100": {
+            "type": "integer",
+            "title": "1100"
+          },
+          "1200": {
+            "type": "integer",
+            "title": "1200"
+          },
+          "1300": {
+            "type": "integer",
+            "title": "1300"
+          },
+          "1400": {
+            "type": "integer",
+            "title": "1400"
+          },
+          "1500": {
+            "type": "integer",
+            "title": "1500"
+          },
+          "1600": {
+            "type": "integer",
+            "title": "1600"
+          },
+          "2110": {
+            "type": "integer",
+            "title": "2110"
+          },
+          "2200": {
+            "type": "integer",
+            "title": "2200"
+          },
+          "2330": {
+            "type": "integer",
+            "title": "2330"
+          },
+          "2400": {
+            "type": "integer",
+            "title": "2400"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "1100",
+          "1200",
+          "1300",
+          "1400",
+          "1500",
+          "1600",
+          "2110",
+          "2200",
+          "2330",
+          "2400"
+        ],
+        "title": "StatementLines",
+        "description": "Все десять строк, рубли. Баланс одной записи должен сходиться."
+      },
+      "SubjectPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "SubjectPage"
+      },
+      "SubjectSummary": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "scenarioCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenariocode"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "SCENARIO",
+              "RUNTIME"
+            ],
+            "title": "Origin"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "scenarioCode",
+          "origin"
+        ],
+        "title": "SubjectSummary"
+      },
+      "SubjectView": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "scenarioCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenariocode"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "SCENARIO",
+              "RUNTIME"
+            ],
+            "title": "Origin"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          },
+          "runtime": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Runtime",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "scenarioCode",
+          "origin",
+          "data"
+        ],
+        "title": "SubjectView",
+        "description": "Всё, что система знает о субъекте: данные сценария и записи, появившиеся в работе."
+      },
+      "TaxBody": {
+        "properties": {
+          "taxProfile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaxProfileCard"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "financials": {
+            "items": {
+              "$ref": "#/components/schemas/FinancialRecord"
+            },
+            "type": "array",
+            "title": "Financials",
+            "default": []
+          },
+          "sme": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SmeRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "npd": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NpdRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accountBlocks": {
+            "items": {
+              "$ref": "#/components/schemas/AccountBlockRecord"
+            },
+            "type": "array",
+            "title": "Accountblocks",
+            "default": []
+          },
+          "contracts": {
+            "items": {
+              "$ref": "#/components/schemas/Contract"
+            },
+            "type": "array",
+            "title": "Contracts",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "TaxBody",
+        "description": "Тело `PUT /admin/subjects/{inn}` (8.3)."
+      },
+      "TaxOffenses": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1990.0,
+            "title": "Year"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Count"
+          },
+          "finesRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Finesrub"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "year",
+          "count",
+          "finesRub"
+        ],
+        "title": "TaxOffenses"
+      },
+      "TaxProfileCard": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "taxRegimes": {
+            "items": {
+              "$ref": "#/components/schemas/TaxRegime"
+            },
+            "type": "array",
+            "title": "Taxregimes",
+            "default": []
+          },
+          "avgHeadcount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AvgHeadcount"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "taxesPaid": {
+            "items": {
+              "$ref": "#/components/schemas/TaxesPaidItem"
+            },
+            "type": "array",
+            "title": "Taxespaid",
+            "default": []
+          },
+          "debts": {
+            "$ref": "#/components/schemas/Debts"
+          },
+          "incomeExpenses": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IncomeExpenses"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "taxOffenses": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaxOffenses"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "riskFlags": {
+            "$ref": "#/components/schemas/RiskFlags",
+            "default": {
+              "massAddress": false,
+              "massDirector": false,
+              "massFounder": false,
+              "disqualifiedManagement": false,
+              "noReportsOverYear": false
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "inn",
+          "debts"
+        ],
+        "title": "TaxProfileCard",
+        "description": "Формат ответа `GET /tax-profile/{inn}` без `meta`."
+      },
+      "TaxProfileResponse": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "taxRegimes": {
+            "items": {
+              "$ref": "#/components/schemas/TaxRegime"
+            },
+            "type": "array",
+            "title": "Taxregimes",
+            "default": []
+          },
+          "avgHeadcount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AvgHeadcount"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "taxesPaid": {
+            "items": {
+              "$ref": "#/components/schemas/TaxesPaidItem"
+            },
+            "type": "array",
+            "title": "Taxespaid",
+            "default": []
+          },
+          "debts": {
+            "$ref": "#/components/schemas/Debts"
+          },
+          "incomeExpenses": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IncomeExpenses"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "taxOffenses": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaxOffenses"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "riskFlags": {
+            "$ref": "#/components/schemas/RiskFlags",
+            "default": {
+              "massAddress": false,
+              "massDirector": false,
+              "massFounder": false,
+              "disqualifiedManagement": false,
+              "noReportsOverYear": false
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "inn",
+          "debts",
+          "meta"
+        ],
+        "title": "TaxProfileResponse"
+      },
+      "TaxRegime": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "OSNO",
+              "USN_INCOME",
+              "USN_INCOME_MINUS_EXPENSES",
+              "PSN",
+              "ESHN",
+              "AUSN",
+              "NPD"
+            ],
+            "title": "Code"
+          },
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1990.0,
+            "title": "Year"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "year"
+        ],
+        "title": "TaxRegime"
+      },
+      "TaxesPaidItem": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1990.0,
+            "title": "Year"
+          },
+          "totalRub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Totalrub"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "year",
+          "totalRub"
+        ],
+        "title": "TaxesPaidItem"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "AdminKeyAuth": {
+        "type": "apiKey",
+        "description": "Админ-ключ для /admin/* и сервиса сценариев",
+        "in": "header",
+        "name": "X-Admin-Key"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "description": "Ключ потребителя бизнес-API (у каждой системы свой)",
+        "in": "header",
+        "name": "X-Api-Key"
+      }
+    }
+  }
+}
