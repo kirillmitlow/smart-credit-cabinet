@@ -348,7 +348,7 @@ class _Search:
             title=cfg.title,
         )
         contract_number = (
-            self.app.contract_registry_number if g.repayment == "BULLET" and self.contract else None
+            self.contract.registry_number if g.repayment == "BULLET" and self.contract else None
         )
         return Variant(
             kind=kind,

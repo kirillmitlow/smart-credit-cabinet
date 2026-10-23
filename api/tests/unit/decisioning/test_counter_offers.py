@@ -103,8 +103,23 @@ def test_credit_line_request_gets_the_product_cap_and_the_contract_card() -> Non
     assert kinds["OTHER_PRODUCT"].product == Product.CONTRACT
 
 
-def test_without_a_registered_contract_the_third_card_is_another_product() -> None:
+def without_contracts(inp: DecisionInput) -> DecisionInput:
+    """Компания без своих контрактов в ЕИС."""
+    snapshot = replace(inp.snapshot, contracts=replace(inp.snapshot.contracts, contracts=()))
+    return replace(inp, snapshot=snapshot)
+
+
+def test_own_contract_without_number_still_gives_the_contract_card() -> None:
+    """Q-148: заявка на оборотный без номера, но свой контракт в ЕИС есть — карточка `CONTRACT`."""
     result = decide(snab(contract_registry_number=None))
+    other = next(v for v in result.variants if v.kind == "OTHER_PRODUCT")
+    assert (other.product, other.amount_rub, other.term_months) == (Product.CONTRACT, 8_000_000, 4)
+    number = SNAB.snapshot.contracts.contracts[0].registry_number
+    assert any(number in r for r in other.requirements)
+
+
+def test_without_a_registered_contract_the_third_card_is_another_product() -> None:
+    result = decide(without_contracts(snab(contract_registry_number=None)))
     other = next(v for v in result.variants if v.kind == "OTHER_PRODUCT")
     assert other.product == Product.CREDIT_LINE  # контракта нет, продукт под контракт не предлагаем
     assert other.requirements == ()
@@ -209,7 +224,9 @@ def test_added_collateral_card_is_marked_priced_and_explained(
     searched: Callable[[DecisionInput], CounterOfferSearch],
 ) -> None:
     """Штраф за залог 0: ближайшая связка «тот же продукт, но с залогом» (в политике штраф 1,5)."""
-    inp = cp.with_application(SNAB, contract_registry_number=None, amount_rub=12_000_000)
+    inp = without_contracts(
+        cp.with_application(SNAB, contract_registry_number=None, amount_rub=12_000_000)
+    )
     policy: Policy = inp.policy
     free = policy.counter_offers.weights.model_copy(update={"security": D(0)})
     counter = policy.counter_offers.model_copy(update={"weights": free})

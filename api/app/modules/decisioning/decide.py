@@ -42,11 +42,31 @@ from app.modules.decisioning.types import (
 
 
 def _contract(inp: DecisionInput) -> ContractInfo | None:
+    """Контракт заявки по номеру; без номера — лучший свой для встречной карточки `CONTRACT`.
+
+    Без номера (заявка не `CONTRACT`) берём исполняемый контракт с наибольшей неоплаченной частью
+    и сроком оплаты не раньше «сегодня»: он даёт самую большую сумму под контракт (Q-148, R-004).
+    """
     number = inp.application.contract_registry_number
-    for c in inp.snapshot.contracts.contracts:
-        if c.registry_number == number:
-            return c
-    return None
+    contracts = inp.snapshot.contracts.contracts
+    if number:
+        return next((c for c in contracts if c.registry_number == number), None)
+    today = inp.context.app_today
+    open_ = [
+        c
+        for c in contracts
+        if c.status == "IN_PROGRESS" and c.payment_deadline >= today and c.price_rub > c.paid_rub
+    ]
+    if not open_:
+        return None
+    return max(
+        open_,
+        key=lambda c: (
+            c.price_rub - c.paid_rub,
+            -c.payment_deadline.toordinal(),
+            c.registry_number,
+        ),
+    )
 
 
 def product_context(inp: DecisionInput, feats: Features, grade: Grade | None) -> ProductContext:

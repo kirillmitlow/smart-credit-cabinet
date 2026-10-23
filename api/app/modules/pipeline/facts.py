@@ -537,9 +537,7 @@ def build_snapshot(
             records.get(BLOCKS, applicant_inn),
         ),
         financials=financials_data(records.get(FINANCIALS, applicant_inn)),
-        contracts=contracts_data(
-            records.get(CONTRACTS, applicant_inn) if product == Product.CONTRACT else None
-        ),
+        contracts=contracts_data(records.get(CONTRACTS, applicant_inn)),
         compliance=compliance_data(records.get(COMPLIANCE, applicant_inn), subjects),
         customer=customer_data(
             records.get(CUSTOMER, applicant_inn),
