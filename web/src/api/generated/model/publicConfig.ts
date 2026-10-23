@@ -5,10 +5,13 @@
  * Прототип цифрового кредитного конвейера для малого бизнеса. Данные синтетические.
  * OpenAPI spec version: 0.1.0
  */
+import type { PublicConfigDocsLinks } from './publicConfigDocsLinks';
 
 export interface PublicConfig {
   demoMode: boolean;
   productName: string;
   version: string;
   nluAvailable: boolean;
+  demoCodeRequired?: boolean;
+  docsLinks?: PublicConfigDocsLinks;
 }

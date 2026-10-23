@@ -38,6 +38,8 @@ import type {
   BankOutboxRetried,
   BankOutboxRetryRequest,
   BankQueuePage,
+  ChaosInput,
+  ChaosView,
   ClientDecisionOut,
   CodeCheck,
   CodeIssued,
@@ -67,6 +69,7 @@ import type {
   PassedOut,
   PaymentOut,
   PaymentRequest,
+  Persona,
   PersonaResetOut,
   ProductList,
   ProductOut,
@@ -79,6 +82,7 @@ import type {
   SignConfirmIn,
   SignRequest,
   SignStartIn,
+  System,
   WizardRequest,
   WizardResult
 } from './model';
@@ -5284,6 +5288,11 @@ export type demoResetResponse409 = {
   status: 409
 }
 
+export type demoResetResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
 export type demoResetResponse502 = {
   data: void
   status: 502
@@ -5292,7 +5301,7 @@ export type demoResetResponse502 = {
 export type demoResetResponseSuccess = (demoResetResponse200) & {
   headers: Headers;
 };
-export type demoResetResponseError = (demoResetResponse403 | demoResetResponse409 | demoResetResponse502) & {
+export type demoResetResponseError = (demoResetResponse403 | demoResetResponse409 | demoResetResponse422 | demoResetResponse502) & {
   headers: Headers;
 };
 
@@ -5327,7 +5336,7 @@ export const demoReset = async ( options?: Parameters<typeof customFetch>[1]): P
 
 export const getDemoResetMutationKey = () => ['demoReset'] as const;
 
-export const getDemoResetMutationOptions = <TError = void,
+export const getDemoResetMutationOptions = <TError = void | HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext> => {
 
@@ -5356,13 +5365,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DemoResetMutationResult = NonNullable<Awaited<ReturnType<typeof demoReset>>>
 
-    export type DemoResetMutationError = void
+    export type DemoResetMutationError = void | HTTPValidationError
 
 
     /**
  * @summary Единый сброс стенда: моки, база api, сессии и кэш
  */
-export const useDemoReset = <TError = void,
+export const useDemoReset = <TError = void | HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof demoReset>>,
@@ -5485,4 +5494,338 @@ export const useDemoResetPersona = <TError = void | HTTPValidationError,
         TContext
       > => {
       return useMutation(getDemoResetPersonaMutationOptions(options), queryClient);
+    }
+
+export type demoListPersonasResponse200 = {
+  data: Persona[]
+  status: 200
+}
+
+export type demoListPersonasResponseSuccess = (demoListPersonasResponse200) & {
+  headers: Headers;
+};
+;
+
+export type demoListPersonasResponse = (demoListPersonasResponseSuccess)
+
+export const getDemoListPersonasUrl = () => {
+
+
+
+
+  return `/demo/personas`
+}
+
+/**
+ * @summary Personas
+ */
+export const demoListPersonas = async ( options?: Parameters<typeof customFetch>[1]): Promise<demoListPersonasResponse> => {
+
+  return customFetch<demoListPersonasResponse>(getDemoListPersonasUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDemoListPersonasQueryKey = () => {
+    return [
+    `/demo/personas`
+    ] as const;
+    }
+
+
+export const getDemoListPersonasQueryOptions = <TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDemoListPersonasQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof demoListPersonas>>> = ({ signal }) => demoListPersonas({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DemoListPersonasQueryResult = NonNullable<Awaited<ReturnType<typeof demoListPersonas>>>
+export type DemoListPersonasQueryError = unknown
+
+
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoListPersonas>>,
+          TError,
+          Awaited<ReturnType<typeof demoListPersonas>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoListPersonas>>,
+          TError,
+          Awaited<ReturnType<typeof demoListPersonas>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Personas
+ */
+
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDemoListPersonasQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type demoGetChaosResponse200 = {
+  data: ChaosView[]
+  status: 200
+}
+
+export type demoGetChaosResponseSuccess = (demoGetChaosResponse200) & {
+  headers: Headers;
+};
+;
+
+export type demoGetChaosResponse = (demoGetChaosResponseSuccess)
+
+export const getDemoGetChaosUrl = () => {
+
+
+
+
+  return `/demo/chaos`
+}
+
+/**
+ * @summary Get Chaos
+ */
+export const demoGetChaos = async ( options?: Parameters<typeof customFetch>[1]): Promise<demoGetChaosResponse> => {
+
+  return customFetch<demoGetChaosResponse>(getDemoGetChaosUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDemoGetChaosQueryKey = () => {
+    return [
+    `/demo/chaos`
+    ] as const;
+    }
+
+
+export const getDemoGetChaosQueryOptions = <TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDemoGetChaosQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof demoGetChaos>>> = ({ signal }) => demoGetChaos({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DemoGetChaosQueryResult = NonNullable<Awaited<ReturnType<typeof demoGetChaos>>>
+export type DemoGetChaosQueryError = unknown
+
+
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoGetChaos>>,
+          TError,
+          Awaited<ReturnType<typeof demoGetChaos>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoGetChaos>>,
+          TError,
+          Awaited<ReturnType<typeof demoGetChaos>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Chaos
+ */
+
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDemoGetChaosQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type demoSetChaosResponse200 = {
+  data: ChaosView
+  status: 200
+}
+
+export type demoSetChaosResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type demoSetChaosResponseSuccess = (demoSetChaosResponse200) & {
+  headers: Headers;
+};
+export type demoSetChaosResponseError = (demoSetChaosResponse422) & {
+  headers: Headers;
+};
+
+export type demoSetChaosResponse = (demoSetChaosResponseSuccess | demoSetChaosResponseError)
+
+export const getDemoSetChaosUrl = (system: System,) => {
+
+
+
+
+  return `/demo/chaos/${system}`
+}
+
+/**
+ * @summary Put Chaos
+ */
+export const demoSetChaos = async (system: System,
+    chaosInput: ChaosInput, options?: Parameters<typeof customFetch>[1]): Promise<demoSetChaosResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<demoSetChaosResponse>(getDemoSetChaosUrl(system),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(chaosInput)
+  }
+);}
+
+
+
+
+
+export const getDemoSetChaosMutationKey = () => ['demoSetChaos'] as const;
+
+export const getDemoSetChaosMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoSetChaos>>, TError,DemoSetChaosMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoSetChaos>>, TError,DemoSetChaosMutationVariables, TContext> => {
+
+const mutationKey = getDemoSetChaosMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoSetChaos>>, DemoSetChaosMutationVariables> = (props) => {
+          const {system,data} = props ?? {};
+
+          return  demoSetChaos(system,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoSetChaosMutationResult = NonNullable<Awaited<ReturnType<typeof demoSetChaos>>>
+    export type DemoSetChaosMutationBody = ChaosInput
+    export type DemoSetChaosMutationError = HTTPValidationError
+    export type DemoSetChaosMutationVariables = {system: System;data: ChaosInput}
+
+    /**
+ * @summary Put Chaos
+ */
+export const useDemoSetChaos = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoSetChaos>>, TError,DemoSetChaosMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoSetChaos>>,
+        TError,
+        DemoSetChaosMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoSetChaosMutationOptions(options), queryClient);
     }

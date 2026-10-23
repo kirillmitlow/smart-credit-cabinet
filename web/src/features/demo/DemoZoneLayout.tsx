@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router';
 import { Shell } from '@/components/Shell';
-import { PlaceholderPage } from '@/components/PlaceholderPage';
-import { placeholders, shell } from '@/texts';
+import { DemoPanel } from './DemoPanel';
+import { shell } from '@/texts';
 
 /** Оболочка демо-панели: служебный вид с пометкой «Только для проверки» (60-05) */
 export function DemoZoneLayout() {
@@ -21,5 +21,5 @@ export function DemoZoneLayout() {
 
 /** Демо-панель (60-05). Содержимое делает T-435 */
 export function DemoPage() {
-  return <PlaceholderPage content={placeholders.demo} />;
+  return <DemoPanel />;
 }
