@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react';
 import { Alert, Button, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
-import { useCreateApplication, useListApplications } from '@/api/generated/api';
-import type { ApplicationOut } from '@/api/generated/model';
+import {
+  getListApplicationTasksQueryOptions,
+  useCreateApplication,
+  useListApplications,
+} from '@/api/generated/api';
+import type { ApplicationOut, TaskList } from '@/api/generated/model';
 import { useActionKey } from '@/api/idempotency';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { isInFlight } from '@/features/application/statuses';
@@ -12,6 +16,7 @@ import { useActiveCompany } from '@/features/auth/useActiveCompany';
 import { usePageHeading } from '@/lib/usePageHeading';
 import { emptyStates, fill, home } from '@/texts';
 import { putApplication } from '@/features/application/useApplication';
+import { unwrapTasks } from '@/features/application/useTasks';
 import { HomeLoans } from '@/features/loans/HomeLoans';
 import { ApplicationCard } from './ApplicationCard';
 import { tasksFrom } from './tasks';
@@ -49,7 +54,21 @@ export function HomePage() {
   const items: ApplicationOut[] =
     applications.data?.status === 200 ? applications.data.data.items : [];
   const hasDraft = items.some((item) => item.status === 'DRAFT');
-  const tasks = tasksFrom(items);
+  // Запросы банка по заявкам, где ждут ответа клиента: по ним строки «Что нужно от вас»
+  const respondIds = items
+    .filter((item) => item.allowedActions.includes('RESPOND'))
+    .map((item) => item.id);
+  const taskLists = useQueries({
+    queries: respondIds.map((id) => ({
+      ...getListApplicationTasksQueryOptions(id, { query: { select: unwrapTasks } }),
+    })),
+  });
+  const tasksByApplication = new Map<string, TaskList>();
+  respondIds.forEach((id, index) => {
+    const loaded = taskLists[index]?.data;
+    if (loaded) tasksByApplication.set(id, loaded);
+  });
+  const tasks = tasksFrom(items, tasksByApplication);
   const inProgressCount = items.filter((item) => isInFlight(item.status)).length;
   const statusText = companyStatusText(choice?.company.status);
 

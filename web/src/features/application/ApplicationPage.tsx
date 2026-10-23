@@ -1,11 +1,12 @@
 import { Alert, Button, Center, Grid, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router';
 import { isAppError } from '@/api/errors';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { NotFoundScreen } from '@/app/screens';
 import { formatMoney, formatTermMonths } from '@/lib/format';
 import { usePageHeading } from '@/lib/usePageHeading';
-import { applicationPage, errorView, fill, guards, productName, shell } from '@/texts';
+import { applicationPage, clientTasks, errorView, fill, guards, productName, shell } from '@/texts';
 import { OutcomeBlock } from './OutcomeBlock';
 import { isInFlight } from './statuses';
 import { Timeline } from './Timeline';
@@ -22,6 +23,8 @@ export function ApplicationPage() {
   const query = useApplication(id);
   const application = query.data;
   const number = application?.number ?? '';
+  // Клиент только что отправил ответы банку: пока идёт новая проверка, говорим об этом прямо
+  const [answersSent, setAnswersSent] = useState(false);
   const headingRef = usePageHeading(
     application ? fill(applicationPage.title, { number }) : applicationPage.loading,
   );
@@ -109,6 +112,12 @@ export function ApplicationPage() {
         </Alert>
       ) : null}
 
+      {answersSent && application.status === 'CHECKING' ? (
+        <Alert color="green" role="status" title={clientTasks.sentTitle} data-testid="recheck-note">
+          {clientTasks.sent}
+        </Alert>
+      ) : null}
+
       <div role="status" aria-live="polite" data-testid="timeline-live">
         {timeline.current ? (
           <Text fw={600}>
@@ -131,7 +140,12 @@ export function ApplicationPage() {
           ) : null}
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: wide ? 12 : 6 }}>
-          <OutcomeBlock application={application} />
+          <OutcomeBlock
+            application={application}
+            onTasksSent={() => {
+              setAnswersSent(true);
+            }}
+          />
         </Grid.Col>
       </Grid>
 

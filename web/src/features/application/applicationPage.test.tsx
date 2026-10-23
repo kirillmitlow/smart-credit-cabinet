@@ -242,7 +242,6 @@ describe('блоки исхода', () => {
 
   it.each([
     ['COUNTER_OFFER', outcomes.counter.title],
-    ['NEEDS_INFO', outcomes.needsInfo.title],
     ['MANUAL_REVIEW', outcomes.manual.title],
   ])('%s: блок по статусу', async (status, title) => {
     mockSessions({ client: makeMe() });

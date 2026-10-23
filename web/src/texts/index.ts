@@ -27,6 +27,7 @@ export { consents } from './consents';
 export { wizard, wizardResult, variantCard } from './wizard';
 export { productNames, applicationForm, applicationPage, outcomes } from './application';
 export { counterOffer } from './counterOffer';
+export { clientTasks } from './clientTasks';
 
 /** Название продукта по коду; неизвестный код показываем как есть, чтобы не терять данные */
 export function productName(code: string | null | undefined): string | null {
