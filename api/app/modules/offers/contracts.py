@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 from app.modules import companies, documents
 from app.modules.applications import BANK_NAME, Actor, Application, record_event
 from app.modules.offers import terms
-from app.modules.offers.models import Contract, Offer, OfferVariant
+from app.modules.offers.models import Contract, Offer, OfferVariant, Signature
 from app.shared import clock
 from app.shared.errors import AppError, not_found
 
@@ -206,12 +206,43 @@ def verify_integrity(contract: Contract) -> None:
         )
 
 
+def _verify_signed_hash(session: Session, contract: Contract, digest: str) -> None:
+    if contract.status != "SIGNED":
+        return
+    signatures = list(
+        session.scalars(select(Signature).where(Signature.contract_id == contract.id))
+    )
+    if not any(signature.signer_role == "DIRECTOR" for signature in signatures) or any(
+        signature.content_hash != digest for signature in signatures
+    ):
+        raise AppError(409, "CONTRACT_TAMPERED", "Файл не соответствует сохранённой подписи")
+
+
+def verify_variant(contract: Contract, variant: OfferVariant) -> None:
+    """Mutable links must not change the conditions contained in the signed original."""
+    try:
+        body = json.loads(contract.body)
+        matching = (
+            body["product"]["code"] == variant.product_code
+            and body["amountRub"] == variant.amount_rub
+            and body["termMonths"] == variant.term_months
+            and Decimal(body["ratePercent"]) == variant.rate_percent
+            and body["contractUid"] == contract.contract_uid
+            and body["number"] == contract.number
+        )
+    except (ValueError, KeyError, TypeError):
+        matching = False
+    if not matching:
+        raise AppError(409, "CONTRACT_TAMPERED", "Условия не соответствуют сохранённому договору")
+
+
 def document_content(session: Session, contract: Contract) -> tuple[bytes, str, str]:
     """Keep legacy signed JSON readable; new contracts sign the saved PDF original."""
     verify_integrity(contract)
     if contract.document_id is None:
         if contract.template_version == TEMPLATE_VERSION:
             raise AppError(409, "DOCUMENT_NOT_READY", "Документ ещё не готов для подписи")
+        _verify_signed_hash(session, contract, contract.content_hash)
         return contract.body.encode("utf-8"), "application/json", contract.content_hash
     application = session.get(Application, contract.application_id)
     if application is None:
@@ -221,8 +252,15 @@ def document_content(session: Session, contract: Contract) -> tuple[bytes, str, 
         documents.Access(application.created_by, (application.company_id,)),
         contract.document_id,
     )
-    if row.application_id != application.id or row.kind != "CREDIT_AGREEMENT":
+    if (
+        row.application_id != application.id
+        or row.kind != "CREDIT_AGREEMENT"
+        or row.origin != "SYSTEM_GENERATED"
+        or row.template_version != contract.template_version
+        or documents.credit_source_hash(content) != contract.content_hash
+    ):
         raise AppError(409, "CONTRACT_TAMPERED", "Файл не соответствует договору")
+    _verify_signed_hash(session, contract, row.sha256)
     return content, row.mime, row.sha256
 
 
@@ -250,6 +288,7 @@ def signed_terms(session: Session, application_id: UUID) -> SignedTerms | None:
         .where(
             Contract.application_id == application_id,
             Contract.status == "SIGNED",
+            Offer.application_id == Contract.application_id,
             Offer.status == "ACCEPTED",
             Offer.accepted_variant_id == OfferVariant.id,
             OfferVariant.offer_id == Offer.id,
@@ -262,6 +301,7 @@ def signed_terms(session: Session, application_id: UUID) -> SignedTerms | None:
         return None
     verify_integrity(contract)
     signing_hash(session, contract)
+    verify_variant(contract, variant)
     return SignedTerms(
         product_code=variant.product_code,
         amount_rub=variant.amount_rub,

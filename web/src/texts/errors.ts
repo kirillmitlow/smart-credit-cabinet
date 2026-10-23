@@ -11,6 +11,28 @@ export interface ErrorText {
 }
 
 export const errorTexts = {
+  INVALID_COLLATERAL: { text: 'Укажите описание залога и положительную стоимость в рублях' },
+  FILE_TOO_LARGE: {
+    text: 'Файл слишком большой. Для PDF допустимо до 10 МБ, для выписки - до 5 МБ',
+  },
+  EMPTY_FILE: { text: 'Файл пуст. Выберите документ с содержимым' },
+  UNSUPPORTED_FORMAT: { text: 'Нужен PDF или текстовая выписка 1С. Проверьте формат файла' },
+  PDF_ENCRYPTED: { text: 'PDF защищён паролем. Загрузите копию без шифрования' },
+  PDF_TOO_LONG: { text: 'В PDF больше 30 страниц. Загрузите нужные страницы отдельно' },
+  TOO_MANY_FILES: { text: 'Для заявки уже загружено максимальное число файлов' },
+  APPLICATION_FILES_TOO_LARGE: { text: 'Общий размер файлов заявки превышает 50 МБ' },
+  BAD_ENCODING: { text: 'Сохраните выписку в кодировке UTF-8 или Windows-1251' },
+  TOO_MANY_LINES: { text: 'Выписка слишком длинная. Выберите меньший период' },
+  UNSUPPORTED_DOCUMENT_KIND: { text: 'Этот вид документа нельзя загрузить' },
+  UPLOAD_INTERRUPTED: { text: 'Загрузка прервалась. Повторите отправку файла' },
+  DOCUMENT_OPERATION_FAILED: { text: 'Не удалось обработать файл. Повторите попытку' },
+  DOCUMENT_INTEGRITY_ERROR: {
+    text: 'Не удалось проверить сохранённый файл. Обратитесь к сотруднику банка',
+  },
+  DOCUMENT_NOT_READY: { text: 'Документ ещё не готов для подписи. Обновите страницу' },
+  TASK_REQUIRED: { text: 'Выберите запрос банка, к которому относится файл' },
+  TASK_NOT_DOCUMENT: { text: 'В этом запросе нужен текстовый ответ' },
+  DOCUMENT_REPLACEMENT_CONFLICT: { text: 'Этот документ уже изменён. Обновите список файлов' },
   EVALUATION_REFERENCE_INVALID: {
     text: 'Расчёт недействителен или относится к другим условиям. Выполните новый расчёт перед сохранением',
   },

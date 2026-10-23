@@ -13,14 +13,25 @@ export function ProductStep({
   autosave: DraftAutosave;
   onValidityChange: (valid: boolean) => void;
 }) {
-  const saved = application.draft.collateral as { description?: string; valueRub?: number } | null;
+  const raw = application.draft.collateral;
+  const saved =
+    raw &&
+    typeof raw === 'object' &&
+    'description' in raw &&
+    'valueRub' in raw &&
+    typeof raw.description === 'string' &&
+    typeof raw.valueRub === 'number'
+      ? { description: raw.description, valueRub: raw.valueRub }
+      : null;
   const [collateral, setCollateral] = useState({
     enabled: !!saved,
     description: saved?.description ?? '',
     value: saved?.valueRub ?? 0,
   });
   const [contractNumber, setContractNumber] = useState(
-    String(application.draft.contractRegistryNumber ?? ''),
+    typeof application.draft.contractRegistryNumber === 'string'
+      ? application.draft.contractRegistryNumber
+      : '',
   );
   const valid =
     (!collateral.enabled || (collateral.description.trim().length > 0 && collateral.value > 0)) &&

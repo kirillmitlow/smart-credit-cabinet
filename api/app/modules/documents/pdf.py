@@ -1,14 +1,22 @@
 """Readable, self-contained synthetic agreements from the already accepted payment snapshot."""
 
 import hashlib
+import io
 import json
 from html import escape
 from pathlib import Path
 from typing import Any
 
+from pypdf import PdfReader
+
 FONTS = Path(__file__).with_name("fonts")
 TEMPLATE_VERSION = "credit-agreement-pdf-v1"
 NOTICE = "ДЕМО. Синтетический документ, юридической силы не имеет"
+
+
+def credit_source_hash(content: bytes) -> str | None:
+    metadata = PdfReader(io.BytesIO(content)).metadata
+    return metadata.keywords if metadata else None
 
 
 def _money(value: Any) -> str:
@@ -63,6 +71,7 @@ def render_credit(body: str, *, schedule_only: bool = False) -> bytes:
     )
     facts_html = "".join(f"<dt>{escape(k)}</dt><dd>{escape(str(v))}</dd>" for k, v in facts)
     markup = f"""<!doctype html><html lang="ru"><meta charset="utf-8"><title>{title}</title>
+    <meta name="keywords" content="{hashlib.sha256(body.encode("utf-8")).hexdigest()}">
     <style>
     @font-face {{font-family:PT;src:url('{(FONTS / "PTSans-Regular.ttf").as_uri()}')}}
     @font-face {{font-family:PT;src:url('{(FONTS / "PTSans-Bold.ttf").as_uri()}');font-weight:700}}

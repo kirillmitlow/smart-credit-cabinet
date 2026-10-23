@@ -18,6 +18,40 @@ function card(value: BankApplicationCard) {
 }
 
 describe('банковская карточка (TS-031)', () => {
+  it('показывает сохранённый файл и заявленную стоимость залога без выдуманного подтверждения', async () => {
+    mockSessions({ bank: makeBankMe() });
+    card(
+      makeBankCard({
+        documents: [
+          {
+            id: 'document-1',
+            taskId: null,
+            kind: 'OTHER',
+            origin: 'UPLOADED',
+            filename: 'contract.pdf',
+            mime: 'application/pdf',
+            sizeBytes: 1024,
+            sha256: 'a'.repeat(64),
+            parseStatus: 'NOT_REQUIRED',
+            createdAt: '2026-10-21T12:00:00Z',
+            cancelledAt: null,
+          },
+        ],
+        collateral: {
+          description: 'Линия оборудования',
+          valueRub: 25_000_000,
+          source: 'CLIENT_DECLARED',
+        },
+      }),
+    );
+    renderApp('/bank/applications/bank-app');
+    expect(await screen.findByRole('link', { name: 'contract.pdf' })).toHaveAttribute(
+      'href',
+      '/api/documents/document-1/download?zone=bank&preview=true',
+    );
+    expect(screen.getByTestId('bank-collateral')).toHaveTextContent('25 000 000');
+    expect(screen.getByTestId('bank-collateral')).toHaveTextContent('Источник: анкета клиента');
+  });
   it('показывает все блоки оценки и не выдаёт недоступные документы за пустой список', async () => {
     mockSessions({ bank: makeBankMe() });
     card(makeBankCard());

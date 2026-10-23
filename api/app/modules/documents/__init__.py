@@ -1,7 +1,7 @@
 """Загрузки, парсер выписки 1С, хранение файлов, генерация PDF. Документ: 40-03, 50-12."""
 
 from app.modules.documents import reset as reset  # registers demo cleanup
-from app.modules.documents.pdf import render_credit
+from app.modules.documents.pdf import credit_source_hash, render_credit
 from app.modules.documents.service import (
     Access,
     UploadContext,
@@ -27,5 +27,6 @@ __all__ = [
     "store",
     "store_generated",
     "render_credit",
+    "credit_source_hash",
     "verified_content",
 ]

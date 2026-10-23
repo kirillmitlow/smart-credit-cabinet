@@ -78,6 +78,8 @@ def contract_out(
     variant = session.get(OfferVariant, contract.variant_id)
     if variant is None:
         raise not_found("Вариант")
+    contracts.verify_integrity(contract)
+    contracts.verify_variant(contract, variant)
     required = signing.signers(session, contract, application)
     member = principal.membership(application.company_id)
     open_for_signing = contract.status == "READY" and application.status == "OFFER_ACCEPTED"

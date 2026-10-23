@@ -23,15 +23,19 @@
 Сохранённый исходник неизменяем; отмена при замене видна по `cancelled_at`.
 Физически `document_blobs` хранит bytea отдельно от метаданных. `FileStore` имеет
 `put/get/delete`; прикладное чтение идёт через `verified_content` с проверкой прав.
-Перед будущей подписью PDF следует использовать именно эту функцию (T-336).
+Новые договоры и графики создаются как PDF с кириллицей при принятии предложения.
+Исходник и его SHA-256 сохраняются атомарно с договором; подпись привязана к байтам PDF.
+Снимок JSON сохраняет расчётные условия; чтение и выдача сверяют обе связи и подпись.
+Старые подписанные JSON-договоры остаются доступны без пересоздания.
 
 ## HTTP
 
 | Ручка | Доступ |
 |---|---|
 | `POST /documents` | Только клиент; multipart: `applicationId`, необязательные `taskId`/`replacesId`, `kind`, `file`. Обязателен `Idempotency-Key` |
+| `GET /documents?applicationId=...` | Файлы заявки своей компании |
 | `GET /documents/{id}` | Своя компания; для банковской сессии явно `?zone=bank` |
-| `GET /documents/{id}/download` | Те же права; attachment, nosniff, private/no-store |
+| `GET /documents/{id}/download` | Те же права; attachment (для PDF `?preview=true` — inline), nosniff, private/no-store |
 
 Типы загрузки: `BANK_STATEMENT_1C`, `CONTRACT`, `FINANCIALS`, `OTHER`.
 Выписка — до 5 МиБ, PDF — до 10 МиБ, до 30 страниц без шифрования; содержимое
