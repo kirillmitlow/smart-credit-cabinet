@@ -102,7 +102,7 @@ describe('банковская карточка (TS-031)', () => {
     expect(requested).toContain('4');
   });
 
-  it('неполнота относится к недоступному источнику текущего решения, перезапрос не притворяется работающим', async () => {
+  it('неполнота относится к текущему источнику; ссылка ведёт к действию перепроверки', async () => {
     mockSessions({ bank: makeBankMe() });
     const data = makeBankCard();
     card({
@@ -111,8 +111,8 @@ describe('банковская карточка (TS-031)', () => {
     });
     renderApp('/bank/applications/bank-app?expectedVersion=3');
     expect(await screen.findByText(t.incomplete)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: t.recheck })).toBeDisabled();
-    expect(screen.getByText(t.recheckUnavailable)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: t.recheck })).toBeEnabled();
+    expect(screen.getByRole('link', { name: t.recheck })).toHaveAttribute('href', '#bank-actions');
   });
 
   it('снимки показывают обе даты и номер запроса; исходные значения выводятся текстом', async () => {

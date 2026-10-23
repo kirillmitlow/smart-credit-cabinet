@@ -6,14 +6,16 @@ import { fill, home, login } from './text';
  * Пользуемся только тем, что видит человек: подписи полей, роли и названия кнопок.
  * Короткий путь `POST /demo/personas/{code}/login` для e2e не годится: он не доказывает вход.
  */
-export async function loginAsClient(page: Page, inn: string): Promise<void> {
+export async function loginAsClient(page: Page, inn: string, personName?: string): Promise<void> {
   await page.goto('/login');
   await page.getByLabel(login.innStep.label).fill(inn);
   await page.getByRole('button', { name: login.innStep.submit }).click();
 
   // «Кто входит?»: если человек один, он может быть уже выбран; иначе берём первого
   await expect(page.getByRole('heading', { name: login.whoStep.heading })).toBeVisible();
-  if ((await page.getByRole('radio', { checked: true }).count()) === 0) {
+  if (personName) {
+    await page.getByRole('radio', { name: new RegExp(personName, 'u') }).check();
+  } else if ((await page.getByRole('radio', { checked: true }).count()) === 0) {
     await page.getByRole('radio').first().check();
   }
   await page.getByRole('button', { name: login.whoStep.submit }).click();

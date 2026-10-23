@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Badge, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import type { BankApplicationCard } from '@/api/generated/model';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { applicationStatusLabels } from '@/texts';
@@ -45,10 +45,11 @@ export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
                 </Text>
                 {source.status === 'UNAVAILABLE' ? (
                   <Stack gap={4} mt="sm">
-                    <Button disabled variant="light">
-                      {t.recheck}
-                    </Button>
-                    <Text size="xs">{t.recheckUnavailable}</Text>
+                    {card.status === 'MANUAL_REVIEW' && !card.stale ? (
+                      <Anchor href="#bank-actions">{t.recheck}</Anchor>
+                    ) : (
+                      <Text size="xs">{t.recheckUnavailable}</Text>
+                    )}
                   </Stack>
                 ) : (
                   <details>
