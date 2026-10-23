@@ -32,19 +32,28 @@ import { useSession } from '@/features/auth/session';
 import { formatMoney, formatTermMonths } from '@/lib/format';
 import { fill, productName } from '@/texts';
 import { bankActions as t } from '@/texts/bankActions';
+import { ManualOfferForm } from './ManualOfferForm';
 
-type Action = 'APPROVED' | 'REJECTED' | 'COUNTER_OFFER' | 'INFO' | 'RECHECK';
+type Action = 'APPROVED' | 'REJECTED' | 'COUNTER_OFFER' | 'INFO' | 'RECHECK' | 'MANUAL';
 const labels: Record<Action, string> = {
   APPROVED: t.approve,
   REJECTED: t.reject,
   COUNTER_OFFER: t.counter,
   INFO: t.info,
   RECHECK: t.recheck,
+  MANUAL: t.manual,
 };
 const reasons = [
   { value: '', label: t.chooseReason },
   ...Object.entries(t.reasonOptions).map(([value, label]) => ({ value, label })),
 ];
+
+function softening(action: Action, baseline: string | null | undefined) {
+  return (
+    (action === 'APPROVED' && baseline !== 'APPROVED') ||
+    (action === 'COUNTER_OFFER' && baseline === 'REJECTED')
+  );
+}
 
 export function BankActions({ card }: { card: BankApplicationCard }) {
   const [opened, setOpened] = useState<{ action: Action; card: BankApplicationCard } | null>(null);
@@ -76,7 +85,10 @@ export function BankActions({ card }: { card: BankApplicationCard }) {
                 card.stale ||
                 !manual ||
                 !level ||
-                (action !== 'INFO' && action !== 'RECHECK' && (!engineReady || lower)) ||
+                (action !== 'INFO' &&
+                  action !== 'RECHECK' &&
+                  (!engineReady || (lower && action !== 'MANUAL' && action !== 'COUNTER_OFFER'))) ||
+                (level === 'L1' && softening(action, card.engineRecommendation?.outcome)) ||
                 (action === 'COUNTER_OFFER' && !card.decision?.variants.length)
               }
               onClick={() => setOpened({ action, card })}
@@ -93,7 +105,13 @@ export function BankActions({ card }: { card: BankApplicationCard }) {
           closeOnEscape={false}
           title={opened ? labels[opened.action] : ''}
         >
-          {opened ? (
+          {opened?.action === 'MANUAL' ? (
+            <ManualOfferForm
+              card={opened.card}
+              stale={card.stale || card.version !== opened.card.version || !manual}
+              onClose={() => setOpened(null)}
+            />
+          ) : opened ? (
             <ActionForm
               key={opened.action}
               action={opened.action}
@@ -114,7 +132,7 @@ function ActionForm({
   stale,
   onClose,
 }: {
-  action: Action;
+  action: Exclude<Action, 'MANUAL'>;
   card: BankApplicationCard;
   stale: boolean;
   onClose: () => void;
@@ -138,7 +156,12 @@ function ActionForm({
   const decisionAction =
     action === 'APPROVED' || action === 'REJECTED' || action === 'COUNTER_OFFER';
   const deviation = decisionAction && card.engineRecommendation?.outcome !== action;
-  const min = card.decision?.requiredLevel === 'L2' || reason === 'UW_OTHER' ? 50 : 20;
+  const min =
+    card.decision?.requiredLevel === 'L2' ||
+    reason === 'UW_OTHER' ||
+    softening(action, card.engineRecommendation?.outcome)
+      ? 50
+      : 20;
   const needsReason = deviation || action === 'INFO';
   const valid =
     !stale &&
@@ -232,7 +255,9 @@ function ActionForm({
       busy.current = false;
     }
   };
-  const locked = mutation.isPending || (isAppError(mutation.error) && mutation.error.status === 0);
+  const locked =
+    mutation.isPending ||
+    (isAppError(mutation.error) && (mutation.error.status === 0 || mutation.error.status >= 500));
   const edit = (change: () => void) => {
     if (locked) return;
     key.reset();
