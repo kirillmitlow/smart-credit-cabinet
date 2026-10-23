@@ -43,7 +43,7 @@
 ## В работе (каждый правит свою строку)
 
 - **A:** смена закрыта 22.10 поздно вечером при 16% лимита. Влит #72 (T-297, встречные, Снабконтракт сходится с оракулом до рубля). PR #74 (T-133: snabkontrakt, stankoprom, zarya; все 9 персон по оракулу на живом стенде) ждёт CI. **Следующее для A по порядку:** (1) интерфейсы, которые просит B для банка (журнал, запись B «начало параллельной работы»): `pipeline.record_underwriter_decision`, `decisioning.evaluate_underwriter_decision`, `pipeline.request_recheck` (T-277), `applications.request_information` (T-350/T-351); (2) Q-148: конвейер не запрашивает ЕИС для карточки «под контракт», если заявка не CONTRACT (тест xfail в `api/tests/personas/test_simple_personas.py`); (3) экран встречных T-423, затем T-424/T-425; (4) T-135 технические сценарии, T-130 выписка.
-- **B:** Передача новому Codex при остатке 9% (D-104). T-213 в REVIEW, PR [#73](https://github.com/kirillmitlow/smart-credit-cabinet/pull/73), ветка `feat/bank-demo-login`, worktree `worktrees/gov-contracts-list`. Сначала проверить CI/ci-ok и слить при зелёном (D-111), затем T-360/T-361; подробный старт и интерфейсы A: [отчёт B](../reviews/B-2026-10-23-handoff.md). T-362…365, T-429…436 ещё не сделаны; строки A/C не менять.
+- **B:** T-360 (очередь банка), ветка `feat/backoffice-queue`, worktree `worktrees/gov-contracts-list`; затем T-361 (карточка). PR #73/T-213 в main, CI зелёный. Зона банка/демо D-111; ждём public интерфейсов A для T-362/T-363/T-364 (журнал).
 - **C:** T-515, ветка `chore/smoke-script`; готовность стенда и smoke Соколовой до выдачи (23.10, отдельная копия на Mac).
 
 ## Что уже в main
