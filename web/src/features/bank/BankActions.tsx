@@ -32,14 +32,16 @@ import { useSession } from '@/features/auth/session';
 import { formatMoney, formatTermMonths } from '@/lib/format';
 import { fill, productName } from '@/texts';
 import { bankActions as t } from '@/texts/bankActions';
+import { ManualOfferForm } from './ManualOfferForm';
 
-type Action = 'APPROVED' | 'REJECTED' | 'COUNTER_OFFER' | 'INFO' | 'RECHECK';
+type Action = 'APPROVED' | 'REJECTED' | 'COUNTER_OFFER' | 'INFO' | 'RECHECK' | 'MANUAL';
 const labels: Record<Action, string> = {
   APPROVED: t.approve,
   REJECTED: t.reject,
   COUNTER_OFFER: t.counter,
   INFO: t.info,
   RECHECK: t.recheck,
+  MANUAL: t.manual,
 };
 const reasons = [
   { value: '', label: t.chooseReason },
@@ -76,7 +78,9 @@ export function BankActions({ card }: { card: BankApplicationCard }) {
                 card.stale ||
                 !manual ||
                 !level ||
-                (action !== 'INFO' && action !== 'RECHECK' && (!engineReady || lower)) ||
+                (action !== 'INFO' &&
+                  action !== 'RECHECK' &&
+                  (!engineReady || (lower && action !== 'MANUAL' && action !== 'COUNTER_OFFER'))) ||
                 (action === 'COUNTER_OFFER' && !card.decision?.variants.length)
               }
               onClick={() => setOpened({ action, card })}
@@ -93,7 +97,13 @@ export function BankActions({ card }: { card: BankApplicationCard }) {
           closeOnEscape={false}
           title={opened ? labels[opened.action] : ''}
         >
-          {opened ? (
+          {opened?.action === 'MANUAL' ? (
+            <ManualOfferForm
+              card={opened.card}
+              stale={card.stale || card.version !== opened.card.version || !manual}
+              onClose={() => setOpened(null)}
+            />
+          ) : opened ? (
             <ActionForm
               key={opened.action}
               action={opened.action}
@@ -114,7 +124,7 @@ function ActionForm({
   stale,
   onClose,
 }: {
-  action: Action;
+  action: Exclude<Action, 'MANUAL'>;
   card: BankApplicationCard;
   stale: boolean;
   onClose: () => void;

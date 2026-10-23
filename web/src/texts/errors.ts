@@ -11,6 +11,9 @@ export interface ErrorText {
 }
 
 export const errorTexts = {
+  EVALUATION_REFERENCE_INVALID: {
+    text: 'Расчёт недействителен или относится к другим условиям. Выполните новый расчёт перед сохранением',
+  },
   AUTHORITY_LEVEL_TOO_LOW: {
     text: 'Для этого решения нужен старший сотрудник банка. Обновите карточку или передайте заявку сотруднику L2',
   },
