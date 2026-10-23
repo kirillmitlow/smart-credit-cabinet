@@ -14,6 +14,8 @@
 
 Человек в контуре: решение андеррайтера — новая запись `source=UNDERWRITER`; отклонение от рекомендации ядра возможно только с причиной, а жёсткие запреты не обходятся.
 
+> **Интерфейс A готов (23.10):** `decisioning.evaluate_underwriter_decision`, `pipeline.record_underwriter_decision`, `pipeline.preview_underwriter_decision`; подробности в журнале, запись «интерфейсы ручного решения для B». Ручки HTTP делает B.
+
 ## Входит / не входит
 
 - **Входит:** `POST /backoffice/applications/{id}/decision`: согласие с ядром без причины; «строже» — код причины; «мягче» — только при DSCR ≥ 1,15 и стресс ≥ 0,9, уровень L2, комментарий ≥ 50 знаков; закрытый список кодов `UW_NEW_INFO`, `UW_COLLATERAL_ASSESSED`, `UW_FLAG_CLEARED`, `UW_POLICY_EXCEPTION`, `UW_RISK_HIGHER`, `UW_DOCUMENT_ISSUE`, `UW_OTHER`; категория + комментарий ≥ 20 знаков (50 для L2 и `UW_OTHER`, D-086); матрица полномочий: `403 AUTHORITY_LEVEL_TOO_LOW` + запись в `audit_log`; никогда: снять стоп-фактор, менять данные источников, баллы, грейд, ставку вне коридора, сумму и срок вне границ каталога; новая запись решения с `overrides_decision_id`, `deviation`, событие `OVERRIDE` (клиенту пересказывается понятная часть, комментарий — нет), переходы `MANUAL_REVIEW → APPROVED/COUNTER_OFFER/REJECTED`.

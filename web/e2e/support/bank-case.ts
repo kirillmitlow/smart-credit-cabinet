@@ -1,26 +1,41 @@
 import { expect, type Page } from '@playwright/test';
 import { applicationForm, consents, fill } from './text';
 
-export async function submitInvestmentReview(client: Page): Promise<string> {
-  // Подготавливаем только запрос клиента через публичный API: клиентские экраны — зона A.
-  // Вход обеих сторон, согласия и отправка проходят через интерфейс.
-  const created = await client.request.post('/api/v1/applications', {
-    data: {
+interface ApplicationRequest {
+  productCode: string;
+  amountRub: number;
+  termMonths: number;
+  purposeCode: string;
+}
+
+export function submitInvestmentReview(client: Page): Promise<string> {
+  return submitApplicationRequest(
+    client,
+    {
       productCode: 'INVESTMENT',
       amountRub: 1_000_000,
       termMonths: 60,
       purposeCode: 'EQUIPMENT',
     },
-  });
+    { collateral: { description: 'Кофейное оборудование', valueRub: 1_500_000 } },
+  );
+}
+
+export async function submitApplicationRequest(
+  client: Page,
+  request: ApplicationRequest,
+  answers?: Record<string, unknown>,
+): Promise<string> {
+  // Подготавливаем запрос через публичный API. Вход, согласия и отправка — через интерфейс.
+  const created = await client.request.post('/api/v1/applications', { data: request });
   expect(created.status()).toBe(201);
   const application = (await created.json()) as { id: string; version: number };
-  const draft = await client.request.patch(`/api/v1/applications/${application.id}/draft`, {
-    data: {
-      version: application.version,
-      answers: { collateral: { description: 'Кофейное оборудование', valueRub: 1_500_000 } },
-    },
-  });
-  expect(draft.status()).toBe(200);
+  if (answers) {
+    const draft = await client.request.patch(`/api/v1/applications/${application.id}/draft`, {
+      data: { version: application.version, answers },
+    });
+    expect(draft.status()).toBe(200);
+  }
   await client.goto(`/applications/${application.id}/edit/4`);
   const agreements = client.getByRole('checkbox', {
     name: fill(consents.agree, { kind: '' }).trim(),

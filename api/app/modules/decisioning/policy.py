@@ -590,6 +590,20 @@ class Routing(_Strict):
         return self
 
 
+class StrList(Cited):
+    value: tuple[str, ...]
+
+
+class Underwriter(_Strict):
+    """Ручное решение андеррайтера (30-11, D-086): пороги исключения, длина комментария, коды причин."""
+
+    exception_dscr_min: DecParam
+    exception_stress_min: DecParam
+    comment_min_chars: IntParam
+    comment_min_chars_strict: IntParam
+    reason_codes: StrList
+
+
 class TermGrid(Cited):
     value: tuple[StrictInt, ...]
 
@@ -698,6 +712,7 @@ class Policy(_Strict):
     pricing: Pricing
     affordability: Affordability
     routing: Routing
+    underwriter: Underwriter
     counter_offers: CounterOffers
     timing: Timing
 

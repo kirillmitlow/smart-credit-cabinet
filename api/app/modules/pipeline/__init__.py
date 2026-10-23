@@ -13,6 +13,11 @@ from app.modules.pipeline.policy_registry import (
 )
 from app.modules.pipeline.recheck import RecheckReceipt, request_recheck
 from app.modules.pipeline.runner import RunResult, run_pipeline
+from app.modules.pipeline.underwriter import (
+    UnderwriterReceipt,
+    preview_underwriter_decision,
+    record_underwriter_decision,
+)
 
 # Клиентский ответ на задачи запускает перепроверку, но applications не знает про pipeline (R1)
 applications.register_recheck(request_recheck)
@@ -21,8 +26,11 @@ __all__ = [
     "ConsentView",
     "RecheckReceipt",
     "RunResult",
+    "UnderwriterReceipt",
     "current_policy",
     "load_policy_file",
+    "preview_underwriter_decision",
+    "record_underwriter_decision",
     "register_current",
     "register_policy",
     "request_recheck",

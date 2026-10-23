@@ -88,6 +88,7 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
   const [receipt, setReceipt] = useState<string[]>([]);
   const [popupError, setPopupError] = useState(false);
   const reset = useMutation({
+    onMutate: () => setReceipt([]),
     mutationFn: async (value: Persona | 'all') => {
       const options = { headers: { 'X-Demo-Code': code } };
       const r =
@@ -192,7 +193,18 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
       {personas.isError ? (
         <ProblemAlert error={personas.error} onAction={() => void personas.refetch()} />
       ) : null}
-      {personas.data?.length === 0 ? <Text>{t.empty}</Text> : null}
+      {personas.data?.length === 0 ? (
+        <Stack align="flex-start">
+          <Text>{t.empty}</Text>
+          <Button
+            variant="light"
+            loading={personas.isFetching}
+            onClick={() => void personas.refetch()}
+          >
+            {t.refresh}
+          </Button>
+        </Stack>
+      ) : null}
       {personas.data
         ?.filter((p) => !p.technical)
         .map((p) => (
@@ -272,7 +284,7 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
                 if (target) reset.mutate(target);
               }}
             >
-              {t.confirm}
+              {reset.isError ? t.retryReset : t.confirm}
             </Button>
           </Group>
         </Stack>

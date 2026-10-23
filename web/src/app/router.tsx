@@ -14,6 +14,7 @@ import { ClientLayout } from './ClientLayout';
 import { RequireBank, RequireClient, RequireDemo } from './guards';
 import { RootLayout } from './RootLayout';
 import { NotFoundScreen, RouteErrorScreen } from './screens';
+import { DemoLayoutRoute, DemoPageRoute } from './DemoRoutes';
 
 /**
  * Карта адресов (60-01). Три зоны одного SPA:
@@ -63,15 +64,11 @@ export const appRoutes: RouteObject[] = [
             element: <RequireDemo />,
             children: [
               {
-                lazy: async () => ({
-                  Component: (await import('@/features/demo/DemoZoneLayout')).DemoZoneLayout,
-                }),
+                element: <DemoLayoutRoute />,
                 children: [
                   {
                     index: true,
-                    lazy: async () => ({
-                      Component: (await import('@/features/demo/DemoZoneLayout')).DemoPage,
-                    }),
+                    element: <DemoPageRoute />,
                   },
                   { path: '*', element: <NotFoundScreen kind="demo" /> },
                 ],

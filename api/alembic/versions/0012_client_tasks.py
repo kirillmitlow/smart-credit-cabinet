@@ -6,8 +6,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = "0011_client_tasks"
-down_revision: str | None = "0010_bank_user_level"
+revision: str = "0012_client_tasks"
+down_revision: str | None = "0011_underwriter_decision"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

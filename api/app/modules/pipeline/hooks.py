@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.modules import offers
 from app.modules.applications import Actor, Application, TaskSpec, request_information
-from app.modules.decisioning import DecisionInput, DecisionResult
+from app.modules.decisioning import DecisionInput, DecisionResult, UnderwriterTerms
 from app.modules.decisioning.types import Outcome, Variant
 from app.modules.offers import VariantDraft
 from app.modules.pipeline.models import Decision
@@ -150,3 +150,47 @@ def after_decision(
     if result.outcome == Outcome.NEEDS_INFO and "REVENUE_UNKNOWN" in result.reason_codes:
         create_revenue_task(session, application)
     # TODO(20-03): задача клиенту при `DATA_INCOMPLETE` (поля, согласия) — шаблоны в политике
+
+
+def create_underwriter_offer(
+    session: Session,
+    application: Application,
+    decision: Decision,
+    inp: DecisionInput,
+    outcome: Outcome,
+    terms: UnderwriterTerms,
+) -> None:
+    """Предложение по ручному решению: так же, как после решения ядра (T-362).
+
+    `APPROVED` — «как просили» по условиям с введённой ставкой; `COUNTER_OFFER` — одна карточка
+    специалиста с тем, чем она отличается от запроса.
+    """
+    if terms.rate is None:
+        raise ValueError("у решения андеррайтера ставка должна быть определена")
+    asked = inp.application
+    counter = outcome == Outcome.COUNTER_OFFER
+    changed: dict[str, Any] = {}
+    if terms.product != asked.product:
+        changed["productCode"] = {"from": asked.product.value, "to": terms.product.value}
+    if terms.amount_rub != asked.amount_rub:
+        changed["amountRub"] = {"from": asked.amount_rub, "to": terms.amount_rub}
+    if terms.term_months != asked.term_months:
+        changed["termMonths"] = {"from": asked.term_months, "to": terms.term_months}
+    draft = VariantDraft(
+        kind="UNDERWRITER" if counter else "AS_REQUESTED",
+        label="Предложение специалиста банка" if counter else "Как вы просили",
+        product_code=terms.product.value,
+        amount_rub=terms.amount_rub,
+        term_months=terms.term_months,
+        annual_rate=terms.rate,
+        recommended=True,
+        what_changed=changed if counter else {},
+    )
+    offers.create_offer(
+        session,
+        application,
+        decision_id=decision.id,
+        kind="COUNTER" if counter else "AS_REQUESTED",
+        variants=[draft],
+        variants_status="READY",
+    )

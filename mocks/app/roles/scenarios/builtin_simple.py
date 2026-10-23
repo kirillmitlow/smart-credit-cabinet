@@ -32,7 +32,7 @@ SOKOLOV_INN = "001310001172"  # директор, владелец и поруч
 ROMASHKA_OVERDUE_DAYS = 94
 
 
-def _clean_person() -> dict[str, Any]:
+def clean_person() -> dict[str, Any]:
     """Чистая личная история как `clean_person()` в фикстурах ядра.
 
     Закрытый потребкредит и карта без долга, история 60 месяцев. Больше двух лет и два
@@ -127,8 +127,8 @@ def _vektor() -> ScenarioSpec:
                     "inquiries30d": 0,
                     "rejectedApplications90d": 0,
                 },
-                "director": _clean_person(),
-                "owner": _clean_person(),
+                "director": clean_person(),
+                "owner": clean_person(),
             },
             "application": {
                 "productCode": "EXPRESS",
@@ -279,8 +279,8 @@ def _romashka(today: date) -> ScenarioSpec:
                     "inquiries30d": 6,
                     "rejectedApplications90d": 2,
                 },
-                "director": _clean_person(),
-                "owner": _clean_person(),
+                "director": clean_person(),
+                "owner": clean_person(),
             },
             "application": {
                 "productCode": "WORKING_CAPITAL",
@@ -454,7 +454,7 @@ def _quick_start(today: date) -> ScenarioSpec:
                 # У компании истории нет: NOT_FOUND (historyYears: 0 из пресета)
                 "company": {"historyYears": 0},
                 # Чистая личная история владельца-поручителя
-                "owner": _clean_person(),
+                "owner": clean_person(),
             },
             "application": {
                 "productCode": "EXPRESS",

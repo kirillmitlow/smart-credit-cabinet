@@ -31,11 +31,23 @@ from app.modules.decisioning.types import (
     DecisionResult,
     Explanation,
     Grade,
+    Level,
+    Outcome,
     Product,
     ReasonCode,
 )
+from app.modules.decisioning.underwriting import (
+    UnderwriterEvaluation,
+    UnderwriterTerms,
+    UwCheck,
+    UwViolation,
+    ViolationKind,
+    evaluate_underwriter_decision,
+)
 
 __all__ = [
+    "Level",
+    "Outcome",
     "lowest_rate",
     "DecisionInput",
     "DecisionResult",
@@ -44,6 +56,12 @@ __all__ = [
     "Policy",
     "PolicyError",
     "Product",
+    "UnderwriterEvaluation",
+    "UnderwriterTerms",
+    "UwCheck",
+    "UwViolation",
+    "ViolationKind",
+    "evaluate_underwriter_decision",
     "ProductContext",
     "ReasonCode",
     "ScheduleRow",

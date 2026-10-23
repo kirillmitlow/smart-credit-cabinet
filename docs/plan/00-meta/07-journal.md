@@ -772,6 +772,36 @@ POST /demo/personas/{code}/login — только хелпер интеграц�
 **Проверка T-370 helper на живом стенде:** login owner сценария b-t370-check →200 DIRECTOR; повтор меняет sid_client, старый /me→401, банк остаётся с прежним sid_bank. Без login→422. Служебная ручка не использовалась в браузерных сценариях: обычные T-213 (две сессии в одном браузере) и TS-001 Соколовой до «Мои кредиты» прошли через ИНН+код. make check зелёный (432 web), 22 целевые проверки helper/лимита/публичных настроек зелёные. Создание компании #87 прошло полный ci-ok и влито в main; helper — следующий отдельный PR. Пользовательский PDF и исследование не менялись.
 
 
+**Ответ пользователя о блокерах банка:** «Я подключу Claude для этих интерфейсов; ты продолжаешь банк после их готовности». Сохранение решения/проверка ручных условий/request_information/request_recheck остаются у A. B не получил разрешение менять чужую зону и продолжает независимые проверки демо.
+
+
+**23.10, B · T-370 в main и проверка T-436.** #88 влит на точной версии badc348 после всех зелёных CI (ci-ok 120277361600), merge 3f01d76. Все методы T-370 теперь в main; карточка DONE. Для C: коллекция API должна включить POST /demo/scenarios и служебный POST /demo/personas/{code}/login (без использования helper в пользовательских e2e). T-436: четыре браузерные проверки прошли — банковская очередь/карточка и подсказка Соколовой (закрыта, раскрывается, axe), изменённая сумма скрывает подсказку. Добавлена проверка отсутствия запроса каталога вне DEMO_MODE. Публичные API не менялись. Мак защищён от простоя процессом caffeinate 41874 примерно до 21:18 НСК.
+
+
+**23.10, B · T-435, повтор сброса.** Найден и воспроизведён дефект: после успешного сброса ошибка следующего оставляла прежнее зелёное подтверждение. Старый receipt очищается при начале каждой операции, после ошибки кнопка явно предлагает повтор. Проверка ждёт серверный ответ повторного запроса и проверяет отсутствие устаревшего успеха и приватного detail. Зона A не менялась.
+
+
+**23.10, B · T-434, загрузка панели вне деморежима.** Браузер подтвердил: RouteObject.lazy загружал DemoZoneLayout/DemoPanel до RequireDemo, хотя показывалось «Не найдено». Исправлено React.lazy после гейта; до исправления тест падал на двух JS-запросах, после — проходит без кода панели и запросов /demo/*. На собственной сборке прошли пять e2e: выключенная панель, включённая панель/хаос/сброс, два состояния подсказки, вход банка. Серверный DEMO_MODE не подменяется: в браузерном тесте изменена только публичная настройка для проверки UI-границы.
+
+---
+
+
+---
+
+**23.10, B · T-434, проверка после T-133.** Собственный scc-bank обновлён моками из main: девять встроенных персон и прежний custom b-t370-check, все APPLIED связаны с компаниями API. TS-101 проверяет название и ожидаемый исход всех нетехнических карточек из живого каталога, затем chaos/reset/независимый банк; прошёл. Пять регрессионных браузерных сценариев тоже прошли. Пустой каталог получил кнопку обновления; ошибка каталога допускает повтор и не прячет независимые источники. Локально 436 web, 1215 API unit/property, 509 mocks быстрых тестов, типы и границы модулей зелёные.
+
+**23.10, B · чтение публичных интерфейсов A, без правок чужой зоны.** #93 (request_recheck) и #94 (evaluate/record underwriter) появились; интеграция банка начнётся после их готовности. В просмотренном head #94 f763a788 типы аргументов Level/Outcome импортируются из decisioning.types и пока не экспортированы decisioning.__init__. Просьба A экспортировать эти два enum через публичный порт (или pipeline.__init__), чтобы B не обходил R1 приватным импортом. Подтверждены: record владеет переходом, OVERRIDE и предложением, принимает Session вызывающего; аудит AUTHORITY_LEVEL_TOO_LOW B пишет отдельно после rollback. Повторять эти эффекты в backoffice нельзя.
+
+**23.10, B · результаты в main, смена продолжается.** #90 влит на8b75b296 после всех12зелёных CI (ci-ok120291765700), merge52c76b8; он включает #89, который GitHub отметил merged. #92 после смены base на main влит на7c5d1ca9 после всех12зелёных CI (ci-ok120292021384), mergeee1c94b. T-436 DONE. T-435 остаётся REVIEW только из-за полного БКИ/recheck; подтверждённые критерии отмечены. Свежий лимит17%, передачу ещё не начинаю. Отчёт B перезаписан актуальным состоянием.
+
+**22.10, вечер · Агент A (Claude Code, субагент) · T-133: персоны snabkontrakt, stankoprom и zarya**
+
+Добавлен `builtin_large.py` в моках, три персоны подключены в общий список (теперь 9). Живой стенд `scc-large` (порты 8088/8100/8105): решения в `decisions` совпали с 30-17 по грейду, потоку, DSCR, стрессу и платежу всех трёх (snabkontrakt A 92, 739 163; stankoprom A 90, 393 247; zarya A 91, 325 000). Ожидание вариантов встречного СнабКонтракта помечено `xfail` до T-297.
+
+Расхождение с фикстурой ядра: у `0018881113`, `001310000200` и `001310000888` неверные контрольные суммы, взяты валидные ИНН (подробно в карточке T-133). Контракты моков и api, ядро и `policy` не менялись.
+
+---
+
 ### A, 23.10: `pipeline.request_recheck` готов (T-277, для B / T-363)
 
 PR `feat/pipeline-recheck`. Публичный импорт: `from app.modules import pipeline`.
@@ -788,10 +818,56 @@ pipeline.request_recheck(session, application_id, *, expected_version, actor, ac
 - Пример: `with db.transaction() as s: pipeline.request_recheck(s, app_id, expected_version=card.version, actor=Actor.UNDERWRITER, actor_id=user_id, reason_code="SOURCE_RECOVERED")`.
 - Не сделано в T-277: сообщение «правила обновлены» при смене политики, обязательный ручной разбор после 3-го раунда (в T-350).
 
+---
+
+---
+
+**23.10 · Агент A (Claude Code, субагент) · интерфейсы ручного решения для B (T-362, T-364)**
+
+**PR:** ветка `feat/underwriter-decision-api` (ссылка в отчёте агента), в main не влит. Ответ на запрос B из записи «начало параллельной работы B».
+
+**Публичный импорт.**
+- `from app.modules.decisioning import evaluate_underwriter_decision, UnderwriterTerms, UnderwriterEvaluation, UwViolation, ViolationKind`
+- `from app.modules import pipeline`; `pipeline.record_underwriter_decision`, `pipeline.preview_underwriter_decision`, `pipeline.UnderwriterReceipt`
+
+**Сигнатуры.**
+- `evaluate_underwriter_decision(inputs: DecisionInput, engine_result: DecisionResult, outcome: Outcome, terms: UnderwriterTerms | None, actor_level: Level, reason_code: str | None, comment: str | None, *, application_version: int | None = None) -> UnderwriterEvaluation`. Чистая функция. Исходы: `APPROVED`, `COUNTER_OFFER`, `REJECTED`. `UnderwriterTerms(product, amount_rub, term_months, rate: Decimal | None)`; ставка долей (0,195), `None` — расчётная ставка ядра.
+- Результат: `allowed`, `violations` (код, `kind` INPUT / HARD / AUTHORITY / REASON, `params`), `required_level`, `deviation`, `exception_used`, `exception_codes`, `rate` и коридор, `payment_rub`, `last_payment_rub`, `overpayment_rub`, `dscr`, `stress_dscr`, `debt_to_revenue_with_new`, `min_comment_chars`, `checks` (проверенные условия), `inputs_hash`, `policy_version`, `policy_hash`, `application_version`.
+- `preview_underwriter_decision(session, *, application_id, actor_level, outcome, terms, reason_code=None, comment=None, expected_version=None, engine_decision_id=None) -> UnderwriterEvaluation`. Это `evaluate-offer` без записи: сама читает последнее ENGINE-решение и считает ядром.
+- `record_underwriter_decision(session, *, application_id, expected_version, actor_id, actor_level, outcome, terms=None, reason_code=None, comment=None, engine_decision_id=None) -> UnderwriterReceipt`. Receipt: `decision_id`, `engine_decision_id`, `application_id`, `previous_status`, `new_status`, `version` (после перехода), `outcome`, `deviation`, `exception_used`, `offer_id`, `evaluation`, `checked_conditions`.
+
+**Ошибки (`AppError`).**
+- 404 `NOT_FOUND`.
+- 409 `VERSION_CONFLICT` (версия не равна `expected_version`; так же ведёт себя повторный вызов после успеха, `errors=[{version}]`).
+- 409 `INVALID_TRANSITION` (не `MANUAL_REVIEW`, `errors=[{currentStatus}]`).
+- 409 `ENGINE_DECISION_MISSING`, `ENGINE_DECISION_STALE` (передан `engine_decision_id`, но есть более новое), `ENGINE_SNAPSHOT_INCOMPATIBLE`, `ENGINE_SNAPSHOT_MISMATCH`.
+- 403 `AUTHORITY_LEVEL_TOO_LOW`, `errors=[{requiredLevel, actorLevel}]`, только если других нарушений нет.
+- 422 `UNDERWRITER_DECISION_INVALID`, `errors=[{code, kind, params}]`. Коды: `RATE_OUT_OF_CORRIDOR`, `AMOUNT_OUT_OF_RANGE` и другие коды продукта, `DSCR_BELOW_EXCEPTION_FLOOR`, `STRESS_BELOW_EXCEPTION_FLOOR`, `DEBT_TOO_HIGH`, `LIMIT_ABOVE_CAP`, `REASON_REQUIRED`, `REASON_UNKNOWN`, `COMMENT_TOO_SHORT`, `TERMS_REQUIRED`, `TERMS_NOT_ALLOWED`, `APPROVED_TERMS_DIFFER`, `COUNTER_SAME_AS_REQUEST`, `OUTCOME_NOT_ALLOWED`, `ACTOR_LEVEL_INVALID`, `ENGINE_NOT_MANUAL_REVIEW`, `ENGINE_RESULT_MISMATCH`.
+
+**Транзакция и владелец перехода.**
+- Всё в транзакции вызывающего (`session`): блокировка заявки `FOR UPDATE`, проверка версии, пересчёт `decide()` по сохранённым inputs и `evaluate_underwriter_decision` (клиенту доверять нельзя), снимок `source=UNDERWRITER` (`overrides_decision_id` = ENGINE), причины, **переход `MANUAL_REVIEW → …` (`Actor.UNDERWRITER`), событие журнала и предложение клиенту делает `record_underwriter_decision`**. Backoffice их не пишет, иначе задвоятся.
+- Событие: при отклонении от рекомендации `OVERRIDE`, иначе `STEP UNDERWRITER_DECISION`; в payload нет комментария. Предложение: для `APPROVED` «как просили», для `COUNTER_OFFER` одна карточка (`pipeline/hooks.py::create_underwriter_offer`). Откат транзакции убирает всё.
+- Отказ по полномочиям с записью в `audit_log` backoffice пишет отдельной транзакцией после отката: ловит `AppError` 403 и берёт уровни из `errors`.
+- Снимок неизменяем (триггер БД). Миграция `0011_underwriter_decision` (колонки `actor_id`, `actor_level`, `override_reason_code`, `deviation`); комментарий андеррайтера лежит в `decisions.override_reason`.
+
+**Пример вызова.**
+```
+with db.transaction() as session:
+    receipt = pipeline.record_underwriter_decision(
+        session, application_id=app_id, expected_version=card.version,
+        actor_id=principal.user_id, actor_level=Level(principal.level), outcome=Outcome.APPROVED,
+        terms=UnderwriterTerms(Product.INVESTMENT, 15_000_000, 60, Decimal("0.195")),
+        reason_code=None, comment=None)
+```
+
+**Что учесть B.** `Level`, `Outcome`, `Product` — из `app.modules.decisioning.types`. Пороги исключения, длины комментария и коды причин теперь в `policy/v1.yaml` (`underwriter.*`); снимки ENGINE старой схемы политики не читаются (стенд сбрасывается). Методические допущения: R-004, пункты 23–30. Тесты: `tests/unit/decisioning/test_underwriting.py`, `tests/property/test_underwriting.py`, `tests/integration/test_underwriter_decision.py` (Станкопром, L2 одобряет). Интерфейс закрывает блокеры T-362 и T-364 со стороны A; `request_recheck` и `request_information` ещё не сделаны.
+
+---
+
 
 ### A, 23.10: `applications.request_information` и ответ клиента готовы (T-350/T-351, для B / T-363)
 
-PR `feat/client-tasks` (ветка построена от `feat/pipeline-recheck`, миграция `0011_client_tasks` после `0010_bank_user_level`; кто вливает вторым, перенумеровывает). Публичный импорт: `from app.modules import applications`.
+PR `feat/client-tasks` (ветка построена от `feat/pipeline-recheck`, миграция `0012_client_tasks` после `0011_underwriter_decision` (перенумерована при слиянии)). Публичный импорт: `from app.modules import applications`.
 
 ```python
 applications.request_information(session, application_id, *, expected_version, actor, actor_id=None,
