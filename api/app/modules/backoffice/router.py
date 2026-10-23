@@ -11,6 +11,7 @@ from app.modules.applications import Status
 from app.modules.backoffice import card, decision_service, outbox_service, service
 from app.modules.backoffice.card_schemas import BankApplicationCard
 from app.modules.backoffice.decision_schemas import BankDecisionRequest, BankDecisionSaved
+from app.modules.backoffice.info_router import router as info_router
 from app.modules.backoffice.outbox_schemas import (
     BankOutboxPage,
     BankOutboxRetried,
@@ -19,6 +20,7 @@ from app.modules.backoffice.outbox_schemas import (
 from app.modules.backoffice.schemas import BankQueuePage, ProductCode
 
 router = APIRouter(prefix="/backoffice", tags=["банк"])
+router.include_router(info_router)
 
 
 @router.post(

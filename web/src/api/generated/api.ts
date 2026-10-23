@@ -36,11 +36,15 @@ import type {
   BankDecisionRequest,
   BankDecisionSaved,
   BankDemoLoginRequest,
+  BankInfoRequest,
+  BankInfoRequested,
   BankMeResponse,
   BankOutboxPage,
   BankOutboxRetried,
   BankOutboxRetryRequest,
   BankQueuePage,
+  BankRecheckRequest,
+  BankRecheckStarted,
   ChaosInput,
   ChaosView,
   ClientDecisionOut,
@@ -1565,6 +1569,262 @@ export const useBankLogout = <TError = HTTPValidationError | void,
         TContext
       > => {
       return useMutation(getBankLogoutMutationOptions(options), queryClient);
+    }
+
+export type requestBackofficeInformationResponse200 = {
+  data: BankInfoRequested
+  status: 200
+}
+
+export type requestBackofficeInformationResponse401 = {
+  data: void
+  status: 401
+}
+
+export type requestBackofficeInformationResponse403 = {
+  data: void
+  status: 403
+}
+
+export type requestBackofficeInformationResponse404 = {
+  data: void
+  status: 404
+}
+
+export type requestBackofficeInformationResponse409 = {
+  data: void
+  status: 409
+}
+
+export type requestBackofficeInformationResponse422 = {
+  data: void
+  status: 422
+}
+
+export type requestBackofficeInformationResponseSuccess = (requestBackofficeInformationResponse200) & {
+  headers: Headers;
+};
+export type requestBackofficeInformationResponseError = (requestBackofficeInformationResponse401 | requestBackofficeInformationResponse403 | requestBackofficeInformationResponse404 | requestBackofficeInformationResponse409 | requestBackofficeInformationResponse422) & {
+  headers: Headers;
+};
+
+export type requestBackofficeInformationResponse = (requestBackofficeInformationResponseSuccess | requestBackofficeInformationResponseError)
+
+export const getRequestBackofficeInformationUrl = (applicationId: string,) => {
+
+
+
+
+  return `/backoffice/applications/${applicationId}/request-info`
+}
+
+/**
+ * @summary Запросить сведения у клиента
+ */
+export const requestBackofficeInformation = async (applicationId: string,
+    bankInfoRequest: BankInfoRequest, options?: Parameters<typeof customFetch>[1]): Promise<requestBackofficeInformationResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<requestBackofficeInformationResponse>(getRequestBackofficeInformationUrl(applicationId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(bankInfoRequest)
+  }
+);}
+
+
+
+
+
+export const getRequestBackofficeInformationMutationKey = () => ['requestBackofficeInformation'] as const;
+
+export const getRequestBackofficeInformationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestBackofficeInformation>>, TError,RequestBackofficeInformationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestBackofficeInformation>>, TError,RequestBackofficeInformationMutationVariables, TContext> => {
+
+const mutationKey = getRequestBackofficeInformationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestBackofficeInformation>>, RequestBackofficeInformationMutationVariables> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  requestBackofficeInformation(applicationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestBackofficeInformationMutationResult = NonNullable<Awaited<ReturnType<typeof requestBackofficeInformation>>>
+    export type RequestBackofficeInformationMutationBody = BankInfoRequest
+    export type RequestBackofficeInformationMutationError = void
+    export type RequestBackofficeInformationMutationVariables = {applicationId: string;data: BankInfoRequest}
+
+    /**
+ * @summary Запросить сведения у клиента
+ */
+export const useRequestBackofficeInformation = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestBackofficeInformation>>, TError,RequestBackofficeInformationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestBackofficeInformation>>,
+        TError,
+        RequestBackofficeInformationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestBackofficeInformationMutationOptions(options), queryClient);
+    }
+
+export type recheckBackofficeApplicationResponse200 = {
+  data: BankRecheckStarted
+  status: 200
+}
+
+export type recheckBackofficeApplicationResponse401 = {
+  data: void
+  status: 401
+}
+
+export type recheckBackofficeApplicationResponse403 = {
+  data: void
+  status: 403
+}
+
+export type recheckBackofficeApplicationResponse404 = {
+  data: void
+  status: 404
+}
+
+export type recheckBackofficeApplicationResponse409 = {
+  data: void
+  status: 409
+}
+
+export type recheckBackofficeApplicationResponse422 = {
+  data: void
+  status: 422
+}
+
+export type recheckBackofficeApplicationResponseSuccess = (recheckBackofficeApplicationResponse200) & {
+  headers: Headers;
+};
+export type recheckBackofficeApplicationResponseError = (recheckBackofficeApplicationResponse401 | recheckBackofficeApplicationResponse403 | recheckBackofficeApplicationResponse404 | recheckBackofficeApplicationResponse409 | recheckBackofficeApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type recheckBackofficeApplicationResponse = (recheckBackofficeApplicationResponseSuccess | recheckBackofficeApplicationResponseError)
+
+export const getRecheckBackofficeApplicationUrl = (applicationId: string,) => {
+
+
+
+
+  return `/backoffice/applications/${applicationId}/recheck`
+}
+
+/**
+ * @summary Повторно проверить источники заявки
+ */
+export const recheckBackofficeApplication = async (applicationId: string,
+    bankRecheckRequest: BankRecheckRequest, options?: Parameters<typeof customFetch>[1]): Promise<recheckBackofficeApplicationResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<recheckBackofficeApplicationResponse>(getRecheckBackofficeApplicationUrl(applicationId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(bankRecheckRequest)
+  }
+);}
+
+
+
+
+
+export const getRecheckBackofficeApplicationMutationKey = () => ['recheckBackofficeApplication'] as const;
+
+export const getRecheckBackofficeApplicationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recheckBackofficeApplication>>, TError,RecheckBackofficeApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recheckBackofficeApplication>>, TError,RecheckBackofficeApplicationMutationVariables, TContext> => {
+
+const mutationKey = getRecheckBackofficeApplicationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recheckBackofficeApplication>>, RecheckBackofficeApplicationMutationVariables> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  recheckBackofficeApplication(applicationId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecheckBackofficeApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof recheckBackofficeApplication>>>
+    export type RecheckBackofficeApplicationMutationBody = BankRecheckRequest
+    export type RecheckBackofficeApplicationMutationError = void
+    export type RecheckBackofficeApplicationMutationVariables = {applicationId: string;data: BankRecheckRequest}
+
+    /**
+ * @summary Повторно проверить источники заявки
+ */
+export const useRecheckBackofficeApplication = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recheckBackofficeApplication>>, TError,RecheckBackofficeApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recheckBackofficeApplication>>,
+        TError,
+        RecheckBackofficeApplicationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRecheckBackofficeApplicationMutationOptions(options), queryClient);
     }
 
 export type saveBackofficeDecisionResponse200 = {
