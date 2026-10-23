@@ -90,6 +90,8 @@ class PublicConfig(Camel):
     product_name: str
     version: str
     nlu_available: bool
+    demo_code_required: bool = False
+    docs_links: dict[str, str] = Field(default_factory=dict)
 
 
 def _brief(company: Company) -> CompanyBrief:
@@ -311,4 +313,6 @@ async def public_config() -> PublicConfig:
         product_name="Умный кредитный кабинет",
         version="0.1.0",
         nlu_available=settings.nlu_enabled,
+        demo_code_required=settings.demo_mode and settings.app_env.value == "cloud",
+        docs_links=settings.docs_links if settings.demo_mode else {},
     )
