@@ -23,6 +23,7 @@ import { BankAssessmentPanels } from './BankAssessmentPanels';
 import { BankEvidencePanels } from './BankEvidencePanels';
 import { bankLabel } from './bankFormatting';
 import { BankRecommendationView } from './BankRecommendationView';
+import { BankOutboxPanel } from './BankOutboxPanel';
 
 export function BankApplicationPage() {
   const { id = '' } = useParams();
@@ -165,6 +166,7 @@ function BankApplication({ id, expected }: { id: string; expected: number | unde
           </Paper>
           <BankAssessmentPanels decision={decision} incomplete={incomplete} />
           <BankEvidencePanels card={card} />
+          <BankOutboxPanel applicationId={card.id} />
         </>
       ) : null}
     </Stack>

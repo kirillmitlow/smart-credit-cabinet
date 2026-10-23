@@ -3,13 +3,18 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Header, Query, Response
 from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
 from app.modules.applications import Status
-from app.modules.backoffice import card, service
+from app.modules.backoffice import card, outbox_service, service
 from app.modules.backoffice.card_schemas import BankApplicationCard
+from app.modules.backoffice.outbox_schemas import (
+    BankOutboxPage,
+    BankOutboxRetried,
+    BankOutboxRetryRequest,
+)
 from app.modules.backoffice.schemas import BankQueuePage, ProductCode
 
 router = APIRouter(prefix="/backoffice", tags=["банк"])
@@ -58,3 +63,55 @@ async def application_card(
     expected_version: Annotated[int | None, Query(alias="expectedVersion", ge=1)] = None,
 ) -> BankApplicationCard:
     return await run_in_threadpool(card.card, principal, application_id, expected_version)
+
+
+@router.get(
+    "/outbox",
+    operation_id="listBackofficeOutbox",
+    summary="Застрявшие сообщения",
+    response_model=BankOutboxPage,
+    response_model_by_alias=True,
+    responses={
+        401: {"description": "UNAUTHENTICATED"},
+        403: {"description": "FORBIDDEN"},
+        422: {"description": "VALIDATION_ERROR"},
+    },
+)
+async def failed_outbox(
+    principal: auth.BankPrincipal,
+    application_id: Annotated[UUID | None, Query(alias="applicationId")] = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    cursor: Annotated[str | None, Query(pattern=r"^[1-9]\d{0,18}$")] = None,
+) -> BankOutboxPage:
+    return await run_in_threadpool(outbox_service.failed, principal, application_id, limit, cursor)
+
+
+@router.post(
+    "/outbox/{message_id}/retry",
+    operation_id="retryBackofficeOutbox",
+    summary="Поставить сообщение на повтор",
+    response_model=BankOutboxRetried,
+    response_model_by_alias=True,
+    responses={
+        401: {"description": "UNAUTHENTICATED"},
+        403: {"description": "FORBIDDEN"},
+        404: {"description": "NOT_FOUND"},
+        409: {
+            "description": "OUTBOX_NOT_FAILED / OUTBOX_RETRY_EXPIRED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+        },
+        422: {"description": "VALIDATION_ERROR"},
+    },
+)
+async def retry_outbox(
+    message_id: int,
+    principal: auth.BankPrincipal,
+    response: Response,
+    idempotency_key: Annotated[
+        str, Header(alias="Idempotency-Key", min_length=1, max_length=200, pattern=r"^\S+$")
+    ],
+    body: BankOutboxRetryRequest | None = None,
+) -> BankOutboxRetried:
+    result = await run_in_threadpool(outbox_service.retry, principal, message_id, idempotency_key)
+    if result.replayed:
+        response.headers["Idempotent-Replayed"] = "true"
+    return BankOutboxRetried.model_validate(result.body)

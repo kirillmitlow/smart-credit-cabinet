@@ -43,7 +43,7 @@
 ## В работе (каждый правит свою строку)
 
 - **A:** смена закрыта 22.10 поздно вечером при 16% лимита. Влит #72 (T-297, встречные, Снабконтракт сходится с оракулом до рубля). PR #74 (T-133: snabkontrakt, stankoprom, zarya; все 9 персон по оракулу на живом стенде) ждёт CI. **Следующее для A по порядку:** (1) интерфейсы, которые просит B для банка (журнал, запись B «начало параллельной работы»): `pipeline.record_underwriter_decision`, `decisioning.evaluate_underwriter_decision`, `pipeline.request_recheck` (T-277), `applications.request_information` (T-350/T-351); (2) Q-148: конвейер не запрашивает ЕИС для карточки «под контракт», если заявка не CONTRACT (тест xfail в `api/tests/personas/test_simple_personas.py`); (3) экран встречных T-423, затем T-424/T-425; (4) T-135 технические сценарии, T-130 выписка.
-- **B:** T-430/T-431 (карточка и её блоки), ветка `feat/web-bank-card`; API #79/#80 в main, экран очереди в PR [#81](https://github.com/kirillmitlow/smart-credit-cabinet/pull/81), ждёт CI. Worktree `worktrees/gov-contracts-list`. Для T-362…364 ждём public интерфейсов A, документы/SSE ещё не готовы.
+- **B:** T-365 (застрявшие сообщения), ветка `feat/backoffice-outbox-retry`; очередь #81 в main, карточка/блоки в PR [#82](https://github.com/kirillmitlow/smart-credit-cabinet/pull/82), ждёт CI. Затем T-434…436 (демо). Worktree `worktrees/gov-contracts-list`. T-362…364/T-432…433 ждут public интерфейсов A; документы/SSE отсутствуют.
 - **C:** T-515, ветка `chore/smoke-script`; готовность стенда и smoke Соколовой до выдачи (23.10, отдельная копия на Mac).
 
 ## Что уже в main

@@ -34,6 +34,9 @@ import type {
   BankApplicationCard,
   BankDemoLoginRequest,
   BankMeResponse,
+  BankOutboxPage,
+  BankOutboxRetried,
+  BankOutboxRetryRequest,
   BankQueuePage,
   ClientDecisionOut,
   CodeCheck,
@@ -53,6 +56,7 @@ import type {
   HealthDeps200,
   HealthLive200,
   ListApplicationsParams,
+  ListBackofficeOutboxParams,
   ListCompanyGovContractsParams,
   ListLoansParams,
   LoanDetail,
@@ -1836,6 +1840,271 @@ export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof ge
 
 
 
+
+export type listBackofficeOutboxResponse200 = {
+  data: BankOutboxPage
+  status: 200
+}
+
+export type listBackofficeOutboxResponse401 = {
+  data: void
+  status: 401
+}
+
+export type listBackofficeOutboxResponse403 = {
+  data: void
+  status: 403
+}
+
+export type listBackofficeOutboxResponse422 = {
+  data: void
+  status: 422
+}
+
+export type listBackofficeOutboxResponseSuccess = (listBackofficeOutboxResponse200) & {
+  headers: Headers;
+};
+export type listBackofficeOutboxResponseError = (listBackofficeOutboxResponse401 | listBackofficeOutboxResponse403 | listBackofficeOutboxResponse422) & {
+  headers: Headers;
+};
+
+export type listBackofficeOutboxResponse = (listBackofficeOutboxResponseSuccess | listBackofficeOutboxResponseError)
+
+export const getListBackofficeOutboxUrl = (params?: ListBackofficeOutboxParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/backoffice/outbox?${stringifiedParams}` : `/backoffice/outbox`
+}
+
+/**
+ * @summary Застрявшие сообщения
+ */
+export const listBackofficeOutbox = async (params?: ListBackofficeOutboxParams, options?: Parameters<typeof customFetch>[1]): Promise<listBackofficeOutboxResponse> => {
+
+  return customFetch<listBackofficeOutboxResponse>(getListBackofficeOutboxUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBackofficeOutboxQueryKey = (params?: ListBackofficeOutboxParams,) => {
+    return [
+    `/backoffice/outbox`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListBackofficeOutboxQueryOptions = <TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBackofficeOutboxQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBackofficeOutbox>>> = ({ signal }) => listBackofficeOutbox(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListBackofficeOutboxQueryResult = NonNullable<Awaited<ReturnType<typeof listBackofficeOutbox>>>
+export type ListBackofficeOutboxQueryError = void
+
+
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params: undefined |  ListBackofficeOutboxParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBackofficeOutbox>>,
+          TError,
+          Awaited<ReturnType<typeof listBackofficeOutbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBackofficeOutbox>>,
+          TError,
+          Awaited<ReturnType<typeof listBackofficeOutbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Застрявшие сообщения
+ */
+
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListBackofficeOutboxQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type retryBackofficeOutboxResponse200 = {
+  data: BankOutboxRetried
+  status: 200
+}
+
+export type retryBackofficeOutboxResponse401 = {
+  data: void
+  status: 401
+}
+
+export type retryBackofficeOutboxResponse403 = {
+  data: void
+  status: 403
+}
+
+export type retryBackofficeOutboxResponse404 = {
+  data: void
+  status: 404
+}
+
+export type retryBackofficeOutboxResponse409 = {
+  data: void
+  status: 409
+}
+
+export type retryBackofficeOutboxResponse422 = {
+  data: void
+  status: 422
+}
+
+export type retryBackofficeOutboxResponseSuccess = (retryBackofficeOutboxResponse200) & {
+  headers: Headers;
+};
+export type retryBackofficeOutboxResponseError = (retryBackofficeOutboxResponse401 | retryBackofficeOutboxResponse403 | retryBackofficeOutboxResponse404 | retryBackofficeOutboxResponse409 | retryBackofficeOutboxResponse422) & {
+  headers: Headers;
+};
+
+export type retryBackofficeOutboxResponse = (retryBackofficeOutboxResponseSuccess | retryBackofficeOutboxResponseError)
+
+export const getRetryBackofficeOutboxUrl = (messageId: number,) => {
+
+
+
+
+  return `/backoffice/outbox/${messageId}/retry`
+}
+
+/**
+ * @summary Поставить сообщение на повтор
+ */
+export const retryBackofficeOutbox = async (messageId: number,
+    bankOutboxRetryRequestNull?: BankOutboxRetryRequest | null, options?: Parameters<typeof customFetch>[1]): Promise<retryBackofficeOutboxResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<retryBackofficeOutboxResponse>(getRetryBackofficeOutboxUrl(messageId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(bankOutboxRetryRequestNull)
+  }
+);}
+
+
+
+
+
+export const getRetryBackofficeOutboxMutationKey = () => ['retryBackofficeOutbox'] as const;
+
+export const getRetryBackofficeOutboxMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryBackofficeOutbox>>, TError,RetryBackofficeOutboxMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryBackofficeOutbox>>, TError,RetryBackofficeOutboxMutationVariables, TContext> => {
+
+const mutationKey = getRetryBackofficeOutboxMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryBackofficeOutbox>>, RetryBackofficeOutboxMutationVariables> = (props) => {
+          const {messageId,data} = props ?? {};
+
+          return  retryBackofficeOutbox(messageId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryBackofficeOutboxMutationResult = NonNullable<Awaited<ReturnType<typeof retryBackofficeOutbox>>>
+    export type RetryBackofficeOutboxMutationBody = BankOutboxRetryRequest | null | undefined
+    export type RetryBackofficeOutboxMutationError = void
+    export type RetryBackofficeOutboxMutationVariables = {messageId: number;data?: BankOutboxRetryRequest | null}
+
+    /**
+ * @summary Поставить сообщение на повтор
+ */
+export const useRetryBackofficeOutbox = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryBackofficeOutbox>>, TError,RetryBackofficeOutboxMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof retryBackofficeOutbox>>,
+        TError,
+        RetryBackofficeOutboxMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryBackofficeOutboxMutationOptions(options), queryClient);
+    }
 
 export type listCompanyGovContractsResponse200 = {
   data: GovContractPage

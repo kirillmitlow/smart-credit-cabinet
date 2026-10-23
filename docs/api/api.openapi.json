@@ -633,6 +633,160 @@
         }
       }
     },
+    "/backoffice/outbox": {
+      "get": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Застрявшие сообщения",
+        "operationId": "listBackofficeOutbox",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Applicationid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[1-9]\\d{0,18}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankOutboxPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          }
+        }
+      }
+    },
+    "/backoffice/outbox/{message_id}/retry": {
+      "post": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Поставить сообщение на повтор",
+        "operationId": "retryBackofficeOutbox",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Message Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^\\S+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BankOutboxRetryRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankOutboxRetried"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "409": {
+            "description": "OUTBOX_NOT_FAILED / OUTBOX_RETRY_EXPIRED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          }
+        }
+      }
+    },
     "/companies/{company_id}/gov-contracts": {
       "get": {
         "tags": [
@@ -3357,6 +3511,151 @@
           "passed"
         ],
         "title": "BankMetric"
+      },
+      "BankOutboxItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "applicationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicationid"
+          },
+          "targetSystem": {
+            "type": "string",
+            "title": "Targetsystem"
+          },
+          "eventType": {
+            "type": "string",
+            "title": "Eventtype"
+          },
+          "status": {
+            "type": "string",
+            "const": "FAILED",
+            "title": "Status",
+            "default": "FAILED"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "lastError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lasterror"
+          },
+          "canRetry": {
+            "type": "boolean",
+            "title": "Canretry"
+          },
+          "blockedReason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EXPIRED",
+                  "APPLICATION_MISSING"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blockedreason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "targetSystem",
+          "eventType",
+          "attempts",
+          "createdAt",
+          "lastError",
+          "canRetry",
+          "blockedReason"
+        ],
+        "title": "BankOutboxItem"
+      },
+      "BankOutboxPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BankOutboxItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "BankOutboxPage"
+      },
+      "BankOutboxRetried": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "status": {
+            "type": "string",
+            "const": "PENDING",
+            "title": "Status",
+            "default": "PENDING"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId"
+        ],
+        "title": "BankOutboxRetried"
+      },
+      "BankOutboxRetryRequest": {
+        "properties": {},
+        "additionalProperties": false,
+        "type": "object",
+        "title": "BankOutboxRetryRequest"
       },
       "BankPolicyReference": {
         "properties": {
