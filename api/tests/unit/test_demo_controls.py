@@ -196,3 +196,18 @@ async def test_personas_use_live_scenarios_and_never_return_users_or_spec(monkey
     r = await call(app, "GET", "/demo/personas")
     assert r.status_code == 502
     assert "private-key" not in r.text
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("cloud", "demo", "required"), [(True, True, True), (False, True, False), (True, False, False)]
+)
+async def test_public_config_exposes_only_code_requirement_not_code(
+    monkeypatch, cloud, demo, required
+):
+    app, _ = stand(monkeypatch, cloud=cloud, demo=demo, code="secret-stand-code")
+    r = await call(app, "GET", "/public-config")
+    assert r.status_code == 200
+    assert r.json()["demoCodeRequired"] is required
+    assert r.json()["docsLinks"] == ({"api": "/docs"} if demo else {})
+    assert "secret-stand-code" not in r.text

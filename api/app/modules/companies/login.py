@@ -306,8 +306,8 @@ async def set_active_company(body: ActiveCompany, principal: auth.ClientPrincipa
     response_model=PublicConfig,
     response_model_by_alias=True,
 )
-async def public_config() -> PublicConfig:
-    settings = get_settings()
+async def public_config(request: Request) -> PublicConfig:
+    settings = request.app.state.settings
     return PublicConfig(
         demo_mode=settings.demo_mode,
         product_name="Умный кредитный кабинет",
