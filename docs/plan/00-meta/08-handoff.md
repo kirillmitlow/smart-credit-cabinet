@@ -42,7 +42,7 @@
 
 ## В работе (каждый правит свою строку)
 
-- **A:** смена 23.10 утро. Интерфейсы для банка по запросу B (субагенты A): `decisioning.evaluate_underwriter_decision` + `pipeline.record_underwriter_decision` — ветка `feat/underwriter-decision-api`; `pipeline.request_recheck` — `feat/pipeline-recheck`, затем `applications.request_information` + ответ клиента — `feat/client-tasks`. Каждый готовый интерфейс описывается в журнале для B. Дальше A: Q-148, T-423…T-425, T-135, T-130.
+- **A:** 23.10: все четыре интерфейса для банка в main — #93 `pipeline.request_recheck`, #94 `decisioning.evaluate_underwriter_decision` + `pipeline.record_underwriter_decision`/`preview_underwriter_decision` (экспортированы `Level`, `Outcome`), #96 `applications.request_information` + ответ клиента (`GET /applications/{id}/tasks`, `POST /tasks/{id}/answer`, `POST /applications/{id}/tasks/submit`). Сигнатуры, ошибки и примеры — в журнале. Миграции: 0011_underwriter_decision → 0012_client_tasks. **Известно:** контрактный тест `test_romashka_report_has_94_days_overdue` даёт 95 от реальной даты (в CI не входит, исход тот же) — чинит A. Следующее у A: Q-148, T-423…T-425 (экраны исходов и задач клиента), T-135, T-130.
 - **B:** T-370/T-365/T-436 DONE. #89/#90/#92 в main, все12CI финальных head зелёные; девять персон проверены в scc-bank. Отчёт reviews/B-2026-10-23-handoff.md актуален, смена продолжается (17% остатка; передача только на10%). T-362…364/T-432…433 после интерфейсов Claude #93/#94 и request_information; просьба о public Level/Outcome в журнале. Worktree `worktrees/gov-contracts-list`.
 - **C:** T-515, ветка `chore/smoke-script`; готовность стенда и smoke Соколовой до выдачи (23.10, отдельная копия на Mac).
 
