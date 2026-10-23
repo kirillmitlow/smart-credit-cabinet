@@ -1,0 +1,207 @@
+{
+  "id": "deba9846-59fb-40fc-bf23-e9a10360003a",
+  "source": "ENGINE",
+  "outcome": "MANUAL_REVIEW",
+  "route": "MANUAL",
+  "requiredLevel": "L1",
+  "createdAt": "2026-10-23T02:07:18.123641Z",
+  "engineVersion": "fixture-1",
+  "policy": {
+    "id": "7afcca9f-334d-4959-bf4b-f92e01d8d893",
+    "version": 1,
+    "contentHash": "f40bfda9e0eab0a620369c26547a45ed32bb85d907f7c6a759c2b04ade26c80d"
+  },
+  "overridesDecisionId": null,
+  "overrideReason": null,
+  "inputsHash": "d21820602376d83be84140a69aadc1b74d75efc1d14a21fcfd027688e4c6a9d3",
+  "snapshotIds": ["dba15a65-9278-4f4b-8ed8-97eaa1fe26ee"],
+  "recommendation": {
+    "outcome": "APPROVED",
+    "hint": "REQUEST_SELLER_DOCUMENT"
+  },
+  "reasons": [
+    {
+      "code": "AMOUNT_ABOVE_AUTO_LIMIT",
+      "title": "Сумма выше лимита автоматики",
+      "detail": "Сумма 15 000 000 ₽ > авто-лимита 0 ₽ (грейд A)",
+      "kind": "ROUTE",
+      "params": {
+        "amount_rub": 15000000,
+        "limit_rub": 0,
+        "grade": "A"
+      }
+    },
+    {
+      "code": "COLLATERAL_REVIEW",
+      "title": "Нужно оценить залог",
+      "detail": "Залог: покупаемая линия, оценка клиента 25 000 000 ₽, к сумме 60%",
+      "kind": "ROUTE",
+      "params": {
+        "description": "покупаемая линия",
+        "value_rub": 25000000,
+        "share": "0.6"
+      }
+    }
+  ],
+  "manualReasons": [
+    {
+      "code": "AMOUNT_ABOVE_AUTO_LIMIT",
+      "title": "Сумма выше лимита автоматики",
+      "detail": "Сумма 15 000 000 ₽ > авто-лимита 0 ₽ (грейд A)"
+    },
+    {
+      "code": "COLLATERAL_REVIEW",
+      "title": "Нужно оценить залог",
+      "detail": "Залог: покупаемая линия, оценка клиента 25 000 000 ₽, к сумме 60%"
+    }
+  ],
+  "score": 90,
+  "grade": "A",
+  "pdPercent": 1.0,
+  "factors": [
+    {
+      "code": "SC_VOLATILITY",
+      "title": "Устойчивость оборотов",
+      "value": "нет данных",
+      "points": 4,
+      "maxPoints": 8
+    },
+    {
+      "code": "SC_CLIENT",
+      "title": "Обслуживание в банке",
+      "value": "не клиент",
+      "points": 2,
+      "maxPoints": 6
+    },
+    {
+      "code": "SC_TREND",
+      "title": "Динамика оборотов",
+      "value": "0.0825",
+      "points": 8,
+      "maxPoints": 10
+    },
+    {
+      "code": "SC_AGE",
+      "title": "Возраст бизнеса",
+      "value": "115",
+      "points": 12,
+      "maxPoints": 12
+    },
+    {
+      "code": "SC_CREDIT_HISTORY",
+      "title": "Кредитная история",
+      "value": "CLEAN",
+      "points": 24,
+      "maxPoints": 24
+    },
+    {
+      "code": "SC_INQUIRIES",
+      "title": "Запросы в БКИ",
+      "value": "0/0",
+      "points": 8,
+      "maxPoints": 8
+    },
+    {
+      "code": "SC_DEBT_LOAD",
+      "title": "Долговая нагрузка",
+      "value": "0",
+      "points": 16,
+      "maxPoints": 16
+    },
+    {
+      "code": "SC_TAX",
+      "title": "Налоги",
+      "value": "0",
+      "points": 8,
+      "maxPoints": 8
+    },
+    {
+      "code": "SC_COVERAGE",
+      "title": "Покрытие текущих платежей",
+      "value": "платежей нет",
+      "points": 8,
+      "maxPoints": 8
+    }
+  ],
+  "comparisons": [],
+  "revenueMonthlyRub": 35000000,
+  "freeCashFlowRub": 2716667,
+  "existingPaymentsRub": 0,
+  "paymentRub": 393247,
+  "lastPaymentRub": 393215,
+  "overpaymentRub": 8594788,
+  "stressShockPercent": 20.0,
+  "maxAmountRub": 82850000,
+  "checks": [
+    {
+      "code": "DSCR",
+      "title": "Покрытие платежей",
+      "value": 6.908297,
+      "threshold": 1.25,
+      "comparison": "MIN",
+      "passed": true
+    },
+    {
+      "code": "STRESS_DSCR",
+      "title": "Стресс-сценарий",
+      "value": 5.526637,
+      "threshold": 1.0,
+      "comparison": "MIN",
+      "passed": true
+    },
+    {
+      "code": "DEBT_TO_REVENUE",
+      "title": "Долг к годовой выручке",
+      "value": 0.035714,
+      "threshold": 1.0,
+      "comparison": "MAX",
+      "passed": true
+    }
+  ],
+  "rate": {
+    "ratePercent": 19.5,
+    "rawRatePercent": 19.35,
+    "corridorMinPercent": 15.0,
+    "corridorMaxPercent": 23.0,
+    "rateWithCollateralPercent": null,
+    "parts": [
+      {
+        "code": "key_rate",
+        "title": "Ключевая ставка",
+        "percent": 14.0
+      },
+      {
+        "code": "spread",
+        "title": "Базовая маржа",
+        "percent": 1.0
+      },
+      {
+        "code": "expected_loss",
+        "title": "Ожидаемые потери",
+        "percent": 0.35
+      },
+      {
+        "code": "expenses",
+        "title": "Расходы",
+        "percent": 2.0
+      },
+      {
+        "code": "capital_charge",
+        "title": "Плата за капитал",
+        "percent": 2.0
+      },
+      {
+        "code": "rounding_corridor",
+        "title": "Округление и коридор продукта",
+        "percent": 0.15
+      }
+    ]
+  },
+  "flags": [],
+  "features": {
+    "business_age_months": 115
+  },
+  "variants": [],
+  "trace": [],
+  "assessedInput": {}
+}

@@ -11,7 +11,17 @@ from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
 from app import health
-from app.modules import applications, catalog, companies, demo, loans, offers, pipeline
+from app.modules import (
+    applications,
+    auth,
+    backoffice,
+    catalog,
+    companies,
+    demo,
+    loans,
+    offers,
+    pipeline,
+)
 from app.operation_fence import OperationFenceMiddleware
 from app.shared import clock, db
 from app.shared.errors import install_error_handlers
@@ -87,6 +97,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestContextMiddleware)
     app.include_router(health.router)
     app.include_router(companies.login_router)
+    app.include_router(auth.bank_login_router)
+    app.include_router(backoffice.router)
     app.include_router(companies.gov_contracts_router)
     app.include_router(companies.profile_router)
     app.include_router(applications.router)

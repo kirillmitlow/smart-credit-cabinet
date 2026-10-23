@@ -344,6 +344,449 @@
         }
       }
     },
+    "/auth/bank-demo-login": {
+      "post": {
+        "tags": [
+          "вход банка"
+        ],
+        "summary": "Войти как демо-андеррайтер L2 или администратор",
+        "operationId": "bankDemoLogin",
+        "parameters": [
+          {
+            "name": "sid_bank",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Bank"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BankDemoLoginRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankMeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED: демо выключено; FORBIDDEN: доступ отозван"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR: разрешены только роли UNDERWRITER и ADMIN"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE: хранилище сессий недоступно"
+          }
+        }
+      }
+    },
+    "/auth/bank-me": {
+      "get": {
+        "tags": [
+          "вход банка"
+        ],
+        "summary": "Кто я в банковской зоне и мой уровень полномочий",
+        "operationId": "getBankMe",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankMeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: нет банковской сессии или доступ отозван"
+          },
+          "403": {
+            "description": "FORBIDDEN: сессия не даёт права работать в банковской зоне"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE: хранилище сессий недоступно"
+          }
+        }
+      }
+    },
+    "/auth/bank-logout": {
+      "post": {
+        "tags": [
+          "вход банка"
+        ],
+        "summary": "Выйти из банковской зоны",
+        "operationId": "bankLogout",
+        "parameters": [
+          {
+            "name": "sid_bank",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Bank"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE: хранилище сессий недоступно"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/backoffice/queue": {
+      "get": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Очередь ручного рассмотрения, старые сверху",
+        "operationId": "getBackofficeQueue",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Status",
+              "default": "MANUAL_REVIEW"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(EXPRESS|WORKING_CAPITAL|CONTRACT|CREDIT_LINE|OVERDRAFT|INVESTMENT)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Productcode"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankQueuePage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR: фильтр или курсор"
+          }
+        }
+      }
+    },
+    "/backoffice/applications/{application_id}": {
+      "get": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Полная карточка для сотрудника банка",
+        "operationId": "getBackofficeApplication",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "expectedVersion",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Expectedversion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankApplicationCard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          }
+        }
+      }
+    },
+    "/backoffice/outbox": {
+      "get": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Застрявшие сообщения",
+        "operationId": "listBackofficeOutbox",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Applicationid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[1-9]\\d{0,18}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankOutboxPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          }
+        }
+      }
+    },
+    "/backoffice/outbox/{message_id}/retry": {
+      "post": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Поставить сообщение на повтор",
+        "operationId": "retryBackofficeOutbox",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Message Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^\\S+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BankOutboxRetryRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankOutboxRetried"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "409": {
+            "description": "OUTBOX_NOT_FAILED / OUTBOX_RETRY_EXPIRED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          }
+        }
+      }
+    },
     "/companies/{company_id}/gov-contracts": {
       "get": {
         "tags": [
@@ -1676,6 +2119,24 @@
         "summary": "Единый сброс стенда: моки, база api, сессии и кэш",
         "description": "Отвечает по факту завершения, а не по таймеру. При ошибке `502 DEMO_RESET_FAILED` в `errors[0].step` стоит шаг (`MOCKS`, `DATABASE`, `SESSIONS`); повторный вызов безопасно доводит сброс. Параллельный вызов: `409 DEMO_RESET_IN_PROGRESS`.",
         "operationId": "demoReset",
+        "parameters": [
+          {
+            "name": "X-Demo-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Code"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1695,6 +2156,16 @@
           },
           "502": {
             "description": "Сброс остановился на одном из шагов (`DEMO_RESET_FAILED`)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
       }
@@ -1716,6 +2187,22 @@
               "type": "string",
               "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
               "title": "Code"
+            }
+          },
+          {
+            "name": "X-Demo-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Code"
             }
           }
         ],
@@ -1751,6 +2238,281 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/demo/personas": {
+      "get": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Personas",
+        "operationId": "demoListPersonas",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Persona"
+                  },
+                  "type": "array",
+                  "title": "Response Demolistpersonas"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/chaos": {
+      "get": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Get Chaos",
+        "operationId": "demoGetChaos",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChaosView"
+                  },
+                  "type": "array",
+                  "title": "Response Demogetchaos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/chaos/{system}": {
+      "put": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Put Chaos",
+        "operationId": "demoSetChaos",
+        "parameters": [
+          {
+            "name": "system",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/System"
+            }
+          },
+          {
+            "name": "X-Demo-Code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChaosInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaosView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/scenarios": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Создать тестовую компанию и применить сценарий",
+        "description": "Тело — ScenarioSpec сервиса сценариев; форма или preset обязательны. Если code не задан, он стабильно определяется ключом запроса. Учётки — только клиентские роли. Idempotency-Key сохраняйте при повторе после таймаута. Моки и каталог api обновляются до подтверждения успеха; учётки/полный spec не возвращаются.",
+        "operationId": "demoCreateScenario",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^\\S+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioInput",
+                "examples": [
+                  {
+                    "title": "Тестовый ИП",
+                    "preset": "IP_HEALTHY",
+                    "users": [
+                      {
+                        "login": "owner",
+                        "role": "DIRECTOR",
+                        "personRef": "self"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedScenario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INN_INVALID"
+          },
+          "503": {
+            "description": "DEMO_CONTROL_UNAVAILABLE"
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED"
+          },
+          "409": {
+            "description": "SCENARIO_EXISTS / SCENARIO_INN_EXISTS / IDEMPOTENCY_KEY_REUSED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          },
+          "502": {
+            "description": "DEMO_SCENARIOS_UNAVAILABLE / DEMO_SCENARIO_INVALID_RESPONSE"
+          }
+        }
+      }
+    },
+    "/demo/personas/{code}/login": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Служебный вход персоны для интеграционных тестов",
+        "description": "Только при DEMO_MODE. Логин существующей активной учётки указывается явно. Пользовательский UI и e2e используют обычный вход по ИНН и коду. Создаёт только sid_client; банковская сессия не меняется.",
+        "operationId": "demoLoginPersona",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+              "title": "Code"
+            }
+          },
+          {
+            "name": "sid_client",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sid Client"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED / FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND: персона или активное членство отсутствуют"
+          },
+          "409": {
+            "description": "DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          },
+          "503": {
+            "description": "SESSION_STORE_UNAVAILABLE / DEMO_CONTROL_UNAVAILABLE"
           }
         }
       }
@@ -2013,6 +2775,50 @@
         ],
         "title": "ApplicationPage"
       },
+      "AppliedSystems": {
+        "properties": {
+          "registry": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Registry"
+          },
+          "tax": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Tax"
+          },
+          "bki": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Bki"
+          },
+          "bankCore": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SKIPPED"
+            ],
+            "title": "Bankcore"
+          }
+        },
+        "type": "object",
+        "required": [
+          "registry",
+          "tax",
+          "bki",
+          "bankCore"
+        ],
+        "title": "AppliedSystems"
+      },
       "AutoDecisionMode": {
         "type": "string",
         "enum": [
@@ -2021,6 +2827,1817 @@
           "NEVER"
         ],
         "title": "AutoDecisionMode"
+      },
+      "BankApplicant": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "isBankCustomer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isbankcustomer"
+          },
+          "registeredOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registeredon"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "okved": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Okved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "inn",
+          "isBankCustomer",
+          "registeredOn",
+          "status",
+          "okved"
+        ],
+        "title": "BankApplicant"
+      },
+      "BankApplicationCard": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "description": "expectedVersion отличается от версии согласованного ответа"
+          },
+          "currentVersionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentversionid"
+          },
+          "productCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termmonths"
+          },
+          "purposeCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purposecode"
+          },
+          "draft": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Draft"
+          },
+          "company": {
+            "$ref": "#/components/schemas/BankApplicant"
+          },
+          "submittedBy": {
+            "$ref": "#/components/schemas/BankSubmittedBy"
+          },
+          "submittedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submittedat"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "engineDecisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enginedecisionid"
+          },
+          "engineRecommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/BankDecisionSummary"
+            },
+            "type": "array",
+            "title": "Decisions"
+          },
+          "sourceSnapshots": {
+            "items": {
+              "$ref": "#/components/schemas/BankSourceSnapshot"
+            },
+            "type": "array",
+            "title": "Sourcesnapshots"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/BankHistoryEvent"
+            },
+            "type": "array",
+            "title": "History"
+          },
+          "documents": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documents",
+            "description": "null — сервис T-332 не подключён"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "version",
+          "stale",
+          "currentVersionId",
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "purposeCode",
+          "draft",
+          "company",
+          "submittedBy",
+          "submittedAt",
+          "decision",
+          "engineDecisionId",
+          "engineRecommendation",
+          "decisions",
+          "sourceSnapshots",
+          "history",
+          "documents"
+        ],
+        "title": "BankApplicationCard"
+      },
+      "BankCompany": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "isBankCustomer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isbankcustomer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "inn",
+          "isBankCustomer"
+        ],
+        "title": "BankCompany"
+      },
+      "BankComparison": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "aRub": {
+            "type": "integer",
+            "title": "Arub"
+          },
+          "bRub": {
+            "type": "integer",
+            "title": "Brub"
+          },
+          "deviationPercent": {
+            "type": "number",
+            "title": "Deviationpercent"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "aRub",
+          "bRub",
+          "deviationPercent",
+          "year"
+        ],
+        "title": "BankComparison"
+      },
+      "BankDecision": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "route": {
+            "type": "string",
+            "title": "Route"
+          },
+          "requiredLevel": {
+            "type": "string",
+            "title": "Requiredlevel"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "engineVersion": {
+            "type": "string",
+            "title": "Engineversion"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/BankPolicyReference"
+          },
+          "overridesDecisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overridesdecisionid"
+          },
+          "overrideReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overridereason",
+            "description": "Внутреннее пояснение, только банку"
+          },
+          "inputsHash": {
+            "type": "string",
+            "title": "Inputshash"
+          },
+          "snapshotIds": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Snapshotids"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/BankDecisionReason"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "manualReasons": {
+            "items": {
+              "$ref": "#/components/schemas/BankReason"
+            },
+            "type": "array",
+            "title": "Manualreasons"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
+          "pdPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdpercent"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/BankFactor"
+            },
+            "type": "array",
+            "title": "Factors"
+          },
+          "comparisons": {
+            "items": {
+              "$ref": "#/components/schemas/BankComparison"
+            },
+            "type": "array",
+            "title": "Comparisons"
+          },
+          "revenueMonthlyRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenuemonthlyrub"
+          },
+          "freeCashFlowRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Freecashflowrub"
+          },
+          "existingPaymentsRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Existingpaymentsrub"
+          },
+          "paymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paymentrub"
+          },
+          "lastPaymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lastpaymentrub"
+          },
+          "overpaymentRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overpaymentrub"
+          },
+          "stressShockPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stressshockpercent"
+          },
+          "maxAmountRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxamountrub"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/BankMetric"
+            },
+            "type": "array",
+            "title": "Checks"
+          },
+          "rate": {
+            "$ref": "#/components/schemas/BankRate"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Flags"
+          },
+          "features": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Features"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/BankVariant"
+            },
+            "type": "array",
+            "title": "Variants"
+          },
+          "trace": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Trace"
+          },
+          "assessedInput": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Assessedinput"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "outcome",
+          "route",
+          "requiredLevel",
+          "createdAt",
+          "engineVersion",
+          "policy",
+          "overridesDecisionId",
+          "overrideReason",
+          "inputsHash",
+          "snapshotIds",
+          "recommendation",
+          "reasons",
+          "manualReasons",
+          "score",
+          "grade",
+          "pdPercent",
+          "factors",
+          "comparisons",
+          "revenueMonthlyRub",
+          "freeCashFlowRub",
+          "existingPaymentsRub",
+          "paymentRub",
+          "lastPaymentRub",
+          "overpaymentRub",
+          "stressShockPercent",
+          "maxAmountRub",
+          "checks",
+          "rate",
+          "flags",
+          "features",
+          "variants",
+          "trace",
+          "assessedInput"
+        ],
+        "title": "BankDecision"
+      },
+      "BankDecisionReason": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "detail",
+          "kind",
+          "params"
+        ],
+        "title": "BankDecisionReason"
+      },
+      "BankDecisionSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "route": {
+            "type": "string",
+            "title": "Route"
+          },
+          "requiredLevel": {
+            "type": "string",
+            "title": "Requiredlevel"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "engineVersion": {
+            "type": "string",
+            "title": "Engineversion"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/BankPolicyReference"
+          },
+          "overridesDecisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overridesdecisionid"
+          },
+          "overrideReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overridereason",
+            "description": "Внутреннее пояснение, только банку"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "outcome",
+          "route",
+          "requiredLevel",
+          "createdAt",
+          "engineVersion",
+          "policy",
+          "overridesDecisionId",
+          "overrideReason"
+        ],
+        "title": "BankDecisionSummary"
+      },
+      "BankDemoLoginRequest": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "UNDERWRITER",
+              "ADMIN"
+            ],
+            "title": "Role",
+            "default": "UNDERWRITER"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "BankDemoLoginRequest"
+      },
+      "BankFactor": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "maxPoints": {
+            "type": "integer",
+            "title": "Maxpoints"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "value",
+          "points",
+          "maxPoints"
+        ],
+        "title": "BankFactor"
+      },
+      "BankHistoryEvent": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "fromStatus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fromstatus"
+          },
+          "toStatus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tostatus"
+          },
+          "stepCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stepcode"
+          },
+          "actorType": {
+            "type": "string",
+            "title": "Actortype"
+          },
+          "actorId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actorid"
+          },
+          "actorName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actorname"
+          },
+          "reasonCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoncode"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          },
+          "requestId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requestid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "at",
+          "kind",
+          "fromStatus",
+          "toStatus",
+          "stepCode",
+          "actorType",
+          "actorId",
+          "actorName",
+          "reasonCode",
+          "payload",
+          "requestId"
+        ],
+        "title": "BankHistoryEvent"
+      },
+      "BankMeResponse": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "UNDERWRITER",
+              "ADMIN"
+            ],
+            "title": "Role"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "L1",
+              "L2"
+            ],
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId",
+          "displayName",
+          "role",
+          "level"
+        ],
+        "title": "BankMeResponse"
+      },
+      "BankMetric": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold"
+          },
+          "comparison": {
+            "type": "string",
+            "enum": [
+              "MIN",
+              "MAX"
+            ],
+            "title": "Comparison"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed",
+            "description": "null — нет значения или порога в сохранённой политике"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "value",
+          "threshold",
+          "comparison",
+          "passed"
+        ],
+        "title": "BankMetric"
+      },
+      "BankOutboxItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "applicationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicationid"
+          },
+          "targetSystem": {
+            "type": "string",
+            "title": "Targetsystem"
+          },
+          "eventType": {
+            "type": "string",
+            "title": "Eventtype"
+          },
+          "status": {
+            "type": "string",
+            "const": "FAILED",
+            "title": "Status",
+            "default": "FAILED"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "lastError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lasterror"
+          },
+          "canRetry": {
+            "type": "boolean",
+            "title": "Canretry"
+          },
+          "blockedReason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EXPIRED",
+                  "APPLICATION_MISSING"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blockedreason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId",
+          "targetSystem",
+          "eventType",
+          "attempts",
+          "createdAt",
+          "lastError",
+          "canRetry",
+          "blockedReason"
+        ],
+        "title": "BankOutboxItem"
+      },
+      "BankOutboxPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BankOutboxItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "BankOutboxPage"
+      },
+      "BankOutboxRetried": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "status": {
+            "type": "string",
+            "const": "PENDING",
+            "title": "Status",
+            "default": "PENDING"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "applicationId"
+        ],
+        "title": "BankOutboxRetried"
+      },
+      "BankOutboxRetryRequest": {
+        "properties": {},
+        "additionalProperties": false,
+        "type": "object",
+        "title": "BankOutboxRetryRequest"
+      },
+      "BankPolicyReference": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "contentHash": {
+            "type": "string",
+            "title": "Contenthash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "contentHash"
+        ],
+        "title": "BankPolicyReference"
+      },
+      "BankQueueItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "company": {
+            "$ref": "#/components/schemas/BankCompany"
+          },
+          "productCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termmonths"
+          },
+          "waitingSince": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Waitingsince"
+          },
+          "waitingSeconds": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Waitingseconds"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue",
+            "description": "Ожидание больше 24 часов по будним дням; выходные исключены"
+          },
+          "manualReasons": {
+            "items": {
+              "$ref": "#/components/schemas/BankReason"
+            },
+            "type": "array",
+            "title": "Manualreasons"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankRecommendation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requiredLevel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requiredlevel"
+          },
+          "badges": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "CLIENT_ANSWERED",
+                "SOURCE_UNAVAILABLE",
+                "PIPELINE_ERROR"
+              ]
+            },
+            "type": "array",
+            "title": "Badges"
+          },
+          "documentReceived": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documentreceived",
+            "description": "null: сервис документов ещё не подключён; наличие файла не предполагается"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "version",
+          "company",
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "waitingSince",
+          "waitingSeconds",
+          "overdue",
+          "manualReasons",
+          "recommendation",
+          "requiredLevel",
+          "badges",
+          "documentReceived"
+        ],
+        "title": "BankQueueItem"
+      },
+      "BankQueuePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BankQueueItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "BankQueuePage"
+      },
+      "BankRate": {
+        "properties": {
+          "ratePercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratepercent"
+          },
+          "rawRatePercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rawratepercent"
+          },
+          "corridorMinPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corridorminpercent"
+          },
+          "corridorMaxPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corridormaxpercent"
+          },
+          "rateWithCollateralPercent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratewithcollateralpercent"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/BankRatePart"
+            },
+            "type": "array",
+            "title": "Parts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ratePercent",
+          "rawRatePercent",
+          "corridorMinPercent",
+          "corridorMaxPercent",
+          "rateWithCollateralPercent",
+          "parts"
+        ],
+        "title": "BankRate"
+      },
+      "BankRatePart": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "percent"
+        ],
+        "title": "BankRatePart"
+      },
+      "BankReason": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "detail"
+        ],
+        "title": "BankReason"
+      },
+      "BankRecommendation": {
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "hint": {
+            "type": "string",
+            "title": "Hint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "hint"
+        ],
+        "title": "BankRecommendation"
+      },
+      "BankSourceSnapshot": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "runId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Runid"
+          },
+          "system": {
+            "type": "string",
+            "title": "System"
+          },
+          "resource": {
+            "type": "string",
+            "title": "Resource"
+          },
+          "subjectInn": {
+            "type": "string",
+            "title": "Subjectinn"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "dataActualAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataactualat"
+          },
+          "retrievedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrievedat"
+          },
+          "requestId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requestid"
+          },
+          "payloadHash": {
+            "type": "string",
+            "title": "Payloadhash"
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              }
+            ],
+            "title": "Payload"
+          },
+          "usedByCurrentDecision": {
+            "type": "boolean",
+            "title": "Usedbycurrentdecision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "runId",
+          "system",
+          "resource",
+          "subjectInn",
+          "status",
+          "dataActualAt",
+          "retrievedAt",
+          "requestId",
+          "payloadHash",
+          "payload",
+          "usedByCurrentDecision"
+        ],
+        "title": "BankSourceSnapshot"
+      },
+      "BankSubmittedBy": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "companyRole": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Companyrole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "companyRole"
+        ],
+        "title": "BankSubmittedBy"
+      },
+      "BankVariant": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "productCode": {
+            "type": "string",
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "integer",
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "type": "number",
+            "title": "Ratepercent"
+          },
+          "paymentRub": {
+            "type": "integer",
+            "title": "Paymentrub"
+          },
+          "dscr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dscr"
+          },
+          "stressDscr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stressdscr"
+          },
+          "securityRequired": {
+            "type": "boolean",
+            "title": "Securityrequired"
+          },
+          "recommended": {
+            "type": "boolean",
+            "title": "Recommended"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "requirements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requirements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "productCode",
+          "amountRub",
+          "termMonths",
+          "ratePercent",
+          "paymentRub",
+          "dscr",
+          "stressDscr",
+          "securityRequired",
+          "recommended",
+          "note",
+          "requirements"
+        ],
+        "title": "BankVariant"
+      },
+      "ChaosInput": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "SLOW",
+              "ERROR",
+              "DOWN",
+              "LOST_RESPONSE"
+            ],
+            "title": "Mode"
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 120000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "title": "ChaosInput"
+      },
+      "ChaosView": {
+        "properties": {
+          "system": {
+            "$ref": "#/components/schemas/System"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "latencyMs": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latencyms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "system",
+          "available"
+        ],
+        "title": "ChaosView"
       },
       "ClientDecisionOut": {
         "properties": {
@@ -2694,6 +5311,22 @@
           "TERMINATED"
         ]
       },
+      "CreatedScenario": {
+        "properties": {
+          "persona": {
+            "$ref": "#/components/schemas/Persona"
+          },
+          "applied": {
+            "$ref": "#/components/schemas/AppliedSystems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "persona",
+          "applied"
+        ],
+        "title": "CreatedScenario"
+      },
       "DecisionReasonOut": {
         "properties": {
           "code": {
@@ -3232,6 +5865,62 @@
         ],
         "title": "LoanPaymentOut"
       },
+      "LoginInput": {
+        "properties": {
+          "login": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{1,63}$",
+            "title": "Login"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "login"
+        ],
+        "title": "LoginInput"
+      },
+      "LoginResult": {
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Userid"
+          },
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Companyid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "const": "CLIENT",
+            "title": "Role",
+            "default": "CLIENT"
+          },
+          "membershipRole": {
+            "type": "string",
+            "enum": [
+              "DIRECTOR",
+              "ACCOUNTANT",
+              "GUARANTOR"
+            ],
+            "title": "Membershiprole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "userId",
+          "companyId",
+          "displayName",
+          "membershipRole"
+        ],
+        "title": "LoginResult"
+      },
       "MeResponse": {
         "properties": {
           "userId": {
@@ -3549,6 +6238,133 @@
           "role"
         ],
         "title": "PersonOption"
+      },
+      "Persona": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "inn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inn"
+          },
+          "companyId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Companyid"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "technical": {
+            "type": "boolean",
+            "title": "Technical"
+          },
+          "application": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonaRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expectedOutcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expectedoutcome"
+          },
+          "expectedFinalOutcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expectedfinaloutcome"
+          },
+          "expectedReasonCodes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Expectedreasoncodes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "status",
+          "technical"
+        ],
+        "title": "Persona"
+      },
+      "PersonaRequest": {
+        "properties": {
+          "productCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "string",
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termmonths"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productCode",
+          "amountRub",
+          "termMonths"
+        ],
+        "title": "PersonaRequest"
       },
       "PersonaResetOut": {
         "properties": {
@@ -3879,6 +6695,18 @@
           "nluAvailable": {
             "type": "boolean",
             "title": "Nluavailable"
+          },
+          "demoCodeRequired": {
+            "type": "boolean",
+            "title": "Democoderequired",
+            "default": false
+          },
+          "docsLinks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Docslinks"
           }
         },
         "type": "object",
@@ -4169,6 +6997,112 @@
         ],
         "title": "RolesResponse"
       },
+      "ScenarioAccount": {
+        "properties": {
+          "login": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{1,63}$",
+            "title": "Login"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "DIRECTOR",
+              "ACCOUNTANT",
+              "GUARANTOR"
+            ],
+            "title": "Role"
+          },
+          "personRef": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Personref"
+          },
+          "fullName": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fullname"
+          },
+          "inn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inn"
+          },
+          "powerOfAttorney": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Powerofattorney"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "login",
+          "role"
+        ],
+        "title": "ScenarioAccount"
+      },
+      "ScenarioInput": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioAccount"
+            },
+            "type": "array",
+            "title": "Users"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "ScenarioInput"
+      },
       "ScheduleRowOut": {
         "properties": {
           "number": {
@@ -4401,6 +7335,26 @@
           "signedAt"
         ],
         "title": "SignerOut"
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "SUBMITTED",
+          "CHECKING",
+          "NEEDS_INFO",
+          "MANUAL_REVIEW",
+          "APPROVED",
+          "COUNTER_OFFER",
+          "OFFER_ACCEPTED",
+          "SIGNED",
+          "DISBURSING",
+          "DISBURSED",
+          "REJECTED",
+          "WITHDRAWN",
+          "EXPIRED"
+        ],
+        "title": "Status"
       },
       "Step": {
         "type": "string",

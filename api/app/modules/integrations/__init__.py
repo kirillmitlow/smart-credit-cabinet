@@ -5,6 +5,7 @@
 """
 
 from app.modules.integrations import (
+    chaos,
     reset,  # noqa: F401 — регистрирует сброс демо-данных (T-371)
     scenarios,
 )
@@ -129,6 +130,7 @@ __all__ = [
     "Turnover",
     "TurnoverMonth",
     "build_integrations",
+    "chaos",
     "classify_failure",
     "get_integrations",
     "known_resources",

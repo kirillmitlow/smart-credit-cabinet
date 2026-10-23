@@ -31,6 +31,15 @@ import type {
   ApplicationFields,
   ApplicationOut,
   ApplicationPage,
+  BankApplicationCard,
+  BankDemoLoginRequest,
+  BankMeResponse,
+  BankOutboxPage,
+  BankOutboxRetried,
+  BankOutboxRetryRequest,
+  BankQueuePage,
+  ChaosInput,
+  ChaosView,
   ClientDecisionOut,
   CodeCheck,
   CodeIssued,
@@ -40,35 +49,44 @@ import type {
   ConsentsSignedOut,
   ContractOut,
   ContractSignedOut,
+  CreatedScenario,
   DeclinedOut,
   DraftPatch,
+  GetBackofficeApplicationParams,
+  GetBackofficeQueueParams,
   GovContractPage,
   HTTPValidationError,
   HealthDeps200,
   HealthLive200,
   ListApplicationsParams,
+  ListBackofficeOutboxParams,
   ListCompanyGovContractsParams,
   ListLoansParams,
   LoanDetail,
   LoanPage,
   LoanPaymentOut,
+  LoginInput,
+  LoginResult,
   MeResponse,
   OfferOut,
   PassedOut,
   PaymentOut,
   PaymentRequest,
+  Persona,
   PersonaResetOut,
   ProductList,
   ProductOut,
   PublicConfig,
   ResetOut,
   RolesResponse,
+  ScenarioInput,
   SignChallenge,
   SignChallengeOut,
   SignConfirm,
   SignConfirmIn,
   SignRequest,
   SignStartIn,
+  System,
   WizardRequest,
   WizardResult
 } from './model';
@@ -1198,6 +1216,903 @@ export function useGetPublicConfig<TData = Awaited<ReturnType<typeof getPublicCo
 
 
 
+
+export type bankDemoLoginResponse200 = {
+  data: BankMeResponse
+  status: 200
+}
+
+export type bankDemoLoginResponse403 = {
+  data: void
+  status: 403
+}
+
+export type bankDemoLoginResponse422 = {
+  data: void
+  status: 422
+}
+
+export type bankDemoLoginResponse503 = {
+  data: void
+  status: 503
+}
+
+export type bankDemoLoginResponseSuccess = (bankDemoLoginResponse200) & {
+  headers: Headers;
+};
+export type bankDemoLoginResponseError = (bankDemoLoginResponse403 | bankDemoLoginResponse422 | bankDemoLoginResponse503) & {
+  headers: Headers;
+};
+
+export type bankDemoLoginResponse = (bankDemoLoginResponseSuccess | bankDemoLoginResponseError)
+
+export const getBankDemoLoginUrl = () => {
+
+
+
+
+  return `/auth/bank-demo-login`
+}
+
+/**
+ * @summary Войти как демо-андеррайтер L2 или администратор
+ */
+export const bankDemoLogin = async (bankDemoLoginRequestNull?: BankDemoLoginRequest | null, options?: Parameters<typeof customFetch>[1]): Promise<bankDemoLoginResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<bankDemoLoginResponse>(getBankDemoLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(bankDemoLoginRequestNull)
+  }
+);}
+
+
+
+
+
+export const getBankDemoLoginMutationKey = () => ['bankDemoLogin'] as const;
+
+export const getBankDemoLoginMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bankDemoLogin>>, TError,BankDemoLoginMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof bankDemoLogin>>, TError,BankDemoLoginMutationVariables, TContext> => {
+
+const mutationKey = getBankDemoLoginMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof bankDemoLogin>>, BankDemoLoginMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  bankDemoLogin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BankDemoLoginMutationResult = NonNullable<Awaited<ReturnType<typeof bankDemoLogin>>>
+    export type BankDemoLoginMutationBody = BankDemoLoginRequest | null | undefined
+    export type BankDemoLoginMutationError = void
+    export type BankDemoLoginMutationVariables = {data?: BankDemoLoginRequest | null}
+
+    /**
+ * @summary Войти как демо-андеррайтер L2 или администратор
+ */
+export const useBankDemoLogin = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bankDemoLogin>>, TError,BankDemoLoginMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof bankDemoLogin>>,
+        TError,
+        BankDemoLoginMutationVariables,
+        TContext
+      > => {
+      return useMutation(getBankDemoLoginMutationOptions(options), queryClient);
+    }
+
+export type getBankMeResponse200 = {
+  data: BankMeResponse
+  status: 200
+}
+
+export type getBankMeResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getBankMeResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getBankMeResponse503 = {
+  data: void
+  status: 503
+}
+
+export type getBankMeResponseSuccess = (getBankMeResponse200) & {
+  headers: Headers;
+};
+export type getBankMeResponseError = (getBankMeResponse401 | getBankMeResponse403 | getBankMeResponse503) & {
+  headers: Headers;
+};
+
+export type getBankMeResponse = (getBankMeResponseSuccess | getBankMeResponseError)
+
+export const getGetBankMeUrl = () => {
+
+
+
+
+  return `/auth/bank-me`
+}
+
+/**
+ * @summary Кто я в банковской зоне и мой уровень полномочий
+ */
+export const getBankMe = async ( options?: Parameters<typeof customFetch>[1]): Promise<getBankMeResponse> => {
+
+  return customFetch<getBankMeResponse>(getGetBankMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBankMeQueryKey = () => {
+    return [
+    `/auth/bank-me`
+    ] as const;
+    }
+
+
+export const getGetBankMeQueryOptions = <TData = Awaited<ReturnType<typeof getBankMe>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBankMe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBankMeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBankMe>>> = ({ signal }) => getBankMe({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBankMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBankMeQueryResult = NonNullable<Awaited<ReturnType<typeof getBankMe>>>
+export type GetBankMeQueryError = void
+
+
+export function useGetBankMe<TData = Awaited<ReturnType<typeof getBankMe>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBankMe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBankMe>>,
+          TError,
+          Awaited<ReturnType<typeof getBankMe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBankMe<TData = Awaited<ReturnType<typeof getBankMe>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBankMe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBankMe>>,
+          TError,
+          Awaited<ReturnType<typeof getBankMe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBankMe<TData = Awaited<ReturnType<typeof getBankMe>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBankMe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Кто я в банковской зоне и мой уровень полномочий
+ */
+
+export function useGetBankMe<TData = Awaited<ReturnType<typeof getBankMe>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBankMe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBankMeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type bankLogoutResponse204 = {
+  data: void
+  status: 204
+}
+
+export type bankLogoutResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type bankLogoutResponse503 = {
+  data: void
+  status: 503
+}
+
+export type bankLogoutResponseSuccess = (bankLogoutResponse204) & {
+  headers: Headers;
+};
+export type bankLogoutResponseError = (bankLogoutResponse422 | bankLogoutResponse503) & {
+  headers: Headers;
+};
+
+export type bankLogoutResponse = (bankLogoutResponseSuccess | bankLogoutResponseError)
+
+export const getBankLogoutUrl = () => {
+
+
+
+
+  return `/auth/bank-logout`
+}
+
+/**
+ * @summary Выйти из банковской зоны
+ */
+export const bankLogout = async ( options?: Parameters<typeof customFetch>[1]): Promise<bankLogoutResponse> => {
+
+  return customFetch<bankLogoutResponse>(getBankLogoutUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getBankLogoutMutationKey = () => ['bankLogout'] as const;
+
+export const getBankLogoutMutationOptions = <TError = HTTPValidationError | void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bankLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof bankLogout>>, TError,void, TContext> => {
+
+const mutationKey = getBankLogoutMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof bankLogout>>, void> = () => {
+
+
+          return  bankLogout(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BankLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof bankLogout>>>
+
+    export type BankLogoutMutationError = HTTPValidationError | void
+
+
+    /**
+ * @summary Выйти из банковской зоны
+ */
+export const useBankLogout = <TError = HTTPValidationError | void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bankLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof bankLogout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getBankLogoutMutationOptions(options), queryClient);
+    }
+
+export type getBackofficeQueueResponse200 = {
+  data: BankQueuePage
+  status: 200
+}
+
+export type getBackofficeQueueResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getBackofficeQueueResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getBackofficeQueueResponse422 = {
+  data: void
+  status: 422
+}
+
+export type getBackofficeQueueResponseSuccess = (getBackofficeQueueResponse200) & {
+  headers: Headers;
+};
+export type getBackofficeQueueResponseError = (getBackofficeQueueResponse401 | getBackofficeQueueResponse403 | getBackofficeQueueResponse422) & {
+  headers: Headers;
+};
+
+export type getBackofficeQueueResponse = (getBackofficeQueueResponseSuccess | getBackofficeQueueResponseError)
+
+export const getGetBackofficeQueueUrl = (params?: GetBackofficeQueueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/backoffice/queue?${stringifiedParams}` : `/backoffice/queue`
+}
+
+/**
+ * @summary Очередь ручного рассмотрения, старые сверху
+ */
+export const getBackofficeQueue = async (params?: GetBackofficeQueueParams, options?: Parameters<typeof customFetch>[1]): Promise<getBackofficeQueueResponse> => {
+
+  return customFetch<getBackofficeQueueResponse>(getGetBackofficeQueueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBackofficeQueueQueryKey = (params?: GetBackofficeQueueParams,) => {
+    return [
+    `/backoffice/queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetBackofficeQueueQueryOptions = <TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBackofficeQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBackofficeQueue>>> = ({ signal }) => getBackofficeQueue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBackofficeQueueQueryResult = NonNullable<Awaited<ReturnType<typeof getBackofficeQueue>>>
+export type GetBackofficeQueueQueryError = void
+
+
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params: undefined |  GetBackofficeQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeQueue>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeQueue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeQueue>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeQueue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Очередь ручного рассмотрения, старые сверху
+ */
+
+export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBackofficeQueue>>, TError = void>(
+ params?: GetBackofficeQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeQueue>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBackofficeQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getBackofficeApplicationResponse200 = {
+  data: BankApplicationCard
+  status: 200
+}
+
+export type getBackofficeApplicationResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getBackofficeApplicationResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getBackofficeApplicationResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getBackofficeApplicationResponse422 = {
+  data: void
+  status: 422
+}
+
+export type getBackofficeApplicationResponseSuccess = (getBackofficeApplicationResponse200) & {
+  headers: Headers;
+};
+export type getBackofficeApplicationResponseError = (getBackofficeApplicationResponse401 | getBackofficeApplicationResponse403 | getBackofficeApplicationResponse404 | getBackofficeApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type getBackofficeApplicationResponse = (getBackofficeApplicationResponseSuccess | getBackofficeApplicationResponseError)
+
+export const getGetBackofficeApplicationUrl = (applicationId: string,
+    params?: GetBackofficeApplicationParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/backoffice/applications/${applicationId}?${stringifiedParams}` : `/backoffice/applications/${applicationId}`
+}
+
+/**
+ * @summary Полная карточка для сотрудника банка
+ */
+export const getBackofficeApplication = async (applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: Parameters<typeof customFetch>[1]): Promise<getBackofficeApplicationResponse> => {
+
+  return customFetch<getBackofficeApplicationResponse>(getGetBackofficeApplicationUrl(applicationId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBackofficeApplicationQueryKey = (applicationId: string,
+    params?: GetBackofficeApplicationParams,) => {
+    return [
+    `/backoffice/applications/${applicationId}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetBackofficeApplicationQueryOptions = <TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBackofficeApplicationQueryKey(applicationId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBackofficeApplication>>> = ({ signal }) => getBackofficeApplication(applicationId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBackofficeApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof getBackofficeApplication>>>
+export type GetBackofficeApplicationQueryError = void
+
+
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params: undefined |  GetBackofficeApplicationParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeApplication>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeApplication>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeApplication>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeApplication>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Полная карточка для сотрудника банка
+ */
+
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBackofficeApplicationQueryOptions(applicationId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type listBackofficeOutboxResponse200 = {
+  data: BankOutboxPage
+  status: 200
+}
+
+export type listBackofficeOutboxResponse401 = {
+  data: void
+  status: 401
+}
+
+export type listBackofficeOutboxResponse403 = {
+  data: void
+  status: 403
+}
+
+export type listBackofficeOutboxResponse422 = {
+  data: void
+  status: 422
+}
+
+export type listBackofficeOutboxResponseSuccess = (listBackofficeOutboxResponse200) & {
+  headers: Headers;
+};
+export type listBackofficeOutboxResponseError = (listBackofficeOutboxResponse401 | listBackofficeOutboxResponse403 | listBackofficeOutboxResponse422) & {
+  headers: Headers;
+};
+
+export type listBackofficeOutboxResponse = (listBackofficeOutboxResponseSuccess | listBackofficeOutboxResponseError)
+
+export const getListBackofficeOutboxUrl = (params?: ListBackofficeOutboxParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/backoffice/outbox?${stringifiedParams}` : `/backoffice/outbox`
+}
+
+/**
+ * @summary Застрявшие сообщения
+ */
+export const listBackofficeOutbox = async (params?: ListBackofficeOutboxParams, options?: Parameters<typeof customFetch>[1]): Promise<listBackofficeOutboxResponse> => {
+
+  return customFetch<listBackofficeOutboxResponse>(getListBackofficeOutboxUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBackofficeOutboxQueryKey = (params?: ListBackofficeOutboxParams,) => {
+    return [
+    `/backoffice/outbox`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListBackofficeOutboxQueryOptions = <TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBackofficeOutboxQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBackofficeOutbox>>> = ({ signal }) => listBackofficeOutbox(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListBackofficeOutboxQueryResult = NonNullable<Awaited<ReturnType<typeof listBackofficeOutbox>>>
+export type ListBackofficeOutboxQueryError = void
+
+
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params: undefined |  ListBackofficeOutboxParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBackofficeOutbox>>,
+          TError,
+          Awaited<ReturnType<typeof listBackofficeOutbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBackofficeOutbox>>,
+          TError,
+          Awaited<ReturnType<typeof listBackofficeOutbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Застрявшие сообщения
+ */
+
+export function useListBackofficeOutbox<TData = Awaited<ReturnType<typeof listBackofficeOutbox>>, TError = void>(
+ params?: ListBackofficeOutboxParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBackofficeOutbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListBackofficeOutboxQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type retryBackofficeOutboxResponse200 = {
+  data: BankOutboxRetried
+  status: 200
+}
+
+export type retryBackofficeOutboxResponse401 = {
+  data: void
+  status: 401
+}
+
+export type retryBackofficeOutboxResponse403 = {
+  data: void
+  status: 403
+}
+
+export type retryBackofficeOutboxResponse404 = {
+  data: void
+  status: 404
+}
+
+export type retryBackofficeOutboxResponse409 = {
+  data: void
+  status: 409
+}
+
+export type retryBackofficeOutboxResponse422 = {
+  data: void
+  status: 422
+}
+
+export type retryBackofficeOutboxResponseSuccess = (retryBackofficeOutboxResponse200) & {
+  headers: Headers;
+};
+export type retryBackofficeOutboxResponseError = (retryBackofficeOutboxResponse401 | retryBackofficeOutboxResponse403 | retryBackofficeOutboxResponse404 | retryBackofficeOutboxResponse409 | retryBackofficeOutboxResponse422) & {
+  headers: Headers;
+};
+
+export type retryBackofficeOutboxResponse = (retryBackofficeOutboxResponseSuccess | retryBackofficeOutboxResponseError)
+
+export const getRetryBackofficeOutboxUrl = (messageId: number,) => {
+
+
+
+
+  return `/backoffice/outbox/${messageId}/retry`
+}
+
+/**
+ * @summary Поставить сообщение на повтор
+ */
+export const retryBackofficeOutbox = async (messageId: number,
+    bankOutboxRetryRequestNull?: BankOutboxRetryRequest | null, options?: Parameters<typeof customFetch>[1]): Promise<retryBackofficeOutboxResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<retryBackofficeOutboxResponse>(getRetryBackofficeOutboxUrl(messageId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(bankOutboxRetryRequestNull)
+  }
+);}
+
+
+
+
+
+export const getRetryBackofficeOutboxMutationKey = () => ['retryBackofficeOutbox'] as const;
+
+export const getRetryBackofficeOutboxMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryBackofficeOutbox>>, TError,RetryBackofficeOutboxMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryBackofficeOutbox>>, TError,RetryBackofficeOutboxMutationVariables, TContext> => {
+
+const mutationKey = getRetryBackofficeOutboxMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryBackofficeOutbox>>, RetryBackofficeOutboxMutationVariables> = (props) => {
+          const {messageId,data} = props ?? {};
+
+          return  retryBackofficeOutbox(messageId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryBackofficeOutboxMutationResult = NonNullable<Awaited<ReturnType<typeof retryBackofficeOutbox>>>
+    export type RetryBackofficeOutboxMutationBody = BankOutboxRetryRequest | null | undefined
+    export type RetryBackofficeOutboxMutationError = void
+    export type RetryBackofficeOutboxMutationVariables = {messageId: number;data?: BankOutboxRetryRequest | null}
+
+    /**
+ * @summary Поставить сообщение на повтор
+ */
+export const useRetryBackofficeOutbox = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryBackofficeOutbox>>, TError,RetryBackofficeOutboxMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof retryBackofficeOutbox>>,
+        TError,
+        RetryBackofficeOutboxMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryBackofficeOutboxMutationOptions(options), queryClient);
+    }
 
 export type listCompanyGovContractsResponse200 = {
   data: GovContractPage
@@ -4377,6 +5292,11 @@ export type demoResetResponse409 = {
   status: 409
 }
 
+export type demoResetResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
 export type demoResetResponse502 = {
   data: void
   status: 502
@@ -4385,7 +5305,7 @@ export type demoResetResponse502 = {
 export type demoResetResponseSuccess = (demoResetResponse200) & {
   headers: Headers;
 };
-export type demoResetResponseError = (demoResetResponse403 | demoResetResponse409 | demoResetResponse502) & {
+export type demoResetResponseError = (demoResetResponse403 | demoResetResponse409 | demoResetResponse422 | demoResetResponse502) & {
   headers: Headers;
 };
 
@@ -4420,7 +5340,7 @@ export const demoReset = async ( options?: Parameters<typeof customFetch>[1]): P
 
 export const getDemoResetMutationKey = () => ['demoReset'] as const;
 
-export const getDemoResetMutationOptions = <TError = void,
+export const getDemoResetMutationOptions = <TError = void | HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext> => {
 
@@ -4449,13 +5369,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DemoResetMutationResult = NonNullable<Awaited<ReturnType<typeof demoReset>>>
 
-    export type DemoResetMutationError = void
+    export type DemoResetMutationError = void | HTTPValidationError
 
 
     /**
  * @summary Единый сброс стенда: моки, база api, сессии и кэш
  */
-export const useDemoReset = <TError = void,
+export const useDemoReset = <TError = void | HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof demoReset>>,
@@ -4578,4 +5498,610 @@ export const useDemoResetPersona = <TError = void | HTTPValidationError,
         TContext
       > => {
       return useMutation(getDemoResetPersonaMutationOptions(options), queryClient);
+    }
+
+export type demoListPersonasResponse200 = {
+  data: Persona[]
+  status: 200
+}
+
+export type demoListPersonasResponseSuccess = (demoListPersonasResponse200) & {
+  headers: Headers;
+};
+;
+
+export type demoListPersonasResponse = (demoListPersonasResponseSuccess)
+
+export const getDemoListPersonasUrl = () => {
+
+
+
+
+  return `/demo/personas`
+}
+
+/**
+ * @summary Personas
+ */
+export const demoListPersonas = async ( options?: Parameters<typeof customFetch>[1]): Promise<demoListPersonasResponse> => {
+
+  return customFetch<demoListPersonasResponse>(getDemoListPersonasUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDemoListPersonasQueryKey = () => {
+    return [
+    `/demo/personas`
+    ] as const;
+    }
+
+
+export const getDemoListPersonasQueryOptions = <TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDemoListPersonasQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof demoListPersonas>>> = ({ signal }) => demoListPersonas({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DemoListPersonasQueryResult = NonNullable<Awaited<ReturnType<typeof demoListPersonas>>>
+export type DemoListPersonasQueryError = unknown
+
+
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoListPersonas>>,
+          TError,
+          Awaited<ReturnType<typeof demoListPersonas>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoListPersonas>>,
+          TError,
+          Awaited<ReturnType<typeof demoListPersonas>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Personas
+ */
+
+export function useDemoListPersonas<TData = Awaited<ReturnType<typeof demoListPersonas>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoListPersonas>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDemoListPersonasQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type demoGetChaosResponse200 = {
+  data: ChaosView[]
+  status: 200
+}
+
+export type demoGetChaosResponseSuccess = (demoGetChaosResponse200) & {
+  headers: Headers;
+};
+;
+
+export type demoGetChaosResponse = (demoGetChaosResponseSuccess)
+
+export const getDemoGetChaosUrl = () => {
+
+
+
+
+  return `/demo/chaos`
+}
+
+/**
+ * @summary Get Chaos
+ */
+export const demoGetChaos = async ( options?: Parameters<typeof customFetch>[1]): Promise<demoGetChaosResponse> => {
+
+  return customFetch<demoGetChaosResponse>(getDemoGetChaosUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDemoGetChaosQueryKey = () => {
+    return [
+    `/demo/chaos`
+    ] as const;
+    }
+
+
+export const getDemoGetChaosQueryOptions = <TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDemoGetChaosQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof demoGetChaos>>> = ({ signal }) => demoGetChaos({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DemoGetChaosQueryResult = NonNullable<Awaited<ReturnType<typeof demoGetChaos>>>
+export type DemoGetChaosQueryError = unknown
+
+
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoGetChaos>>,
+          TError,
+          Awaited<ReturnType<typeof demoGetChaos>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof demoGetChaos>>,
+          TError,
+          Awaited<ReturnType<typeof demoGetChaos>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Chaos
+ */
+
+export function useDemoGetChaos<TData = Awaited<ReturnType<typeof demoGetChaos>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof demoGetChaos>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDemoGetChaosQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type demoSetChaosResponse200 = {
+  data: ChaosView
+  status: 200
+}
+
+export type demoSetChaosResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type demoSetChaosResponseSuccess = (demoSetChaosResponse200) & {
+  headers: Headers;
+};
+export type demoSetChaosResponseError = (demoSetChaosResponse422) & {
+  headers: Headers;
+};
+
+export type demoSetChaosResponse = (demoSetChaosResponseSuccess | demoSetChaosResponseError)
+
+export const getDemoSetChaosUrl = (system: System,) => {
+
+
+
+
+  return `/demo/chaos/${system}`
+}
+
+/**
+ * @summary Put Chaos
+ */
+export const demoSetChaos = async (system: System,
+    chaosInput: ChaosInput, options?: Parameters<typeof customFetch>[1]): Promise<demoSetChaosResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<demoSetChaosResponse>(getDemoSetChaosUrl(system),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(chaosInput)
+  }
+);}
+
+
+
+
+
+export const getDemoSetChaosMutationKey = () => ['demoSetChaos'] as const;
+
+export const getDemoSetChaosMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoSetChaos>>, TError,DemoSetChaosMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoSetChaos>>, TError,DemoSetChaosMutationVariables, TContext> => {
+
+const mutationKey = getDemoSetChaosMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoSetChaos>>, DemoSetChaosMutationVariables> = (props) => {
+          const {system,data} = props ?? {};
+
+          return  demoSetChaos(system,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoSetChaosMutationResult = NonNullable<Awaited<ReturnType<typeof demoSetChaos>>>
+    export type DemoSetChaosMutationBody = ChaosInput
+    export type DemoSetChaosMutationError = HTTPValidationError
+    export type DemoSetChaosMutationVariables = {system: System;data: ChaosInput}
+
+    /**
+ * @summary Put Chaos
+ */
+export const useDemoSetChaos = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoSetChaos>>, TError,DemoSetChaosMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoSetChaos>>,
+        TError,
+        DemoSetChaosMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoSetChaosMutationOptions(options), queryClient);
+    }
+
+export type demoCreateScenarioResponse201 = {
+  data: CreatedScenario
+  status: 201
+}
+
+export type demoCreateScenarioResponse400 = {
+  data: void
+  status: 400
+}
+
+export type demoCreateScenarioResponse403 = {
+  data: void
+  status: 403
+}
+
+export type demoCreateScenarioResponse409 = {
+  data: void
+  status: 409
+}
+
+export type demoCreateScenarioResponse422 = {
+  data: void
+  status: 422
+}
+
+export type demoCreateScenarioResponse429 = {
+  data: void
+  status: 429
+}
+
+export type demoCreateScenarioResponse502 = {
+  data: void
+  status: 502
+}
+
+export type demoCreateScenarioResponse503 = {
+  data: void
+  status: 503
+}
+
+export type demoCreateScenarioResponseSuccess = (demoCreateScenarioResponse201) & {
+  headers: Headers;
+};
+export type demoCreateScenarioResponseError = (demoCreateScenarioResponse400 | demoCreateScenarioResponse403 | demoCreateScenarioResponse409 | demoCreateScenarioResponse422 | demoCreateScenarioResponse429 | demoCreateScenarioResponse502 | demoCreateScenarioResponse503) & {
+  headers: Headers;
+};
+
+export type demoCreateScenarioResponse = (demoCreateScenarioResponseSuccess | demoCreateScenarioResponseError)
+
+export const getDemoCreateScenarioUrl = () => {
+
+
+
+
+  return `/demo/scenarios`
+}
+
+/**
+ * Тело — ScenarioSpec сервиса сценариев; форма или preset обязательны. Если code не задан, он стабильно определяется ключом запроса. Учётки — только клиентские роли. Idempotency-Key сохраняйте при повторе после таймаута. Моки и каталог api обновляются до подтверждения успеха; учётки/полный spec не возвращаются.
+ * @summary Создать тестовую компанию и применить сценарий
+ */
+export const demoCreateScenario = async (scenarioInput: ScenarioInput, options?: Parameters<typeof customFetch>[1]): Promise<demoCreateScenarioResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<demoCreateScenarioResponse>(getDemoCreateScenarioUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(scenarioInput)
+  }
+);}
+
+
+
+
+
+export const getDemoCreateScenarioMutationKey = () => ['demoCreateScenario'] as const;
+
+export const getDemoCreateScenarioMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoCreateScenario>>, TError,DemoCreateScenarioMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoCreateScenario>>, TError,DemoCreateScenarioMutationVariables, TContext> => {
+
+const mutationKey = getDemoCreateScenarioMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoCreateScenario>>, DemoCreateScenarioMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  demoCreateScenario(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoCreateScenarioMutationResult = NonNullable<Awaited<ReturnType<typeof demoCreateScenario>>>
+    export type DemoCreateScenarioMutationBody = ScenarioInput
+    export type DemoCreateScenarioMutationError = void
+    export type DemoCreateScenarioMutationVariables = {data: ScenarioInput}
+
+    /**
+ * @summary Создать тестовую компанию и применить сценарий
+ */
+export const useDemoCreateScenario = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoCreateScenario>>, TError,DemoCreateScenarioMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoCreateScenario>>,
+        TError,
+        DemoCreateScenarioMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoCreateScenarioMutationOptions(options), queryClient);
+    }
+
+export type demoLoginPersonaResponse200 = {
+  data: LoginResult
+  status: 200
+}
+
+export type demoLoginPersonaResponse403 = {
+  data: void
+  status: 403
+}
+
+export type demoLoginPersonaResponse404 = {
+  data: void
+  status: 404
+}
+
+export type demoLoginPersonaResponse409 = {
+  data: void
+  status: 409
+}
+
+export type demoLoginPersonaResponse422 = {
+  data: void
+  status: 422
+}
+
+export type demoLoginPersonaResponse429 = {
+  data: void
+  status: 429
+}
+
+export type demoLoginPersonaResponse503 = {
+  data: void
+  status: 503
+}
+
+export type demoLoginPersonaResponseSuccess = (demoLoginPersonaResponse200) & {
+  headers: Headers;
+};
+export type demoLoginPersonaResponseError = (demoLoginPersonaResponse403 | demoLoginPersonaResponse404 | demoLoginPersonaResponse409 | demoLoginPersonaResponse422 | demoLoginPersonaResponse429 | demoLoginPersonaResponse503) & {
+  headers: Headers;
+};
+
+export type demoLoginPersonaResponse = (demoLoginPersonaResponseSuccess | demoLoginPersonaResponseError)
+
+export const getDemoLoginPersonaUrl = (code: string,) => {
+
+
+
+
+  return `/demo/personas/${code}/login`
+}
+
+/**
+ * Только при DEMO_MODE. Логин существующей активной учётки указывается явно. Пользовательский UI и e2e используют обычный вход по ИНН и коду. Создаёт только sid_client; банковская сессия не меняется.
+ * @summary Служебный вход персоны для интеграционных тестов
+ */
+export const demoLoginPersona = async (code: string,
+    loginInput: LoginInput, options?: Parameters<typeof customFetch>[1]): Promise<demoLoginPersonaResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<demoLoginPersonaResponse>(getDemoLoginPersonaUrl(code),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(loginInput)
+  }
+);}
+
+
+
+
+
+export const getDemoLoginPersonaMutationKey = () => ['demoLoginPersona'] as const;
+
+export const getDemoLoginPersonaMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoLoginPersona>>, TError,DemoLoginPersonaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoLoginPersona>>, TError,DemoLoginPersonaMutationVariables, TContext> => {
+
+const mutationKey = getDemoLoginPersonaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoLoginPersona>>, DemoLoginPersonaMutationVariables> = (props) => {
+          const {code,data} = props ?? {};
+
+          return  demoLoginPersona(code,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoLoginPersonaMutationResult = NonNullable<Awaited<ReturnType<typeof demoLoginPersona>>>
+    export type DemoLoginPersonaMutationBody = LoginInput
+    export type DemoLoginPersonaMutationError = void
+    export type DemoLoginPersonaMutationVariables = {code: string;data: LoginInput}
+
+    /**
+ * @summary Служебный вход персоны для интеграционных тестов
+ */
+export const useDemoLoginPersona = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoLoginPersona>>, TError,DemoLoginPersonaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof demoLoginPersona>>,
+        TError,
+        DemoLoginPersonaMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDemoLoginPersonaMutationOptions(options), queryClient);
     }

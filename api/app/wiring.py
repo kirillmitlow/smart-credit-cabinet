@@ -13,7 +13,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.modules import catalog, companies, disbursement, offers
+from app.modules import audit, auth, catalog, companies, disbursement, offers
 
 
 def _date(value: Any) -> date | None:
@@ -61,5 +61,6 @@ def agreed_terms(session: Session, application_id: UUID) -> disbursement.AgreedT
 
 
 def wire_modules() -> None:
+    auth.register_bank_audit_recorder(audit.record)
     catalog.register_company_facts_provider(company_facts)
     disbursement.register_terms_provider(agreed_terms)

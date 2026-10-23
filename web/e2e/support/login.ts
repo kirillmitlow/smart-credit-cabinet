@@ -32,13 +32,10 @@ export async function loginAsClient(page: Page, inn: string): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: home.title })).toBeVisible();
 }
 
-/**
- * Вход андеррайтера кнопкой «Войти как андеррайтер» (D-010).
- * Заготовка: вход банка в интерфейсе пока заглушка (T-434), поэтому вызов сразу падает с понятным
- * сообщением; тесты банка пишутся вместе с экранами (T-434).
- */
-export function loginAsUnderwriter(page: Page): Promise<void> {
-  void page;
-  // TODO(T-434): после появления входа банка нажать «Войти как андеррайтер» и дождаться очереди заявок
-  return Promise.reject(new Error('Вход андеррайтера в интерфейсе ещё не сделан (T-434)'));
+/** Демо-вход банка через интерфейс, со своей cookie sid_bank (T-213, D-085). */
+export async function loginAsUnderwriter(page: Page): Promise<void> {
+  await page.goto('/login?zone=bank');
+  await page.getByRole('button', { name: 'Войти как андеррайтер' }).click();
+  await expect(page).toHaveURL(/\/bank$/);
+  await expect(page.getByTestId('zone-strip')).toContainText('Рабочее место банка');
 }
