@@ -23,7 +23,7 @@ export const test = base.extend<Fixtures>({
   persona: [personas.sokolova, { option: true }],
 
   clientPage: async ({ page, persona }, provide) => {
-    await loginAsClient(page, persona.inn);
+    await loginAsClient(page, persona.inn, persona.personName);
     await resetPersona(page.request, persona.code);
     await provide(page);
   },

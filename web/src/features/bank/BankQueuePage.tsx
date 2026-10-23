@@ -13,7 +13,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { appErrorFromResponse } from '@/api/errors';
 import { getBackofficeQueue, getGetBackofficeQueueQueryKey } from '@/api/generated/api';
 import { Status } from '@/api/generated/model';
@@ -32,6 +32,8 @@ const products = [
 ];
 
 export function BankQueuePage() {
+  const location = useLocation();
+  const notice = (location.state as { bankActionNotice?: unknown } | null)?.bankActionNotice;
   const heading = usePageHeading(t.queueTitle);
   const [status, setStatus] = useState<Status>(Status.MANUAL_REVIEW);
   const [productCode, setProductCode] = useState('');
@@ -70,6 +72,11 @@ export function BankQueuePage() {
 
   return (
     <Stack gap="md">
+      {typeof notice === 'string' ? (
+        <Alert color="blue" role="status">
+          {notice}
+        </Alert>
+      ) : null}
       <Group justify="space-between">
         <div>
           <Title order={1} ref={heading} tabIndex={-1}>

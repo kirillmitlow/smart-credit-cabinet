@@ -5,6 +5,7 @@
 export interface Persona {
   code: string;
   inn: string;
+  personName?: string;
 }
 
 export const personas = {

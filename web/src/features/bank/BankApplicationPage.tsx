@@ -24,6 +24,8 @@ import { BankEvidencePanels } from './BankEvidencePanels';
 import { bankLabel } from './bankFormatting';
 import { BankRecommendationView } from './BankRecommendationView';
 import { BankOutboxPanel } from './BankOutboxPanel';
+import { BankActions } from './BankActions';
+import { BankClientRequests } from './BankClientRequests';
 
 export function BankApplicationPage() {
   const { id = '' } = useParams();
@@ -92,6 +94,7 @@ function BankApplication({ id, expected }: { id: string; expected: number | unde
               {t.changed}
             </Alert>
           ) : null}
+          <BankActions card={card} />
           <Paper withBorder p="md" data-testid="bank-request">
             <Title order={2} size="h3">
               {t.request}
@@ -166,6 +169,7 @@ function BankApplication({ id, expected }: { id: string; expected: number | unde
           </Paper>
           <BankAssessmentPanels decision={decision} incomplete={incomplete} />
           <BankEvidencePanels card={card} />
+          <BankClientRequests card={card} />
           <BankOutboxPanel applicationId={card.id} />
         </>
       ) : null}
