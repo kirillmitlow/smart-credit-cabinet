@@ -31,7 +31,7 @@
 - [x] Роль `UNDERWRITER`/`ADMIN`; без банковской cookie → `401`, неверная роль → `403`
 - [x] `stankoprom`, `zarya`, `quick-start`, `t-mass`, `t-overdue-45`, `t-mismatch`, `t-young-collateral` попадают в очередь
 - [x] Нет автоотказов (D-034)
-- [ ] Тесты написаны и зелёные (`make check`)
+- [x] Тесты написаны и зелёные (`make check`)
 - [x] Документация и OpenAPI обновлены, если менялся контракт
 - [x] Запись в журнале
 
