@@ -1039,4 +1039,3 @@ README актуализирован по банковским функциям, 
 **Подсказки следующему.** iCloud сделал .git старого worktree dataless и чтение зависло; разрешённые файлы сохранены в собственной копии /private/tmp/scc-jury-submission-repo, чужие checkout не переключались. После push источник передачи — GitHub. Открытые #77/#78/#109 не считать частью main. Мак защищён от сна launchd/caffeinate на12ч от00:57НСК24.10 (при открытой крышке). Пользовательский PDF/research не добавлялись/не удалялись; в handoff изменена только C.
 
 **Файлы.** README.md; THIRD_PARTY_NOTICES.md; licenses/; docs/README.md; docs/architecture/{architecture,state_machine,data_model}.md; docs/api/{README.md,postman_collection.json}; docs/test-scenarios.md; отчёт/результаты reviews/C-2026-10-24-jury-package-*; карточки T-524…527/T-530/T-532/T-544 и чек-лист сдачи; собственная строка C в08-handoff.
-

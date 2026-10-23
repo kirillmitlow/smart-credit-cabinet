@@ -19,7 +19,7 @@
       "licenseTexts": [
         {
           "sha256": "326ff3850062286003ff4cbdaa8f61764e128f9a6532431bccf97e4e2bd75059",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -39,7 +39,7 @@
       "licenseTexts": [
         {
           "sha256": "2f11a643ac2dfffa6649f388df26c2310830580d4077ebccba923811c52bb8b1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -59,7 +59,7 @@
       "licenseTexts": [
         {
           "sha256": "c2fe8edc6572312535eea25abd4af682eb85cfc90a97ee1137d1cf6edca991cf",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -79,7 +79,7 @@
       "licenseTexts": [
         {
           "sha256": "af175b9d96ee93c21a036152e1b905b0b95304d4ae8c2c921c7609100ba8df7e",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -99,7 +99,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -119,7 +119,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -139,7 +139,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -159,7 +159,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -179,7 +179,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -199,7 +199,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -219,7 +219,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -239,7 +239,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -259,7 +259,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -279,7 +279,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -299,7 +299,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -319,7 +319,7 @@
       "licenseTexts": [
         {
           "sha256": "4be9d87b56a306293223b490c0d0b245e9e94f39884147bf051a6c7b825aeb30",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -339,7 +339,7 @@
       "licenseTexts": [
         {
           "sha256": "2e97627cb278aa7556fb9e8817368302301a595b6c7582512b8d74c57b773652",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -359,7 +359,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -379,7 +379,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -399,7 +399,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -419,7 +419,7 @@
       "licenseTexts": [
         {
           "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -439,11 +439,11 @@
       "licenseTexts": [
         {
           "sha256": "98d226d560dfbb0a07a77c3654acc18ba6c87589c48cf00cb2a9855ad50fcd07",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "1a9c55b2961f5e3062e181fa55666c44d011fc3cc03ed6d4fa4321c51f2a5ec5",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -463,7 +463,7 @@
       "licenseTexts": [
         {
           "sha256": "ae842a63dd9bc829c95a2ec22dda25a08e422a368b71dbca67a45cde7c4a4b81",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -483,7 +483,7 @@
       "licenseTexts": [
         {
           "sha256": "b5d2415e5e1bee0a27b4f4bda0f57f66bd8d413576bf120f2a0acbc7fdd7c191",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -503,7 +503,7 @@
       "licenseTexts": [
         {
           "sha256": "947e32047a166cd05f04e45938d172b412c07cbee0b9735afd14bae30e02c2f6",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -523,7 +523,7 @@
       "licenseTexts": [
         {
           "sha256": "d00d032f517721b45c56c70c46bf904ebb71ad313df4d4db7722266b38069665",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -543,7 +543,7 @@
       "licenseTexts": [
         {
           "sha256": "d00d032f517721b45c56c70c46bf904ebb71ad313df4d4db7722266b38069665",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -563,7 +563,7 @@
       "licenseTexts": [
         {
           "sha256": "d00d032f517721b45c56c70c46bf904ebb71ad313df4d4db7722266b38069665",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -583,7 +583,7 @@
       "licenseTexts": [
         {
           "sha256": "947e32047a166cd05f04e45938d172b412c07cbee0b9735afd14bae30e02c2f6",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -603,7 +603,7 @@
       "licenseTexts": [
         {
           "sha256": "d00d032f517721b45c56c70c46bf904ebb71ad313df4d4db7722266b38069665",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -963,7 +963,7 @@
       "licenseTexts": [
         {
           "sha256": "fcf6eabf68ca96988a6b506b4fdc6cc32535d80eb2e11c79724af5ac6f50262b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -983,7 +983,7 @@
       "licenseTexts": [
         {
           "sha256": "fcf6eabf68ca96988a6b506b4fdc6cc32535d80eb2e11c79724af5ac6f50262b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1003,7 +1003,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1023,7 +1023,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1043,7 +1043,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1063,7 +1063,7 @@
       "licenseTexts": [
         {
           "sha256": "3b6be04f862a077a4b97929dbf247299360824d9365f8603c263769303ace18c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1083,7 +1083,7 @@
       "licenseTexts": [
         {
           "sha256": "3b6be04f862a077a4b97929dbf247299360824d9365f8603c263769303ace18c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1103,7 +1103,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1123,7 +1123,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1143,7 +1143,7 @@
       "licenseTexts": [
         {
           "sha256": "dbffd380d59504ba19fcf87ff5a1a33c37edf66d5b09966b0ad5368ab87bc2af",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1163,7 +1163,7 @@
       "licenseTexts": [
         {
           "sha256": "8c0814c525426e67c04ca562f28364be477003697903d257160c081d14b271bf",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1183,7 +1183,7 @@
       "licenseTexts": [
         {
           "sha256": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1203,7 +1203,7 @@
       "licenseTexts": [
         {
           "sha256": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1223,7 +1223,7 @@
       "licenseTexts": [
         {
           "sha256": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1243,7 +1243,7 @@
       "licenseTexts": [
         {
           "sha256": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1263,7 +1263,7 @@
       "licenseTexts": [
         {
           "sha256": "0e4c9a9b6c71019cbbea3bdc20b01223110a9035700f9c960c8fcbf78c2325ce",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1283,7 +1283,7 @@
       "licenseTexts": [
         {
           "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1303,7 +1303,7 @@
       "licenseTexts": [
         {
           "sha256": "e8eeb472f0a5889c2c51625b86a3f9b8630680adb9f49a125352e2e426392780",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1323,7 +1323,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1343,7 +1343,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1378,7 +1378,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1398,7 +1398,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1418,7 +1418,7 @@
       "licenseTexts": [
         {
           "sha256": "85aca0b12ce5ade4ff76e9cbbe7e0d5a4cdde979e3930727c272e1fa04b8cc23",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1438,7 +1438,7 @@
       "licenseTexts": [
         {
           "sha256": "85aca0b12ce5ade4ff76e9cbbe7e0d5a4cdde979e3930727c272e1fa04b8cc23",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1458,7 +1458,7 @@
       "licenseTexts": [
         {
           "sha256": "85aca0b12ce5ade4ff76e9cbbe7e0d5a4cdde979e3930727c272e1fa04b8cc23",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1478,7 +1478,7 @@
       "licenseTexts": [
         {
           "sha256": "85aca0b12ce5ade4ff76e9cbbe7e0d5a4cdde979e3930727c272e1fa04b8cc23",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1498,7 +1498,7 @@
       "licenseTexts": [
         {
           "sha256": "85aca0b12ce5ade4ff76e9cbbe7e0d5a4cdde979e3930727c272e1fa04b8cc23",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1518,7 +1518,7 @@
       "licenseTexts": [
         {
           "sha256": "769d154fbde32a915af110b1123650bc79f4cbe675acc66e005265bf069c6c6c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1538,7 +1538,7 @@
       "licenseTexts": [
         {
           "sha256": "769d154fbde32a915af110b1123650bc79f4cbe675acc66e005265bf069c6c6c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1558,7 +1558,7 @@
       "licenseTexts": [
         {
           "sha256": "1ad100697b2b3320d602f7606be8ea5025f6c2f833879f14d77b7421dfa72cd0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1578,7 +1578,7 @@
       "licenseTexts": [
         {
           "sha256": "769d154fbde32a915af110b1123650bc79f4cbe675acc66e005265bf069c6c6c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1598,7 +1598,7 @@
       "licenseTexts": [
         {
           "sha256": "769d154fbde32a915af110b1123650bc79f4cbe675acc66e005265bf069c6c6c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1618,7 +1618,7 @@
       "licenseTexts": [
         {
           "sha256": "61c765e625bc25d55143f14de7554685c52f21d9e671d3d204304691a163d06a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1638,7 +1638,7 @@
       "licenseTexts": [
         {
           "sha256": "61c765e625bc25d55143f14de7554685c52f21d9e671d3d204304691a163d06a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1658,7 +1658,7 @@
       "licenseTexts": [
         {
           "sha256": "73dcf3bdb05d2912314cdb8dfbc0c4fbd7dcc75098862b8a40e1c2f84e48fa10",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1678,7 +1678,7 @@
       "licenseTexts": [
         {
           "sha256": "bb3a5cb8fb224f632970e31425348f556f7a83b165d5384ea5e142575f5c412e",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -1698,7 +1698,7 @@
       "licenseTexts": [
         {
           "sha256": "40fa61cad189e31256c0483cf454045dbef07b098d9f02642a4e9517b3c13f59",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1913,7 +1913,7 @@
       "licenseTexts": [
         {
           "sha256": "95ced5ecf1133fbf41d409b5555c86c344f83f3b019926057ddbc07cfdcc27b3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -1933,11 +1933,11 @@
       "licenseTexts": [
         {
           "sha256": "7fab1461b41970ff376f1c9303a637076bfaaeb71cd12dd3a1c44aaf59a1a2b9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2336,7 +2336,7 @@
       "licenseTexts": [
         {
           "sha256": "e1919b3b98b8bf6c1b99fcc60a0ed46027c97ac947432e1278446c9606f50161",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2356,7 +2356,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2376,7 +2376,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2396,7 +2396,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2416,7 +2416,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2436,7 +2436,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2456,7 +2456,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2506,7 +2506,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2526,7 +2526,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2546,7 +2546,7 @@
       "licenseTexts": [
         {
           "sha256": "380cd0a6ad700e1f821f2a509f0dd9ff835041cee2d43daf5dedc1adb2bcc620",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2566,7 +2566,7 @@
       "licenseTexts": [
         {
           "sha256": "7e32638e170fa7342000a703a8ed950e05095b2f73fc689992a82776a3c3bd3c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2586,7 +2586,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2606,7 +2606,7 @@
       "licenseTexts": [
         {
           "sha256": "13dc70601979b9f8bb3f3c080e7b0aa67f947c852f3fcc5f5a97e45870f52353",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2626,7 +2626,7 @@
       "licenseTexts": [
         {
           "sha256": "a405ee70c632bb938acb7ac5f210e814409b3760ea9d2329d8ed8ffcfd11a0e7",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2646,7 +2646,7 @@
       "licenseTexts": [
         {
           "sha256": "a405ee70c632bb938acb7ac5f210e814409b3760ea9d2329d8ed8ffcfd11a0e7",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2666,7 +2666,7 @@
       "licenseTexts": [
         {
           "sha256": "bf8fd38056b7606deccfcadb4d8ca1c210082d8ef5513426d2650daedc30bed3",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2686,7 +2686,7 @@
       "licenseTexts": [
         {
           "sha256": "bf8fd38056b7606deccfcadb4d8ca1c210082d8ef5513426d2650daedc30bed3",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2706,7 +2706,7 @@
       "licenseTexts": [
         {
           "sha256": "9680978280d509520d2a7b51e93ffbf7d9ec2b9de4411a6989daba5b659048e0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2726,7 +2726,7 @@
       "licenseTexts": [
         {
           "sha256": "b5a4028c49c48f820831421de69c8ea83d621a062914bf16739fd0703c7c9fba",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2746,7 +2746,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2766,7 +2766,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2786,7 +2786,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2806,7 +2806,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2826,7 +2826,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2846,7 +2846,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2866,7 +2866,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2886,7 +2886,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2906,7 +2906,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2926,7 +2926,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2946,7 +2946,7 @@
       "licenseTexts": [
         {
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -2966,7 +2966,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -2986,7 +2986,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3006,7 +3006,7 @@
       "licenseTexts": [
         {
           "sha256": "053a75a14b7508a897466b65e12797201a06b0e9b5066d1223da72cac99601b5",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3026,7 +3026,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3046,7 +3046,7 @@
       "licenseTexts": [
         {
           "sha256": "053a75a14b7508a897466b65e12797201a06b0e9b5066d1223da72cac99601b5",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3066,7 +3066,7 @@
       "licenseTexts": [
         {
           "sha256": "f3c51ace7f159b21566d72535e84ff354505ae7ffdca835dac81fcdafbf9e879",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3086,7 +3086,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3106,7 +3106,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3126,7 +3126,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3146,7 +3146,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3166,7 +3166,7 @@
       "licenseTexts": [
         {
           "sha256": "29b68325fe026047d13e187b44c33b2acacf7dc647dec4583702e59f235e13b5",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3186,7 +3186,7 @@
       "licenseTexts": [
         {
           "sha256": "04575fc5bfae19a9b63100f8691f901a2e15a399011ac02db435a9ef27295551",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3206,7 +3206,7 @@
       "licenseTexts": [
         {
           "sha256": "77bf9ac1273b3af5c59c632e9dfad86bd1961f65d8a56c76b5fb844488b4991c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3226,7 +3226,7 @@
       "licenseTexts": [
         {
           "sha256": "77bf9ac1273b3af5c59c632e9dfad86bd1961f65d8a56c76b5fb844488b4991c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3246,7 +3246,7 @@
       "licenseTexts": [
         {
           "sha256": "04575fc5bfae19a9b63100f8691f901a2e15a399011ac02db435a9ef27295551",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3266,7 +3266,7 @@
       "licenseTexts": [
         {
           "sha256": "04575fc5bfae19a9b63100f8691f901a2e15a399011ac02db435a9ef27295551",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3286,7 +3286,7 @@
       "licenseTexts": [
         {
           "sha256": "76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3306,7 +3306,7 @@
       "licenseTexts": [
         {
           "sha256": "cfa72b62b9ae173078823a3796b25c027a9071046a263beddf966df67018ce06",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3326,7 +3326,7 @@
       "licenseTexts": [
         {
           "sha256": "79c1241dff8eeccb49b52eb32ad93b4654b74d5d8ddb7cec318f6c45595a10ed",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3346,7 +3346,7 @@
       "licenseTexts": [
         {
           "sha256": "9b6a90e9be78799534e4030d71b6817271fb99aa10e261f9f9f6dec1cff4177a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3366,7 +3366,7 @@
       "licenseTexts": [
         {
           "sha256": "6e737548e1fc84ae35ef356774ab1f764674f9e0f35b80e77dc2e158d5104fa3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3386,7 +3386,7 @@
       "licenseTexts": [
         {
           "sha256": "9df3bb69929a3b650ed73b3bfa1756725aaff0ac296461605753547004eafeaf",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3406,7 +3406,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3426,7 +3426,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3446,7 +3446,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3466,7 +3466,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3486,7 +3486,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3506,7 +3506,7 @@
       "licenseTexts": [
         {
           "sha256": "de4d1f2d2ad5ad0cfd1657a106476b31cb5db5ef9d1ff842b237c0c81f0c8a23",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3526,7 +3526,7 @@
       "licenseTexts": [
         {
           "sha256": "c8df456c7ccba74b959087dff494d4ac2a12dfb0400c08b46b2494a08a000567",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3546,7 +3546,7 @@
       "licenseTexts": [
         {
           "sha256": "c8df456c7ccba74b959087dff494d4ac2a12dfb0400c08b46b2494a08a000567",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3566,7 +3566,7 @@
       "licenseTexts": [
         {
           "sha256": "499507afc8a14166950bd5e445a8206d0b38fab61ea54e436b8bf2fa073cd59a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3586,7 +3586,7 @@
       "licenseTexts": [
         {
           "sha256": "210549bd75abec340599f291e5ecd95b9acd0d8a713543838ab42f6f462b16bc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3606,7 +3606,7 @@
       "licenseTexts": [
         {
           "sha256": "567b1f5e84afcfc97685f3c7fce4c7502e1ac7a91e79cf10980ecd6a9ad38583",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3626,7 +3626,7 @@
       "licenseTexts": [
         {
           "sha256": "567b1f5e84afcfc97685f3c7fce4c7502e1ac7a91e79cf10980ecd6a9ad38583",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3646,7 +3646,7 @@
       "licenseTexts": [
         {
           "sha256": "a6c1514885935d6b699b7e6c1ab22e9312189a75a4e937d83f20749a67d0dbe7",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3666,7 +3666,7 @@
       "licenseTexts": [
         {
           "sha256": "2130216d5ab4c02134f8247f32999feda0abe1eaf028218baeac445c19ce4cea",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3686,7 +3686,7 @@
       "licenseTexts": [
         {
           "sha256": "02293bba2170b45a1d8b49b52b695f7bd6f9005ed93f8f047dcededacaf2f9f4",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3706,7 +3706,7 @@
       "licenseTexts": [
         {
           "sha256": "7771f0b6f55e76efe99cb8e6fdbff583193c9bdfd74d41620d330cc3db6b913a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3726,7 +3726,7 @@
       "licenseTexts": [
         {
           "sha256": "eab1e270ad6ecc6fdd64f9c149e019633fb6e59b2445002cb33d14f93092c42f",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3746,7 +3746,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0917530cf3b3dca12c1ab7798e4d38ad0a6798ecc1bd27849a3048ba91d265",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3766,11 +3766,11 @@
       "licenseTexts": [
         {
           "sha256": "af175b9d96ee93c21a036152e1b905b0b95304d4ae8c2c921c7609100ba8df7e",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "cadf92d5df0bf94bb4d74f906d5207f6198923e4f96aff0b6793d793f5f80e77",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3790,7 +3790,7 @@
       "licenseTexts": [
         {
           "sha256": "c8df456c7ccba74b959087dff494d4ac2a12dfb0400c08b46b2494a08a000567",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3810,7 +3810,7 @@
       "licenseTexts": [
         {
           "sha256": "a1bd5deadb6a06dd74efa852c1b8b23f63b67f2214fbe9c8bd591da51da69268",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3830,7 +3830,7 @@
       "licenseTexts": [
         {
           "sha256": "d408f38ffa3355c5faec517153295338892eb0f1ea43f57874bb23c6075979b5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3850,7 +3850,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -3870,7 +3870,7 @@
       "licenseTexts": [
         {
           "sha256": "49d4d143fed599deb502a0fe6e02f49832f87e9a3a4cd0502e469596d50faa6d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3890,7 +3890,7 @@
       "licenseTexts": [
         {
           "sha256": "68f12f6e2c33688699249c01d8f9623c534da20aa71989c57b061b7bc1676d14",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3910,7 +3910,7 @@
       "licenseTexts": [
         {
           "sha256": "9c63a23124d68cd30cd316a94a1a0bca34f032786df6df69fc4b5f136bac8d2e",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3930,7 +3930,7 @@
       "licenseTexts": [
         {
           "sha256": "21c2679a63d7699c0e644409e2f17d0adbc7a965003feb06b3ff4b833d21f722",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3950,7 +3950,7 @@
       "licenseTexts": [
         {
           "sha256": "39c5ec504cf6bd5cd782a7c695828e09189df79f5d94840e4f08feb97b9fd416",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3970,7 +3970,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -3990,7 +3990,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4010,7 +4010,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4030,7 +4030,7 @@
       "licenseTexts": [
         {
           "sha256": "7e7170e3cebf88a9f60c7b8421418323c09304da1af4d5e90f4da1dc1c8a2661",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         }
       ]
     },
@@ -4050,7 +4050,7 @@
       "licenseTexts": [
         {
           "sha256": "b181da80336ff9dd1043fc8be1a764d7382363433319aa872e4d2cb5ce2a3066",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4070,7 +4070,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4090,7 +4090,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4110,7 +4110,7 @@
       "licenseTexts": [
         {
           "sha256": "bdfd5e0edb6089e6586c8f15e6a86fab83ffbeeda3b3b7b33734ccb8c5906965",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4130,7 +4130,7 @@
       "licenseTexts": [
         {
           "sha256": "31493c14dc0b4eb1e06fe5d4bab3ca4e3b40f8749433455c713863238600cf1a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4150,7 +4150,7 @@
       "licenseTexts": [
         {
           "sha256": "2dc0465729366c3a7890dfa9e972a1ba7048a26c02116fb8b419a6a1ac110149",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4170,7 +4170,7 @@
       "licenseTexts": [
         {
           "sha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4190,7 +4190,7 @@
       "licenseTexts": [
         {
           "sha256": "119fee4adef95a6af980129b12bbc02ef32a0a75737cbdd31b6922c0db0050bc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4210,7 +4210,7 @@
       "licenseTexts": [
         {
           "sha256": "9060d3e477a57e94563100d089ee07a1bf3342f149fd7366913abf2b4b54f04b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4230,7 +4230,7 @@
       "licenseTexts": [
         {
           "sha256": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4250,7 +4250,7 @@
       "licenseTexts": [
         {
           "sha256": "4c247e0dce60c6a29332afa80ba7d81243e7045b0e4b6e6e59e21fb5a1a7b5ab",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4270,7 +4270,7 @@
       "licenseTexts": [
         {
           "sha256": "435a6722c786b0a56fbe7387028f1d9d3f3a2d0fb615bb8fee118727c3f59b7b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4290,7 +4290,7 @@
       "licenseTexts": [
         {
           "sha256": "0d22dfefcd138a157d8b68e1056e229ccdece6ca5a7153d38ee289983483c33d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4310,7 +4310,7 @@
       "licenseTexts": [
         {
           "sha256": "fe9538ec27e7fb9bfbcc05c97bc5087a2a25a7caf4ad7e6bc99fbcbf1a37e6ce",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         }
       ]
     },
@@ -4330,7 +4330,7 @@
       "licenseTexts": [
         {
           "sha256": "fe9538ec27e7fb9bfbcc05c97bc5087a2a25a7caf4ad7e6bc99fbcbf1a37e6ce",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         }
       ]
     },
@@ -4350,7 +4350,7 @@
       "licenseTexts": [
         {
           "sha256": "aaa78451b6fecd1b9c4594c796c133c0e90cad100372ff8bc6de615e9ef9adf1",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4370,7 +4370,7 @@
       "licenseTexts": [
         {
           "sha256": "719a251ceca49c057ea90a1152af6546b767ec88e6d573bb6324454267b32c22",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4390,7 +4390,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4410,7 +4410,7 @@
       "licenseTexts": [
         {
           "sha256": "11d55bd4541c75ee7879547ac49089c489163dae49551389713c3d026cab383e",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4430,7 +4430,7 @@
       "licenseTexts": [
         {
           "sha256": "8bcfa73a7b42b5c786a8a05291f9a5573a8d5f2446a956203c2e4c0e755d73b7",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4450,7 +4450,7 @@
       "licenseTexts": [
         {
           "sha256": "528eec83cb836a0adda9f8fc3d6a2a70a710d6cc0be9a155f92212c8df28acfa",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4470,7 +4470,7 @@
       "licenseTexts": [
         {
           "sha256": "b41d08bc3624d8c436fc80237d73ebb361985a67f4504bbcd703e5ca2b27254c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4490,7 +4490,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4510,7 +4510,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4530,7 +4530,7 @@
       "licenseTexts": [
         {
           "sha256": "23eb8602cd5902bcfca56b23aa08e8672a809f5a12eaf8bb56abfa9d44e1a4fd",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4550,7 +4550,7 @@
       "licenseTexts": [
         {
           "sha256": "528c29f424e6304e1dbda234067aa77d51c01202b1987d2cc2160473442f6035",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4570,7 +4570,7 @@
       "licenseTexts": [
         {
           "sha256": "f2042f3634c4136d06b5139c9c6aefb81a3a462b514548bc1845953233dfba98",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4590,7 +4590,7 @@
       "licenseTexts": [
         {
           "sha256": "b41d08bc3624d8c436fc80237d73ebb361985a67f4504bbcd703e5ca2b27254c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4610,7 +4610,7 @@
       "licenseTexts": [
         {
           "sha256": "210549bd75abec340599f291e5ecd95b9acd0d8a713543838ab42f6f462b16bc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4630,7 +4630,7 @@
       "licenseTexts": [
         {
           "sha256": "306fa513e39b23a6e8747520de761809d206b99800ef41907b530226574c59ae",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4650,7 +4650,7 @@
       "licenseTexts": [
         {
           "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4670,7 +4670,7 @@
       "licenseTexts": [
         {
           "sha256": "54b32293ea560d22cd9b62af9b2cda1a030d910a48c6601d227c5ff2338d95f8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4690,7 +4690,7 @@
       "licenseTexts": [
         {
           "sha256": "0ffe67fe630169de46df2d29dc18f5857b4c98f0f95b0cd9e3c21fef51f9a9b8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4710,7 +4710,7 @@
       "licenseTexts": [
         {
           "sha256": "0ffe67fe630169de46df2d29dc18f5857b4c98f0f95b0cd9e3c21fef51f9a9b8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4730,7 +4730,7 @@
       "licenseTexts": [
         {
           "sha256": "2b770a704c15de238c3f622b01b0044ddd60b49ee30608ea6991ebf19db7a7a1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4750,7 +4750,7 @@
       "licenseTexts": [
         {
           "sha256": "25ba5c59dad3e0dd8f9540beaa0f0a86a10e3aec35af5fdc8e88c5f6a5c0d8c6",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4770,7 +4770,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4790,7 +4790,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4810,7 +4810,7 @@
       "licenseTexts": [
         {
           "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4830,7 +4830,7 @@
       "licenseTexts": [
         {
           "sha256": "210549bd75abec340599f291e5ecd95b9acd0d8a713543838ab42f6f462b16bc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4850,7 +4850,7 @@
       "licenseTexts": [
         {
           "sha256": "5b06b483b5c8874fd4e977fedb335067a9e8f722fd45c46ed42797af9d37fbf3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4870,7 +4870,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4890,7 +4890,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4910,7 +4910,7 @@
       "licenseTexts": [
         {
           "sha256": "8a4b6c44eebfb026d23719a348145a661a555568dbfdc11618ff2d0dd9306b00",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4930,7 +4930,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4950,7 +4950,7 @@
       "licenseTexts": [
         {
           "sha256": "1a3aeb1f1398bd697d57c3c585faadf59d825aca6e3162cd7eeb72ff76eb2466",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -4970,7 +4970,7 @@
       "licenseTexts": [
         {
           "sha256": "d90bf0a089da4cf43d644ed240a0b3825dcdb705e64e38371d56995a4cc9e4c5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -4990,7 +4990,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5010,7 +5010,7 @@
       "licenseTexts": [
         {
           "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5030,7 +5030,7 @@
       "licenseTexts": [
         {
           "sha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5050,7 +5050,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5070,7 +5070,7 @@
       "licenseTexts": [
         {
           "sha256": "3b6be04f862a077a4b97929dbf247299360824d9365f8603c263769303ace18c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5090,7 +5090,7 @@
       "licenseTexts": [
         {
           "sha256": "82b19019e25e266a310ef46800b3af726136a3cee79af8812dc83ca0b045afae",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5110,7 +5110,7 @@
       "licenseTexts": [
         {
           "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5130,7 +5130,7 @@
       "licenseTexts": [
         {
           "sha256": "fba570176c68f716676e04cad6c39fb56b763e44fc11be22fe6863ff19092a9b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5150,7 +5150,7 @@
       "licenseTexts": [
         {
           "sha256": "d3a724e2ed749f172ff70b62a1d0631b7d4b0ea273782365a3464d4e2d6b6dbd",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5170,7 +5170,7 @@
       "licenseTexts": [
         {
           "sha256": "d8bf34ff6d190640a01e7704ad78253fc181bc128949d71273fbbaa12f33c0b4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5190,7 +5190,7 @@
       "licenseTexts": [
         {
           "sha256": "d8bf34ff6d190640a01e7704ad78253fc181bc128949d71273fbbaa12f33c0b4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5210,7 +5210,7 @@
       "licenseTexts": [
         {
           "sha256": "d8bf34ff6d190640a01e7704ad78253fc181bc128949d71273fbbaa12f33c0b4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5230,7 +5230,7 @@
       "licenseTexts": [
         {
           "sha256": "26c95937762a3dc17a3934a0a2773c70259ba4bf28dab713c225e4af8eb9d349",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5250,7 +5250,7 @@
       "licenseTexts": [
         {
           "sha256": "ac68116ae73740de4190892f334992e449a124600924ec761e64319d3aac9e6e",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5285,7 +5285,7 @@
       "licenseTexts": [
         {
           "sha256": "0e74697a68cebdcd61502c30fe80ab7f9e341d995dcd452023654d57133534b1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5305,7 +5305,7 @@
       "licenseTexts": [
         {
           "sha256": "dc63692c70bf95b67d9059b0fa660a9189a0cfa054e9d5fda89ed35aca262901",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5325,7 +5325,7 @@
       "licenseTexts": [
         {
           "sha256": "0e74697a68cebdcd61502c30fe80ab7f9e341d995dcd452023654d57133534b1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5345,7 +5345,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5365,7 +5365,7 @@
       "licenseTexts": [
         {
           "sha256": "7c6cc83c84eaa249a85bf12fe3eedd831bb50c696e8890b5248223ae68c7b408",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5385,7 +5385,7 @@
       "licenseTexts": [
         {
           "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5405,7 +5405,7 @@
       "licenseTexts": [
         {
           "sha256": "a833d366242c298cf1b10263516572fb8dcbe68eb5072cdcac2b4546e2b4eb36",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5425,7 +5425,7 @@
       "licenseTexts": [
         {
           "sha256": "47dfaa11d4560faf9a9c043393656d4131ff4b750324c9d87fe14dea7aa877b2",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5445,7 +5445,7 @@
       "licenseTexts": [
         {
           "sha256": "2547dead17a32b1e49a588e943d52420b4d75f1349d9afd9ecb567b2dc8911c0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5465,7 +5465,7 @@
       "licenseTexts": [
         {
           "sha256": "2547dead17a32b1e49a588e943d52420b4d75f1349d9afd9ecb567b2dc8911c0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5485,7 +5485,7 @@
       "licenseTexts": [
         {
           "sha256": "df7464922225c9b286167fa692d305e5ba98bf71613525d4d031649a344a3f3f",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5505,7 +5505,7 @@
       "licenseTexts": [
         {
           "sha256": "9235f5ebfd80d41920fae7a0317caa3914f2a9249837bc486d7706f73080e375",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5525,7 +5525,7 @@
       "licenseTexts": [
         {
           "sha256": "9a39f2aadab11a3697edd668ff2d8ad885b649737b7ab4d3bf12b34e5ada0c86",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5545,7 +5545,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5565,7 +5565,7 @@
       "licenseTexts": [
         {
           "sha256": "750315e157c49f551560b05004c439ad6a3b41caf03847dfec9aad8c81d2501f",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5585,7 +5585,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5605,7 +5605,7 @@
       "licenseTexts": [
         {
           "sha256": "47bb0c0aaf5c075e11acfaed88f890b6a12740bd7c771d449f7b6934f6c5a229",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5625,7 +5625,7 @@
       "licenseTexts": [
         {
           "sha256": "148718606d34f467fd08a2176bb4c1ab275f999576f779368503d8d3e3642861",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5645,7 +5645,7 @@
       "licenseTexts": [
         {
           "sha256": "c88d22f013838502db82496d270bb584805a1b64fb9c2765ec89ba09c59f5059",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5665,7 +5665,7 @@
       "licenseTexts": [
         {
           "sha256": "2a8a5d6197bb97a018b8a190dd3ed853d750ca87c8e80c17aad41d6c6ff448e1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5685,7 +5685,7 @@
       "licenseTexts": [
         {
           "sha256": "916586c760c1cb1092a9e1eeb94b129507a2e9342ebe609196ba69c6a8655ccc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5705,7 +5705,7 @@
       "licenseTexts": [
         {
           "sha256": "acfaf437865d82f0fa9b9cdcae8b550bed8d011adaa5b42d973191caf99f62a8",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5725,7 +5725,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5745,7 +5745,7 @@
       "licenseTexts": [
         {
           "sha256": "1ac0263302bfb8eedc54a10a44175b0df51419306d5bc1539bfd7a7da121bd08",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5765,7 +5765,7 @@
       "licenseTexts": [
         {
           "sha256": "e3a956681ee067f971ac413994171b3d90ca801ec6324e76c9c55366cfe31cb0",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5785,7 +5785,7 @@
       "licenseTexts": [
         {
           "sha256": "902dbb4154679fb2b8d7c33878183f45b268d01eae5e5033dddaa8852d45f213",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5805,7 +5805,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5825,7 +5825,7 @@
       "licenseTexts": [
         {
           "sha256": "39c5ec504cf6bd5cd782a7c695828e09189df79f5d94840e4f08feb97b9fd416",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5845,7 +5845,7 @@
       "licenseTexts": [
         {
           "sha256": "acf3b087b348d2f2e731b9d4131af185aad694c1204ce14a46909483fd42da05",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5865,7 +5865,7 @@
       "licenseTexts": [
         {
           "sha256": "be46ce1e3b0479af9ce82d22b465a6d7d2ff084fca0aaf3d54172da2b5eb5781",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5885,7 +5885,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5905,7 +5905,7 @@
       "licenseTexts": [
         {
           "sha256": "e2560e002e13281578c75c850061d9255c33d16d732939e8c2db64c2506642fa",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5925,7 +5925,7 @@
       "licenseTexts": [
         {
           "sha256": "10c904a49af44409b073532e45a53fd4df19bdf26eaf9afc7917258c2b354382",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5945,7 +5945,7 @@
       "licenseTexts": [
         {
           "sha256": "fc68eb8f1c8e1d6b8be50f3c177927e24791cae7dc251e6253a012f37926a30c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -5965,7 +5965,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -5985,7 +5985,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6005,7 +6005,7 @@
       "licenseTexts": [
         {
           "sha256": "acfaf437865d82f0fa9b9cdcae8b550bed8d011adaa5b42d973191caf99f62a8",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6025,7 +6025,7 @@
       "licenseTexts": [
         {
           "sha256": "d90bf0a089da4cf43d644ed240a0b3825dcdb705e64e38371d56995a4cc9e4c5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6045,7 +6045,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6065,7 +6065,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6085,7 +6085,7 @@
       "licenseTexts": [
         {
           "sha256": "0f0ca96f50793990031ebc488a38f7292ff70bce8ab6a8e5eeda674abc32ccdf",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6105,7 +6105,7 @@
       "licenseTexts": [
         {
           "sha256": "0f0ca96f50793990031ebc488a38f7292ff70bce8ab6a8e5eeda674abc32ccdf",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6125,7 +6125,7 @@
       "licenseTexts": [
         {
           "sha256": "206c1adcf206dc0031b11232f5b054ec5f1662407ab1ca415247921cab2068ab",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6145,7 +6145,7 @@
       "licenseTexts": [
         {
           "sha256": "e2560e002e13281578c75c850061d9255c33d16d732939e8c2db64c2506642fa",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6165,7 +6165,7 @@
       "licenseTexts": [
         {
           "sha256": "bf9b0d665be2a689851eea667ca9f42066ea1d903b38349c51e6a44b2577680a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6185,7 +6185,7 @@
       "licenseTexts": [
         {
           "sha256": "b7e6f39fae834b72ef575518b0d88d5200e04b65cba72c12ab67b2a449170999",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6205,7 +6205,7 @@
       "licenseTexts": [
         {
           "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6225,7 +6225,7 @@
       "licenseTexts": [
         {
           "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6245,7 +6245,7 @@
       "licenseTexts": [
         {
           "sha256": "528eec83cb836a0adda9f8fc3d6a2a70a710d6cc0be9a155f92212c8df28acfa",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6265,7 +6265,7 @@
       "licenseTexts": [
         {
           "sha256": "f4ff0f211345d2496a6e9dc56d6f13f4ee52c0223ab718bfe7ebc77945af3942",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6285,7 +6285,7 @@
       "licenseTexts": [
         {
           "sha256": "542e7521fab287d3d2ea83e0145692c7d82ea81b28f141be6686364929d33079",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6305,7 +6305,7 @@
       "licenseTexts": [
         {
           "sha256": "542e7521fab287d3d2ea83e0145692c7d82ea81b28f141be6686364929d33079",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6325,7 +6325,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6360,7 +6360,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6380,7 +6380,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6400,7 +6400,7 @@
       "licenseTexts": [
         {
           "sha256": "b505862c2bf0b38f98a4629efe0d17fb87690cbd35a9f3ae95d2fd769d7cea23",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6420,7 +6420,7 @@
       "licenseTexts": [
         {
           "sha256": "36571397680e083211d7968a24f46e31cb75df18d4c03fe48896ee1367119fe8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6440,7 +6440,7 @@
       "licenseTexts": [
         {
           "sha256": "971e376febf7afbcceab6857e243f2ccb3ea88f520b68c324af15a28171f5de3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6460,7 +6460,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6480,7 +6480,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6500,7 +6500,7 @@
       "licenseTexts": [
         {
           "sha256": "166ffde0aa2773f509ba6edb3d0716602e076eb1cb1b21ae50b8262641af13b3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6520,7 +6520,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6540,7 +6540,7 @@
       "licenseTexts": [
         {
           "sha256": "492328129d2df31681bd85ebc673ebadb6017bcbc7a494e2eaf475eefc0e6d24",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6560,7 +6560,7 @@
       "licenseTexts": [
         {
           "sha256": "73b5283588baa142c5baaef5f56d3e8fdea7a30b214e8c5737e87640f882453a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6580,7 +6580,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0917530cf3b3dca12c1ab7798e4d38ad0a6798ecc1bd27849a3048ba91d265",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6600,7 +6600,7 @@
       "licenseTexts": [
         {
           "sha256": "dc0fe5a22d9336f345ee984f9bf56f11f22877a3aa5fd16a1db9a8ca0e23a5d1",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6620,7 +6620,7 @@
       "licenseTexts": [
         {
           "sha256": "4cd903859549d4b20b571041f96dfae1136ed079c476126268f9d7cc1b611150",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6640,7 +6640,7 @@
       "licenseTexts": [
         {
           "sha256": "5a26e47b9d7020848f061bcad66f8e73cab95f529dab5c02588b21e57c4f876c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6660,7 +6660,7 @@
       "licenseTexts": [
         {
           "sha256": "dc0fe5a22d9336f345ee984f9bf56f11f22877a3aa5fd16a1db9a8ca0e23a5d1",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6695,7 +6695,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6715,7 +6715,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6735,7 +6735,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6755,7 +6755,7 @@
       "licenseTexts": [
         {
           "sha256": "dc0fe5a22d9336f345ee984f9bf56f11f22877a3aa5fd16a1db9a8ca0e23a5d1",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6775,7 +6775,7 @@
       "licenseTexts": [
         {
           "sha256": "5a26e47b9d7020848f061bcad66f8e73cab95f529dab5c02588b21e57c4f876c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6795,7 +6795,7 @@
       "licenseTexts": [
         {
           "sha256": "e2560e002e13281578c75c850061d9255c33d16d732939e8c2db64c2506642fa",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6815,7 +6815,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6835,7 +6835,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6855,7 +6855,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6875,7 +6875,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -6895,7 +6895,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6915,7 +6915,7 @@
       "licenseTexts": [
         {
           "sha256": "5a26e47b9d7020848f061bcad66f8e73cab95f529dab5c02588b21e57c4f876c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6935,7 +6935,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0917530cf3b3dca12c1ab7798e4d38ad0a6798ecc1bd27849a3048ba91d265",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6955,7 +6955,7 @@
       "licenseTexts": [
         {
           "sha256": "5a26e47b9d7020848f061bcad66f8e73cab95f529dab5c02588b21e57c4f876c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6975,7 +6975,7 @@
       "licenseTexts": [
         {
           "sha256": "68f12f6e2c33688699249c01d8f9623c534da20aa71989c57b061b7bc1676d14",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -6995,7 +6995,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7015,7 +7015,7 @@
       "licenseTexts": [
         {
           "sha256": "46231df5a7733c3f52f11b71f3df61813007745b62b09031acfb45fb42d75082",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7035,7 +7035,7 @@
       "licenseTexts": [
         {
           "sha256": "3b07ef3fdd96c7f4025deb20139ec92b3fb88d3988b98047d9beee10b659f47b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7055,7 +7055,7 @@
       "licenseTexts": [
         {
           "sha256": "2213d91c606205c71eb051a199478cdc2adde945893404d7f1421436dd6d5cc1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7075,7 +7075,7 @@
       "licenseTexts": [
         {
           "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7095,7 +7095,7 @@
       "licenseTexts": [
         {
           "sha256": "242d37e7cab25cbafc36cc973ee88f9345fddf066afe4f72b7ac3d9ad4e24cce",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7115,7 +7115,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7135,7 +7135,7 @@
       "licenseTexts": [
         {
           "sha256": "730f0dbd825a0a9e01c2fa5976078f68a8e6bab8dfc3d65689d981c760e5279d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7155,7 +7155,7 @@
       "licenseTexts": [
         {
           "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7175,7 +7175,7 @@
       "licenseTexts": [
         {
           "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7195,7 +7195,7 @@
       "licenseTexts": [
         {
           "sha256": "435a6722c786b0a56fbe7387028f1d9d3f3a2d0fb615bb8fee118727c3f59b7b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7215,7 +7215,7 @@
       "licenseTexts": [
         {
           "sha256": "53e59feb13058722d977c699eb0407c7bce2f93c949b681bbd2ff31698535927",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7235,7 +7235,7 @@
       "licenseTexts": [
         {
           "sha256": "82b19019e25e266a310ef46800b3af726136a3cee79af8812dc83ca0b045afae",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7300,7 +7300,7 @@
       "licenseTexts": [
         {
           "sha256": "b9eb082c39fe245e38793699074c394c43a722c51fce031c3c165cb92a31035c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -7320,7 +7320,7 @@
       "licenseTexts": [
         {
           "sha256": "5eba353fe5076ac3432177f8ab1cf75e3afcd0584251e37c3bfead5f447d040e",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7353,7 +7353,7 @@
       "licenseTexts": [
         {
           "sha256": "5eba353fe5076ac3432177f8ab1cf75e3afcd0584251e37c3bfead5f447d040e",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7490,7 +7490,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7510,7 +7510,7 @@
       "licenseTexts": [
         {
           "sha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -7530,7 +7530,7 @@
       "licenseTexts": [
         {
           "sha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -7550,7 +7550,7 @@
       "licenseTexts": [
         {
           "sha256": "8a1af140fdfbf5afd3df27f7e662f989c5b963a300020dfafce42033cae9e004",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7570,7 +7570,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7590,7 +7590,7 @@
       "licenseTexts": [
         {
           "sha256": "433fc9dfe659dbfb1e91eed8351f13651e97bfa3ac6d03394c3d63f61d4bbc80",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7610,7 +7610,7 @@
       "licenseTexts": [
         {
           "sha256": "1cbe51b907662f6cb1492b16c359384a595180bf0e4d101603ed525e75c4e484",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7630,7 +7630,7 @@
       "licenseTexts": [
         {
           "sha256": "7917b04272f3f7c11f9fb89716742747a77f5906ebe5a81e70cbd090b8c7f961",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7650,7 +7650,7 @@
       "licenseTexts": [
         {
           "sha256": "2b770a704c15de238c3f622b01b0044ddd60b49ee30608ea6991ebf19db7a7a1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7670,7 +7670,7 @@
       "licenseTexts": [
         {
           "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7690,7 +7690,7 @@
       "licenseTexts": [
         {
           "sha256": "9638fa87f845af6cecc56fab498c1f74f4a98522d3b53377bedcbdb44b5a8dcc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7710,7 +7710,7 @@
       "licenseTexts": [
         {
           "sha256": "2c7c5d22ed5a8ee968c64757710979afcd77438c48b4a265b94e615babd8a901",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7730,7 +7730,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7750,7 +7750,7 @@
       "licenseTexts": [
         {
           "sha256": "1662fae9b5314d11cf51284e2dcd1f006a354f7343f08712a730fcff9a359801",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7770,7 +7770,7 @@
       "licenseTexts": [
         {
           "sha256": "be7690d23425cbcf147da49a90e7c86009e614a51ba60127392546f75166e959",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -7790,7 +7790,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7810,7 +7810,7 @@
       "licenseTexts": [
         {
           "sha256": "da4db1480d9beea3483a2eda5c53b22238d0827d57da162b48f122e04d2d9987",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -7830,7 +7830,7 @@
       "licenseTexts": [
         {
           "sha256": "4383cb2c3608397ce7a4159502614ed66890f8999c2a9c056dd3b1024d6721f0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7865,7 +7865,7 @@
       "licenseTexts": [
         {
           "sha256": "3706296ed611888111ceccc1dff4712844dea4bde0b185c82d718c3b69895abe",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7885,7 +7885,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7905,7 +7905,7 @@
       "licenseTexts": [
         {
           "sha256": "bd40cc437e28a3ad7bef2ad34e6b72e757b182e67bda1acadbab4ef0476f8232",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -7925,7 +7925,7 @@
       "licenseTexts": [
         {
           "sha256": "61b723ee61d8544f2d998214ac9cc5e2a97deb8d717e9ac90aeb9e3b07964441",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7945,7 +7945,7 @@
       "licenseTexts": [
         {
           "sha256": "7365a9e1142d7dbc107605c4ec5d4846664b4aa5ccce9db79b925a7732e184a7",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7965,7 +7965,7 @@
       "licenseTexts": [
         {
           "sha256": "971e376febf7afbcceab6857e243f2ccb3ea88f520b68c324af15a28171f5de3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -7985,7 +7985,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8005,7 +8005,7 @@
       "licenseTexts": [
         {
           "sha256": "ee48679d379ca6b4493d5e231094d85f818dd9be40b1a4f234fb7ff657ee35d9",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8025,7 +8025,7 @@
       "licenseTexts": [
         {
           "sha256": "b9eb082c39fe245e38793699074c394c43a722c51fce031c3c165cb92a31035c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8060,7 +8060,7 @@
       "licenseTexts": [
         {
           "sha256": "d06a69cefbdd9135436ff8e36ea5c32f07fc27c629063aa411f811efe7c30359",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8080,7 +8080,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8100,7 +8100,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8120,7 +8120,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8140,7 +8140,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8160,7 +8160,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8180,7 +8180,7 @@
       "licenseTexts": [
         {
           "sha256": "8c535800331e1e4439835555b3f9edc7fe9dee2fab0d8bbbd5a982e8b8343d4d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8200,7 +8200,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8220,7 +8220,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8240,7 +8240,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8260,7 +8260,7 @@
       "licenseTexts": [
         {
           "sha256": "52e92576851154bad7737e90cc72818936f43665cb0e3f7428ed8edc8cc5709b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8280,7 +8280,7 @@
       "licenseTexts": [
         {
           "sha256": "6582629e2979466878f6014313dcc2f3756c9616148682227ce3063dde310750",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8300,7 +8300,7 @@
       "licenseTexts": [
         {
           "sha256": "d0cd141b0c322fded5dfad1d4645bb2fedfc05b7321fe1009469638190d59ef9",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8320,11 +8320,11 @@
       "licenseTexts": [
         {
           "sha256": "7fab1461b41970ff376f1c9303a637076bfaaeb71cd12dd3a1c44aaf59a1a2b9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8344,11 +8344,11 @@
       "licenseTexts": [
         {
           "sha256": "7fab1461b41970ff376f1c9303a637076bfaaeb71cd12dd3a1c44aaf59a1a2b9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8381,7 +8381,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8401,7 +8401,7 @@
       "licenseTexts": [
         {
           "sha256": "5be1f3465bba68a626777f984878814aaf35e7ef8e9fd314d469bcf887050fb8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8421,7 +8421,7 @@
       "licenseTexts": [
         {
           "sha256": "b9eb082c39fe245e38793699074c394c43a722c51fce031c3c165cb92a31035c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8441,7 +8441,7 @@
       "licenseTexts": [
         {
           "sha256": "b0f2417199889f1c0d28ec4e0244eacf1a15de5819d61f641dd7d8f45153ac9c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8461,7 +8461,7 @@
       "licenseTexts": [
         {
           "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8481,7 +8481,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8501,7 +8501,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8521,7 +8521,7 @@
       "licenseTexts": [
         {
           "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8541,7 +8541,7 @@
       "licenseTexts": [
         {
           "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8561,7 +8561,7 @@
       "licenseTexts": [
         {
           "sha256": "e8eeb472f0a5889c2c51625b86a3f9b8630680adb9f49a125352e2e426392780",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8581,7 +8581,7 @@
       "licenseTexts": [
         {
           "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8601,7 +8601,7 @@
       "licenseTexts": [
         {
           "sha256": "55aaf8cf3f0c02371907f2c6fdd8bb366647fd6d4be0cfcc403e62613597cab8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8621,7 +8621,7 @@
       "licenseTexts": [
         {
           "sha256": "30f0cfddf483d1128e3610205020f2041a6c5e837aa999e0aa82e5576187d4a9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8656,7 +8656,7 @@
       "licenseTexts": [
         {
           "sha256": "77c9ee6a9c5d5782fb0c50b50d101189116314c14f7df0a1b0d385fc96a7ba49",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8676,7 +8676,7 @@
       "licenseTexts": [
         {
           "sha256": "30f0cfddf483d1128e3610205020f2041a6c5e837aa999e0aa82e5576187d4a9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8696,7 +8696,7 @@
       "licenseTexts": [
         {
           "sha256": "dffec71d93f273d2af7b54c6c7e7e70b3289c632ec0d7253210ec21ac336d5ac",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8716,7 +8716,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8736,7 +8736,7 @@
       "licenseTexts": [
         {
           "sha256": "d6151cc698dc6a772e5b448069270a095488f3962aef0b11e78974e1e1587082",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8756,7 +8756,7 @@
       "licenseTexts": [
         {
           "sha256": "62ed855907a27f4d6f2e7b96cdd20d10b513aef18733b0a5abc7880537491595",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8776,7 +8776,7 @@
       "licenseTexts": [
         {
           "sha256": "6ee0feb1f6ef996ff5a68600f8cf98909cf412d39ef3cdceaefd87d636fa1b7f",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8796,7 +8796,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8816,7 +8816,7 @@
       "licenseTexts": [
         {
           "sha256": "10c904a49af44409b073532e45a53fd4df19bdf26eaf9afc7917258c2b354382",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8836,7 +8836,7 @@
       "licenseTexts": [
         {
           "sha256": "29de6bd2570e11d73396880c41a2f1dea7e072782012f160e4dbf17f39e2db03",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8856,7 +8856,7 @@
       "licenseTexts": [
         {
           "sha256": "23ecfff35a5a2e80d92142f75228912c3b1abc4b5a8337a821ff4397e2f9f734",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8876,7 +8876,7 @@
       "licenseTexts": [
         {
           "sha256": "b41d08bc3624d8c436fc80237d73ebb361985a67f4504bbcd703e5ca2b27254c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8896,7 +8896,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8916,7 +8916,7 @@
       "licenseTexts": [
         {
           "sha256": "d90bf0a089da4cf43d644ed240a0b3825dcdb705e64e38371d56995a4cc9e4c5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8951,7 +8951,7 @@
       "licenseTexts": [
         {
           "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -8971,7 +8971,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -8991,7 +8991,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9011,7 +9011,7 @@
       "licenseTexts": [
         {
           "sha256": "c5c6c5183a789d122f267c405f685037efb87e27fcde28ab1dd7378a2d2f5962",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9031,7 +9031,7 @@
       "licenseTexts": [
         {
           "sha256": "c5c6c5183a789d122f267c405f685037efb87e27fcde28ab1dd7378a2d2f5962",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9051,7 +9051,7 @@
       "licenseTexts": [
         {
           "sha256": "bf9b0d665be2a689851eea667ca9f42066ea1d903b38349c51e6a44b2577680a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9071,7 +9071,7 @@
       "licenseTexts": [
         {
           "sha256": "bf9b0d665be2a689851eea667ca9f42066ea1d903b38349c51e6a44b2577680a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9091,7 +9091,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9111,7 +9111,7 @@
       "licenseTexts": [
         {
           "sha256": "69dee148a2cc470554dfa7142e830662062394d0fe67cddd379aba90dc60d6b3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9131,7 +9131,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9151,7 +9151,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9171,7 +9171,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9191,7 +9191,7 @@
       "licenseTexts": [
         {
           "sha256": "5e325595b4ea8cfec3802f545b1def5d7b73e4a5b8e9ba63e32a320f67732292",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9211,7 +9211,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9231,7 +9231,7 @@
       "licenseTexts": [
         {
           "sha256": "b173e19b9a78df305577ace0e52ef45a4bcc915ea28b47b256dc3b68dcb1f7e7",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9251,7 +9251,7 @@
       "licenseTexts": [
         {
           "sha256": "6cb0631f71c7749763fd3dd1d5bee52dd1070ec17f2edc1710079ad070bd2fbd",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9271,7 +9271,7 @@
       "licenseTexts": [
         {
           "sha256": "46231df5a7733c3f52f11b71f3df61813007745b62b09031acfb45fb42d75082",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9291,7 +9291,7 @@
       "licenseTexts": [
         {
           "sha256": "b41d08bc3624d8c436fc80237d73ebb361985a67f4504bbcd703e5ca2b27254c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9311,7 +9311,7 @@
       "licenseTexts": [
         {
           "sha256": "c1bedcaba680235da423dfcf04ac1e5624904c70a3578e929f9db3ea1398947d",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9331,7 +9331,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9351,7 +9351,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9371,7 +9371,7 @@
       "licenseTexts": [
         {
           "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9391,7 +9391,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9411,7 +9411,7 @@
       "licenseTexts": [
         {
           "sha256": "a5e49293b629194f16e08c965807b34a4a8f45aa2735658a3b0e3c1478a34b30",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9431,7 +9431,7 @@
       "licenseTexts": [
         {
           "sha256": "a5e49293b629194f16e08c965807b34a4a8f45aa2735658a3b0e3c1478a34b30",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9451,7 +9451,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9471,7 +9471,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9491,7 +9491,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9511,7 +9511,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9531,7 +9531,7 @@
       "licenseTexts": [
         {
           "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9551,7 +9551,7 @@
       "licenseTexts": [
         {
           "sha256": "2ae096f44e6308c9be1843ddd9aa8326bc69f01b6a225bdf067d8a50aa5d8560",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9571,7 +9571,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9591,7 +9591,7 @@
       "licenseTexts": [
         {
           "sha256": "cebc084d54e6dd99e53292ddb4bc1cdb63d9bfcd9ce438fe3aa6eb106d79e2ea",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9611,7 +9611,7 @@
       "licenseTexts": [
         {
           "sha256": "f95f668fe64081ddb4153b322e34fdd719b991285ed08177d5ad7133b7988d92",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9631,7 +9631,7 @@
       "licenseTexts": [
         {
           "sha256": "22c68811e174cbbfb3813d4135918df4f540959c14d872e601d9abe83d3cde8f",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9651,7 +9651,7 @@
       "licenseTexts": [
         {
           "sha256": "cebc084d54e6dd99e53292ddb4bc1cdb63d9bfcd9ce438fe3aa6eb106d79e2ea",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9671,7 +9671,7 @@
       "licenseTexts": [
         {
           "sha256": "c64182d48160db948b6aa97a984f1a32974ce4d2053900361264cd33853796cb",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9691,7 +9691,7 @@
       "licenseTexts": [
         {
           "sha256": "c64182d48160db948b6aa97a984f1a32974ce4d2053900361264cd33853796cb",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9711,7 +9711,7 @@
       "licenseTexts": [
         {
           "sha256": "22ec6791c91ba42c0516a05f4cbdde019aae4687f8a38c5ca7e8a69ee68f851d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9731,7 +9731,7 @@
       "licenseTexts": [
         {
           "sha256": "499d6d466d064e0460427967a344e2a32fcb86ea8c6cd1a285ec4f1fa03fba67",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9751,7 +9751,7 @@
       "licenseTexts": [
         {
           "sha256": "76c9d5f5ea942054715c026f33f8717c9e24603196a3737b8899afa216bcbdab",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9771,7 +9771,7 @@
       "licenseTexts": [
         {
           "sha256": "5989359645911c04a140c49d89496b13feca980bbf36d2250a12d3b9d06250d6",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9791,7 +9791,7 @@
       "licenseTexts": [
         {
           "sha256": "b9eb082c39fe245e38793699074c394c43a722c51fce031c3c165cb92a31035c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9811,11 +9811,11 @@
       "licenseTexts": [
         {
           "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9835,7 +9835,7 @@
       "licenseTexts": [
         {
           "sha256": "b41d08bc3624d8c436fc80237d73ebb361985a67f4504bbcd703e5ca2b27254c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9855,7 +9855,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0917530cf3b3dca12c1ab7798e4d38ad0a6798ecc1bd27849a3048ba91d265",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9875,7 +9875,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0917530cf3b3dca12c1ab7798e4d38ad0a6798ecc1bd27849a3048ba91d265",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9895,7 +9895,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0917530cf3b3dca12c1ab7798e4d38ad0a6798ecc1bd27849a3048ba91d265",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9915,7 +9915,7 @@
       "licenseTexts": [
         {
           "sha256": "527adf9d4c760f7367c2aeffed6a89afba8ba40ea1b0efbc8f56496ad30ea9cf",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9935,7 +9935,7 @@
       "licenseTexts": [
         {
           "sha256": "2eb5c7a0bba9deb77a98c81bf6b9d3fb1c67118eebf968b6b1a787b3f8928ee0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -9955,7 +9955,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9975,7 +9975,7 @@
       "licenseTexts": [
         {
           "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -9995,7 +9995,7 @@
       "licenseTexts": [
         {
           "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10015,7 +10015,7 @@
       "licenseTexts": [
         {
           "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10035,7 +10035,7 @@
       "licenseTexts": [
         {
           "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10055,7 +10055,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10075,7 +10075,7 @@
       "licenseTexts": [
         {
           "sha256": "40fa61cad189e31256c0483cf454045dbef07b098d9f02642a4e9517b3c13f59",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10095,7 +10095,7 @@
       "licenseTexts": [
         {
           "sha256": "9877e90da14aa8c931a1f9d07cc2a20ce119106e5dab1ebb41af865266d0cd2a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10115,7 +10115,7 @@
       "licenseTexts": [
         {
           "sha256": "0af366eff4c01ec147c9c61ea9e8ffad64a4294754c9d79355f3fd1b97cb2fb9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10135,7 +10135,7 @@
       "licenseTexts": [
         {
           "sha256": "30f0cfddf483d1128e3610205020f2041a6c5e837aa999e0aa82e5576187d4a9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10155,7 +10155,7 @@
       "licenseTexts": [
         {
           "sha256": "30f0cfddf483d1128e3610205020f2041a6c5e837aa999e0aa82e5576187d4a9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10175,7 +10175,7 @@
       "licenseTexts": [
         {
           "sha256": "8f1715f772cf26b4b91fb4a8401a160ab841ecb2b4ef2b9bcca12b65c5ebe2fd",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10195,7 +10195,7 @@
       "licenseTexts": [
         {
           "sha256": "ba6ed0cd56b7e688b7400b29da7753b0b9727619590a9acd6130da2479abb8bc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10215,7 +10215,7 @@
       "licenseTexts": [
         {
           "sha256": "dcef9df4e5e6d8d278b930b8a947f172207272c9d36ae0197c7cfae2a05af007",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10235,7 +10235,7 @@
       "licenseTexts": [
         {
           "sha256": "ab654de803cdaa9e2819ab2e934bdf7f757e308649ec231d78e80e92425cdc34",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10255,7 +10255,7 @@
       "licenseTexts": [
         {
           "sha256": "a889cc4dbee2ae172c179856b25d75b0b7a5a136e1b97109b9b590b2ff1a879c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10275,7 +10275,7 @@
       "licenseTexts": [
         {
           "sha256": "528eec83cb836a0adda9f8fc3d6a2a70a710d6cc0be9a155f92212c8df28acfa",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10295,7 +10295,7 @@
       "licenseTexts": [
         {
           "sha256": "db480f236292a093e77a83c35431a8496624e1e664a3547768a9ce2bdde39877",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10315,7 +10315,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10335,7 +10335,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc3f455254c0af0655cc3ff46a41ed644b67599f6043346169d285bf2b3cf3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10355,7 +10355,7 @@
       "licenseTexts": [
         {
           "sha256": "bfc4406bbf7f0bc110196312ce26471bcc7c47666949ef6a42fa500cfcb4173a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10375,7 +10375,7 @@
       "licenseTexts": [
         {
           "sha256": "5a26e47b9d7020848f061bcad66f8e73cab95f529dab5c02588b21e57c4f876c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10395,7 +10395,7 @@
       "licenseTexts": [
         {
           "sha256": "c16d06f1808d8d8c6ec0f6b6fb7e951126c46730fbb67320863a81f8aa8ca033",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10415,7 +10415,7 @@
       "licenseTexts": [
         {
           "sha256": "6a134e51aa31496c15a741592fc5d782b2dbf8d8b6b8524e15c8520ae0cd6374",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10435,7 +10435,7 @@
       "licenseTexts": [
         {
           "sha256": "73b5283588baa142c5baaef5f56d3e8fdea7a30b214e8c5737e87640f882453a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10455,7 +10455,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10475,7 +10475,7 @@
       "licenseTexts": [
         {
           "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10495,7 +10495,7 @@
       "licenseTexts": [
         {
           "sha256": "45d196313c2647d313cc65ca9b093d2d6974b64d35ee7346f2c60c9d518dff2c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10515,7 +10515,7 @@
       "licenseTexts": [
         {
           "sha256": "2034cce3b6fafcddd642c4175e01d3ddfc332a53b9f20fdc46b1466dc89ac469",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10535,7 +10535,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10555,7 +10555,7 @@
       "licenseTexts": [
         {
           "sha256": "5bba27375d93e9119f76c1015f7672cf9ad5f70952296e0842fb2243d6376869",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10575,7 +10575,7 @@
       "licenseTexts": [
         {
           "sha256": "2f1a503bfab84b3ba7393627308b3274501e459e3b5185bbb56bbf16cb1602d4",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10595,7 +10595,7 @@
       "licenseTexts": [
         {
           "sha256": "365496ca1f56da40b23c9815fc40fa9005847b2f8f8fd1c1a4929ef25ec8cd1d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10615,7 +10615,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10635,7 +10635,7 @@
       "licenseTexts": [
         {
           "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10655,7 +10655,7 @@
       "licenseTexts": [
         {
           "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10675,7 +10675,7 @@
       "licenseTexts": [
         {
           "sha256": "03cc9a630489a2544b799548a0e8b134f382fe09fa06dc22b339091b28b8f4a8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10700,7 +10700,7 @@
       "licenseTexts": [
         {
           "sha256": "6e68d94a03a0e3e327ddf3e86d1ebedc14eece3922022618fc246a36296fd0cc",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10718,7 +10718,7 @@
       "licenseTexts": [
         {
           "sha256": "f5ef5f1282eae1931c74645f8719b6c69b3d6a2cf277bfda249a8270cd473af3",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10743,7 +10743,7 @@
       "licenseTexts": [
         {
           "sha256": "fff170779a6acbf65abdb405c087f1cee1786691e4a96a4034517e4a504a0cdf",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         }
       ]
     },
@@ -10766,7 +10766,7 @@
       "licenseTexts": [
         {
           "sha256": "fe1049884b1a0d9342901e88e07f32925d24b3121d9972b6a6805fb9824b095d",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         }
       ]
     },
@@ -10790,7 +10790,7 @@
       "licenseTexts": [
         {
           "sha256": "5361ac9dc58f2ef5fd2e9b09c68297c17f04950909bbc8023bdb82eacf22c2b0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10810,7 +10810,7 @@
       "licenseTexts": [
         {
           "sha256": "cb5192c1942aa96164a70e86d25f9b1a67180daf4f0725a3c1ad9bc5563ea6e0",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10832,11 +10832,11 @@
       "licenseTexts": [
         {
           "sha256": "db90b8fd0ae1748117ab467680a5193bfd057a3119846cb53ee3b64f16577b3b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "2597d854122b77ddc71971564ca2350a37608575ce324adc5650a2b2051c8f18",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10856,7 +10856,7 @@
       "licenseTexts": [
         {
           "sha256": "d9222d73fdac50992174076efa04f44f6fbcd9d56155a7c7092e98757042a6f6",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10874,7 +10874,7 @@
       "licenseTexts": [
         {
           "sha256": "27883e12193b9e4fec0bea2ec0295d535c87a243fae163a9f988af10aeabe8fe",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10898,7 +10898,7 @@
       "licenseTexts": [
         {
           "sha256": "c358cdf77f28bbab50d4a754e123118339c15230349e82bf66489cece3ac093a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10919,7 +10919,7 @@
       "licenseTexts": [
         {
           "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -10943,7 +10943,7 @@
       "licenseTexts": [
         {
           "sha256": "6d0d41bfe170ac6c7dc248c9a63e254d0fb45a60d50a8257d0af92c6e249b887",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10968,7 +10968,7 @@
       "licenseTexts": [
         {
           "sha256": "9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -10988,7 +10988,7 @@
       "licenseTexts": [
         {
           "sha256": "efc74f255dd6fd4289363b1bfe71cd0ed70b2926c8258d6152204e6a89041c0a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11006,11 +11006,11 @@
       "licenseTexts": [
         {
           "sha256": "154843f706715f9fbe77d292ee1501fb09c78324baee97675af00393c96b2de1",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "56c057dfbde1b2df7b394c48271a3fbd2b276082e3394004dc621cdb58c1fd53",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11028,7 +11028,7 @@
       "licenseTexts": [
         {
           "sha256": "c39a97224173e617907a62d7568484bd83e05a5a655ea942407dc35a321eb431",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11067,11 +11067,11 @@
       "licenseTexts": [
         {
           "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "80e177ab397d5f332954693a52abc1b34b06c5792dd57297608b6d68a2f6af11",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11096,7 +11096,7 @@
       "licenseTexts": [
         {
           "sha256": "f2f0b07fa5e492c11d27aa0d2f3f1a0e64b9d17f32d8aa489ae2af9609af33b2",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11121,7 +11121,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec89ffc81485b97fec584b2d4a961032eeffe834453894fd9c1274906cc744e",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11145,11 +11145,11 @@
       "licenseTexts": [
         {
           "sha256": "769831d6e5dfaf2c20802faccff1fafb4c2025dd8f6253dfa47fcad59d4d0979",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "e5ff3c23c110e494cd7d736c10fd96d462457bafeca310840db6527298c7d46b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11170,11 +11170,11 @@
       "licenseTexts": [
         {
           "sha256": "4919876487f009b5074fdb7366d3f4e42f4c54a2fa0798b1c9510a4d3674ab82",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "79e413debda5ce0a3d47690b7dc1328264d0efc0cd0ecd05dc90567059d53f3d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11193,7 +11193,7 @@
       "licenseTexts": [
         {
           "sha256": "37db5bb85926db28a427a25867f10b1232003aea1be69ccb851138adb8e6f361",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11216,7 +11216,7 @@
       "licenseTexts": [
         {
           "sha256": "fdcb59154c74cbaba16a11242f7740bea9f23d6feb5547917d8c5f94a80392a5",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         }
       ]
     },
@@ -11240,7 +11240,7 @@
       "licenseTexts": [
         {
           "sha256": "4ec59d544f12b5f539a3a716fd321ac58ccd8030b465221f2c880200cdf28d8d",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11265,7 +11265,7 @@
       "licenseTexts": [
         {
           "sha256": "ac89037bac63550644dce8cf32c6765e5fab9dc1a1ce94b89f8a805f341a6750",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11288,7 +11288,7 @@
       "licenseTexts": [
         {
           "sha256": "1a9a4f0e3d479a27240ddd59a9137a66ab4a0f9dfdc8ca6188cc0bfd85187f04",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11309,7 +11309,7 @@
       "licenseTexts": [
         {
           "sha256": "79148a8320bf8bffee734e39e334f52e373b06298d5e453b61d220c9fd36b273",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11330,7 +11330,7 @@
       "licenseTexts": [
         {
           "sha256": "3409fa91f7ace557894632676656e32264fe5ef7581535725dc9a23774551bd4",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11350,7 +11350,7 @@
       "licenseTexts": [
         {
           "sha256": "72216de09e6340d2c1aa67f833c3b6aeeee2e6922721366699811b632640fd3b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11372,7 +11372,7 @@
       "licenseTexts": [
         {
           "sha256": "88f9e379c684580053c58e75e296ca2eb243b6edcc6e5357f247310e96eeef8a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11395,7 +11395,7 @@
       "licenseTexts": [
         {
           "sha256": "8c1d171bc5d341ad9cd33d5e2c39b96a82c7bd49b3ae89a470c37e5822232054",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11416,11 +11416,11 @@
       "licenseTexts": [
         {
           "sha256": "4a2260d6e2cd0f5a151a1e86dbfe7d3ed552b1e2beabf9941c1ba5c49cbce484",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11445,7 +11445,7 @@
       "licenseTexts": [
         {
           "sha256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11465,7 +11465,7 @@
       "licenseTexts": [
         {
           "sha256": "7c605df6e28667a9603118e98274f64a49ce3eed0d26fccce9534a345e0ef955",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11490,11 +11490,11 @@
       "licenseTexts": [
         {
           "sha256": "fdf1cd17f50e1305ed8cfd37467312d27a984648dba622cef70573b5512e4e1b",
-          "file": "licenses/third-party-texts-03.txt"
+          "file": "licenses/third-party-texts-03.json"
         },
         {
           "sha256": "295f8538c94ae5c3043301cf7cff1c852dab6a786a8ddee471e061b40d5ecabe",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11515,7 +11515,7 @@
       "licenseTexts": [
         {
           "sha256": "a50450da1d53cd777b80ced77c58ff96abe0ccd879706bd142c3ec20e245f0b4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11537,7 +11537,7 @@
       "licenseTexts": [
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11559,15 +11559,15 @@
       "licenseTexts": [
         {
           "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11591,7 +11591,7 @@
       "licenseTexts": [
         {
           "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11617,7 +11617,7 @@
       "licenseTexts": [
         {
           "sha256": "d6b65e6c213a5d0b577911d34d6e5949b9f59d76c238c5071a2f3fc16cfb2606",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11638,11 +11638,11 @@
       "licenseTexts": [
         {
           "sha256": "d3dc62c6bc8436658495ab89aea37511e7fa9391d282657239c9cfb80dbd42e5",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "303574d9bdd85c757d6025017942bf17baeedf2778f62bd7f425d07d880f4c4a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11667,7 +11667,7 @@
       "licenseTexts": [
         {
           "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11692,7 +11692,7 @@
       "licenseTexts": [
         {
           "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11717,7 +11717,7 @@
       "licenseTexts": [
         {
           "sha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11740,7 +11740,7 @@
       "licenseTexts": [
         {
           "sha256": "2afdd30d54b4d62b6f488a6bcc1546e84ec5061f13f4209c03d012348783795a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11765,7 +11765,7 @@
       "licenseTexts": [
         {
           "sha256": "eb355a753e020346d33d83bf9769135b89fc610568ac531a01c295bcee7fd998",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11790,11 +11790,11 @@
       "licenseTexts": [
         {
           "sha256": "ea74b9158f4587191549080d5713701859bf6f7b61ce491020338128131847f3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11820,7 +11820,7 @@
       "licenseTexts": [
         {
           "sha256": "ca836a5f9ecca3b2f350230faa20a48fb8b145653b5568d784862df864706b9b",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11845,7 +11845,7 @@
       "licenseTexts": [
         {
           "sha256": "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11869,11 +11869,11 @@
       "licenseTexts": [
         {
           "sha256": "d7390c793c73c36265497ffac90a886a235c8b50948454c9af98f1aef2a00d2a",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "835586ae156766a24e3c103fbc55d9af6b1a16df57ca932c97482a2737fd83d5",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11894,7 +11894,7 @@
       "licenseTexts": [
         {
           "sha256": "9313256b27c4a1b7666c433acbf70a447383df0ea8c4b59bee0b6e412a281f92",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11915,7 +11915,7 @@
       "licenseTexts": [
         {
           "sha256": "80619b7049f08c81683ad0e01f08f257a840652dd71ee83146d36658c7d2c2b9",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11953,7 +11953,7 @@
       "licenseTexts": [
         {
           "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -11977,7 +11977,7 @@
       "licenseTexts": [
         {
           "sha256": "a57b250a5bf03d7afe55b74063313f2adb7b00d546c0ab149a89398333fe3cc8",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -11999,11 +11999,11 @@
       "licenseTexts": [
         {
           "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "f5110972dedad2b4e9d314518daf3b7d72d6e02e499acd802181de6f74571dcc",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12025,7 +12025,7 @@
       "licenseTexts": [
         {
           "sha256": "741b7f3f139d58c88ecf43de1ffedb4914936e914a93a95dfa33d3673b5137bd",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12046,7 +12046,7 @@
       "licenseTexts": [
         {
           "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12064,7 +12064,7 @@
       "licenseTexts": [
         {
           "sha256": "4375ba20e2b9c6c4e7cad2940a628fd90e95cc3d50ee92aae755715d8ba1fbd0",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12086,15 +12086,15 @@
       "licenseTexts": [
         {
           "sha256": "652c878488d1456361e08c3f8607fd7ba59892a14103d15cce4ff93c85b5cc8b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "3e6dae555eb92787fc82d1d48355677f454c7f65aeb38d3f9e72bf9a3daf034b",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12113,7 +12113,7 @@
       "licenseTexts": [
         {
           "sha256": "1db7cae7fce6452e2e608e401a0f953e0133e4c2d75db69fb8ae851d2086f5b6",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12139,11 +12139,11 @@
       "licenseTexts": [
         {
           "sha256": "dc1db0b5d17455adc37b693ff8e409c9a80f603e441695825518c36f786c963e",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "e862bb5b904fb5513c3e14288d7a25a12eb0ecc7847a0a965d310e9a955e7cb9",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12168,7 +12168,7 @@
       "licenseTexts": [
         {
           "sha256": "dcb95677a02240243187e964f941847d19b17821cf99e5afae684fab328c19bf",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12195,15 +12195,15 @@
       "licenseTexts": [
         {
           "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "2bc12bb94eec2ccea211daebb763235bec3169276197a7be1f858963db31c5dd",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         },
         {
           "sha256": "274a71ae064275a87378f2a93ad2cf351b2929f016e280a33fc3c836a3f0f84c",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12227,7 +12227,7 @@
       "licenseTexts": [
         {
           "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12250,7 +12250,7 @@
       "licenseTexts": [
         {
           "sha256": "f885d4d66ef7cbb5e54c14a89d6e611efb505a567329b1156aa1842b840093eb",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12274,7 +12274,7 @@
       "licenseTexts": [
         {
           "sha256": "295f8538c94ae5c3043301cf7cff1c852dab6a786a8ddee471e061b40d5ecabe",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12300,7 +12300,7 @@
       "licenseTexts": [
         {
           "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12324,7 +12324,7 @@
       "licenseTexts": [
         {
           "sha256": "804b59b25f2c31bd278f9202a19ae49a3945aa2664387e2d0a128c7cacc61ec3",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12346,11 +12346,11 @@
       "licenseTexts": [
         {
           "sha256": "df58f69ea88683035d720b5375bcef0cf5aeaa98a1d098d572e0992c378deb46",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         },
         {
           "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12372,7 +12372,7 @@
       "licenseTexts": [
         {
           "sha256": "d99ab209aeb16aad2c25c90ffd83c1a981e290ffff76a420a2ab03e03f041b8c",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12397,7 +12397,7 @@
       "licenseTexts": [
         {
           "sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12421,7 +12421,7 @@
       "licenseTexts": [
         {
           "sha256": "efe1acf3e62fb99c288b0ec73e5a773b7268ef4320fe757ea994214e4b63c371",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12439,7 +12439,7 @@
       "licenseTexts": [
         {
           "sha256": "177f62f5352b9321f802cead0c2247663d37895304f9c434698446be90c5aaf8",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12459,7 +12459,7 @@
       "licenseTexts": [
         {
           "sha256": "70b98a95a2144eb70af8017fa8c6d95ce247e40867436e8bc649e137fe13d21a",
-          "file": "licenses/third-party-texts-01.txt"
+          "file": "licenses/third-party-texts-01.json"
         }
       ]
     },
@@ -12483,7 +12483,7 @@
       "licenseTexts": [
         {
           "sha256": "d4f66854a24dda2f2a5282912aedebe6b18186b86284510a433d78fadcd88e5d",
-          "file": "licenses/third-party-texts-02.txt"
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     }
