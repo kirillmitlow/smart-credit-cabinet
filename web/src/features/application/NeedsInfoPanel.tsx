@@ -1,3 +1,4 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { useRef, useState } from 'react';
 import {
   Alert,
@@ -99,11 +100,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
           <Stack gap={4}>
             <Textarea
               label={fill(t.answerLabel, { title: task.title })}
-              description={
-                task.kind === 'DOCUMENT'
-                  ? 'Прикрепите файл ниже и добавьте пояснение к нему'
-                  : undefined
-              }
+              description={task.kind === 'DOCUMENT' ? dt.answerHelp : undefined}
               placeholder={t.answerPlaceholder}
               value={text}
               maxLength={MAX_ANSWER}
@@ -119,7 +116,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
                 applicationId={task.applicationId}
                 taskId={task.id}
                 disabled={locked}
-                onUploaded={(file) => onEdit(task.id, `Загружен документ: ${file.filename}`)}
+                onUploaded={(file) => onEdit(task.id, dt.uploadedAnswer(file.filename))}
               />
             ) : null}
             {saved ? (
@@ -184,7 +181,7 @@ export interface NeedsInfoPanelProps {
 
 /**
  * Блок «Нужна информация» (60-03 №11, 20-03): задачи текущего раунда с полем текста на каждую,
- * черновик и «Отправить ответы». Файлы пока не загружаются (нет хранилища, T-332): ответ только текстом.
+ * черновик, загрузка файлов для DOCUMENT и «Отправить ответы».
  * Двойное нажатие даёт один запрос: пока идёт работа, повторные нажатия игнорируются.
  */
 export function NeedsInfoPanel({ application, onSent }: NeedsInfoPanelProps) {

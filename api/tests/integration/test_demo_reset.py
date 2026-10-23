@@ -27,7 +27,6 @@ from app.modules.disbursement.models import Disbursement
 from app.modules.integrations import scenarios
 from app.modules.integrations.models import IntegrationCall
 from app.modules.loans import Loan, PaymentScheduleRow
-from app.modules.offers.models import Signature
 from app.modules.pipeline.models import Decision, DecisionReason, PipelineRun, SourceSnapshot
 from app.shared import cache, clock, db, outbox, resets, tasks
 from app.shared.models import IdempotencyKey, OutboxMessage
@@ -173,13 +172,7 @@ def fill(policy_id: Any, *, inn: str = INN, suffix: str = "") -> None:
         s.flush()
         s.add(DecisionReason(decision_id=decision.id, position=1, code="OK", kind="INFO"))
         contract = add_signed_contract(s, application)
-        s.add(
-            Signature(
-                contract_id=contract.id, signer_user_id=user.id, signer_role="DIRECTOR",
-                proof="p", method="SIMPLE_ESIGN", attempt_id="att-1" + suffix,
-                consent_text_version="pep-rules-v1", content_hash="h",
-            )
-        )  # fmt: skip
+        # add_signed_contract also persists the matching signature.
         disbursement = Disbursement(
             application_id=application.id, company_id=company.id, application_ref="A-1" + suffix,
             customer_inn=inn, contract_number=contract.number, contract_uid=contract.contract_uid,

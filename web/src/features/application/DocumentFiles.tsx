@@ -1,3 +1,4 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { useRef, useState } from 'react';
 import { Anchor, Button, FileInput, Group, Loader, Stack, Text } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
@@ -60,7 +61,7 @@ export function DocumentFiles({
   };
   return (
     <Stack gap="xs">
-      {query.isPending ? <Loader size="sm" aria-label="Получаем список документов" /> : null}
+      {query.isPending ? <Loader size="sm" aria-label={dt.loading} /> : null}
       {query.error ? (
         <ProblemAlert error={query.error} onAction={() => void query.refetch()} />
       ) : null}
@@ -74,15 +75,13 @@ export function DocumentFiles({
             {document.filename}
           </Anchor>
           <Text size="xs" c="dimmed">
-            {document.parseStatus === 'PENDING'
-              ? 'Файл сохранён; сведения ещё не разобраны'
-              : 'Файл сохранён'}
+            {document.parseStatus === 'PENDING' ? dt.pending : dt.saved}
           </Text>
         </Group>
       ))}
       <FileInput
-        label="Прикрепить документ"
-        description="PDF до 10 МБ или выписка 1С в TXT до 5 МБ"
+        label={dt.attach}
+        description={dt.limits}
         accept=".pdf,.txt"
         value={file}
         disabled={disabled || upload.isPending}
@@ -100,7 +99,7 @@ export function DocumentFiles({
         loading={upload.isPending}
         onClick={() => void send()}
       >
-        Загрузить файл
+        {dt.upload}
       </Button>
     </Stack>
   );

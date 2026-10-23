@@ -1,3 +1,4 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { useEffect, useState } from 'react';
 import { Checkbox, NumberInput, Stack, Text, Textarea, TextInput, Title } from '@mantine/core';
 import type { ApplicationOut } from '@/api/generated/model';
@@ -54,15 +55,15 @@ export function ProductStep({
   };
   return (
     <Stack gap="md">
-      <Title order={2}>Что нужно для продукта</Title>
-      <Text>Прикрепите подтверждающие документы и укажите обеспечение, если оно есть.</Text>
+      <Title order={2}>{dt.productTitle}</Title>
+      <Text>{dt.intro}</Text>
       {application.productCode === 'CONTRACT' ? (
         <TextInput
-          label="Реестровый номер госконтракта"
+          label={dt.registryNumber}
           required
           maxLength={64}
           value={contractNumber}
-          description="Укажите номер контракта вашей компании из ЕИС. Банк проверит его по источнику."
+          description={dt.registryHelp}
           onChange={(event) => {
             const value = event.currentTarget.value;
             setContractNumber(value);
@@ -71,7 +72,7 @@ export function ProductStep({
         />
       ) : null}
       <Checkbox
-        label="Предлагаю имущество в залог"
+        label={dt.hasCollateral}
         checked={collateral.enabled}
         onChange={(event) =>
           changeCollateral({ ...collateral, enabled: event.currentTarget.checked })
@@ -80,7 +81,7 @@ export function ProductStep({
       {collateral.enabled ? (
         <>
           <Textarea
-            label="Описание залога"
+            label={dt.description}
             required
             maxLength={500}
             value={collateral.description}
@@ -89,7 +90,7 @@ export function ProductStep({
             }
           />
           <NumberInput
-            label="Ваша оценка стоимости залога, ₽"
+            label={dt.value}
             required
             min={1}
             max={1_000_000_000}
@@ -100,14 +101,13 @@ export function ProductStep({
             onChange={(value) => changeCollateral({ ...collateral, value: Number(value) || 0 })}
           />
           <Text size="sm" c="dimmed">
-            Это ваша оценка. Сотрудник банка рассматривает залог отдельно; автоматическим
-            подтверждением она не является.
+            {dt.disclaimer}
           </Text>
         </>
       ) : null}
       {!valid ? (
         <Text size="sm" c="red.9">
-          Заполните обязательные сведения, чтобы продолжить.
+          {dt.required}
         </Text>
       ) : null}
       <DocumentFiles applicationId={application.id} disabled={autosave.state.kind === 'conflict'} />

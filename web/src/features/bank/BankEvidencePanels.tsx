@@ -1,3 +1,4 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { Alert, Anchor, Badge, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import type { BankApplicationCard } from '@/api/generated/model';
 import { getDownloadDocumentUrl } from '@/api/generated/api';
@@ -148,17 +149,11 @@ export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
                   {document.filename}
                 </Anchor>
                 <Text size="sm">
-                  {document.origin === 'SYSTEM_GENERATED'
-                    ? 'Сформирован системой'
-                    : 'Предоставлен клиентом'}{' '}
-                  · {formatDateTime(document.createdAt)} · {Math.ceil(document.sizeBytes / 1024)} КБ
+                  {document.origin === 'SYSTEM_GENERATED' ? dt.generated : dt.uploaded} ·{' '}
+                  {formatDateTime(document.createdAt)} · {dt.size(document.sizeBytes)}
                 </Text>
-                {document.cancelledAt ? <Badge color="gray">Заменён новым файлом</Badge> : null}
-                {document.parseStatus === 'PENDING' ? (
-                  <Text size="sm">
-                    Содержимое ещё не разобрано; сведения из файла не подтверждены
-                  </Text>
-                ) : null}
+                {document.cancelledAt ? <Badge color="gray">{dt.replaced}</Badge> : null}
+                {document.parseStatus === 'PENDING' ? <Text size="sm">{dt.unparsed}</Text> : null}
               </Paper>
             ))}
           </Stack>
@@ -166,19 +161,18 @@ export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
       </Paper>
       <Paper withBorder p="md" data-testid="bank-collateral">
         <Title order={2} size="h3">
-          Залог по заявке
+          {dt.collateralTitle}
         </Title>
         {card.collateral ? (
           <Stack gap="xs" mt="sm">
             <Text>{card.collateral.description}</Text>
-            <Text>Заявленная стоимость: {formatMoney(card.collateral.valueRub)}</Text>
+            <Text>{dt.declaredValue(formatMoney(card.collateral.valueRub))}</Text>
             <Text size="sm" c="dimmed">
-              Источник: анкета клиента. Оценка и принятие залога сотрудником банка не подтверждены
-              этими данными.
+              {dt.collateralSource}
             </Text>
           </Stack>
         ) : (
-          <Text mt="sm">Клиент не предоставил сведения о залоге.</Text>
+          <Text mt="sm">{dt.noCollateral}</Text>
         )}
       </Paper>
     </>
