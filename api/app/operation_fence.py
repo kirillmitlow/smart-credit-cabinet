@@ -9,7 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response
 
-from app.modules import applications, auth, companies, offers
+from app.modules import applications, auth, backoffice, companies, offers
 from app.shared import db, operations
 from app.shared.errors import AppError, problem
 
@@ -46,7 +46,12 @@ def _scope(
         return None  # вход и выдача кода ограждены общим замком, а не доступом к чужой компании
     parts = request.url.path.strip("/").split("/")
     scope = None
-    if request.url.path == "/me/active-company":
+    if parts[0] == "backoffice" and len(parts) > 2 and parts[1] == "outbox":
+        try:
+            scope = backoffice.outbox_operation_scope(int(parts[2]))
+        except ValueError:
+            pass  # валидатор роутера вернёт422
+    elif request.url.path == "/me/active-company":
         company_id = _uuid(str(body.get("companyId", "")))
         scope = companies.operation_scope(company_id) if company_id else None
     elif parts[0] == "companies" and len(parts) > 1:
@@ -81,7 +86,15 @@ class OperationFenceMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         tracked = (
             path.startswith(
-                ("/applications", "/offers", "/contracts", "/auth", "/wizard", "/companies")
+                (
+                    "/applications",
+                    "/offers",
+                    "/contracts",
+                    "/auth",
+                    "/wizard",
+                    "/companies",
+                    "/backoffice",
+                )
             )
             or path == "/me/active-company"
         )

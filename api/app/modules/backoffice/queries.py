@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, func, or_, select, text, tuple_
+from sqlalchemy import String, and_, func, or_, select, text, tuple_
 from sqlalchemy.orm import Session
 
 from app.shared.db import Base
@@ -199,3 +199,53 @@ def card_rows(session: Session, application_id: UUID) -> dict[str, Any] | None:
         "snapshots": [dict(x) for x in source_rows],
         "history": [dict(x) for x in history],
     }
+
+
+def outbox_reference(session: Session, message_id: int) -> dict[str, Any] | None:
+    messages, applications = Base.metadata.tables["outbox"], Base.metadata.tables["applications"]
+    row = (
+        session.execute(
+            select(
+                messages.c.id, applications.c.id.label("application_id"), applications.c.company_id
+            )
+            .select_from(
+                messages.outerjoin(
+                    applications, messages.c.aggregate_id == applications.c.id.cast(String)
+                )
+            )
+            .where(messages.c.id == message_id)
+        )
+        .mappings()
+        .first()
+    )
+    return dict(row) if row else None
+
+
+def outbox_failed(
+    session: Session, application_id: UUID | None, after_id: int, limit: int
+) -> list[dict[str, Any]]:
+    messages, applications = Base.metadata.tables["outbox"], Base.metadata.tables["applications"]
+    query = (
+        select(messages, applications.c.id.label("application_id"))
+        .select_from(
+            messages.outerjoin(
+                applications, messages.c.aggregate_id == applications.c.id.cast(String)
+            )
+        )
+        .where(messages.c.status == "FAILED", messages.c.id > after_id)
+        .order_by(messages.c.id)
+        .limit(limit)
+    )
+    if application_id is not None:
+        query = query.where(applications.c.id == application_id)
+    return [dict(row) for row in session.execute(query).mappings()]
+
+
+def outbox_for_retry(session: Session, message_id: int) -> dict[str, Any] | None:
+    messages = Base.metadata.tables["outbox"]
+    row = (
+        session.execute(select(messages).where(messages.c.id == message_id).with_for_update())
+        .mappings()
+        .first()
+    )
+    return dict(row) if row else None
