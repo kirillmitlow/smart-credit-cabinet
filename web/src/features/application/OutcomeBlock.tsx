@@ -3,6 +3,7 @@ import { Card, Stack, Text, Title } from '@mantine/core';
 import type { ApplicationOut } from '@/api/generated/model';
 import { outcomes } from '@/texts';
 import { ContractSigning } from '@/features/offers/ContractSigning';
+import { CounterOfferPanel } from './CounterOfferPanel';
 import { DecisionPanel } from './DecisionPanel';
 
 function OutcomeCard({ title, children }: { title: string; children: ReactNode }) {
@@ -28,8 +29,8 @@ function NoticeBlock({ title, body }: { title: string; body: string }) {
 
 /**
  * Блок исхода выбирается по `status` (60-01: одна страница на все статусы, адрес не расходится
- * со статусом). Одобрение и отказ читают снимок решения сервера (T-422); остальные исходы
- * (T-423…T-425) пока короткие пояснения.
+ * со статусом). Одобрение, отказ и встречное предложение читают снимок решения сервера
+ * (T-422, T-423); остальные исходы (T-424, T-425) пока короткие пояснения.
  */
 export function OutcomeBlock({ application }: { application: ApplicationOut }) {
   switch (application.status) {
@@ -38,7 +39,7 @@ export function OutcomeBlock({ application }: { application: ApplicationOut }) {
     case 'REJECTED':
       return <DecisionPanel application={application} />;
     case 'COUNTER_OFFER':
-      return <NoticeBlock title={outcomes.counter.title} body={outcomes.counter.body} />;
+      return <CounterOfferPanel application={application} />;
     case 'NEEDS_INFO':
       return <NoticeBlock title={outcomes.needsInfo.title} body={outcomes.needsInfo.body} />;
     case 'MANUAL_REVIEW':

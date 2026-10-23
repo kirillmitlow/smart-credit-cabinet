@@ -29,6 +29,7 @@ import {
   wizard,
   wizardResult,
   variantCard,
+  counterOffer,
 } from '.';
 import { forbiddenClientWords } from './forbidden';
 
@@ -69,6 +70,7 @@ const allTexts = collectStrings([
   wizard,
   wizardResult,
   variantCard,
+  counterOffer,
 ]);
 
 describe('словарь текстов', () => {

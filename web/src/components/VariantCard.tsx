@@ -25,6 +25,8 @@ export interface VariantCardProps {
   overpaymentRub?: number | null;
   /** Ставка «от», % годовых */
   ratePercentFrom?: number | null;
+  /** Ставка окончательная (решение банка): без слова «от» */
+  rateExact?: boolean;
   /** Ставка ориентировочная (до проверки) */
   approximate?: boolean;
   decisionTime?: DecisionTime | null;
@@ -70,6 +72,7 @@ export function VariantCard({
   paymentKind,
   overpaymentRub,
   ratePercentFrom,
+  rateExact = false,
   approximate = false,
   decisionTime,
   documents = [],
@@ -137,7 +140,9 @@ export function VariantCard({
           ) : null}
           {ratePercentFrom != null ? (
             <Row label={<TermHint hint={termHints.rate} />}>
-              {fill(t.rateFrom, { rate: formatPercent(ratePercentFrom) })}
+              {rateExact
+                ? formatPercent(ratePercentFrom)
+                : fill(t.rateFrom, { rate: formatPercent(ratePercentFrom) })}
             </Row>
           ) : null}
           {decisionTime ? (

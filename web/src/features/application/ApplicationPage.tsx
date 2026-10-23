@@ -74,6 +74,8 @@ export function ApplicationPage() {
       : applicationPage.summaryEmpty;
   const canWithdraw = application.allowedActions.includes('WITHDRAW');
   const isOffer = application.status === 'APPROVED' || application.status === 'COUNTER_OFFER';
+  // Три карточки встречного предложения не помещаются в половину страницы
+  const wide = application.status === 'COUNTER_OFFER';
   const closed = application.status === 'WITHDRAWN' || application.status === 'EXPIRED';
 
   return (
@@ -118,7 +120,7 @@ export function ApplicationPage() {
       </div>
 
       <Grid gap="xl">
-        <Grid.Col span={{ base: 12, md: 6 }}>
+        <Grid.Col span={{ base: 12, md: wide ? 12 : 6 }}>
           <Timeline model={timeline} />
           {closed ? (
             <Group mt="md">
@@ -128,7 +130,7 @@ export function ApplicationPage() {
             </Group>
           ) : null}
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
+        <Grid.Col span={{ base: 12, md: wide ? 12 : 6 }}>
           <OutcomeBlock application={application} />
         </Grid.Col>
       </Grid>
