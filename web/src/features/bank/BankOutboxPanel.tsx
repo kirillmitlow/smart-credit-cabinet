@@ -78,7 +78,11 @@ export function BankOutboxPanel({ applicationId }: { applicationId?: string }) {
           </Alert>
         ) : null}
         {mutation.isError ? <ProblemAlert error={mutation.error} onAction={recover} /> : null}
-        {query.isPending ? <Skeleton height={40} aria-label={t.loading} /> : null}
+        {query.isPending ? (
+          <Stack role="status" aria-label={t.loading}>
+            <Skeleton height={40} />
+          </Stack>
+        ) : null}
         {query.isError ? (
           <ProblemAlert error={query.error} onAction={() => void query.refetch()} />
         ) : null}
