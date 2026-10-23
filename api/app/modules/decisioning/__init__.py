@@ -34,6 +34,14 @@ from app.modules.decisioning.types import (
     Product,
     ReasonCode,
 )
+from app.modules.decisioning.underwriting import (
+    UnderwriterEvaluation,
+    UnderwriterTerms,
+    UwCheck,
+    UwViolation,
+    ViolationKind,
+    evaluate_underwriter_decision,
+)
 
 __all__ = [
     "lowest_rate",
@@ -44,6 +52,12 @@ __all__ = [
     "Policy",
     "PolicyError",
     "Product",
+    "UnderwriterEvaluation",
+    "UnderwriterTerms",
+    "UwCheck",
+    "UwViolation",
+    "ViolationKind",
+    "evaluate_underwriter_decision",
     "ProductContext",
     "ReasonCode",
     "ScheduleRow",

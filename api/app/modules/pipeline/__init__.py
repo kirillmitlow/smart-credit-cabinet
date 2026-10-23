@@ -11,12 +11,20 @@ from app.modules.pipeline.policy_registry import (
     reset_policy_cache,
 )
 from app.modules.pipeline.runner import RunResult, run_pipeline
+from app.modules.pipeline.underwriter import (
+    UnderwriterReceipt,
+    preview_underwriter_decision,
+    record_underwriter_decision,
+)
 
 __all__ = [
     "ConsentView",
     "RunResult",
+    "UnderwriterReceipt",
     "current_policy",
     "load_policy_file",
+    "preview_underwriter_decision",
+    "record_underwriter_decision",
     "register_current",
     "register_policy",
     "reset_policy_cache",

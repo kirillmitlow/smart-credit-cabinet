@@ -13,6 +13,7 @@ from uuid import UUID
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     Date,
     DateTime,
@@ -152,7 +153,12 @@ class Decision(IdMixin, Base):
     explain: Mapped[dict[str, Any]] = mapped_column(JSONB)
     snapshot_ids: Mapped[list[UUID]] = mapped_column(ARRAY(Uuid))
     overrides_decision_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("decisions.id"))
-    override_reason: Mapped[str | None] = mapped_column(Text)
+    override_reason: Mapped[str | None] = mapped_column(Text)  # комментарий андеррайтера
+    # Только UNDERWRITER (миграция 0011): кто решил, его уровень, код причины, отклонение от ядра
+    actor_id: Mapped[UUID | None] = mapped_column(Uuid, ForeignKey("users.id"))
+    actor_level: Mapped[str | None] = mapped_column(String(2))
+    override_reason_code: Mapped[str | None] = mapped_column(String(32))
+    deviation: Mapped[bool | None] = mapped_column(Boolean)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=clock.now)
 
 
