@@ -8,6 +8,7 @@
 import type { BankApplicant } from './bankApplicant';
 import type { BankApplicationCardDocuments } from './bankApplicationCardDocuments';
 import type { BankApplicationCardDraft } from './bankApplicationCardDraft';
+import type { BankClientTask } from './bankClientTask';
 import type { BankDecision } from './bankDecision';
 import type { BankDecisionSummary } from './bankDecisionSummary';
 import type { BankHistoryEvent } from './bankHistoryEvent';
@@ -39,4 +40,7 @@ export interface BankApplicationCard {
   history: BankHistoryEvent[];
   /** null — сервис T-332 не подключён */
   documents: BankApplicationCardDocuments;
+  clientTasks?: BankClientTask[];
+  /** Последний отправленный клиентом раунд, не черновик */
+  latestAnsweredRound?: number | null;
 }

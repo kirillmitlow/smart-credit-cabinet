@@ -1,0 +1,29 @@
+meta {
+  name: Запросить пояснение у клиента
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{apiUrl}}/backoffice/applications/{{applicationId}}/request-info
+  body: json
+  auth: none
+}
+
+headers {
+  Idempotency-Key: {{infoActionKey}}
+}
+
+body:json {
+  {
+    "expectedVersion": {{applicationVersion}},
+    "reasonCode": "UW_NEW_INFO",
+    "items": [{
+      "kind": "EXPLANATION",
+      "title": "Поясните сроки поставки",
+      "whyText": "Нужно проверить план приобретения оборудования",
+      "what": "Срок и условия оплаты поставщику",
+      "where": "В договоре с поставщиком"
+    }]
+  }
+}
