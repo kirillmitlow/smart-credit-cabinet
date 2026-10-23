@@ -43,7 +43,7 @@
 ## В работе (каждый правит свою строку)
 
 - **A:** смена 23.10 утро. Интерфейсы для банка по запросу B (субагенты A): `decisioning.evaluate_underwriter_decision` + `pipeline.record_underwriter_decision` — ветка `feat/underwriter-decision-api`; `pipeline.request_recheck` — `feat/pipeline-recheck`, затем `applications.request_information` + ответ клиента — `feat/client-tasks`. Каждый готовый интерфейс описывается в журнале для B. Дальше A: Q-148, T-423…T-425, T-135, T-130.
-- **B:** T-434, проверка загрузки кода панели при DEMO_MODE=false (`fix/demo-route-loading`). T-370 DONE (#88); T-436 #89 и исправление T-435 #90 ждут CI. Четыре интерфейса ядра делает Claude. Worktree `worktrees/gov-contracts-list`.
+- **B:** T-370/T-365/T-436 DONE. #89/#90/#92 в main, все12CI финальных head зелёные; девять персон проверены в scc-bank. Отчёт reviews/B-2026-10-23-handoff.md актуален, смена продолжается (17% остатка; передача только на10%). T-362…364/T-432…433 после интерфейсов Claude #93/#94 и request_information; просьба о public Level/Outcome в журнале. Worktree `worktrees/gov-contracts-list`.
 - **C:** T-515, ветка `chore/smoke-script`; готовность стенда и smoke Соколовой до выдачи (23.10, отдельная копия на Mac).
 
 ## Что уже в main
