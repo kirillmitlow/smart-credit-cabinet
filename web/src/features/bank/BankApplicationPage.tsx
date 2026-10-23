@@ -91,7 +91,7 @@ function BankApplication({ id, expected }: { id: string; expected: number | unde
               {t.changed}
             </Alert>
           ) : null}
-          <Paper withBorder p="md">
+          <Paper withBorder p="md" data-testid="bank-request">
             <Title order={2} size="h3">
               {t.request}
             </Title>
