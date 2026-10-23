@@ -82,17 +82,22 @@ def check(response: httpx.Response, status: int = 200) -> Any:
     return response.json() if response.content else None
 
 
-def login(client: httpx.Client, inn: str) -> dict[str, Any]:
-    """Вход клиента по ИНН и коду из демо-режима (D-062); выбирает компанию с этим ИНН."""
+def login(client: httpx.Client, inn: str, role: str | None = None) -> dict[str, Any]:
+    """Вход клиента по ИНН и коду из демо-режима (D-062); выбирает компанию с этим ИНН.
+
+    `role` выбирает пользователя с этой ролью (у СтанкоПрома двое: бухгалтер и директор);
+    если такой роли нет, входит первый.
+    """
     roles = check(client.get(f"/auth/roles/{inn}"))
     people = roles.get("people") or []
     if not people:
         raise AssertionError(f"По ИНН {inn} некому войти: {roles}")
     company = roles.get("company") or {}
+    person = next((p for p in people if role and p.get("role") == role), people[0])
     issued = check(
         client.post(
             "/auth/request-code",
-            json={"userId": people[0]["userId"], "companyId": company.get("id")},
+            json={"userId": person["userId"], "companyId": company.get("id")},
         )
     )
     if not issued.get("demoCode"):
