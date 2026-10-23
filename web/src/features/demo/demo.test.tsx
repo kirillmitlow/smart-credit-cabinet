@@ -4,7 +4,7 @@ import { http } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 import { makeApplication, makeBankMe, makeMe, problemResponse } from '@/test/factories';
 import { blockingA11yViolations } from '@/test/a11y';
-import { renderApp } from '@/test/render';
+import { renderApp, createTestQueryClient } from '@/test/render';
 import { mockSessions } from '@/test/sessions';
 import { server } from '@/test/server';
 import { makeDecision } from '@/test/decisionFactory';
@@ -140,7 +140,9 @@ describe('демо-панель', () => {
       name: `${t.chooseMode}: ${t.systems.tax}`,
     });
     await userEvent.click(select);
-    await userEvent.click(screen.getByRole('option', { name: t.modes.DOWN }));
+    await userEvent.click(
+      (await screen.findAllByRole('option', { name: t.modes.DOWN, hidden: true })).at(-1)!,
+    );
     await userEvent.click(screen.getByRole('button', { name: t.set }));
     expect(await screen.findByText(t.queued)).toBeInTheDocument();
     expect(await screen.findByText(t.active)).toBeInTheDocument();
@@ -158,12 +160,16 @@ describe('демо-панель', () => {
     const tab = { opener: {}, location: { href: 'about:blank' }, close: vi.fn() };
     const open = vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
     server.use(http.post('*/api/auth/bank-demo-login', () => Response.json(makeBankMe())));
-    const { queryClient } = renderApp('/demo');
+    const queryClient = createTestQueryClient();
+    const clientSession = makeMe();
+    queryClient.setQueryData(['session', 'client'], clientSession);
+    renderApp('/demo', queryClient);
     await userEvent.click(await screen.findByRole('button', { name: t.bank }));
     await waitFor(() => expect(tab.location.href).toBe('/bank'));
     expect(open).toHaveBeenCalledWith('about:blank', '_blank');
     expect(tab.opener).toBeNull();
     expect(queryClient.getQueryData(['session', 'bank'])).toBeDefined();
+    expect(queryClient.getQueryData(['session', 'client'])).toEqual(clientSession);
     open.mockRestore();
   });
   it('подсказка ожидаемого исхода закрыта по умолчанию', async () => {

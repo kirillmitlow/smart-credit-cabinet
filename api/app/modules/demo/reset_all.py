@@ -82,7 +82,15 @@ def failed(step: ResetStep, exc: Exception) -> AppError:
         502,
         "DEMO_RESET_FAILED",
         f"Сброс остановился на шаге «{title}». Повторите. Причина: {reason}",
-        errors=[{"step": step.value, "title": title, "msg": reason}],
+        errors=[
+            {
+                "field": "reset",
+                "code": step.value,
+                "step": step.value,
+                "title": title,
+                "msg": reason,
+            }
+        ],
     )
 
 

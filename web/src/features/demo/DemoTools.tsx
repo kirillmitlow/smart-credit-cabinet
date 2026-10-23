@@ -86,6 +86,7 @@ export default function DemoTools() {
         opened={opened}
         onClose={() => setOpened(false)}
         title={t.title}
+        closeButtonProps={{ 'aria-label': t.close }}
         position="right"
         size="lg"
       >

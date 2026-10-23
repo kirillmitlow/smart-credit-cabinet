@@ -11,6 +11,10 @@ export interface ErrorText {
 }
 
 export const errorTexts = {
+  DEMO_RESET_FAILED: {
+    text: 'Сброс не завершён. Повторите его для восстановления данных',
+    action: 'Повторить',
+  },
   DEMO_CODE_REQUIRED: {
     text: 'Нужен верный код стенда. Уточните его у организатора и повторите действие',
   },

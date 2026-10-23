@@ -3,7 +3,9 @@ import { checkAccessibility } from './support/axe';
 import { demo as t } from '../src/texts/demo';
 
 // Своё демо-окружение: общий сброс завершает тест, не затрагивает другие compose-проекты.
-test('демо-панель: реальная шпаргалка, сбой, восстановление и сброс', async ({ sessions }) => {
+test('TS-101: демо-панель: реальная шпаргалка, сбой, восстановление и сброс', async ({
+  sessions,
+}) => {
   const client = sessions.client;
   await client.goto('/demo');
   const response = await client.request.get('/api/demo/personas');
@@ -27,7 +29,12 @@ test('демо-панель: реальная шпаргалка, сбой, во
   await source.getByRole('button', { name: t.set }).click();
   await expect(client.getByText(t.active, { exact: true })).toBeVisible();
   try {
-    const bank = await sessions.bank();
+    const [bank] = await Promise.all([
+      client.waitForEvent('popup'),
+      client.getByRole('button', { name: t.bank, exact: true }).click(),
+    ]);
+    await expect(bank).toHaveURL(/\/bank/);
+    expect((await client.request.get('/api/me')).status()).toBe(200);
     await expect(bank.getByText(t.active, { exact: true })).toBeVisible();
     await bank.getByRole('button', { name: t.open }).click();
     await expect(bank.getByRole('link', { name: t.full })).toBeVisible();
@@ -41,6 +48,7 @@ test('демо-панель: реальная шпаргалка, сбой, во
   await card.getByRole('button', { name: t.resetOne }).click();
   const modal = client.getByRole('dialog');
   await expect(modal.getByText(t.oneWarning)).toBeVisible();
+  await checkAccessibility(client, 'подтверждение сброса');
   await modal.getByRole('button', { name: t.confirm }).click();
   await expect(modal).not.toBeVisible({ timeout: 90000 });
   await expect(client.getByText(t.resetDone, { exact: false })).toBeVisible();

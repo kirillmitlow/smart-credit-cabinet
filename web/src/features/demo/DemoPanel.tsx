@@ -16,13 +16,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
 import { bankDemoLogin, demoReset, demoResetPersona } from '@/api/generated/api';
 import type { Persona } from '@/api/generated/model';
-import { appErrorFromResponse } from '@/api/errors';
+import { appErrorFromResponse, isAppError } from '@/api/errors';
 import { readCookie } from '@/api/client';
 import { sessionQueryKey } from '@/api/session-keys';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { usePublicConfig } from '@/features/auth/session';
 import { productNames } from '@/texts/application';
-import { formatMoney } from '@/lib/format';
+import { formatMoney, formatTermMonths } from '@/lib/format';
 import { demo as t } from '@/texts/demo';
 import { usePersonas } from './api';
 import { DemoChaos } from './DemoChaos';
@@ -45,7 +45,7 @@ function PersonaCard({ persona: p, onReset }: { persona: Persona; onReset: () =>
               p.application.productCode ??
               t.unknown}{' '}
             · {formatMoney(Number(p.application.amountRub))} ·{' '}
-            {p.application.termMonths ?? t.unknown} {t.months}
+            {formatTermMonths(p.application.termMonths)}
           </Text>
         ) : null}
         <Text>
@@ -125,6 +125,8 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
       login.mutate({ role, tab });
     }
   };
+  const failedStep = isAppError(reset.error) ? reset.error.errors[0]?.code : null;
+  const stepLabel = failedStep ? t.resetSteps[failedStep as keyof typeof t.resetSteps] : null;
   const links = Object.entries(config?.docsLinks ?? {}).filter(([, url]) =>
     /^(https?:\/\/|\/(?!\/))/.test(url),
   );
@@ -231,6 +233,7 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
         </Text>
       ) : null}
       <Modal
+        closeButtonProps={{ 'aria-label': t.close }}
         opened={target !== null}
         onClose={() => {
           if (!reset.isPending) setTarget(null);
@@ -243,6 +246,11 @@ export function DemoPanel({ onResetAll }: { onResetAll?: () => void }) {
         <Stack>
           <Text>{target === 'all' ? t.allWarning : t.oneWarning}</Text>
           {reset.isError ? <ProblemAlert error={reset.error} /> : null}
+          {stepLabel ? (
+            <Text role="status">
+              {t.failedAt}: {stepLabel}
+            </Text>
+          ) : null}
           {reset.isPending ? <Text role="status">{t.resetting}</Text> : null}
           <Group>
             <Button variant="default" disabled={reset.isPending} onClick={() => setTarget(null)}>

@@ -42,7 +42,10 @@ function Control({ item, code }: { item: ChaosView; code: string }) {
           data={Object.entries(t.modes).map(([value, label]) => ({ value, label }))}
           value={mode}
           onChange={(v) => {
-            if (v) setMode(v as ChaosInputMode);
+            if (v) {
+              setMode(v as ChaosInputMode);
+              change.reset();
+            }
           }}
           allowDeselect={false}
         />
@@ -57,7 +60,9 @@ function Control({ item, code }: { item: ChaosView; code: string }) {
           />
         ) : null}
         {change.isError ? <ProblemAlert error={change.error} /> : null}
-        {change.isSuccess ? <Text role="status">{t.queued}</Text> : null}
+        {change.isSuccess && change.data.mode === item.mode ? (
+          <Text role="status">{t.queued}</Text>
+        ) : null}
         <Group>
           <Button
             variant="light"
