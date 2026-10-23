@@ -1,0 +1,28 @@
+meta {
+  name: Одобрить Станкопром на запрошенных условиях
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{apiUrl}}/backoffice/applications/{{applicationId}}/decision
+  body: json
+  auth: none
+}
+
+headers {
+  Idempotency-Key: {{decisionActionKey}}
+}
+
+body:json {
+  {
+    "expectedVersion": {{applicationVersion}},
+    "engineDecisionId": "{{engineDecisionId}}",
+    "outcome": "APPROVED",
+    "terms": {
+      "productCode": "INVESTMENT",
+      "amountRub": 15000000,
+      "termMonths": 60
+    }
+  }
+}

@@ -484,6 +484,76 @@
         }
       }
     },
+    "/backoffice/applications/{application_id}/decision": {
+      "post": {
+        "tags": [
+          "банк"
+        ],
+        "summary": "Сохранить решение сотрудника банка",
+        "operationId": "saveBackofficeDecision",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^\\S+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankDecisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDecisionSaved"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED"
+          },
+          "403": {
+            "description": "FORBIDDEN / AUTHORITY_LEVEL_TOO_LOW"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT / INVALID_TRANSITION / ENGINE_DECISION_STALE / ENGINE_DECISION_MISSING / ENGINE_SNAPSHOT_INCOMPATIBLE / ENGINE_SNAPSHOT_MISMATCH / IDEMPOTENCY_KEY_REUSED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR / UNDERWRITER_DECISION_INVALID"
+          }
+        }
+      }
+    },
     "/backoffice/queue": {
       "get": {
         "tags": [
@@ -3690,6 +3760,151 @@
         ],
         "title": "BankDecisionReason"
       },
+      "BankDecisionRequest": {
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expectedversion"
+          },
+          "engineDecisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enginedecisionid"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "COUNTER_OFFER",
+              "REJECTED"
+            ],
+            "title": "Outcome"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankDecisionTerms"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasonCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoncode"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expectedVersion",
+          "outcome"
+        ],
+        "title": "BankDecisionRequest"
+      },
+      "BankDecisionSaved": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "decisionId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Decisionid"
+          },
+          "engineDecisionId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Enginedecisionid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "COUNTER_OFFER",
+              "REJECTED"
+            ],
+            "title": "Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "COUNTER_OFFER",
+              "REJECTED"
+            ],
+            "title": "Outcome"
+          },
+          "deviation": {
+            "type": "boolean",
+            "title": "Deviation"
+          },
+          "exceptionUsed": {
+            "type": "boolean",
+            "title": "Exceptionused"
+          },
+          "offerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offerid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "decisionId",
+          "engineDecisionId",
+          "status",
+          "version",
+          "outcome",
+          "deviation",
+          "exceptionUsed",
+          "offerId"
+        ],
+        "title": "BankDecisionSaved"
+      },
       "BankDecisionSummary": {
         "properties": {
           "id": {
@@ -3764,6 +3979,49 @@
           "overrideReason"
         ],
         "title": "BankDecisionSummary"
+      },
+      "BankDecisionTerms": {
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "pattern": "^(EXPRESS|WORKING_CAPITAL|CONTRACT|CREDIT_LINE|OVERDRAFT|INVESTMENT)$",
+            "title": "Productcode"
+          },
+          "amountRub": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Amountrub"
+          },
+          "termMonths": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Termmonths"
+          },
+          "ratePercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratepercent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "productCode",
+          "amountRub",
+          "termMonths"
+        ],
+        "title": "BankDecisionTerms"
       },
       "BankDemoLoginRequest": {
         "properties": {

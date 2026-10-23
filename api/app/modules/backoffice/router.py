@@ -8,8 +8,9 @@ from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
 from app.modules.applications import Status
-from app.modules.backoffice import card, outbox_service, service
+from app.modules.backoffice import card, decision_service, outbox_service, service
 from app.modules.backoffice.card_schemas import BankApplicationCard
+from app.modules.backoffice.decision_schemas import BankDecisionRequest, BankDecisionSaved
 from app.modules.backoffice.outbox_schemas import (
     BankOutboxPage,
     BankOutboxRetried,
@@ -18,6 +19,41 @@ from app.modules.backoffice.outbox_schemas import (
 from app.modules.backoffice.schemas import BankQueuePage, ProductCode
 
 router = APIRouter(prefix="/backoffice", tags=["банк"])
+
+
+@router.post(
+    "/applications/{application_id}/decision",
+    operation_id="saveBackofficeDecision",
+    summary="Сохранить решение сотрудника банка",
+    response_model=BankDecisionSaved,
+    response_model_by_alias=True,
+    responses={
+        401: {"description": "UNAUTHENTICATED"},
+        403: {"description": "FORBIDDEN / AUTHORITY_LEVEL_TOO_LOW"},
+        404: {"description": "NOT_FOUND"},
+        409: {
+            "description": "VERSION_CONFLICT / INVALID_TRANSITION / ENGINE_DECISION_STALE / "
+            "ENGINE_DECISION_MISSING / ENGINE_SNAPSHOT_INCOMPATIBLE / ENGINE_SNAPSHOT_MISMATCH / "
+            "IDEMPOTENCY_KEY_REUSED / IDEMPOTENCY_IN_PROGRESS / DEMO_RESET_IN_PROGRESS"
+        },
+        422: {"description": "VALIDATION_ERROR / UNDERWRITER_DECISION_INVALID"},
+    },
+)
+async def save_decision(
+    application_id: UUID,
+    body: BankDecisionRequest,
+    principal: auth.BankPrincipal,
+    response: Response,
+    idempotency_key: Annotated[
+        str, Header(alias="Idempotency-Key", min_length=1, max_length=200, pattern=r"^\S+$")
+    ],
+) -> BankDecisionSaved:
+    result = await run_in_threadpool(
+        decision_service.decide, principal, application_id, body, idempotency_key
+    )
+    if result.replayed:
+        response.headers["Idempotent-Replayed"] = "true"
+    return BankDecisionSaved.model_validate(result.body)
 
 
 @router.get(
