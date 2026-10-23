@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, func, or_, select, tuple_
+from sqlalchemy import and_, func, or_, select, text, tuple_
 from sqlalchemy.orm import Session
 
 from app.shared.db import Base
@@ -109,3 +109,90 @@ def queue_rows(
     if after is not None:
         query = query.where(tuple_(since, applications.c.id) > after)
     return [dict(row) for row in session.execute(query).mappings()]
+
+
+def card_rows(session: Session, application_id: UUID) -> dict[str, Any] | None:
+    """Одна версия данных даже при параллельном изменении статуса другим сотрудником."""
+    session.execute(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY"))
+    tables = Base.metadata.tables
+    applications, companies, users = tables["applications"], tables["companies"], tables["users"]
+    members, decisions, policies = (
+        tables["company_members"],
+        tables["decisions"],
+        tables["policy_versions"],
+    )
+    events, snapshots = tables["application_events"], tables["source_snapshots"]
+    submitted_role = (
+        select(members.c.role)
+        .where(
+            members.c.company_id == applications.c.company_id,
+            members.c.user_id == applications.c.created_by,
+        )
+        .correlate(applications)
+        .scalar_subquery()
+    )
+    application = (
+        session.execute(
+            select(
+                applications,
+                companies.c.name.label("company_name"),
+                companies.c.inn,
+                companies.c.registered_on,
+                companies.c.status.label("company_status"),
+                companies.c.okved,
+                companies.c.is_bank_customer,
+                users.c.display_name.label("submitted_name"),
+                submitted_role.label("submitted_role"),
+            )
+            .select_from(
+                applications.join(companies, companies.c.id == applications.c.company_id).join(
+                    users, users.c.id == applications.c.created_by
+                )
+            )
+            .where(applications.c.id == application_id)
+        )
+        .mappings()
+        .first()
+    )
+    if application is None:
+        return None
+    decision_rows = (
+        session.execute(
+            select(
+                decisions,
+                policies.c.version.label("policy_number"),
+                policies.c.content_hash.label("policy_hash"),
+                policies.c.content.label("policy_content"),
+            )
+            .select_from(decisions.join(policies, policies.c.id == decisions.c.policy_version_id))
+            .where(decisions.c.application_id == application_id)
+            .order_by(decisions.c.created_at.desc(), decisions.c.id.desc())
+        )
+        .mappings()
+        .all()
+    )
+    source_rows = (
+        session.execute(
+            select(snapshots)
+            .where(snapshots.c.application_id == application_id)
+            .order_by(snapshots.c.retrieved_at.desc(), snapshots.c.id.desc())
+        )
+        .mappings()
+        .all()
+    )
+    history = (
+        session.execute(
+            select(events, users.c.display_name.label("actor_name"))
+            .select_from(events.outerjoin(users, users.c.id == events.c.actor_id))
+            .where(events.c.application_id == application_id)
+            .order_by(events.c.id)
+        )
+        .mappings()
+        .all()
+    )
+    return {
+        "application": dict(application),
+        "decisions": [dict(x) for x in decision_rows],
+        "snapshots": [dict(x) for x in source_rows],
+        "history": [dict(x) for x in history],
+    }

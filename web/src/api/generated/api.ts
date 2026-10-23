@@ -31,6 +31,7 @@ import type {
   ApplicationFields,
   ApplicationOut,
   ApplicationPage,
+  BankApplicationCard,
   BankDemoLoginRequest,
   BankMeResponse,
   BankQueuePage,
@@ -45,6 +46,7 @@ import type {
   ContractSignedOut,
   DeclinedOut,
   DraftPatch,
+  GetBackofficeApplicationParams,
   GetBackofficeQueueParams,
   GovContractPage,
   HTTPValidationError,
@@ -1673,6 +1675,156 @@ export function useGetBackofficeQueue<TData = Awaited<ReturnType<typeof getBacko
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetBackofficeQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getBackofficeApplicationResponse200 = {
+  data: BankApplicationCard
+  status: 200
+}
+
+export type getBackofficeApplicationResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getBackofficeApplicationResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getBackofficeApplicationResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getBackofficeApplicationResponse422 = {
+  data: void
+  status: 422
+}
+
+export type getBackofficeApplicationResponseSuccess = (getBackofficeApplicationResponse200) & {
+  headers: Headers;
+};
+export type getBackofficeApplicationResponseError = (getBackofficeApplicationResponse401 | getBackofficeApplicationResponse403 | getBackofficeApplicationResponse404 | getBackofficeApplicationResponse422) & {
+  headers: Headers;
+};
+
+export type getBackofficeApplicationResponse = (getBackofficeApplicationResponseSuccess | getBackofficeApplicationResponseError)
+
+export const getGetBackofficeApplicationUrl = (applicationId: string,
+    params?: GetBackofficeApplicationParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/backoffice/applications/${applicationId}?${stringifiedParams}` : `/backoffice/applications/${applicationId}`
+}
+
+/**
+ * @summary Полная карточка для сотрудника банка
+ */
+export const getBackofficeApplication = async (applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: Parameters<typeof customFetch>[1]): Promise<getBackofficeApplicationResponse> => {
+
+  return customFetch<getBackofficeApplicationResponse>(getGetBackofficeApplicationUrl(applicationId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBackofficeApplicationQueryKey = (applicationId: string,
+    params?: GetBackofficeApplicationParams,) => {
+    return [
+    `/backoffice/applications/${applicationId}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetBackofficeApplicationQueryOptions = <TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBackofficeApplicationQueryKey(applicationId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBackofficeApplication>>> = ({ signal }) => getBackofficeApplication(applicationId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBackofficeApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof getBackofficeApplication>>>
+export type GetBackofficeApplicationQueryError = void
+
+
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params: undefined |  GetBackofficeApplicationParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeApplication>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeApplication>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBackofficeApplication>>,
+          TError,
+          Awaited<ReturnType<typeof getBackofficeApplication>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Полная карточка для сотрудника банка
+ */
+
+export function useGetBackofficeApplication<TData = Awaited<ReturnType<typeof getBackofficeApplication>>, TError = void>(
+ applicationId: string,
+    params?: GetBackofficeApplicationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBackofficeApplication>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBackofficeApplicationQueryOptions(applicationId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
