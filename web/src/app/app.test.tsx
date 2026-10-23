@@ -261,7 +261,6 @@ describe('зона банка', () => {
   it('зона банка подгружается отдельным куском (lazy)', () => {
     const root = appRoutes[0]?.children?.[0]?.children ?? [];
     const bank = root.find((route) => route.path === '/bank');
-    const demo = root.find((route) => route.path === '/demo');
     expect(bank?.children?.[0]?.lazy).toBeTypeOf('function');
   });
 });

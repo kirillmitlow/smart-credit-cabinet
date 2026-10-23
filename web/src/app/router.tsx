@@ -1,4 +1,3 @@
-import { lazy, Suspense } from 'react';
 import { createBrowserRouter, type RouteObject } from 'react-router';
 import { PlaceholderPage } from '@/components/PlaceholderPage';
 import { LoginPage } from '@/features/auth/LoginPage';
@@ -14,15 +13,8 @@ import { placeholders } from '@/texts';
 import { ClientLayout } from './ClientLayout';
 import { RequireBank, RequireClient, RequireDemo } from './guards';
 import { RootLayout } from './RootLayout';
-import { NotFoundScreen, RouteErrorScreen, Splash } from './screens';
-
-// React.lazy запускается после RequireDemo. RouteObject.lazy подгружает код до проверки гейта.
-const DemoZoneLayout = lazy(async () => ({
-  default: (await import('@/features/demo/DemoZoneLayout')).DemoZoneLayout,
-}));
-const DemoPage = lazy(async () => ({
-  default: (await import('@/features/demo/DemoZoneLayout')).DemoPage,
-}));
+import { NotFoundScreen, RouteErrorScreen } from './screens';
+import { DemoLayoutRoute, DemoPageRoute } from './DemoRoutes';
 
 /**
  * Карта адресов (60-01). Три зоны одного SPA:
@@ -72,19 +64,11 @@ export const appRoutes: RouteObject[] = [
             element: <RequireDemo />,
             children: [
               {
-                element: (
-                  <Suspense fallback={<Splash />}>
-                    <DemoZoneLayout />
-                  </Suspense>
-                ),
+                element: <DemoLayoutRoute />,
                 children: [
                   {
                     index: true,
-                    element: (
-                      <Suspense fallback={<Splash />}>
-                        <DemoPage />
-                      </Suspense>
-                    ),
+                    element: <DemoPageRoute />,
                   },
                   { path: '*', element: <NotFoundScreen kind="demo" /> },
                 ],
