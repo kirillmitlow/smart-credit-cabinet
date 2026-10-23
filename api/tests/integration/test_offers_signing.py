@@ -452,3 +452,37 @@ async def test_signed_original_cannot_be_rebound_before_issuance(
             with pytest.raises(AppError, match="сохранённой подписи"):
                 contracts.signed_terms(session, UUID(app_id))
     assert not sql("SELECT id FROM disbursements WHERE application_id = :i", i=app_id)
+
+
+async def test_legacy_json_original_can_still_be_read_signed_and_issued(
+    stand: dict[str, Any],
+) -> None:
+    """Deploying PDF support must not replace an existing JSON original or invalidate its OTP."""
+    from app.modules.offers.contracts import content_hash_of
+    from app.modules.offers.models import Contract
+
+    app_id = approve_sokolova(stand)
+    async with client_for(stand, "sokolova:sokolova") as boss:
+        contract_id = (await accept(boss, app_id)).json()["contract"]["id"]
+        with db.transaction() as session:
+            contract = session.get(Contract, UUID(contract_id))
+            assert contract is not None
+            contract.template_version = "credit-agreement-json-v1"
+            body = json.loads(contract.body)
+            body["template"] = contract.template_version
+            contract.body = json.dumps(body, ensure_ascii=False, sort_keys=True)
+            contract.content_hash = content_hash_of(contract.body)
+            contract.document_id = None
+            expected = contract.body.encode("utf-8")
+        original = await boss.get(f"/contracts/{contract_id}/document")
+        assert original.headers["content-type"] == "application/json"
+        assert original.content == expected
+        challenge = (await start_signing(boss, contract_id)).json()
+        signed = await boss.post(
+            f"/contracts/{contract_id}/sign",
+            json={"requestId": challenge["requestId"], "code": challenge["demoCode"]},
+        )
+        assert signed.status_code == 200
+        assert signed.json()["contract"]["status"] == "SIGNED"
+        assert (await boss.get(f"/contracts/{contract_id}/document")).content == expected
+    assert disbursement.run(UUID(app_id)) == "STARTED"
