@@ -80,7 +80,10 @@ def queue_rows(
             companies.c.id.label("company_id"),
             companies.c.name.label("company_name"),
             companies.c.inn,
-            companies.c.is_bank_customer,
+            func.coalesce(
+                companies.c.is_bank_customer,
+                decisions.c.features["is_bank_customer"].as_boolean(),
+            ).label("is_bank_customer"),
             decisions.c.explain,
             decisions.c.required_level,
             versions.c.reason.label("version_reason"),

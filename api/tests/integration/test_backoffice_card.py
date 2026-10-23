@@ -1,5 +1,6 @@
 """T-361: неизменяемые снимки, банковские поля и согласованное чтение при гонке."""
 
+from collections.abc import Callable
 from datetime import timedelta
 from typing import Any
 from uuid import UUID, uuid4
@@ -10,8 +11,8 @@ from sqlalchemy import event, select, update
 
 from app.modules import auth, pipeline
 from app.modules.applications import Application, ApplicationEvent
-from app.modules.companies.models import CompanyMember
-from app.modules.decisioning import decide, parse_policy
+from app.modules.companies.models import Company, CompanyMember
+from app.modules.decisioning import DecisionInput, decide, parse_policy
 from app.modules.pipeline.models import PipelineRun, SourceSnapshot
 from app.modules.pipeline.persist import build_decision
 from app.shared import clock, db
@@ -76,6 +77,25 @@ async def test_line_card_has_saved_limit_comparison(bank: httpx.AsyncClient) -> 
     assert metric["value"] == 20_000_000
     assert metric["threshold"] == 27_083_333.5
     assert metric["passed"] is True
+
+
+@pytest.mark.parametrize(("factory", "expected"), [(cases.stankoprom, False), (cases.zarya, True)])
+async def test_bank_customer_falls_back_to_collected_evidence_when_profile_is_unknown(
+    bank: httpx.AsyncClient,
+    factory: Callable[[], DecisionInput],
+    expected: bool,
+) -> None:
+    app_id = seed("Компания", factory())
+    with db.transaction() as session:
+        application = session.get(Application, app_id)
+        assert application is not None
+        company = session.get(Company, application.company_id)
+        assert company is not None
+        company.is_bank_customer = None
+    card = (await bank.get(f"/backoffice/applications/{app_id}")).json()
+    queue = (await bank.get("/backoffice/queue")).json()
+    assert card["company"]["isBankCustomer"] is expected
+    assert queue["items"][0]["company"]["isBankCustomer"] is expected
 
 
 async def test_missing_decision_is_explicit_not_fake_zero_scores(bank: httpx.AsyncClient) -> None:

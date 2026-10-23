@@ -53,6 +53,7 @@ test('TS-030: ручная заявка появляется в банковск
   await expect(row).toBeVisible({ timeout: 90_000 });
   await expect(row).toContainText('Инвестиционный кредит');
   await expect(row).toContainText('Нужно оценить залог');
+  await expect(row).toContainText(t.client);
   await expect(row).toContainText(t.hints.REQUEST_SELLER_DOCUMENT);
   await expectNoReload(bank);
   await checkAccessibility(bank, 'Банковская очередь');
