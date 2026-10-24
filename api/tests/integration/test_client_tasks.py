@@ -21,7 +21,7 @@ from app.modules.applications import (
 )
 from app.modules.applications.models import Task
 from app.modules.companies.models import CompanyMember
-from app.modules.pipeline.models import PipelineRun
+from app.modules.pipeline.models import Decision, PipelineRun
 from app.shared import db, tasks
 from app.shared.errors import AppError
 from tests.integration.test_pipeline import (  # noqa: F401  (фикстуры)
@@ -355,3 +355,81 @@ def test_pipeline_creates_revenue_statement_task(database: db.Database, sokolova
     assert (task.kind, task.round, task.status) == ("DOCUMENT", 1, "OPEN")
     assert task.created_by_actor == "SYSTEM"
     assert task.details["reasonCode"] == "REVENUE_UNKNOWN"
+
+
+@pytest.mark.parametrize("previous_rounds", [2, 3])
+@pytest.mark.parametrize("revenue_known", [False, True])
+def test_pipeline_after_answered_rounds_routes_without_a_fourth_request(
+    database: db.Database, sokolova: Case, previous_rounds: int, revenue_known: bool
+) -> None:
+    if not revenue_known:
+        sokolova.world.turnover[sokolova.inn] = None
+        sokolova.world.financials[sokolova.inn] = None
+    with database.transaction() as s:
+        for number in range(1, previous_rounds + 1):
+            s.add(
+                Task(
+                    application_id=sokolova.application_id,
+                    round=number,
+                    kind="DOCUMENT",
+                    title="Выписка",
+                    why_text="Нужно подтвердить выручку",
+                    status="ANSWERED",
+                    created_by_actor="SYSTEM",
+                )
+            )
+
+    pipeline.run_pipeline(sokolova.application_id, integrations=sokolova.integrations)
+    # Доставка той же фоновой задачи не создаёт ни второго решения, ни четвёртого раунда.
+    pipeline.run_pipeline(sokolova.application_id, integrations=sokolova.integrations)
+
+    expected = (
+        "APPROVED" if revenue_known else "MANUAL_REVIEW" if previous_rounds == 3 else "NEEDS_INFO"
+    )
+    assert status_of(database, sokolova.application_id) == expected
+    rows = tasks_of(database, sokolova.application_id)
+    assert max(t.round for t in rows) <= 3
+    assert sum(t.status == "OPEN" for t in rows) == int(expected == "NEEDS_INFO")
+    with database.transaction() as s:
+        (decision,) = s.scalars(select(Decision)).all()
+        assert decision.outcome == expected
+        (event,) = s.scalars(
+            select(ApplicationEvent).where(
+                ApplicationEvent.to_status == expected,
+                ApplicationEvent.kind == "TRANSITION",
+            )
+        ).all()
+        assert event.payload["outcome"] == expected
+        if expected == "MANUAL_REVIEW":
+            # По принятой матрице до 3 млн достаточно L1, в том числе без грейда.
+            assert (decision.route, decision.required_level) == ("MANUAL", "L1")
+            assert decision.explain["outcome"] == expected
+            assert decision.explain["workflow"] == {
+                "reasonCode": "ROUNDS_LIMIT_REACHED",
+                "engineOutcome": "NEEDS_INFO",
+            }
+            assert decision.explain["recommendation"]["outcome"] == "NEEDS_INFO"
+            assert [r["code"] for r in decision.explain["reasons"]] == ["REVENUE_UNKNOWN"]
+        else:
+            assert "workflow" not in decision.explain
+
+
+def test_revenue_task_error_rolls_back_instead_of_silently_leaving_needs_info(
+    database: db.Database, sokolova: Case, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.modules.pipeline import hooks
+
+    sokolova.world.turnover[sokolova.inn] = None
+    sokolova.world.financials[sokolova.inn] = None
+
+    def fail(*_args: Any, **_kwargs: Any) -> None:
+        raise AppError(409, "ROUND_OPEN", "Предыдущий запрос ещё не закрыт")
+
+    monkeypatch.setattr(hooks, "request_information", fail)
+    with pytest.raises(AppError, match="Предыдущий запрос"):
+        pipeline.run_pipeline(sokolova.application_id, integrations=sokolova.integrations)
+
+    assert status_of(database, sokolova.application_id) == "CHECKING"
+    assert tasks_of(database, sokolova.application_id) == []
+    with database.transaction() as s:
+        assert s.scalar(select(Decision.id)) is None

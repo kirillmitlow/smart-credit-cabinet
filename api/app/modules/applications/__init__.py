@@ -5,6 +5,7 @@ from app.modules.applications import wizard_draft as _wizard_draft  # noqa: F401
 from app.modules.applications.client_tasks import (
     InfoRequestReceipt,
     TaskSpec,
+    information_rounds_exhausted,
     register_recheck,
     request_information,
 )
@@ -71,6 +72,7 @@ __all__ = [
     "get_for",
     "get_valid_consent",
     "hold_operation",
+    "information_rounds_exhausted",
     "operation_scope",
     "pep_rules_version",
     "proof_for",

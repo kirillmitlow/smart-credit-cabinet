@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -16,14 +17,22 @@ from pydantic import TypeAdapter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.modules.applications import Actor, Application, Status, record_event, transition
+from app.modules.applications import (
+    Actor,
+    Application,
+    Status,
+    information_rounds_exhausted,
+    record_event,
+    transition,
+)
 from app.modules.decisioning import (
     DecisionInput,
     DecisionResult,
+    authority_level,
     client_factor_phrases,
     input_to_json,
 )
-from app.modules.decisioning.types import Outcome
+from app.modules.decisioning.types import Outcome, Recommendation, Route
 from app.modules.pipeline import hooks
 from app.modules.pipeline.models import Decision, DecisionReason, PipelineRun
 
@@ -120,6 +129,21 @@ def persist_decision(
     application = session.scalars(
         select(Application).where(Application.id == run.application_id).with_for_update()
     ).one()
+    # Лимит относится к процессу запроса данных, а не к скорингу: ядро остаётся чистым.
+    # Выбираем маршрут до перехода, чтобы не оставлять NEEDS_INFO без открытых задач.
+    rounds_exhausted = result.outcome == Outcome.NEEDS_INFO and information_rounds_exhausted(
+        session, application.id
+    )
+    if rounds_exhausted:
+        result = replace(
+            result,
+            outcome=Outcome.MANUAL_REVIEW,
+            route=Route.MANUAL,
+            required_level=authority_level(
+                inp.policy, inp.application.amount_rub, result.numbers.grade
+            ),
+            recommendation=Recommendation(Outcome.NEEDS_INFO),
+        )
     decision = build_decision(
         run,
         inp,
@@ -128,6 +152,11 @@ def persist_decision(
         engine_version=engine_version,
         snapshot_ids=snapshot_ids,
     )
+    if rounds_exhausted:
+        decision.explain["workflow"] = {
+            "reasonCode": "ROUNDS_LIMIT_REACHED",
+            "engineOutcome": Outcome.NEEDS_INFO.value,
+        }
     session.add(decision)
     session.flush()
     session.add_all(build_reasons(decision.id, result))
