@@ -34,6 +34,7 @@ export function ClientLayout() {
     : [
         { to: '/', label: shell.nav.home, end: true },
         { to: '/wizard', label: shell.nav.wizard },
+        { to: '/products', label: shell.nav.products },
         { to: '/loans', label: shell.nav.loans },
         ...(config?.demoMode ? [{ to: '/demo', label: shell.nav.demo }] : []),
       ];

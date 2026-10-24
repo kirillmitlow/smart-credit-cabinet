@@ -8,6 +8,7 @@ import { LoanPage } from '@/features/loans/LoanPage';
 import { LoansPage } from '@/features/loans/LoansPage';
 import { WizardPage } from '@/features/wizard/WizardPage';
 import { WizardResultPage } from '@/features/wizard/WizardResultPage';
+import { CatalogPage } from '@/features/catalog/CatalogPage';
 import { ClientLayout } from './ClientLayout';
 import { RequireBank, RequireClient, RequireDemo } from './guards';
 import { RootLayout } from './RootLayout';
@@ -83,6 +84,8 @@ export const appRoutes: RouteObject[] = [
                   { path: 'company', element: <CompanyPage /> },
                   { path: 'wizard', element: <WizardPage /> },
                   { path: 'wizard/result', element: <WizardResultPage /> },
+                  { path: 'products', element: <CatalogPage /> },
+                  { path: 'products/:code', element: <CatalogPage /> },
                   { path: 'applications/:id', element: <ApplicationPage /> },
                   { path: 'applications/:id/edit/:step', element: <ApplicationEditPage /> },
                   { path: 'loans', element: <LoansPage /> },

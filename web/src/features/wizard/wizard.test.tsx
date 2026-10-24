@@ -399,7 +399,10 @@ describe('результат: подбор без вариантов и недо
     expect(rejected).toHaveTextContent('Овердрафт');
     expect(rejected).toHaveTextContent('Откройте счёт у нас');
     expect(rejected).toHaveTextContent('Станет доступно 22 апреля 2027');
-    expect(screen.queryByRole('link', { name: wizardResult.openCatalog })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: wizardResult.openCatalog })).toHaveAttribute(
+      'href',
+      '/products',
+    );
     await waitFor(() => expect(window.location.pathname).toBe('/wizard/result'));
   });
 });

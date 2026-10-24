@@ -28,6 +28,7 @@ export { emptyStates, termHints, demoMarks } from './content';
 export { login, companyChoice, logout } from './login';
 export { home } from './home';
 export { loansTexts } from './loans';
+export { catalogTexts } from './catalog';
 export { decision } from './decision';
 export { consents } from './consents';
 export { wizard, wizardResult, variantCard } from './wizard';
