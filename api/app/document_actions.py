@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.modules import applications, audit, auth, companies, documents
 from app.modules.documents.uploads import Upload
-from app.shared import db, idempotency
+from app.shared import db, idempotency, tasks
 from app.shared.errors import AppError
 
 
@@ -104,6 +104,8 @@ def upload(principal: auth.Principal, data: Upload, key: str) -> idempotency.Rep
                 company_id=context.company_id,
                 details={"sha256": row.sha256, "sizeBytes": row.size_bytes, "kind": kind},
             )
+            if kind == "BANK_STATEMENT_1C":
+                tasks.enqueue(session, "documents.parse_statement", document_id=str(row.id))
             return idempotency.Reply(201, documents.as_dict(row))
 
         import hashlib

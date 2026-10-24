@@ -313,18 +313,26 @@ def submit_round(
         )
     )
     missing = [t for t in open_tasks if t.answer is None]
-    document_tasks = [t for t in open_tasks if t.kind == "DOCUMENT"]
+    document_tasks = [t for t in open_tasks if t.kind in {"DOCUMENT", "CONFIRM_REVENUE"}]
     if document_tasks:
         files = documents.list_metadata(
             session, documents.Access(principal.user_id, (application.company_id,)), application.id
         )
         attached_tasks = {f.task_id for f in files if f.cancelled_at is None}
         missing.extend(t for t in document_tasks if t.id not in attached_tasks and t not in missing)
+        unready_tasks = {
+            f.task_id
+            for f in files
+            if f.cancelled_at is None
+            and f.kind == "BANK_STATEMENT_1C"
+            and f.parse_status != "PARSED"
+        }
+        missing.extend(t for t in document_tasks if t.id in unready_tasks and t not in missing)
     if missing:
         raise AppError(
             409,
             "ROUND_INCOMPLETE",
-            "Ответьте на все задачи, потом отправляйте",
+            "Ответьте на все задачи и дождитесь разбора выписок; файл с ошибкой нужно заменить",
             errors=[{"taskId": str(t.id)} for t in missing],
         )
     if _recheck is None:

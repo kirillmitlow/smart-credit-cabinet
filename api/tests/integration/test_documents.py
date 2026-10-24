@@ -318,7 +318,7 @@ async def test_document_task_requires_original_and_list_is_company_scoped(
         assert answer.status_code == 200
         blocked = await client.post(f"/applications/{app_id}/tasks/submit")
         assert (blocked.status_code, blocked.json()["code"]) == (409, "ROUND_INCOMPLETE")
-    original = await upload(stand)
+    original = await upload(stand, content=pdf_bytes(), data={**fields(stand), "kind": "OTHER"})
     assert original.status_code == 201
     async with client_for(stand, "a:d") as client:
         listed = await client.get("/documents", params={"applicationId": str(app_id)})

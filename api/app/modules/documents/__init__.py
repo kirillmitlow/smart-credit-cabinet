@@ -2,6 +2,7 @@
 
 from app.modules.documents import reset as reset  # registers demo cleanup
 from app.modules.documents.pdf import credit_source_hash, render_credit
+from app.modules.documents.processing import pending_statements, process_statement, statement_job
 from app.modules.documents.service import (
     Access,
     UploadContext,
@@ -22,6 +23,9 @@ from app.modules.documents.storage import FileStore, PostgresFileStore
 
 __all__ = [
     "Access",
+    "pending_statements",
+    "process_statement",
+    "statement_job",
     "ParsedStatement",
     "parse_statement",
     "validate_statement_set",
