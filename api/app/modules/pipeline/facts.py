@@ -41,6 +41,7 @@ from app.modules.decisioning.types import (
     Snapshot,
     SourceMeta,
     SourceStatus,
+    StatementData,
     SubjectRole,
     TaxData,
     TurnoverData,
@@ -62,6 +63,7 @@ TURNOVER = "bank_core:turnover"
 LOANS = "bank_core:loans"
 COMPLIANCE = "bank_core:compliance"
 BKI_REPORT = "credit_bureau:report"
+STATEMENT = "client_upload:statement"
 
 _OK, _NOT_FOUND, _UNAVAILABLE = SourceStatus.OK, SourceStatus.NOT_FOUND, SourceStatus.UNAVAILABLE
 
@@ -445,6 +447,22 @@ def turnover_data(rec: SourceRecord | None) -> TurnoverData:
     )
 
 
+def statement_data(rec: SourceRecord | None) -> StatementData:
+    if rec is None:
+        return StatementData()
+    if not rec.usable:
+        return StatementData(rec.meta)
+    payload: dict[str, Any] = rec.data
+    return StatementData(
+        rec.meta,
+        tuple(
+            TurnoverMonth(_month_start(row["month"]), row["incomingRub"], row["outgoingRub"], None)
+            for row in payload["months"]
+        ),
+        owner_inn_matches=payload["inn"] == rec.subject_inn,
+    )
+
+
 def _month_start(value: str) -> date:
     year, month = value.split("-")[:2]
     return date(int(year), int(month), 1)
@@ -545,5 +563,6 @@ def build_snapshot(
             bki_payments_by_uid(records, bki_subject_list),
         ),
         turnover=turnover_data(records.get(TURNOVER, applicant_inn)),
+        statement=statement_data(records.get(STATEMENT, applicant_inn)),
         bki=bki_subject_data(records, bki_subject_list, bki_no_consent),
     )

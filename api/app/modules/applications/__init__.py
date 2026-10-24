@@ -21,6 +21,7 @@ from app.modules.applications.consents import (
 )
 from app.modules.applications.consents_router import router as consents_router
 from app.modules.applications.document_access import (
+    document_confirmation_context,
     document_upload_context,
     statement_processing_context,
 )
@@ -60,6 +61,7 @@ __all__ = [
     "consents_router",
     "current_version",
     "document_upload_context",
+    "document_confirmation_context",
     "statement_processing_context",
     "ensure_pep_rules",
     "get_for",

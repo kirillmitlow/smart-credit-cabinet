@@ -71,6 +71,8 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
   const text = fieldText(task, edits);
   const saved = isSaved(task, edits);
   const needsFile = task.kind === 'DOCUMENT' || task.kind === 'CONFIRM_REVENUE';
+  const needsRevenue =
+    task.kind === 'CONFIRM_REVENUE' || task.details?.reasonCode === 'REVENUE_UNKNOWN';
   return (
     <Paper component="section" withBorder p="md" aria-labelledby={titleId} data-testid="info-task">
       <Stack gap="sm">
@@ -117,6 +119,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
                 applicationId={task.applicationId}
                 taskId={task.id}
                 disabled={locked}
+                includeUnassignedStatements={needsRevenue}
                 onUploaded={(file) => onEdit(task.id, dt.uploadedAnswer(file.filename))}
               />
             ) : null}

@@ -44,7 +44,12 @@ from app.modules.pipeline import bureau, facts, persist, sources
 from app.modules.pipeline.consents import CONSENT_LABELS, load_bki_consents, valid_consent
 from app.modules.pipeline.models import PipelineRun
 from app.modules.pipeline.policy_registry import policy_by_id, register_current
-from app.modules.pipeline.snapshots import Collected, load_records, save_snapshots
+from app.modules.pipeline.snapshots import (
+    Collected,
+    load_records,
+    save_snapshots,
+    save_statement_snapshot,
+)
 from app.shared import clock, db
 from app.shared.errors import AppError
 from app.shared.ids import uuid7
@@ -256,6 +261,12 @@ def step_sources(claim: Claimed, integrations: Integrations) -> None:
     with db.transaction() as session:
         _checkpoint(session, claim, "SOURCES")
         created = save_snapshots(session, claim.run_id, claim.application_id, items)
+        application = session.get(Application, claim.application_id)
+        if application is None:
+            raise _Abandoned()
+        created += save_statement_snapshot(
+            session, claim.run_id, claim.application_id, application.company_id, info.applicant_inn
+        )
         _event(session, claim, "SOURCES", _collected_payload(items, created))
 
 

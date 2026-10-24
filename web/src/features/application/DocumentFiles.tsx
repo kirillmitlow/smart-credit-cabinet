@@ -12,6 +12,7 @@ import { UploadDocumentBodyKind, type DocumentOut } from '@/api/generated/model'
 import { resolveUrl } from '@/api/client';
 import { useActionKey } from '@/api/idempotency';
 import { ProblemAlert } from '@/components/ProblemAlert';
+import { StatementConfirmation } from './StatementConfirmation';
 
 const uploadKind = (kind: string) =>
   Object.values(UploadDocumentBodyKind).find((value) => value === kind);
@@ -59,11 +60,13 @@ export function DocumentFiles({
   taskId,
   disabled = false,
   onUploaded,
+  includeUnassignedStatements = false,
 }: {
   applicationId: string;
   taskId?: string;
   disabled?: boolean;
   onUploaded?: (file: DocumentOut) => void;
+  includeUnassignedStatements?: boolean;
 }) {
   const client = useQueryClient();
   const query = useListDocuments(
@@ -89,7 +92,13 @@ export function DocumentFiles({
   const busy = useRef(false);
   const files =
     query.data?.status === 200
-      ? query.data.data.filter((d) => !d.cancelledAt && (!taskId || d.taskId === taskId))
+      ? query.data.data.filter(
+          (d) =>
+            !d.cancelledAt &&
+            (!taskId ||
+              d.taskId === taskId ||
+              (includeUnassignedStatements && !d.taskId && d.kind === 'BANK_STATEMENT_1C')),
+        )
       : [];
 
   const send = async () => {
@@ -156,6 +165,9 @@ export function DocumentFiles({
             </Button>
           </Group>
           <ParseStatus document={document} />
+          {document.parseStatus === 'PARSED' && document.kind === 'BANK_STATEMENT_1C' ? (
+            <StatementConfirmation document={document} disabled={disabled} />
+          ) : null}
         </Stack>
       ))}
       {replacement ? (

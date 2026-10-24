@@ -54,6 +54,7 @@ import type {
   CodeIssued,
   CodeRequest,
   CompanyProfile,
+  ConfirmStatementIn,
   ConsentsOut,
   ConsentsSignedOut,
   ContractOut,
@@ -4320,6 +4321,114 @@ export const useSubmitTaskRound = <TError = HTTPValidationError,
         TContext
       > => {
       return useMutation(getSubmitTaskRoundMutationOptions(options), queryClient);
+    }
+
+export type confirmStatementResponse200 = {
+  data: DocumentOut
+  status: 200
+}
+
+export type confirmStatementResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type confirmStatementResponseSuccess = (confirmStatementResponse200) & {
+  headers: Headers;
+};
+export type confirmStatementResponseError = (confirmStatementResponse422) & {
+  headers: Headers;
+};
+
+export type confirmStatementResponse = (confirmStatementResponseSuccess | confirmStatementResponseError)
+
+export const getConfirmStatementUrl = (documentId: string,) => {
+
+
+
+
+  return `/documents/${documentId}/confirm`
+}
+
+/**
+ * @summary Подтвердить поступления от бизнеса по проверенной выписке
+ */
+export const confirmStatement = async (documentId: string,
+    confirmStatementIn: ConfirmStatementIn, options?: Parameters<typeof customFetch>[1]): Promise<confirmStatementResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<confirmStatementResponse>(getConfirmStatementUrl(documentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(confirmStatementIn)
+  }
+);}
+
+
+
+
+
+export const getConfirmStatementMutationKey = () => ['confirmStatement'] as const;
+
+export const getConfirmStatementMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmStatement>>, TError,ConfirmStatementMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmStatement>>, TError,ConfirmStatementMutationVariables, TContext> => {
+
+const mutationKey = getConfirmStatementMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmStatement>>, ConfirmStatementMutationVariables> = (props) => {
+          const {documentId,data} = props ?? {};
+
+          return  confirmStatement(documentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmStatementMutationResult = NonNullable<Awaited<ReturnType<typeof confirmStatement>>>
+    export type ConfirmStatementMutationBody = ConfirmStatementIn
+    export type ConfirmStatementMutationError = HTTPValidationError
+    export type ConfirmStatementMutationVariables = {documentId: string;data: ConfirmStatementIn}
+
+    /**
+ * @summary Подтвердить поступления от бизнеса по проверенной выписке
+ */
+export const useConfirmStatement = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmStatement>>, TError,ConfirmStatementMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirmStatement>>,
+        TError,
+        ConfirmStatementMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConfirmStatementMutationOptions(options), queryClient);
     }
 
 export type listDocumentsResponse200 = {
