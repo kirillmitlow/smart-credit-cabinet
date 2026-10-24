@@ -91,7 +91,7 @@ def submit_and_decide(
         # Заявка в работе мешала бы повтору (require_clean_persona); отзыв делает её терминальной
         current = client.get(f"/applications/{application_id}")
         if current.status_code == 200 and "WITHDRAW" in current.json()["allowedActions"]:
-            client.post(f"/applications/{application_id}/withdraw")
+            client.post(f"/applications/{application_id}/withdraw", json={"confirmed": True})
 
 
 def plain(text: str) -> str:

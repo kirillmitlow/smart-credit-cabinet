@@ -376,6 +376,20 @@ def withdraw(session: Session, principal: auth.Principal, application: Applicati
     if not principal.can_access(application.company_id):
         raise not_found("Заявка")
 
+    # Два повтора с разными ключами сериализуются на заявке. Читаем актуальное состояние
+    # под замком: потерянный ответ после первого коммита не превращается во второе событие.
+    current = session.scalars(
+        select(Application)
+        .where(Application.id == application.id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).one_or_none()
+    if current is None:
+        raise not_found("Заявка")
+    application = current
+    if application.status == Status.WITHDRAWN:
+        return application
+
     transition(
         session, application, Status.WITHDRAWN, actor=Actor.CLIENT, actor_id=principal.user_id
     )

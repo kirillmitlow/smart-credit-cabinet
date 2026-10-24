@@ -107,6 +107,7 @@ import type {
   TaskList,
   TaskOut,
   UploadDocumentBody,
+  WithdrawConfirmation,
   WizardRequest,
   WizardResult
 } from './model';
@@ -3853,14 +3854,29 @@ export const getWithdrawApplicationUrl = (applicationId: string,) => {
 /**
  * @summary Отозвать заявку
  */
-export const withdrawApplication = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<withdrawApplicationResponse> => {
+export const withdrawApplication = async (applicationId: string,
+    withdrawConfirmation: WithdrawConfirmation, options?: Parameters<typeof customFetch>[1]): Promise<withdrawApplicationResponse> => {
 
-  return customFetch<withdrawApplicationResponse>(getWithdrawApplicationUrl(applicationId),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<withdrawApplicationResponse>(getWithdrawApplicationUrl(applicationId),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(withdrawConfirmation)
   }
 );}
 
@@ -3885,9 +3901,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof withdrawApplication>>, WithdrawApplicationMutationVariables> = (props) => {
-          const {applicationId} = props ?? {};
+          const {applicationId,data} = props ?? {};
 
-          return  withdrawApplication(applicationId,requestOptions)
+          return  withdrawApplication(applicationId,data,requestOptions)
         }
 
 
@@ -3898,9 +3914,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type WithdrawApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof withdrawApplication>>>
-
+    export type WithdrawApplicationMutationBody = WithdrawConfirmation
     export type WithdrawApplicationMutationError = HTTPValidationError
-    export type WithdrawApplicationMutationVariables = {applicationId: string}
+    export type WithdrawApplicationMutationVariables = {applicationId: string;data: WithdrawConfirmation}
 
     /**
  * @summary Отозвать заявку

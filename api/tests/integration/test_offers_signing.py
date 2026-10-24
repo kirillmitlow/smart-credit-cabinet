@@ -232,7 +232,9 @@ async def test_sokolova_decision_accept_sign_and_disbursement_handoff(
     assert [t[0] for t in transitions][-2:] == ["OFFER_ACCEPTED", "SIGNED"]
     # после SIGNED отозвать нельзя
     async with client_for(stand, "sokolova:sokolova") as boss:
-        assert (await boss.post(f"/applications/{app_id}/withdraw")).status_code == 409
+        assert (
+            await boss.post(f"/applications/{app_id}/withdraw", json={"confirmed": True})
+        ).status_code == 409
     assert disbursement.run(UUID(app_id)) == "STARTED"
     funding = sql(
         "SELECT amount_rub, term_months, rate_percent, contract_number, contract_uid "
