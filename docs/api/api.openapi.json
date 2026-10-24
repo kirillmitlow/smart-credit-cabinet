@@ -76,6 +76,81 @@
         }
       }
     },
+    "/events/stream": {
+      "get": {
+        "tags": [
+          "живые статусы"
+        ],
+        "summary": "Stream Events",
+        "operationId": "streamEvents",
+        "parameters": [
+          {
+            "name": "zone",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Zone"
+            }
+          },
+          {
+            "name": "lastEventId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lasteventid"
+            }
+          },
+          {
+            "name": "last-event-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/roles/{inn}": {
       "get": {
         "tags": [
@@ -9911,6 +9986,14 @@
           "askCollateral"
         ],
         "title": "WizardResult"
+      },
+      "Zone": {
+        "type": "string",
+        "enum": [
+          "client",
+          "bank"
+        ],
+        "title": "Zone"
       }
     }
   }

@@ -101,6 +101,7 @@ import type {
   SignConfirmIn,
   SignRequest,
   SignStartIn,
+  StreamEventsParams,
   System,
   TaskList,
   TaskOut,
@@ -463,6 +464,133 @@ export function useHealthDeps<TData = Awaited<ReturnType<typeof healthDeps>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getHealthDepsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type streamEventsResponse200 = {
+  data: string
+  status: 200
+}
+
+export type streamEventsResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type streamEventsResponseSuccess = (streamEventsResponse200) & {
+  headers: Headers;
+};
+export type streamEventsResponseError = (streamEventsResponse422) & {
+  headers: Headers;
+};
+
+export type streamEventsResponse = (streamEventsResponseSuccess | streamEventsResponseError)
+
+export const getStreamEventsUrl = (params: StreamEventsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/events/stream?${stringifiedParams}` : `/events/stream`
+}
+
+/**
+ * @summary Stream Events
+ */
+export const streamEvents = async (params: StreamEventsParams, options?: Parameters<typeof customFetch>[1]): Promise<streamEventsResponse> => {
+
+  return customFetch<streamEventsResponse>(getStreamEventsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getStreamEventsQueryKey = (params?: StreamEventsParams,) => {
+    return [
+    `/events/stream`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getStreamEventsQueryOptions = <TData = Awaited<ReturnType<typeof streamEvents>>, TError = HTTPValidationError>(params: StreamEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStreamEventsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof streamEvents>>> = ({ signal }) => streamEvents(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof streamEvents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StreamEventsQueryResult = NonNullable<Awaited<ReturnType<typeof streamEvents>>>
+export type StreamEventsQueryError = HTTPValidationError
+
+
+export function useStreamEvents<TData = Awaited<ReturnType<typeof streamEvents>>, TError = HTTPValidationError>(
+ params: StreamEventsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamEvents>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof streamEvents>>,
+          TError,
+          Awaited<ReturnType<typeof streamEvents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStreamEvents<TData = Awaited<ReturnType<typeof streamEvents>>, TError = HTTPValidationError>(
+ params: StreamEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamEvents>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof streamEvents>>,
+          TError,
+          Awaited<ReturnType<typeof streamEvents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStreamEvents<TData = Awaited<ReturnType<typeof streamEvents>>, TError = HTTPValidationError>(
+ params: StreamEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Stream Events
+ */
+
+export function useStreamEvents<TData = Awaited<ReturnType<typeof streamEvents>>, TError = HTTPValidationError>(
+ params: StreamEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStreamEventsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
