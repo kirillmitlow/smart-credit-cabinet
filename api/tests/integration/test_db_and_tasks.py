@@ -149,3 +149,112 @@ def test_resets_refuse_outside_demo_mode(
     with database.transaction() as s:
         assert resets.run_all_resets(s) == ["a"]
     assert calls == ["a"]
+
+
+def test_callbacks_wait_for_outer_commit_and_task_can_observe_committed_data(
+    database: db.Database,
+) -> None:
+    from uuid import uuid4
+
+    key = f"commit-proof-{uuid4()}"
+    seen: list[int] = []
+
+    def observe() -> None:
+        with database.engine.connect() as connection:
+            seen.append(
+                connection.scalar(
+                    text("SELECT count(*) FROM outbox WHERE idempotency_key=:key"), {"key": key}
+                )
+            )
+
+    with database.transaction() as session:
+        with session.begin_nested():
+            session.execute(
+                text(
+                    "INSERT INTO outbox (aggregate_id, event_type, target_system, payload, "
+                    "idempotency_key, status, attempts, next_attempt_at, created_at) "
+                    "VALUES ('after-commit', 'TEST_COMMIT', 'BKI', '{}', :key, 'PENDING', 0, now(), now())"
+                ),
+                {"key": key},
+            )
+            db.after_commit(session, observe)
+        assert seen == []  # releasing the savepoint is not publishing the committed row
+    assert seen == [1]
+    with database.engine.begin() as connection:
+        connection.execute(text("DELETE FROM outbox WHERE idempotency_key=:key"), {"key": key})
+
+
+def test_released_savepoint_then_outer_rollback_publishes_nothing(
+    database: db.Database, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sent: list[str] = []
+    monkeypatch.setattr(tasks, "send_now", lambda name, **kw: sent.append(name))
+
+    def run_then_rollback() -> None:
+        with database.transaction() as session:
+            with session.begin_nested():
+                tasks.enqueue(session, "pipeline.run", application_id="not-committed")
+            assert sent == []
+            raise RuntimeError("outer rollback")
+
+    with pytest.raises(RuntimeError, match="outer rollback"):
+        run_then_rollback()
+    assert sent == []
+
+
+def test_nested_rollback_discards_only_its_subtree(database: db.Database) -> None:
+    called: list[str] = []
+    with database.transaction() as session:
+        db.after_commit(session, lambda: called.append("outer-before"))
+
+        def roll_parent_back() -> None:
+            with session.begin_nested():
+                db.after_commit(session, lambda: called.append("rolled-parent"))
+                with session.begin_nested():
+                    db.after_commit(session, lambda: called.append("released-child"))
+                assert called == []
+                raise RuntimeError("parent rollback")
+
+        with pytest.raises(RuntimeError, match="parent rollback"):
+            roll_parent_back()
+        with session.begin_nested():
+            db.after_commit(session, lambda: called.append("kept-child"))
+        db.after_commit(session, lambda: called.append("outer-after"))
+        assert called == []
+    assert called == ["outer-before", "kept-child", "outer-after"]
+
+
+@pytest.mark.parametrize("finish", ["rollback", "close", "commit"])
+def test_session_reuse_never_republishes_old_callbacks(database: db.Database, finish: str) -> None:
+    called: list[str] = []
+    with database.sessions() as session:
+        session.begin()
+        db.after_commit(session, lambda: called.append("old"))
+        getattr(session, finish)()
+        assert called == (["old"] if finish == "commit" else [])
+        with session.begin():
+            db.after_commit(session, lambda: called.append("new"))
+    assert called == (["old", "new"] if finish == "commit" else ["new"])
+
+
+def test_failed_callback_is_not_replayed_by_next_transaction(database: db.Database) -> None:
+    called: list[str] = []
+
+    def fail() -> None:
+        called.append("failed")
+        raise RuntimeError("delivery unavailable")
+
+    with database.sessions() as session:
+        with pytest.raises(RuntimeError, match="delivery unavailable"):
+            with session.begin():
+                db.after_commit(session, fail)
+        session.close()  # committed DB transaction cannot be rolled back after delivery failed
+        with session.begin():
+            db.after_commit(session, lambda: called.append("next"))
+    assert called == ["failed", "next"]
+
+
+def test_callback_registration_requires_active_transaction(database: db.Database) -> None:
+    with database.sessions() as session:
+        with pytest.raises(ValueError, match="active transaction"):
+            db.after_commit(session, lambda: None)
