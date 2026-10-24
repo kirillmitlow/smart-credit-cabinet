@@ -6,7 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.requests import ClientDisconnect
 
@@ -39,6 +39,51 @@ class DocumentOut(BaseModel):
     createdAt: str
     cancelledAt: str | None
     confirmedAt: str | None
+
+
+class StatementMonthConfirmation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    month: str = Field(pattern=r"^[0-9]{4}-(0[1-9]|1[0-2])$")
+    businessIncomingKopecks: int = Field(ge=0, le=9_007_199_254_740_991, strict=True)
+
+
+class ConfirmStatementIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    acknowledged: Literal[True]
+    months: list[StatementMonthConfirmation] = Field(min_length=3, max_length=24)
+
+    @model_validator(mode="after")
+    def unique_months(self) -> "ConfirmStatementIn":
+        if len({row.month for row in self.months}) != len(self.months):
+            raise ValueError("Месяц не должен повторяться")
+        return self
+
+
+@router.post(
+    "/{document_id}/confirm",
+    operation_id="confirmStatement",
+    response_model=DocumentOut,
+    summary="Подтвердить поступления от бизнеса по проверенной выписке",
+)
+def confirm_statement(
+    document_id: UUID,
+    body: ConfirmStatementIn,
+    principal: auth.ClientPrincipal,
+    idempotency_key: Annotated[str, Header(min_length=1, max_length=128)],
+) -> JSONResponse:
+    reply = document_actions.confirm_statement(
+        principal,
+        document_id,
+        body.sha256,
+        {row.month: row.businessIncomingKopecks for row in body.months},
+        idempotency_key,
+    )
+    return JSONResponse(
+        reply.body,
+        status_code=reply.status,
+        headers={"Idempotent-Replayed": "true"} if reply.replayed else {},
+    )
 
 
 def reader(request: Request, zone: Literal["client", "bank"] = "client") -> auth.Principal:

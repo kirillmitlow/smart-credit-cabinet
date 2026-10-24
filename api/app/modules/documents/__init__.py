@@ -19,10 +19,13 @@ from app.modules.documents.statement_parser import (
     parse_statement,
     validate_statement_set,
 )
+from app.modules.documents.statement_source import confirm_statement, confirmed_statement_source
 from app.modules.documents.storage import FileStore, PostgresFileStore
 
 __all__ = [
     "Access",
+    "confirm_statement",
+    "confirmed_statement_source",
     "pending_statements",
     "process_statement",
     "statement_job",

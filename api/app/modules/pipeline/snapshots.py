@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from calendar import monthrange
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -18,6 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from app.modules import documents
 from app.modules.decisioning.types import SourceStatus
 from app.modules.integrations import Ok, Result, SourceUnavailable, parse_snapshot
 from app.modules.pipeline import facts
@@ -102,6 +104,46 @@ def save_snapshots(
     return created
 
 
+def save_statement_snapshot(
+    session: Session, run_id: UUID, application_id: UUID, company_id: UUID, inn: str
+) -> int:
+    """Local evidence is frozen per run, including absence; never masquerades as a bank API."""
+    existing = session.scalar(
+        select(SourceSnapshot.id).where(
+            SourceSnapshot.run_id == run_id,
+            SourceSnapshot.resource == facts.STATEMENT,
+            SourceSnapshot.subject_inn == inn,
+        )
+    )
+    if existing is not None:
+        return 0
+    payload = documents.confirmed_statement_source(session, application_id, company_id, inn)
+    actual = date.fromisoformat(payload["months"][-1]["month"] + "-01") if payload else None
+    if actual is not None:
+        actual = actual.replace(day=monthrange(actual.year, actual.month)[1])
+    values = {
+        "id": uuid7(),
+        "run_id": run_id,
+        "application_id": application_id,
+        "system": "CLIENT_UPLOAD",
+        "resource": facts.STATEMENT,
+        "subject_inn": inn,
+        "status": "OK" if payload else "NOT_FOUND",
+        "payload": payload or {},
+        "payload_hash": payload_hash(payload or {}),
+        "data_actual_at": actual,
+        "retrieved_at": clock.system_now(),
+        "request_id": None,
+    }
+    statement = (
+        insert(SourceSnapshot)
+        .values(**values)
+        .on_conflict_do_nothing(constraint="uq_source_snapshots_run_resource_subject")
+        .returning(SourceSnapshot.id)
+    )
+    return int(session.execute(statement).first() is not None)
+
+
 def find_reusable_report(
     session: Session, application_id: UUID, subject_inn: str
 ) -> SourceSnapshot | None:
@@ -126,8 +168,12 @@ def _record(row: SourceSnapshot) -> facts.SourceRecord:
     data = None
     error_code = None
     if status == SourceStatus.OK:
-        data = parse_snapshot(
-            row.resource, row.payload, inn=row.subject_inn, on=row.retrieved_at.date()
+        data = (
+            row.payload
+            if row.resource == facts.STATEMENT
+            else parse_snapshot(
+                row.resource, row.payload, inn=row.subject_inn, on=row.retrieved_at.date()
+            )
         )
     elif status == SourceStatus.UNAVAILABLE and isinstance(row.payload, dict):
         error_code = row.payload.get("errorCode")

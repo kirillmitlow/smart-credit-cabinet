@@ -144,6 +144,7 @@ export const bankCard = {
   year: 'Год',
   sourceStatus: { OK: 'Получен', NOT_FOUND: 'Данные не найдены', UNAVAILABLE: 'Не получен' },
   sourceNames: {
+    'client_upload:statement': 'Подтверждённая клиентом выписка',
     'registry:company': 'ЕГРЮЛ/ЕГРИП',
     'registry:bankruptcies': 'ЕФРСБ',
     'tax:profile': 'ФНС: налоги',

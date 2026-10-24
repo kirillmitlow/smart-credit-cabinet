@@ -1798,6 +1798,70 @@
         }
       }
     },
+    "/documents/{document_id}/confirm": {
+      "post": {
+        "tags": [
+          "документы"
+        ],
+        "summary": "Подтвердить поступления от бизнеса по проверенной выписке",
+        "operationId": "confirmStatement",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmStatementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/documents": {
       "get": {
         "tags": [
@@ -6577,6 +6641,37 @@
         ],
         "title": "CompanyProfile"
       },
+      "ConfirmStatementIn": {
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256"
+          },
+          "acknowledged": {
+            "type": "boolean",
+            "const": true,
+            "title": "Acknowledged"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/StatementMonthConfirmation"
+            },
+            "type": "array",
+            "maxItems": 24,
+            "minItems": 3,
+            "title": "Months"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sha256",
+          "acknowledged",
+          "months"
+        ],
+        "title": "ConfirmStatementIn"
+      },
       "ConsentItemOut": {
         "properties": {
           "kind": {
@@ -9057,6 +9152,28 @@
           "signedAt"
         ],
         "title": "SignerOut"
+      },
+      "StatementMonthConfirmation": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "title": "Month"
+          },
+          "businessIncomingKopecks": {
+            "type": "integer",
+            "maximum": 9007199254740991.0,
+            "minimum": 0.0,
+            "title": "Businessincomingkopecks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "month",
+          "businessIncomingKopecks"
+        ],
+        "title": "StatementMonthConfirmation"
       },
       "Status": {
         "type": "string",

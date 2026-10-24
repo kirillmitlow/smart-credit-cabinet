@@ -4,7 +4,7 @@ Lower documents storage never imports application, auth or audit modules. All ef
 the caller's transaction; HTTP operation fences hold the company lock throughout upload.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import replace
 from functools import wraps
 from typing import Any
@@ -159,3 +159,55 @@ def list_for(principal: auth.Principal, application_id: UUID) -> list[dict[str, 
             documents.as_dict(row)
             for row in documents.list_metadata(session, access_for(principal), application_id)
         ]
+
+
+@file_boundary
+def confirm_statement(
+    principal: auth.Principal, document_id: UUID, sha256: str, months: Mapping[str, int], key: str
+) -> idempotency.Reply:
+    with db.transaction() as session:
+        principal = fresh_principal(session, principal)
+        access = access_for(principal)
+        row = documents.get_metadata(session, access, document_id)
+        context = applications.document_confirmation_context(
+            session, principal, row.application_id, row.task_id
+        )
+        company = companies.by_id(session, context.company_id)
+        if company is None:
+            raise AppError(404, "NOT_FOUND", "Компания не найдена")
+        inn = company.inn
+
+        def save() -> idempotency.Reply:
+            confirmed, created = documents.confirm_statement(
+                session, access, document_id, inn=inn, sha256=sha256, months=months
+            )
+            if created:
+                application = applications.get_for(session, principal, context.application_id)
+                applications.record_event(
+                    session,
+                    application,
+                    "STEP",
+                    actor_type=applications.Actor.CLIENT,
+                    actor_id=principal.user_id,
+                    step_code="STATEMENT_CONFIRMED",
+                    payload={"documentId": str(document_id)},
+                )
+                audit.record(
+                    session,
+                    "STATEMENT_CONFIRMED",
+                    actor_id=principal.user_id,
+                    actor_role=principal.role,
+                    object_type="document",
+                    object_id=str(document_id),
+                    company_id=context.company_id,
+                    details={"sha256": sha256},
+                )
+            return idempotency.Reply(200, documents.as_dict(confirmed))
+
+        return idempotency.run_once(
+            session,
+            scope=f"documents:confirm:{document_id}:{principal.user_id}",
+            key=key,
+            request={"sha256": sha256, "months": dict(months)},
+            action=save,
+        )

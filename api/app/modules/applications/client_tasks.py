@@ -319,6 +319,24 @@ def submit_round(
             session, documents.Access(principal.user_id, (application.company_id,)), application.id
         )
         attached_tasks = {f.task_id for f in files if f.cancelled_at is None}
+        revenue_tasks = {
+            t.id
+            for t in document_tasks
+            if t.kind == "CONFIRM_REVENUE" or t.details.get("reasonCode") == "REVENUE_UNKNOWN"
+        }
+        if revenue_tasks:
+            company = companies.by_id(session, application.company_id)
+            source = (
+                documents.confirmed_statement_source(
+                    session, application.id, application.company_id, company.inn
+                )
+                if company is not None
+                else None
+            )
+            # A generic PDF or unconfirmed parsed statement cannot answer a revenue request.
+            attached_tasks -= revenue_tasks
+            if source is not None:
+                attached_tasks |= revenue_tasks
         missing.extend(t for t in document_tasks if t.id not in attached_tasks and t not in missing)
         unready_tasks = {
             f.task_id
@@ -332,7 +350,7 @@ def submit_round(
         raise AppError(
             409,
             "ROUND_INCOMPLETE",
-            "Ответьте на все задачи и дождитесь разбора выписок; файл с ошибкой нужно заменить",
+            "Ответьте на все задачи, дождитесь разбора выписок и подтвердите поступления от бизнеса",
             errors=[{"taskId": str(t.id)} for t in missing],
         )
     if _recheck is None:

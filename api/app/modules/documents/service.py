@@ -73,7 +73,8 @@ def store(
     """Called after applications locks and authorizes the upload context (one transaction).
 
     Counts include replaced files: originals remain stored for the audit and consume quota.
-    Only the same task/kind can be replaced; failed validation never cancels the old file.
+    Task/kind stay scoped; an unassigned DRAFT original may be replaced into an authorized
+    current document task. Failed validation never cancels the old file.
     """
     if access.bank or context.company_id not in access.company_ids:
         raise not_found("Заявка")
@@ -96,7 +97,7 @@ def store(
         old = get_metadata(session, access, replaces_id)
         if (
             old.application_id != context.application_id
-            or old.task_id != context.task_id
+            or (old.task_id is not None and old.task_id != context.task_id)
             or old.kind != kind
             or old.cancelled_at is not None
         ):
