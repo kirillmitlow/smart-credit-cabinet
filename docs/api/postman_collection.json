@@ -2,7 +2,7 @@
   "info": {
     "name": "Умный кредитный кабинет — проверка жюри",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Снимок main 78fda5e, 24.10.2026. Четыре независимые папки сценариев и проверки моков. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос удаляет демо-заявки этой персоны. Cookie jar включён. Источники: текущие OpenAPI/маршруты, существующий Bruno и браузерные тесты. См. docs/api/README.md для границ проверки. Динамические коды не сохраняйте в экспортируемое окружение."
+    "description": "Снимок main 1114d1c, 24.10.2026. Четыре независимые папки сценариев и проверки моков. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос удаляет демо-заявки этой персоны. Cookie jar включён. Источники: текущие OpenAPI/маршруты, существующий Bruno и браузерные тесты. См. docs/api/README.md для границ проверки. Динамические коды не сохраняйте в экспортируемое окружение."
   },
   "auth": {
     "type": "noauth"
@@ -510,7 +510,7 @@
         },
         {
           "id": "277faed9-8ab4-5403-9aab-1445ee183d84",
-          "name": "Соколова · 18 Получить текст договора JSON",
+          "name": "Соколова · 18 Получить сохранённый договор PDF",
           "request": {
             "method": "GET",
             "header": [],
@@ -525,7 +525,9 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
-                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));"
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
                 ]
               }
             }
@@ -1133,7 +1135,7 @@
         },
         {
           "id": "d70e5dfe-c0a3-5fc8-bdd9-9b81405b094d",
-          "name": "СнабКонтракт · 18 Получить текст договора JSON",
+          "name": "СнабКонтракт · 18 Получить сохранённый договор PDF",
           "request": {
             "method": "GET",
             "header": [],
@@ -1148,7 +1150,9 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
-                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));"
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
                 ]
               }
             }
@@ -1911,7 +1915,7 @@
         },
         {
           "id": "c8f694f3-f2c3-5784-9207-9f4d1c95292f",
-          "name": "Станкопром · 18 Получить текст договора JSON",
+          "name": "Станкопром · 18 Получить сохранённый договор PDF",
           "request": {
             "method": "GET",
             "header": [],
@@ -1926,7 +1930,9 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
-                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));"
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
                 ]
               }
             }
