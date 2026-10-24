@@ -191,7 +191,10 @@ describe('результат подбора: карточки', () => {
     await screen.findByRole('heading', { level: 1, name: wizardResult.noneTitle });
     expect(screen.queryByTestId('variant-card')).not.toBeInTheDocument();
     expect(screen.getByTestId('catalog-hint')).toHaveTextContent('подходящих продуктов нет');
-    expect(screen.queryByRole('link', { name: wizardResult.openCatalog })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: wizardResult.openCatalog })).toHaveAttribute(
+      'href',
+      '/products',
+    );
     expect(screen.getByRole('button', { name: wizardResult.changeAnswers })).toBeInTheDocument();
     expect(await blockingA11yViolations(container)).toEqual([]);
   });

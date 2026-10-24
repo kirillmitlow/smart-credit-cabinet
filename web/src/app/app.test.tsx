@@ -39,7 +39,10 @@ describe('оболочка клиента', () => {
     expect(screen.getByRole('link', { name: shell.productName })).toBeInTheDocument();
     const nav = screen.getByRole('navigation', { name: shell.mainNavLabel });
     expect(within(nav).getByRole('link', { name: shell.nav.loans })).toBeInTheDocument();
-    expect(within(nav).queryByRole('link', { name: shell.nav.products })).not.toBeInTheDocument();
+    expect(within(nav).getByRole('link', { name: shell.nav.products })).toHaveAttribute(
+      'href',
+      '/products',
+    );
     expect(
       within(nav).queryByRole('link', { name: shell.nav.notifications }),
     ).not.toBeInTheDocument();
@@ -85,7 +88,6 @@ describe('оболочка клиента', () => {
   it('неподдерживаемые адреса не показывают обещаний будущих экранов', async () => {
     mockSessions({ client: makeMe() });
     const paths = [
-      '/products',
       '/products/overdraft',
       '/applications/a1/offer',
       '/applications/a1/sign',

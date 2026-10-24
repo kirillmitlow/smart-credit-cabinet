@@ -264,6 +264,9 @@ function ResultView({
         <Stack gap="sm" maw={640} data-testid="catalog-hint">
           {result.hint ? <Text size="lg">{result.hint}</Text> : null}
           <Text c="dimmed">{t.noneNext}</Text>
+          <Button component={Link} to="/products" variant="light">
+            {t.openCatalog}
+          </Button>
         </Stack>
       )}
 
