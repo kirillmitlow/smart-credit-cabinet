@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import random
 import threading
+from calendar import monthrange
 from collections.abc import Iterator
 from datetime import date, timedelta
 from typing import Any
@@ -147,6 +148,20 @@ def application_number(application_id: UUID) -> str:
         return s.get(Application, application_id).number  # type: ignore[union-attr]
 
 
+def expected_first_payment(opened_on: date) -> date:
+    """The live bank may use today's date while the API test clock is fixed.
+
+    Independently verify the date rule against the actual value date returned by the bank;
+    never copy the production schedule calculator into the expected value.
+    """
+    year = opened_on.year + (opened_on.month == 12)
+    month = opened_on.month % 12 + 1
+    due = date(year, month, min(opened_on.day, 28, monthrange(year, month)[1]))
+    while due.weekday() >= 5:
+        due += timedelta(days=1)
+    return due
+
+
 def test_sokolova_signed_to_disbursed_with_schedule(stand: dict[str, Any]) -> None:
     journal = use_live(None)
     application_id = signed_application(stand)
@@ -162,9 +177,7 @@ def test_sokolova_signed_to_disbursed_with_schedule(stand: dict[str, Any]) -> No
         rows = list(s.scalars(select(PaymentScheduleRow).order_by(PaymentScheduleRow.seq)))
         assert len(rows) == 12
         assert sum(r.principal_rub for r in rows) == 500_000
-        assert rows[0].due_date == date(
-            2026, 11, 23
-        )  # 21.11.2026 — суббота, перенос на понедельник
+        assert rows[0].due_date == expected_first_payment(loans[0].opened_on)
         sent = s.scalars(select(OutboxMessage.event_type).where(OutboxMessage.status == "SENT"))
         assert sorted(sent) == ["DISBURSEMENT", "OBLIGATION_OPENED"]
     mine = our_loans(application_number(application_id))
@@ -220,7 +233,9 @@ def test_my_loans_api_shows_loan_to_owner_and_404_to_foreign(stand: dict[str, An
     disbursement.run(application_id)
     drain()
     with db.transaction() as s:
-        loan_id = s.scalars(select(Loan.id)).one()
+        loan = s.scalars(select(Loan)).one()
+        loan_id = loan.id
+        expected_due = expected_first_payment(loan.opened_on).isoformat()
 
     async def check() -> None:
         async with client_for(stand, "sokolova:owner") as owner:
@@ -229,7 +244,7 @@ def test_my_loans_api_shows_loan_to_owner_and_404_to_foreign(stand: dict[str, An
             assert [i["id"] for i in listing["items"]] == [str(loan_id)]
             detail = (await owner.get(f"/loans/{loan_id}")).json()
             assert len(detail["schedule"]) == 12 and detail["amountRub"] == 500_000
-            assert detail["nextPayment"]["dueDate"] == "2026-11-23"
+            assert detail["nextPayment"]["dueDate"] == expected_due
             assert detail["nextPayment"]["totalRub"] == detail["schedule"][0]["totalRub"]
             assert (await owner.get(f"/loans/{loan_id}/schedule")).status_code == 200
         async with client_for(stand, "other:boss") as stranger:
