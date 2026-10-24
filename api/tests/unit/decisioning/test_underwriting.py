@@ -281,16 +281,20 @@ def test_non_manual_engine_result_is_refused() -> None:
     assert ev.violation_codes == ("ENGINE_NOT_MANUAL_REVIEW",)
 
 
-def test_manual_without_financial_assessment_can_only_reject_with_reason_and_authority() -> None:
+@pytest.mark.parametrize("clear_features", [False, True])
+def test_manual_without_financial_assessment_can_only_reject_with_reason_and_authority(
+    clear_features: bool,
+) -> None:
     inp, result = basis(cases.garipov)
     assert result.outcome == Outcome.NEEDS_INFO
-    assert result.features is None
+    assert result.numbers.grade is None
     manual = replace(
         result,
         outcome=Outcome.MANUAL_REVIEW,
         route=Route.MANUAL,
         required_level=L2,
         recommendation=Recommendation(Outcome.NEEDS_INFO),
+        features=None if clear_features else result.features,
     )
     assert evaluate_underwriter_decision(
         inp, manual, Outcome.REJECTED, None, L2, "UW_DOCUMENT_ISSUE", LONG
