@@ -17,10 +17,10 @@ from sqlalchemy import Sequence, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.modules import auth
+from app.modules import auth, notifications
 from app.modules.applications.models import Application, ApplicationEvent, ApplicationVersion
 from app.modules.applications.states import CLIENT_ACTIONS, TERMINAL, Actor, Status, is_allowed
-from app.shared import clock
+from app.shared import clock, db
 from app.shared.errors import AppError, not_found
 from app.shared.tasks import enqueue
 
@@ -65,6 +65,8 @@ def record_event(
     )
     session.add(event)
     session.flush()
+    event_id, company_id = event.id, application.company_id
+    db.after_commit(session, lambda: notifications.publish(event_id, company_id))
     return event
 
 

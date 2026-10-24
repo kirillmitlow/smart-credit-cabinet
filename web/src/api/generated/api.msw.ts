@@ -85,6 +85,8 @@ export const getHealthLiveResponseMock = (): HealthLive200 => ({
 
 export const getHealthDepsResponseMock = (): HealthDeps200 => ({})
 
+export const getStreamEventsResponseMock = (): string => (faker.word.sample())
+
 export const getGetLoginRolesResponseMock = (overrideResponse: Partial<Extract<RolesResponse, object>> = {}): RolesResponse => ({kind: faker.helpers.arrayElement(['COMPANY','PERSON','NOT_ELIGIBLE'] as const), company: faker.helpers.arrayElement([{id: faker.string.uuid(), inn: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canApply: faker.datatype.boolean()},null,]), people: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), role: faker.string.alpha({length: {min: 10, max: 20}})})), companies: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({company: {id: faker.string.uuid(), inn: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), canApply: faker.datatype.boolean()}, role: faker.string.alpha({length: {min: 10, max: 20}})})), reasonCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
 
 export const getRequestLoginCodeResponseMock = (overrideResponse: Partial<Extract<CodeIssued, object>> = {}): CodeIssued => ({requestId: faker.string.alpha({length: {min: 10, max: 20}}), expiresInSeconds: faker.number.int(), demoCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
@@ -240,6 +242,19 @@ export const getHealthDepsMockHandler = (overrideResponse?: HealthDeps200 | ((in
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getHealthDepsResponseMock(),
       { status: 200
+      })
+  }, options)
+}
+
+export const getStreamEventsMockHandler = (overrideResponse?: string | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string> | string), options?: RequestHandlerOptions) => {
+  return http.get('*/events/stream', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+  const resolvedBody = overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getStreamEventsResponseMock();
+    const textBody = typeof resolvedBody === 'string' ? resolvedBody : JSON.stringify(resolvedBody ?? null);
+    return HttpResponse.text(textBody,
+      { status: 200, headers: { 'Content-Type': 'text/event-stream' }
       })
   }, options)
 }
@@ -986,6 +1001,7 @@ export const getApiMock = () => [
   getHealthLiveMockHandler(),
   getHealthReadyMockHandler(),
   getHealthDepsMockHandler(),
+  getStreamEventsMockHandler(),
   getGetLoginRolesMockHandler(),
   getRequestLoginCodeMockHandler(),
   getVerifyLoginCodeMockHandler(),

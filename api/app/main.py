@@ -10,7 +10,7 @@ import structlog
 from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
-from app import documents_http, health
+from app import documents_http, event_stream, health
 from app.modules import (
     applications,
     auth,
@@ -19,6 +19,7 @@ from app.modules import (
     companies,
     demo,
     loans,
+    notifications,
     offers,
     pipeline,
 )
@@ -68,6 +69,9 @@ async def _migrate_until_done(database: db.Database) -> None:
 
 @contextlib.asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    hub = notifications.EventHub(app.state.settings.redis_url)
+    app.state.event_hub = hub
+    await hub.start()
     task = asyncio.create_task(_migrate_until_done(db.get_database()))
     try:
         yield
@@ -75,6 +79,7 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await task
+        await hub.stop()
         db.get_database().dispose()
 
 
@@ -96,6 +101,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(OperationFenceMiddleware)
     app.add_middleware(RequestContextMiddleware)
     app.include_router(health.router)
+    app.include_router(event_stream.router)
     app.include_router(companies.login_router)
     app.include_router(auth.bank_login_router)
     app.include_router(backoffice.router)
