@@ -6,6 +6,8 @@ export const loansTexts = {
   loadingOne: 'Загружаем кредит…',
   emptyAction: 'Подобрать кредит',
   moreShown: 'Показаны последние {count}',
+  shown: 'Показано кредитов: {count}',
+  loadMore: 'Загрузить ещё кредиты',
   home: {
     all: 'Все кредиты',
   },
@@ -42,6 +44,9 @@ export const loansTexts = {
     settlementAccount: 'Расчётный счёт',
     loanAccount: 'Ссудный счёт',
     document: 'Скачать договор',
+    documentLoading: 'Получаем ссылку на договор…',
+    documentMissing: 'Договор пока недоступен. Попробуйте получить ссылку ещё раз.',
+    documentRefresh: 'Обновить ссылку на договор',
     notModelled: 'Оплата в этом прототипе не моделируется. Остаток долга равен выданной сумме',
     limitNote:
       'По кредитной линии и овердрафту у нас виден только лимит и ставка. Графика платежей нет',
