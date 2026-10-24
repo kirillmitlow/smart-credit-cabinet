@@ -183,6 +183,19 @@ def company_principal(session: Session, principal: auth.Principal) -> auth.Princ
     return replace(principal, memberships=memberships)
 
 
+def task_principal(session: Session, principal: auth.Principal) -> auth.Principal:
+    """Актуальные права задач, включая личные задачи поручителя (D-096)."""
+    user = auth.get(session, principal.user_id)
+    if user is None or user.status != "ACTIVE" or user.role != "CLIENT":
+        raise AppError(401, "UNAUTHENTICATED", "Нужно войти")
+    memberships = tuple(
+        auth.Membership(member.company_id, member.role, frozenset(member.poa_permissions))
+        for member, _ in companies.memberships_of(session, principal.user_id)
+        if member.role in {"DIRECTOR", "ACCOUNTANT", "GUARANTOR"}
+    )
+    return replace(principal, memberships=memberships, person_inn=user.person_inn)
+
+
 def get_for(session: Session, principal: auth.Principal, application_id: UUID) -> Application:
     """Чужая и несуществующая заявка неразличимы: 404 (R11)."""
     application = session.get(Application, application_id)
