@@ -345,3 +345,86 @@ async def test_pdf_preview_uses_original_with_correct_session(stand: dict[str, A
         assert response.status_code == 200
         assert response.content == pdf_bytes()
         assert response.headers["content-disposition"].startswith("inline;")
+
+
+async def test_pdf_view_headers_and_suspended_bank_session(stand: dict[str, Any]) -> None:
+    result = await upload(stand, content=pdf_bytes(), data={**fields(stand), "kind": "CONTRACT"})
+    item = result.json()
+    async with client_for(stand, "a:d") as client, client_for(stand, "b:d") as other:
+        assert (
+            await other.get(f"/documents/{item['id']}/download?preview=true")
+        ).status_code == 404
+        # A client cookie cannot silently become a bank read session.
+        assert (
+            await client.get(f"/documents/{item['id']}/download?zone=bank&preview=true")
+        ).status_code == 401
+        assert (
+            await client.post("/auth/bank-demo-login", json={"role": "UNDERWRITER"})
+        ).status_code == 200
+        opened = await client.get(f"/documents/{item['id']}/download?zone=bank&preview=true")
+        assert opened.content == pdf_bytes()
+        assert opened.headers["content-type"] == "application/pdf"
+        assert opened.headers["x-content-type-options"] == "nosniff"
+        assert opened.headers["cache-control"] == "private, no-store"
+        assert opened.headers["content-disposition"].startswith("inline;")
+        downloaded = await client.get(f"/documents/{item['id']}/download?zone=bank")
+        assert downloaded.content == opened.content
+        assert downloaded.headers["content-disposition"].startswith("attachment;")
+        from app.modules import auth
+
+        principal = auth.sessions.load(auth.Zone.BANK, client.cookies.get("sid_bank"))
+        with db.transaction() as session:
+            session.execute(
+                text("UPDATE users SET status='SUSPENDED' WHERE id=:id"), {"id": principal.user_id}
+            )
+        assert (
+            await client.get(f"/documents/{item['id']}/download?zone=bank&preview=true")
+        ).status_code in {401, 403}
+        # The independently authenticated client can still read its own original.
+        assert (
+            await client.get(f"/documents/{item['id']}/download?preview=true")
+        ).status_code == 200
+
+
+async def test_task_readiness_matches_submit_with_pending_failed_and_replaced_file(
+    stand: dict[str, Any],
+) -> None:
+    from app import document_tasks
+    from tests.integration.test_statement_source import statement
+
+    async with client_for(stand, "a:d") as client:
+
+        async def listing() -> dict[str, Any]:
+            return (await client.get(f"/applications/{stand['a_app']}/tasks")).json()
+
+        assert (await listing())["items"][0]["documentReady"] is False
+        uploaded = await upload(stand, content=pdf_bytes(), data={**fields(stand), "kind": "OTHER"})
+        assert uploaded.status_code == 201
+        ready = await listing()
+        assert ready["items"][0]["documentReady"] is True
+        assert ready["canSubmit"] is False  # a file does not replace the explanation
+        answered = await client.post(
+            f"/tasks/{stand['a_task']}/answer", json={"text": "Договор приложен"}
+        )
+        assert answered.json()["documentReady"] is True
+        assert (await listing())["canSubmit"] is True
+        pending = await upload(stand, key="pending-extra")
+        assert pending.status_code == 201
+        assert (await listing())["canSubmit"] is False
+        assert (
+            await client.post(f"/applications/{stand['a_app']}/tasks/submit")
+        ).status_code == 409
+        assert document_tasks.run_statement(UUID(pending.json()["id"])) == "FAILED"
+        assert (await listing())["items"][0]["documentReady"] is False
+        replacement = await upload(
+            stand,
+            key="replace-extra",
+            content=statement(),
+            data={
+                **fields(stand),
+                "replacesId": pending.json()["id"],
+            },
+        )
+        assert replacement.status_code == 201
+        assert document_tasks.run_statement(UUID(replacement.json()["id"])) == "PARSED"
+        assert (await listing())["canSubmit"] is True

@@ -1,10 +1,11 @@
 import { documentTexts as dt } from '@/texts/documents';
-import { useRef, useState } from 'react';
-import { Anchor, Button, FileInput, Group, Loader, Stack, Text } from '@mantine/core';
+import { useEffect, useRef, useState } from 'react';
+import { Anchor, Button, FileInput, Group, Loader, Paper, Stack, Text } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   getDownloadDocumentUrl,
   getListDocumentsQueryKey,
+  getListApplicationTasksQueryKey,
   useListDocuments,
   useUploadDocument,
   useGenerateDemoStatement,
@@ -95,6 +96,7 @@ export function DocumentFiles({
   const generation = useGenerateDemoStatement<unknown>({ request: demoAction.request() });
   const demoMode = usePublicConfig().data?.demoMode === true;
   const working = upload.isPending || generation.isPending;
+  const [selectionError, setSelectionError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [replacement, setReplacement] = useState<DocumentOut | null>(null);
   const busy = useRef(false);
@@ -108,6 +110,41 @@ export function DocumentFiles({
               (includeUnassignedStatements && !d.taskId && d.kind === 'BANK_STATEMENT_1C')),
         )
       : [];
+
+  const documentState =
+    query.data?.status === 200
+      ? query.data.data
+          .map((d) => [d.id, d.parseStatus, d.confirmedAt, d.cancelledAt].join(':'))
+          .join('|')
+      : null;
+  useEffect(() => {
+    if (taskId && documentState !== null) {
+      void client.invalidateQueries({ queryKey: getListApplicationTasksQueryKey(applicationId) });
+    }
+  }, [applicationId, taskId, documentState, client]);
+
+  const choose = (next: File | null) => {
+    if (disabled || working) return;
+    let error: string | null = null;
+    if (next) {
+      const txt = next.name.toLowerCase().endsWith('.txt');
+      const pdf = next.name.toLowerCase().endsWith('.pdf');
+      const valid = replacement
+        ? replacement.kind === 'BANK_STATEMENT_1C'
+          ? txt
+          : pdf
+        : txt || pdf;
+      if (!valid) error = dt.fileTypeError;
+      else if (next.size === 0) error = dt.emptyFile;
+      else if (next.size > (txt ? 5 : 10) * 1024 * 1024)
+        error = txt ? dt.statementTooLarge : dt.pdfTooLarge;
+    }
+    setSelectionError(error);
+    setFile(error ? null : next);
+    action.reset();
+    upload.reset();
+    generation.reset();
+  };
 
   const send = async () => {
     if (!file || busy.current || disabled) return;
@@ -131,6 +168,7 @@ export function DocumentFiles({
       if (result.status === 201) {
         action.reset();
         setFile(null);
+        setSelectionError(null);
         setReplacement(null);
         await client.invalidateQueries({ queryKey: getListDocumentsQueryKey({ applicationId }) });
         onUploaded?.(result.data);
@@ -152,6 +190,7 @@ export function DocumentFiles({
         demoAction.reset();
         setReplacement(null);
         setFile(null);
+        setSelectionError(null);
         await client.invalidateQueries({ queryKey: getListDocumentsQueryKey({ applicationId }) });
         onUploaded?.(result.data);
       }
@@ -183,6 +222,7 @@ export function DocumentFiles({
               disabled={disabled || working || !uploadKind(document.kind)}
               aria-label={`${dt.replace}: ${document.filename}`}
               onClick={() => {
+                setSelectionError(null);
                 setReplacement(document);
                 setFile(null);
                 action.reset();
@@ -209,6 +249,7 @@ export function DocumentFiles({
             variant="subtle"
             disabled={working}
             onClick={() => {
+              setSelectionError(null);
               setReplacement(null);
               setFile(null);
               action.reset();
@@ -221,21 +262,46 @@ export function DocumentFiles({
           </Button>
         </Group>
       ) : null}
-      <FileInput
-        label={dt.attach}
-        description={dt.limits}
-        accept={
-          replacement ? (replacement.kind === 'BANK_STATEMENT_1C' ? '.txt' : '.pdf') : '.pdf,.txt'
-        }
-        value={file}
-        disabled={disabled || working}
-        clearable
-        onChange={(next) => {
-          setFile(next);
-          action.reset();
-          upload.reset();
+      <Paper
+        withBorder
+        p="sm"
+        role="group"
+        aria-label={dt.dropArea}
+        aria-disabled={disabled || working}
+        onDragOver={(event) => {
+          if (event.dataTransfer.types.includes('Files')) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = disabled || working ? 'none' : 'copy';
+          }
         }}
-      />
+        onDrop={(event) => {
+          event.preventDefault();
+          if (disabled || working || event.dataTransfer.files.length === 0) return;
+          if (event.dataTransfer.files.length !== 1) {
+            choose(null);
+            setSelectionError(dt.singleFile);
+            return;
+          }
+          choose(event.dataTransfer.files[0] ?? null);
+        }}
+      >
+        <Text size="sm" mb="xs">
+          {dt.dropHelp}
+        </Text>
+        <FileInput
+          label={dt.attach}
+          description={dt.limits}
+          accept={
+            replacement ? (replacement.kind === 'BANK_STATEMENT_1C' ? '.txt' : '.pdf') : '.pdf,.txt'
+          }
+          value={file}
+          disabled={disabled || working}
+          error={selectionError ? <span role="alert">{selectionError}</span> : undefined}
+          clearable
+          clearButtonProps={{ 'aria-label': dt.clearFile }}
+          onChange={choose}
+        />
+      </Paper>
       {upload.error ? <ProblemAlert error={upload.error} /> : null}
       <Button
         variant="default"

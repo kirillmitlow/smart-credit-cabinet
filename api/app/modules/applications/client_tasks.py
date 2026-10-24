@@ -280,6 +280,52 @@ def save_answer(session: Session, principal: auth.Principal, task_id: UUID, text
     return task
 
 
+def document_readiness(
+    session: Session, principal: auth.Principal, application: Application, tasks: Sequence[Task]
+) -> dict[UUID, bool]:
+    """The read projection and submit guard use the same file/confirmation conditions."""
+    document_tasks = [
+        t for t in tasks if t.status == "OPEN" and t.kind in {"DOCUMENT", "CONFIRM_REVENUE"}
+    ]
+    ready = {t.id: True for t in tasks}
+    if document_tasks:
+        files = documents.list_metadata(
+            session, documents.Access(principal.user_id, (application.company_id,)), application.id
+        )
+        attached_tasks = {f.task_id for f in files if f.cancelled_at is None}
+        revenue_tasks = {
+            t.id
+            for t in document_tasks
+            if t.kind == "CONFIRM_REVENUE" or t.details.get("reasonCode") == "REVENUE_UNKNOWN"
+        }
+        if revenue_tasks:
+            company = companies.by_id(session, application.company_id)
+            source = (
+                documents.confirmed_statement_source(
+                    session, application.id, application.company_id, company.inn
+                )
+                if company is not None
+                else None
+            )
+            # A generic PDF or unconfirmed parsed statement cannot answer a revenue request.
+            attached_tasks -= revenue_tasks
+            if source is not None:
+                attached_tasks |= revenue_tasks
+        for task in document_tasks:
+            ready[task.id] = task.id in attached_tasks
+        unready_tasks = {
+            f.task_id
+            for f in files
+            if f.cancelled_at is None
+            and f.kind == "BANK_STATEMENT_1C"
+            and f.parse_status != "PARSED"
+        }
+        for task in document_tasks:
+            if task.id in unready_tasks:
+                ready[task.id] = False
+    return ready
+
+
 def submit_round(
     session: Session, principal: auth.Principal, application_id: UUID
 ) -> tuple[Application, list[Task]]:
@@ -313,39 +359,8 @@ def submit_round(
         )
     )
     missing = [t for t in open_tasks if t.answer is None]
-    document_tasks = [t for t in open_tasks if t.kind in {"DOCUMENT", "CONFIRM_REVENUE"}]
-    if document_tasks:
-        files = documents.list_metadata(
-            session, documents.Access(principal.user_id, (application.company_id,)), application.id
-        )
-        attached_tasks = {f.task_id for f in files if f.cancelled_at is None}
-        revenue_tasks = {
-            t.id
-            for t in document_tasks
-            if t.kind == "CONFIRM_REVENUE" or t.details.get("reasonCode") == "REVENUE_UNKNOWN"
-        }
-        if revenue_tasks:
-            company = companies.by_id(session, application.company_id)
-            source = (
-                documents.confirmed_statement_source(
-                    session, application.id, application.company_id, company.inn
-                )
-                if company is not None
-                else None
-            )
-            # A generic PDF or unconfirmed parsed statement cannot answer a revenue request.
-            attached_tasks -= revenue_tasks
-            if source is not None:
-                attached_tasks |= revenue_tasks
-        missing.extend(t for t in document_tasks if t.id not in attached_tasks and t not in missing)
-        unready_tasks = {
-            f.task_id
-            for f in files
-            if f.cancelled_at is None
-            and f.kind == "BANK_STATEMENT_1C"
-            and f.parse_status != "PARSED"
-        }
-        missing.extend(t for t in document_tasks if t.id in unready_tasks and t not in missing)
+    ready = document_readiness(session, principal, application, open_tasks)
+    missing.extend(t for t in open_tasks if not ready[t.id] and t not in missing)
     if missing:
         raise AppError(
             409,

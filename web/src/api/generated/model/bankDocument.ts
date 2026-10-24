@@ -16,6 +16,8 @@ export interface BankDocument {
   sizeBytes: number;
   sha256: string;
   parseStatus: string;
+  parseError?: string | null;
+  confirmedAt?: string | null;
   createdAt: string;
   cancelledAt: string | null;
 }

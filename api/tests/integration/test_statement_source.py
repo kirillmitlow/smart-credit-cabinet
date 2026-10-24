@@ -152,7 +152,13 @@ async def test_confirmation_required_and_repeated_request_has_one_proof(
         task = session.get(Task, stand["a_task"])
         task.details = {"reasonCode": "REVENUE_UNKNOWN"}
     async with client_for(stand, "a:d") as client:
-        await client.post(f"/tasks/{stand['a_task']}/answer", json={"text": "Проверил выписку"})
+        saved = await client.post(
+            f"/tasks/{stand['a_task']}/answer", json={"text": "Проверил выписку"}
+        )
+        assert saved.json()["documentReady"] is False
+        listed = (await client.get(f"/applications/{stand['a_app']}/tasks")).json()
+        assert listed["canSubmit"] is False
+        assert listed["items"][0]["documentReady"] is False
         assert (
             await client.post(f"/applications/{stand['a_app']}/tasks/submit")
         ).status_code == 409
@@ -179,6 +185,9 @@ async def test_confirmation_required_and_repeated_request_has_one_proof(
         )
         assert len(events) == 1
     async with client_for(stand, "a:d") as client:
+        listed = (await client.get(f"/applications/{stand['a_app']}/tasks")).json()
+        assert listed["canSubmit"] is True
+        assert listed["items"][0]["documentReady"] is True
         sent = await client.post(f"/applications/{stand['a_app']}/tasks/submit")
         assert sent.status_code == 200, sent.text
 

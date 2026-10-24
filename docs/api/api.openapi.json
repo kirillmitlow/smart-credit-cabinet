@@ -4865,6 +4865,29 @@
             "type": "string",
             "title": "Parsestatus"
           },
+          "parseError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parseerror"
+          },
+          "confirmedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmedat"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -9334,7 +9357,7 @@
           "canSubmit": {
             "type": "boolean",
             "title": "Cansubmit",
-            "description": "Раунд открыт и на все его задачи есть ответ"
+            "description": "Раунд открыт, на все задачи есть ответ и обязательные документы готовы"
           }
         },
         "type": "object",
@@ -9446,6 +9469,12 @@
           "canAnswer": {
             "type": "boolean",
             "title": "Cananswer"
+          },
+          "documentReady": {
+            "type": "boolean",
+            "title": "Documentready",
+            "description": "Все требуемые файлы проверены; поступления подтверждены, если нужна выручка",
+            "default": true
           },
           "createdAt": {
             "type": "string",

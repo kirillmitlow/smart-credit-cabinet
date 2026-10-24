@@ -9,6 +9,7 @@ from uuid import UUID
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
+from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
@@ -41,6 +42,10 @@ class TaskOut(Camel):
     )
     answer: str | None = Field(description="Отправленный ответ")
     can_answer: bool
+    document_ready: bool = Field(
+        default=True,
+        description="Все требуемые файлы проверены; поступления подтверждены, если нужна выручка",
+    )
     created_at: datetime
     answered_at: datetime | None
 
@@ -49,7 +54,9 @@ class TaskList(Camel):
     items: list[TaskOut]
     current_round: int
     rounds_limit: int
-    can_submit: bool = Field(description="Раунд открыт и на все его задачи есть ответ")
+    can_submit: bool = Field(
+        description="Раунд открыт, на все задачи есть ответ и обязательные документы готовы"
+    )
 
 
 class AnswerBody(Camel):
@@ -59,7 +66,9 @@ class AnswerBody(Camel):
     )
 
 
-def _out(principal: auth.Principal, application: Application, task: Task) -> TaskOut:
+def _out(
+    principal: auth.Principal, application: Application, task: Task, document_ready: bool
+) -> TaskOut:
     text = (task.answer or {}).get("text")
     sent = task.status == "ANSWERED"
     return TaskOut(
@@ -76,27 +85,32 @@ def _out(principal: auth.Principal, application: Application, task: Task) -> Tas
         expires_at=task.expires_at,
         draft_answer=None if sent else text,
         answer=text if sent else None,
+        document_ready=document_ready,
         can_answer=task.status == "OPEN" and client_tasks.can_answer(principal, application, task),
         created_at=task.created_at,
         answered_at=task.answered_at,
     )
 
 
-def _list_out(principal: auth.Principal, application: Application, tasks: list[Task]) -> TaskList:
+def _list_out(
+    session: Session, principal: auth.Principal, application: Application, tasks: list[Task]
+) -> TaskList:
+    ready = client_tasks.document_readiness(session, principal, application, tasks)
     current = max((t.round for t in tasks), default=0)
     latest_open = [t for t in tasks if t.round == current and t.status == "OPEN"]
     return TaskList(
-        items=[_out(principal, application, t) for t in tasks],
+        items=[_out(principal, application, t, ready[t.id]) for t in tasks],
         current_round=current,
         rounds_limit=client_tasks.MAX_ROUNDS,
-        can_submit=bool(latest_open) and all(t.answer is not None for t in latest_open),
+        can_submit=bool(latest_open)
+        and all(t.answer is not None and ready[t.id] for t in latest_open),
     )
 
 
 def _list(principal: auth.Principal, application_id: UUID) -> TaskList:
     with db.transaction() as session:
         application, tasks = client_tasks.list_tasks(session, principal, application_id)
-        return _list_out(principal, application, tasks)
+        return _list_out(session, principal, application, tasks)
 
 
 @router.get(
@@ -119,7 +133,12 @@ def _answer(principal: auth.Principal, task_id: UUID, body: AnswerBody) -> TaskO
         if body.submit_round:
             client_tasks.submit_round(session, principal, task.application_id)
             session.refresh(task)
-        return _out(principal, application, task)
+        return _out(
+            principal,
+            application,
+            task,
+            client_tasks.document_readiness(session, principal, application, [task])[task.id],
+        )
 
 
 @router.post(
@@ -137,7 +156,7 @@ def _submit(principal: auth.Principal, application_id: UUID) -> TaskList:
     with db.transaction() as session:
         application, _ = client_tasks.submit_round(session, principal, application_id)
         _, tasks = client_tasks.list_tasks(session, principal, application_id)
-        return _list_out(principal, application, tasks)
+        return _list_out(session, principal, application, tasks)
 
 
 @router.post(
