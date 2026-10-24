@@ -198,6 +198,7 @@ export * from './validationError';
 export * from './validationErrorCtx';
 export * from './variantOut';
 export * from './variantOutWhatChanged';
+export * from './withdrawConfirmation';
 export * from './wizardAnswers';
 export * from './wizardAnswersCollateral';
 export * from './wizardAnswersFrequency';

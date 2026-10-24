@@ -174,7 +174,9 @@ async def test_unexpected_failure_and_timeout_are_safe_file_errors(
 async def test_late_job_after_withdrawal_or_reset_is_skipped(stand: dict[str, Any]) -> None:
     document_id = UUID((await upload(stand, content=content())).json()["id"])
     async with client_for(stand, "a:d") as client:
-        withdrawn = await client.post(f"/applications/{stand['a_app']}/withdraw")
+        withdrawn = await client.post(
+            f"/applications/{stand['a_app']}/withdraw", json={"confirmed": True}
+        )
         assert withdrawn.status_code == 200, withdrawn.text
     assert document_tasks.run_statement(document_id) == "SKIPPED"
     assert result_events(document_id) == 0
@@ -224,7 +226,7 @@ async def test_recovery_requeues_pending_but_not_closed_replaced_or_finished(
     assert document_tasks.recover_statements() == 0
     await upload(stand, key="pending", content=content())
     async with client_for(stand, "a:d") as client:
-        await client.post(f"/applications/{stand['a_app']}/withdraw")
+        await client.post(f"/applications/{stand['a_app']}/withdraw", json={"confirmed": True})
     assert document_tasks.recover_statements() == 0
 
 

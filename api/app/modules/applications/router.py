@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Query
@@ -40,6 +40,10 @@ class DraftPatch(ApplicationFields):
     answers: dict[str, Any] = Field(
         default_factory=dict, description="Ответы мастера и анкеты по шагам"
     )
+
+
+class WithdrawConfirmation(Camel):
+    confirmed: Literal[True] = Field(description="Клиент подтвердил отзыв заявки")
 
 
 class ApplicationOut(Camel):
@@ -212,5 +216,7 @@ def _withdraw(principal: auth.Principal, application_id: UUID) -> ApplicationOut
     response_model=ApplicationOut,
     response_model_by_alias=True,
 )
-async def withdraw(application_id: UUID, principal: auth.ClientPrincipal) -> ApplicationOut:
+async def withdraw(
+    application_id: UUID, _body: WithdrawConfirmation, principal: auth.ClientPrincipal
+) -> ApplicationOut:
     return await run_in_threadpool(_withdraw, principal, application_id)

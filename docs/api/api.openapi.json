@@ -1606,6 +1606,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawConfirmation"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -9936,6 +9946,21 @@
           "schedulePreview"
         ],
         "title": "VariantOut"
+      },
+      "WithdrawConfirmation": {
+        "properties": {
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmed",
+            "description": "Клиент подтвердил отзыв заявки"
+          }
+        },
+        "type": "object",
+        "required": [
+          "confirmed"
+        ],
+        "title": "WithdrawConfirmation"
       },
       "WizardAnswers": {
         "properties": {
