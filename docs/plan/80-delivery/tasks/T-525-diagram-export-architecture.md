@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Статус | TODO |
+| Статус | PARTIAL (24.10): docs/architecture/architecture.md с Mermaid по реальному Compose, проверка синтаксиса зелёная; SVG/PNG, экспортёр и make/CI не входят в текущую зону C |
 | Владелец | Агент A/B (любой сменщик) |
 | Ветка | `chore/diagram-export-architecture` |
 | Оценка | ~3 ч |

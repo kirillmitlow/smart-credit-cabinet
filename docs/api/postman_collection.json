@@ -1,0 +1,2639 @@
+{
+  "info": {
+    "name": "Умный кредитный кабинет — проверка жюри",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Снимок main 1114d1c, 24.10.2026. Четыре независимые папки сценариев и проверки моков. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос удаляет демо-заявки этой персоны. Cookie jar включён. Источники: текущие OpenAPI/маршруты, существующий Bruno и браузерные тесты. См. docs/api/README.md для границ проверки. Динамические коды не сохраняйте в экспортируемое окружение."
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "apiUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "webOrigin",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "registryUrl",
+      "value": "http://127.0.0.1:8101",
+      "type": "string"
+    },
+    {
+      "key": "taxUrl",
+      "value": "http://127.0.0.1:8102",
+      "type": "string"
+    },
+    {
+      "key": "bkiUrl",
+      "value": "http://127.0.0.1:8103",
+      "type": "string"
+    },
+    {
+      "key": "bankCoreUrl",
+      "value": "http://127.0.0.1:8104",
+      "type": "string"
+    },
+    {
+      "key": "scenariosUrl",
+      "value": "http://127.0.0.1:8105",
+      "type": "string"
+    },
+    {
+      "key": "mockAdminKey",
+      "value": "dev-admin-key",
+      "type": "string"
+    },
+    {
+      "key": "demoCode",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const path = pm.variables.replaceIn(pm.request.url.toString());",
+          "const safe = [\"GET\",\"HEAD\",\"OPTIONS\"].includes(pm.request.method);",
+          "if (!safe) {",
+          "    const bank = path.includes(\"/backoffice/\") || path.includes(\"/auth/bank-\");",
+          "    const token = pm.cookies.get(bank ? \"csrf_bank\" : \"csrf_client\");",
+          "    if (token) pm.request.headers.upsert({key:\"X-CSRF-Token\", value:token});",
+          "    pm.request.headers.upsert({key:\"Origin\", value:pm.variables.get(\"webOrigin\")});",
+          "}",
+          "const demo = pm.variables.get(\"demoCode\");",
+          "if (demo && path.includes(\"/demo/\")) pm.request.headers.upsert({key:\"X-Demo-Code\",value:demo});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Соколова",
+      "description": "Запускайте эту папку целиком с cookie jar и задержкой Runner 1000 мс. Первый запрос удаляет демо-заявки только этой персоны. Вход и подпись используют новые коды из ответов. Для Станкопрома выбирается директор, затем отдельная sid_bank L2.",
+      "item": [
+        {
+          "id": "e9c53b51-eea3-5f30-90fd-689fb3056fba",
+          "name": "Соколова · 01 Сбросить только эту персону",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/demo/personas/sokolova/reset",
+            "description": "Удаляет демо-заявки и кредиты этой компании. При 409 DEMO_RESET_IN_PROGRESS повторите через секунду. Не запускайте на общей демонстрации без согласования."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "[\"applicationId\",\"offerId\",\"variantId\",\"contractId\",\"evaluationRef\",\"decisionActionKey\",\"engineDecisionId\"].forEach(k => pm.collectionVariables.unset(k));",
+                  "pm.collectionVariables.set(\"decisionPolls\", 0);",
+                  "pm.collectionVariables.set(\"disbursementPolls\", 0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "45a3df49-0947-54c8-a928-71620e2f3ecc",
+          "name": "Соколова · 02 Найти компанию и руководителя",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/auth/roles/001234567887",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const person = j.people.find(x => x.role === \"DIRECTOR\");",
+                  "pm.test(\"Найден руководитель\", () => pm.expect(person).to.be.an(\"object\"));",
+                  "if (!person) { pm.execution.setNextRequest(null); throw new Error(\"No director\"); }",
+                  "pm.collectionVariables.set(\"companyId\", j.company.id);",
+                  "pm.collectionVariables.set(\"userId\", person.userId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "720b353c-4676-5694-83b5-0887a5ad273f",
+          "name": "Соколова · 03 Получить код входа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/request-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"companyId\": \"{{companyId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"loginRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"loginCode\", j.demoCode);",
+                  "pm.test(\"Код получен от демо-сервера\", () => pm.expect(j.demoCode).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "1095b8bd-4f90-5898-a1b0-24be58cbddbd",
+          "name": "Соколова · 04 Войти, сохранить cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/verify-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{loginRequestId}}\",\n  \"code\": \"{{loginCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"loginCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "3a0ef98b-60b0-5b5d-9da0-a58f9aab6348",
+          "name": "Соколова · 05 Создать черновик",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"EXPRESS\",\n  \"amountRub\": 500000,\n  \"termMonths\": 12,\n  \"purposeCode\": \"EQUIPMENT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationId\", j.id);",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "0cd495ca-fd21-5059-9774-230d5e2129f2",
+          "name": "Соколова · 06 Получить нужные согласия",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const items = j.items.filter(x => x.canSign && x.status !== \"SIGNED\").map(x => ({kind:x.kind, subjectInn:x.subjectInn}));",
+                  "pm.test(\"Есть согласия руководителя\", () => pm.expect(items.length).to.be.above(0));",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "a4f1e402-6190-569c-a6a4-39bd41d6286d",
+          "name": "Соколова · 07 Получить код пакета согласий",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\": {{consentItems}}, \"acceptPepRules\": true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consentRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"consentCode\", j.demoCode);",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(j.items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "066616c1-0f53-57ce-93f3-a7a14b41c201",
+          "name": "Соколова · 08 Подписать согласия",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{consentRequestId}}\", \"code\":\"{{consentCode}}\", \"items\": {{consentItems}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Все согласия подписаны\", () => pm.expect(pm.response.json().allSigned).to.eql(true));",
+                  "pm.collectionVariables.unset(\"consentCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "50d6e334-1e56-52ac-8829-feda7769c603",
+          "name": "Соколова · 09 Отправить заявку",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c68676c7-41c9-56a2-91be-ecb0c64e0892",
+          "name": "Соколова · 10 Дождаться решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": "В Runner задайте задержку 1000 мс. Максимум 60 опросов, затем явная ошибка. При ручном Send повторяйте этот запрос до конечного исхода."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"APPROVED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "92dc4734-9c68-5b6c-8165-ff7e4a6c3b32",
+          "name": "Соколова · 11 Прочитать объяснение",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/decision",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "7c8518b4-caeb-52a9-b741-0f49de03aed8",
+          "name": "Соколова · 16 Получить предложение и выбрать рекомендуемый вариант",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/offer",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const v = j.variants.find(x => x.recommended) || j.variants[0];",
+                  "pm.test(\"Вариант готов\", () => pm.expect(v).to.be.an(\"object\"));",
+                  "if (!v) { pm.execution.setNextRequest(null); throw new Error(\"No offer variant\"); }",
+                  "pm.collectionVariables.set(\"offerId\", j.id);",
+                  "pm.collectionVariables.set(\"variantId\", v.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "a03e70c7-e018-5cae-8909-ea9d775c13bb",
+          "name": "Соколова · 17 Принять вариант",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/offers/{{offerId}}/accept",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantId\": \"{{variantId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.set(\"contractId\", pm.response.json().contract.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "277faed9-8ab4-5403-9aab-1445ee183d84",
+          "name": "Соколова · 18 Получить сохранённый договор PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/document",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "ea85f8a0-c81d-54c5-bb1f-7fe620a28969",
+          "name": "Соколова · 19 Получить код подписи",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign/request",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agree\": true,\n  \"acceptPepRules\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"signRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"signCode\", j.demoCode);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "df0b31f0-2d28-593b-900a-414215af673c",
+          "name": "Соколова · 20 Подписать договор",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{signRequestId}}\",\n  \"code\": \"{{signCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"signCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "d71bc5ca-0cb3-5b9a-a1eb-d53e239040d9",
+          "name": "Соколова · 21 Дождаться выдачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"DISBURSED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"disbursementPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"disbursementPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b2075220-ba26-5ec6-8ecc-38113e2baa70",
+          "name": "Соколова · 22 Найти выданный кредит",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const loan = pm.response.json().items.find(x => x.applicationId === pm.collectionVariables.get(\"applicationId\"));",
+                  "pm.test(\"Кредит найден\", () => pm.expect(loan).to.be.an(\"object\"));",
+                  "if (!loan) { pm.execution.setNextRequest(null); throw new Error(\"Loan not found\"); }",
+                  "pm.collectionVariables.set(\"loanId\", loan.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "72cb6d97-390e-58ed-aeed-c66a7d9a6e7d",
+          "name": "Соколова · 23 Получить график",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans/{{loanId}}/schedule",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"График непустой\", () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "СнабКонтракт",
+      "description": "Запускайте эту папку целиком с cookie jar и задержкой Runner 1000 мс. Первый запрос удаляет демо-заявки только этой персоны. Вход и подпись используют новые коды из ответов. Для Станкопрома выбирается директор, затем отдельная sid_bank L2.",
+      "item": [
+        {
+          "id": "daf1ad1c-39cb-50f0-82be-7a64e6613d21",
+          "name": "СнабКонтракт · 01 Сбросить только эту персону",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/demo/personas/snabkontrakt/reset",
+            "description": "Удаляет демо-заявки и кредиты этой компании. При 409 DEMO_RESET_IN_PROGRESS повторите через секунду. Не запускайте на общей демонстрации без согласования."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "[\"applicationId\",\"offerId\",\"variantId\",\"contractId\",\"evaluationRef\",\"decisionActionKey\",\"engineDecisionId\"].forEach(k => pm.collectionVariables.unset(k));",
+                  "pm.collectionVariables.set(\"decisionPolls\", 0);",
+                  "pm.collectionVariables.set(\"disbursementPolls\", 0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "27fb42b6-7e85-5c64-a632-87f26d2758c8",
+          "name": "СнабКонтракт · 02 Найти компанию и руководителя",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/auth/roles/0012345673",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const person = j.people.find(x => x.role === \"DIRECTOR\");",
+                  "pm.test(\"Найден руководитель\", () => pm.expect(person).to.be.an(\"object\"));",
+                  "if (!person) { pm.execution.setNextRequest(null); throw new Error(\"No director\"); }",
+                  "pm.collectionVariables.set(\"companyId\", j.company.id);",
+                  "pm.collectionVariables.set(\"userId\", person.userId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "69bf3bc9-f9b3-5f6a-b74b-a40f877cafa3",
+          "name": "СнабКонтракт · 03 Получить код входа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/request-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"companyId\": \"{{companyId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"loginRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"loginCode\", j.demoCode);",
+                  "pm.test(\"Код получен от демо-сервера\", () => pm.expect(j.demoCode).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "458f3678-5410-54e8-bddf-a16e9580e6a8",
+          "name": "СнабКонтракт · 04 Войти, сохранить cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/verify-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{loginRequestId}}\",\n  \"code\": \"{{loginCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"loginCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "554551de-c708-5ef3-a438-154f11fd4a6b",
+          "name": "СнабКонтракт · 05 Создать черновик",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"WORKING_CAPITAL\",\n  \"amountRub\": 8000000,\n  \"termMonths\": 12,\n  \"purposeCode\": \"EQUIPMENT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationId\", j.id);",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "37fefb80-de75-5592-9217-0d55857e3bbc",
+          "name": "СнабКонтракт · 06 Получить нужные согласия",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const items = j.items.filter(x => x.canSign && x.status !== \"SIGNED\").map(x => ({kind:x.kind, subjectInn:x.subjectInn}));",
+                  "pm.test(\"Есть согласия руководителя\", () => pm.expect(items.length).to.be.above(0));",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "677e2a8a-39bd-560e-a486-58c5cd083069",
+          "name": "СнабКонтракт · 07 Получить код пакета согласий",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\": {{consentItems}}, \"acceptPepRules\": true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consentRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"consentCode\", j.demoCode);",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(j.items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "7c27e289-c8ce-573b-a1c3-377c7ea6ba31",
+          "name": "СнабКонтракт · 08 Подписать согласия",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{consentRequestId}}\", \"code\":\"{{consentCode}}\", \"items\": {{consentItems}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Все согласия подписаны\", () => pm.expect(pm.response.json().allSigned).to.eql(true));",
+                  "pm.collectionVariables.unset(\"consentCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "125bd46b-84fc-5b20-b87b-772b4e53b0d7",
+          "name": "СнабКонтракт · 09 Отправить заявку",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "075ec699-3628-5369-ab47-1897957a63cb",
+          "name": "СнабКонтракт · 10 Дождаться решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": "В Runner задайте задержку 1000 мс. Максимум 60 опросов, затем явная ошибка. При ручном Send повторяйте этот запрос до конечного исхода."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"COUNTER_OFFER\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "4d1a4aa5-9dde-5b33-bd3a-33c1e07e2163",
+          "name": "СнабКонтракт · 11 Прочитать объяснение",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/decision",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c7a83855-f466-53e8-970c-5143bd03efb8",
+          "name": "СнабКонтракт · 16 Получить предложение и выбрать рекомендуемый вариант",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/offer",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const v = j.variants.find(x => x.recommended) || j.variants[0];",
+                  "pm.test(\"Вариант готов\", () => pm.expect(v).to.be.an(\"object\"));",
+                  "if (!v) { pm.execution.setNextRequest(null); throw new Error(\"No offer variant\"); }",
+                  "pm.collectionVariables.set(\"offerId\", j.id);",
+                  "pm.collectionVariables.set(\"variantId\", v.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "23d8f209-c97d-5538-a77c-dceed8675266",
+          "name": "СнабКонтракт · 17 Принять вариант",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/offers/{{offerId}}/accept",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantId\": \"{{variantId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.set(\"contractId\", pm.response.json().contract.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "d70e5dfe-c0a3-5fc8-bdd9-9b81405b094d",
+          "name": "СнабКонтракт · 18 Получить сохранённый договор PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/document",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "6ca6da7d-7579-59e3-897f-b50c91b509c1",
+          "name": "СнабКонтракт · 19 Получить код подписи",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign/request",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agree\": true,\n  \"acceptPepRules\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"signRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"signCode\", j.demoCode);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b8668eff-7c4c-5ca2-8f48-f396ce0e5797",
+          "name": "СнабКонтракт · 20 Подписать договор",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{signRequestId}}\",\n  \"code\": \"{{signCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"signCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "2b221dd9-e64b-53fa-9510-926454e926cd",
+          "name": "СнабКонтракт · 21 Дождаться выдачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"DISBURSED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"disbursementPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"disbursementPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "4a94d15c-0bbf-5cce-833b-1a91b81b2085",
+          "name": "СнабКонтракт · 22 Найти выданный кредит",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const loan = pm.response.json().items.find(x => x.applicationId === pm.collectionVariables.get(\"applicationId\"));",
+                  "pm.test(\"Кредит найден\", () => pm.expect(loan).to.be.an(\"object\"));",
+                  "if (!loan) { pm.execution.setNextRequest(null); throw new Error(\"Loan not found\"); }",
+                  "pm.collectionVariables.set(\"loanId\", loan.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "e7d11ed4-fd9c-59c9-a473-a6761fb325e1",
+          "name": "СнабКонтракт · 23 Получить график",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans/{{loanId}}/schedule",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"График непустой\", () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Станкопром",
+      "description": "Запускайте эту папку целиком с cookie jar и задержкой Runner 1000 мс. Первый запрос удаляет демо-заявки только этой персоны. Вход и подпись используют новые коды из ответов. Для Станкопрома выбирается директор, затем отдельная sid_bank L2.",
+      "item": [
+        {
+          "id": "b287dfef-47cd-5fc7-9db0-729bce4c873f",
+          "name": "Станкопром · 01 Сбросить только эту персону",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/demo/personas/stankoprom/reset",
+            "description": "Удаляет демо-заявки и кредиты этой компании. При 409 DEMO_RESET_IN_PROGRESS повторите через секунду. Не запускайте на общей демонстрации без согласования."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "[\"applicationId\",\"offerId\",\"variantId\",\"contractId\",\"evaluationRef\",\"decisionActionKey\",\"engineDecisionId\"].forEach(k => pm.collectionVariables.unset(k));",
+                  "pm.collectionVariables.set(\"decisionPolls\", 0);",
+                  "pm.collectionVariables.set(\"disbursementPolls\", 0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "d86c08ce-61bb-5890-95eb-841db50a9148",
+          "name": "Станкопром · 02 Найти компанию и руководителя",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/auth/roles/0017654322",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const person = j.people.find(x => x.role === \"DIRECTOR\");",
+                  "pm.test(\"Найден руководитель\", () => pm.expect(person).to.be.an(\"object\"));",
+                  "if (!person) { pm.execution.setNextRequest(null); throw new Error(\"No director\"); }",
+                  "pm.collectionVariables.set(\"companyId\", j.company.id);",
+                  "pm.collectionVariables.set(\"userId\", person.userId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "9b6e1f8d-d77f-5e60-82ea-c2f514762858",
+          "name": "Станкопром · 03 Получить код входа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/request-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"companyId\": \"{{companyId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"loginRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"loginCode\", j.demoCode);",
+                  "pm.test(\"Код получен от демо-сервера\", () => pm.expect(j.demoCode).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "65eda302-478d-5cf5-8d96-dba6760d174a",
+          "name": "Станкопром · 04 Войти, сохранить cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/verify-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{loginRequestId}}\",\n  \"code\": \"{{loginCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"loginCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "ccff4b2d-72d6-536d-aff2-1ee2f612b23f",
+          "name": "Станкопром · 05 Создать черновик",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"WORKING_CAPITAL\",\n  \"amountRub\": 15000000,\n  \"termMonths\": 12,\n  \"purposeCode\": \"EQUIPMENT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationId\", j.id);",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "df873067-5e3e-534c-86e5-26595aedf144",
+          "name": "Станкопром · 06 Получить нужные согласия",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const items = j.items.filter(x => x.canSign && x.status !== \"SIGNED\").map(x => ({kind:x.kind, subjectInn:x.subjectInn}));",
+                  "pm.test(\"Есть согласия руководителя\", () => pm.expect(items.length).to.be.above(0));",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "641895c6-c8f2-5844-8d9c-6d2af3389c7c",
+          "name": "Станкопром · 07 Получить код пакета согласий",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\": {{consentItems}}, \"acceptPepRules\": true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consentRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"consentCode\", j.demoCode);",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(j.items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c4294bdd-2207-5821-adfb-e575dd658d20",
+          "name": "Станкопром · 08 Подписать согласия",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{consentRequestId}}\", \"code\":\"{{consentCode}}\", \"items\": {{consentItems}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Все согласия подписаны\", () => pm.expect(pm.response.json().allSigned).to.eql(true));",
+                  "pm.collectionVariables.unset(\"consentCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "68d95db9-53fb-518d-94f2-50682f19e5a5",
+          "name": "Станкопром · 09 Отправить заявку",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b1668b4a-da06-553e-a88e-481e0062a582",
+          "name": "Станкопром · 10 Дождаться решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": "В Runner задайте задержку 1000 мс. Максимум 60 опросов, затем явная ошибка. При ручном Send повторяйте этот запрос до конечного исхода."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"MANUAL_REVIEW\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b4fc41c8-e299-53ab-9731-812e94b46225",
+          "name": "Станкопром · 11 Прочитать объяснение",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/decision",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "e23238be-fec5-50dc-9b2c-3d708fc0010e",
+          "name": "Станкопром · 12 Войти в отдельную банковскую сессию L2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/bank-demo-login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"UNDERWRITER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b6fe3cfb-c69b-5173-9096-6c560fe9fb0c",
+          "name": "Станкопром · 13 Получить версию и ENGINE",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/backoffice/applications/{{applicationId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);",
+                  "pm.collectionVariables.set(\"engineDecisionId\", j.engineDecisionId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "3c9750d2-ccc7-54c2-8d4e-ca02b803caa6",
+          "name": "Станкопром · 14 Рассчитать 10 млн на 12 месяцев",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/backoffice/applications/{{applicationId}}/evaluate-offer",
+            "description": "Ставка не передаётся: считает ядро. Источник примера — Bruno bank/evaluate-offer.bru и оборотная ветка bank-manual.spec.ts.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expectedVersion\": {{applicationVersion}},\n  \"engineDecisionId\": \"{{engineDecisionId}}\",\n  \"outcome\": \"COUNTER_OFFER\",\n  \"terms\": {\n    \"productCode\": \"WORKING_CAPITAL\",\n    \"amountRub\": 10000000,\n    \"termMonths\": 12\n  },\n  \"reasonCode\": \"UW_RISK_HIGHER\",\n  \"comment\": \"По результатам изучения источников предлагаем меньшую сумму финансирования с сохранением расчётной ставки.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Условия допустимы\", () => pm.expect(j.allowed).to.eql(true));",
+                  "if (!j.allowed) { pm.execution.setNextRequest(null); throw new Error(\"Underwriter terms denied\"); }",
+                  "pm.collectionVariables.set(\"evaluationRef\", j.evaluationRef);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c46f7b4d-3698-57bf-b44e-3a904e310e9b",
+          "name": "Станкопром · 15 Сохранить проверенное встречное",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{decisionActionKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/backoffice/applications/{{applicationId}}/decision",
+            "description": "После потерянного ответа повторите то же тело с тем же ключом. При изменении версии перечитайте карточку и заново рассчитайте условия; для нового действия нужен новый ключ.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expectedVersion\": {{applicationVersion}},\n  \"engineDecisionId\": \"{{engineDecisionId}}\",\n  \"outcome\": \"COUNTER_OFFER\",\n  \"evaluationRef\": \"{{evaluationRef}}\",\n  \"reasonCode\": \"UW_RISK_HIGHER\",\n  \"comment\": \"По результатам изучения источников предлагаем меньшую сумму финансирования с сохранением расчётной ставки.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get(\"decisionActionKey\")) pm.collectionVariables.set(\"decisionActionKey\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Встречное сохранено\", () => pm.expect(pm.response.json().status).to.eql(\"COUNTER_OFFER\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "d9e9a9fb-aa46-5797-bb4d-19377f89b578",
+          "name": "Станкопром · 16 Получить предложение и выбрать рекомендуемый вариант",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/offer",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const v = j.variants.find(x => x.recommended) || j.variants[0];",
+                  "pm.test(\"Вариант готов\", () => pm.expect(v).to.be.an(\"object\"));",
+                  "if (!v) { pm.execution.setNextRequest(null); throw new Error(\"No offer variant\"); }",
+                  "pm.collectionVariables.set(\"offerId\", j.id);",
+                  "pm.collectionVariables.set(\"variantId\", v.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "f8ed78dd-ecb8-5ac2-9ebd-fe18572b7b11",
+          "name": "Станкопром · 17 Принять вариант",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/offers/{{offerId}}/accept",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantId\": \"{{variantId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.set(\"contractId\", pm.response.json().contract.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c8f694f3-f2c3-5784-9207-9f4d1c95292f",
+          "name": "Станкопром · 18 Получить сохранённый договор PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/document",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b71813d2-f0f0-5766-9eff-d8f890cc05ed",
+          "name": "Станкопром · 19 Получить код подписи",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign/request",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agree\": true,\n  \"acceptPepRules\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"signRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"signCode\", j.demoCode);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "020e43b0-529e-58b5-9f75-d3d9e4184d4d",
+          "name": "Станкопром · 20 Подписать договор",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{signRequestId}}\",\n  \"code\": \"{{signCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"signCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "e8bd9ef9-a70f-50d6-b657-7cce9651d5b1",
+          "name": "Станкопром · 21 Дождаться выдачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"DISBURSED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"disbursementPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"disbursementPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "21780202-746f-5616-ba52-876eb12f122e",
+          "name": "Станкопром · 22 Найти выданный кредит",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const loan = pm.response.json().items.find(x => x.applicationId === pm.collectionVariables.get(\"applicationId\"));",
+                  "pm.test(\"Кредит найден\", () => pm.expect(loan).to.be.an(\"object\"));",
+                  "if (!loan) { pm.execution.setNextRequest(null); throw new Error(\"Loan not found\"); }",
+                  "pm.collectionVariables.set(\"loanId\", loan.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "dcce8742-4d80-5af6-a8c8-431b8bec606b",
+          "name": "Станкопром · 23 Получить график",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans/{{loanId}}/schedule",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"График непустой\", () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ромашка",
+      "description": "Отказ: налоговый долг и просрочка. Подписание и выдача не выполняются.",
+      "item": [
+        {
+          "id": "6efa4cf9-33c6-5c7c-af12-cd9b68b857fb",
+          "name": "Ромашка · 01 Сбросить только эту персону",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/demo/personas/romashka/reset",
+            "description": "Удаляет демо-заявки и кредиты этой компании. При 409 DEMO_RESET_IN_PROGRESS повторите через секунду. Не запускайте на общей демонстрации без согласования."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "[\"applicationId\",\"offerId\",\"variantId\",\"contractId\",\"evaluationRef\",\"decisionActionKey\",\"engineDecisionId\"].forEach(k => pm.collectionVariables.unset(k));",
+                  "pm.collectionVariables.set(\"decisionPolls\", 0);",
+                  "pm.collectionVariables.set(\"disbursementPolls\", 0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "ee998caf-da31-5729-9226-32a58cac2ef2",
+          "name": "Ромашка · 02 Найти компанию и руководителя",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/auth/roles/0015557771",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const person = j.people.find(x => x.role === \"DIRECTOR\");",
+                  "pm.test(\"Найден руководитель\", () => pm.expect(person).to.be.an(\"object\"));",
+                  "if (!person) { pm.execution.setNextRequest(null); throw new Error(\"No director\"); }",
+                  "pm.collectionVariables.set(\"companyId\", j.company.id);",
+                  "pm.collectionVariables.set(\"userId\", person.userId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "30b5a68f-9402-53a6-981f-55d3f382e559",
+          "name": "Ромашка · 03 Получить код входа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/request-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"companyId\": \"{{companyId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"loginRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"loginCode\", j.demoCode);",
+                  "pm.test(\"Код получен от демо-сервера\", () => pm.expect(j.demoCode).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "08e1b373-646f-5a9d-b1b0-f721247b3dfe",
+          "name": "Ромашка · 04 Войти, сохранить cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/verify-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{loginRequestId}}\",\n  \"code\": \"{{loginCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"loginCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "46e47d2b-5721-5ed5-b601-babb4b2006d8",
+          "name": "Ромашка · 05 Создать черновик",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"WORKING_CAPITAL\",\n  \"amountRub\": 3000000,\n  \"termMonths\": 6,\n  \"purposeCode\": \"EQUIPMENT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationId\", j.id);",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "a7538aa7-d9f0-55fe-bdda-13b928255897",
+          "name": "Ромашка · 06 Получить нужные согласия",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const items = j.items.filter(x => x.canSign && x.status !== \"SIGNED\").map(x => ({kind:x.kind, subjectInn:x.subjectInn}));",
+                  "pm.test(\"Есть согласия руководителя\", () => pm.expect(items.length).to.be.above(0));",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "a45a62de-853e-5620-9c20-9805e7996e04",
+          "name": "Ромашка · 07 Получить код пакета согласий",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\": {{consentItems}}, \"acceptPepRules\": true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consentRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"consentCode\", j.demoCode);",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(j.items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "5cccdc2c-942d-5a14-86c7-79f43d5cdb39",
+          "name": "Ромашка · 08 Подписать согласия",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{consentRequestId}}\", \"code\":\"{{consentCode}}\", \"items\": {{consentItems}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Все согласия подписаны\", () => pm.expect(pm.response.json().allSigned).to.eql(true));",
+                  "pm.collectionVariables.unset(\"consentCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "e72c420b-c162-5920-81e6-5dca9b1cb6a9",
+          "name": "Ромашка · 09 Отправить заявку",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "a6679786-1da7-531e-982c-b2965fea07b0",
+          "name": "Ромашка · 10 Дождаться решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": "В Runner задайте задержку 1000 мс. Максимум 60 опросов, затем явная ошибка. При ручном Send повторяйте этот запрос до конечного исхода."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"REJECTED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "cc830f48-37b5-50fa-9590-e86067e7f95c",
+          "name": "Ромашка · 11 Прочитать объяснение",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/decision",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Есть объяснение отказа\", () => pm.expect(JSON.stringify(pm.response.json())).to.match(/налог|просроч|TAX_ARREARS|CURRENT_OVERDUE/i));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Моки: готовность и предпросмотр",
+      "item": [
+        {
+          "id": "a5e98d97-8221-514f-8295-aa6a03d3d7c5",
+          "name": "Моки · registry ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{registryUrl}}/health/ready",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "d32b2e13-899e-52b4-8063-4c626040e598",
+          "name": "Моки · tax / ЕИС ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{taxUrl}}/health/ready",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b58e0aa5-e90e-5b7a-8a52-ee5bf1900db3",
+          "name": "Моки · credit-bureau ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{bkiUrl}}/health/ready",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "e39776cd-484f-5660-80a9-42f076bd9ad2",
+          "name": "Моки · bank-core ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{bankCoreUrl}}/health/ready",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "7eb8f031-b399-5a96-ae35-d084d89ccb88",
+          "name": "Моки · scenarios ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{scenariosUrl}}/health/ready",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b4a46ffb-2fef-5bf2-a322-ac9c9787786c",
+          "name": "Моки · предпросмотр ООО без сохранения",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Admin-Key",
+                "value": "{{mockAdminKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{scenariosUrl}}/api/v1/scenarios/preview",
+            "description": "Точное тело из Bruno mocks/own-company/preview-llc.bru. Предпросмотр без применения не создаёт пользователя для входа.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"jury-preview\",\n  \"title\": \"ООО: два учредителя\",\n  \"preset\": \"LLC_HEALTHY\",\n  \"company\": {\n    \"name\": \"Маяк\",\n    \"ageMonths\": 24\n  },\n  \"people\": {\n    \"founders\": [\n      {\n        \"ref\": \"first\",\n        \"sharePercent\": 40\n      },\n      {\n        \"ref\": \"second\",\n        \"sharePercent\": 60\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}

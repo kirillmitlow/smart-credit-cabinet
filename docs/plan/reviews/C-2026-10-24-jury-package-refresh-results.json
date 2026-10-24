@@ -1,0 +1,853 @@
+{
+  "codeReference": "1114d1c",
+  "checkedOn": "2026-10-24",
+  "appToday": "2026-10-21",
+  "runner": "Newman 6.2.1",
+  "primaryCollectionSha256": "8788c39eb3081d5f1e7a4544feea8e6c9db17f4dd66c06d05a94caba42c5259f",
+  "primary": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 88,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 177,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 88,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 88,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 88,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 132,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 88,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 89,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "failures": 0,
+    "executions": [
+      {
+        "request": "Соколова · 01 Сбросить только эту персону",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 02 Найти компанию и руководителя",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 03 Получить код входа",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 04 Войти, сохранить cookie",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 05 Создать черновик",
+        "status": 201,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 06 Получить нужные согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 07 Получить код пакета согласий",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 08 Подписать согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 09 Отправить заявку",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 11 Прочитать объяснение",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 16 Получить предложение и выбрать рекомендуемый вариант",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 17 Принять вариант",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 18 Получить сохранённый договор PDF",
+        "status": 200,
+        "assertions": 4,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 19 Получить код подписи",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 20 Подписать договор",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 21 Дождаться выдачи",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 22 Найти выданный кредит",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Соколова · 23 Получить график",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 01 Сбросить только эту персону",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 02 Найти компанию и руководителя",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 03 Получить код входа",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 04 Войти, сохранить cookie",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 05 Создать черновик",
+        "status": 201,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 06 Получить нужные согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 07 Получить код пакета согласий",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 08 Подписать согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 09 Отправить заявку",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 11 Прочитать объяснение",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 16 Получить предложение и выбрать рекомендуемый вариант",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 17 Принять вариант",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 18 Получить сохранённый договор PDF",
+        "status": 200,
+        "assertions": 4,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 19 Получить код подписи",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 20 Подписать договор",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 21 Дождаться выдачи",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 22 Найти выданный кредит",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "СнабКонтракт · 23 Получить график",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 01 Сбросить только эту персону",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 02 Найти компанию и руководителя",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 03 Получить код входа",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 04 Войти, сохранить cookie",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 05 Создать черновик",
+        "status": 201,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 06 Получить нужные согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 07 Получить код пакета согласий",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 08 Подписать согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 09 Отправить заявку",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 11 Прочитать объяснение",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 12 Войти в отдельную банковскую сессию L2",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 13 Получить версию и ENGINE",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 14 Рассчитать 10 млн на 12 месяцев",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 15 Сохранить проверенное встречное",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 16 Получить предложение и выбрать рекомендуемый вариант",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 17 Принять вариант",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 18 Получить сохранённый договор PDF",
+        "status": 200,
+        "assertions": 4,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 19 Получить код подписи",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 20 Подписать договор",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 21 Дождаться выдачи",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 22 Найти выданный кредит",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Станкопром · 23 Получить график",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 01 Сбросить только эту персону",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 02 Найти компанию и руководителя",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 03 Получить код входа",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 04 Войти, сохранить cookie",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 05 Создать черновик",
+        "status": 201,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 06 Получить нужные согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 07 Получить код пакета согласий",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 08 Подписать согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 09 Отправить заявку",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Ромашка · 11 Прочитать объяснение",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Моки · registry ready",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Моки · tax / ЕИС ready",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Моки · credit-bureau ready",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Моки · bank-core ready",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Моки · scenarios ready",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Моки · предпросмотр ООО без сохранения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      }
+    ]
+  },
+  "garipovSeparateCheck": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 31,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 62,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 31,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 31,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 31,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 49,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 31,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 31,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "failures": 0,
+    "executions": [
+      {
+        "request": "Гарипов · 01 Сбросить только эту персону",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 02 Найти компанию и руководителя",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 03 Получить код входа",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 04 Войти, сохранить cookie",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 05 Создать черновик",
+        "status": 201,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 06 Получить нужные согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 07 Получить код пакета согласий",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 08 Подписать согласия",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 09 Отправить заявку",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 10 Дождаться решения",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 11 Прочитать объяснение",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 12 Получить задачу",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 13 Проверить предел кнопки генерации",
+        "status": 503,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 14 Загрузить файл независимого тестового writer",
+        "status": 201,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 15 Дождаться разбора",
+        "status": 200,
+        "assertions": 3,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 16 Подтвердить поступления",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 17 Добавить пояснение к файлу",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 18 Отправить полный раунд",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 19 Дождаться повторного расчёта",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 19 Дождаться повторного расчёта",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 16 Получить предложение и выбрать рекомендуемый вариант",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 17 Принять вариант",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 18 Получить сохранённый договор PDF",
+        "status": 200,
+        "assertions": 4,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 19 Получить код подписи",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 20 Подписать договор",
+        "status": 200,
+        "assertions": 1,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 21 Дождаться выдачи",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 22 Найти выданный кредит",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      },
+      {
+        "request": "Гарипов · 23 Получить график",
+        "status": 200,
+        "assertions": 2,
+        "failedAssertions": 0
+      }
+    ]
+  },
+  "fixtureSha256": "87be27ac8ea5e34bda00e4188f31b22753696812ca0117fed9e05f4dd49eeb44",
+  "tables": 26,
+  "foreignKeys": 42,
+  "SSE": [
+    "authenticated HTTP200 text/event-stream",
+    "retry + replay/resync",
+    "unauthenticated HTTP401"
+  ],
+  "PDF": [
+    {
+      "scenario": "Соколова",
+      "bytes": 17559,
+      "sha256": "fac4396cab92e4067bdc3a98393176625dc8d72f05cedcc2ce81e66416a5e687",
+      "matchesHeader": true
+    },
+    {
+      "scenario": "СнабКонтракт",
+      "bytes": 19591,
+      "sha256": "36491f8b7b0d307ee480c4afc756786190ae763b41be00488c2fc40eefacab1d",
+      "matchesHeader": true
+    },
+    {
+      "scenario": "Станкопром",
+      "bytes": 17561,
+      "sha256": "c54e16d879ce3c009be30494485a6597fcfa798b3f12b64bcf672a6f2aa28252",
+      "matchesHeader": true
+    }
+  ]
+}
