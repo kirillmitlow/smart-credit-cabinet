@@ -84,6 +84,7 @@ def _out(application: Application, principal: auth.Principal) -> ApplicationOut:
 
 def _create(principal: auth.Principal, body: ApplicationFields) -> ApplicationOut:
     with db.transaction() as session:
+        principal = service.company_principal(session, principal)
         application = service.create(session, principal, body.model_dump(exclude_none=True))
         return _out(application, principal)
 
@@ -102,6 +103,7 @@ async def create(body: ApplicationFields, principal: auth.ClientPrincipal) -> Ap
 
 def _list(principal: auth.Principal, limit: int, cursor: str | None) -> ApplicationPage:
     with db.transaction() as session:
+        principal = service.company_principal(session, principal)
         rows, next_cursor = service.list_for(session, principal, limit, cursor)
         return ApplicationPage(items=[_out(a, principal) for a in rows], next_cursor=next_cursor)
 
@@ -123,6 +125,7 @@ async def list_applications(
 
 def _get(principal: auth.Principal, application_id: UUID) -> ApplicationOut:
     with db.transaction() as session:
+        principal = service.company_principal(session, principal)
         return _out(service.get_for(session, principal, application_id), principal)
 
 
@@ -139,6 +142,7 @@ async def get_application(application_id: UUID, principal: auth.ClientPrincipal)
 
 def _patch(principal: auth.Principal, application_id: UUID, body: DraftPatch) -> ApplicationOut:
     with db.transaction() as session:
+        principal = service.company_principal(session, principal)
         application = service.get_for(session, principal, application_id)
         fields = body.model_dump(exclude_none=True, exclude={"version", "answers"})
         application = service.update_draft(session, application, body.version, fields, body.answers)
@@ -160,6 +164,7 @@ async def patch_draft(
 
 def _submit(principal: auth.Principal, application_id: UUID) -> ApplicationOut:
     with db.transaction() as session:
+        principal = service.company_principal(session, principal)
         application = service.get_for(session, principal, application_id)
         return _out(service.submit(session, principal, application), principal)
 

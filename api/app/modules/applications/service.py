@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Callable
+from dataclasses import replace
 from typing import Any
 from uuid import UUID
 
@@ -161,6 +162,23 @@ def create(session: Session, principal: auth.Principal, fields: dict[str, Any]) 
     session.add(application)
     session.flush()
     return application
+
+
+def company_principal(session: Session, principal: auth.Principal) -> auth.Principal:
+    """Fresh access to the full company application. Personal tasks/consents have their own ACL.
+
+    A guarantor must never receive the general application draft (D-096), even if a cached
+    Redis session still claims DIRECTOR. Roles are scoped to each company, not to the user.
+    """
+    user = auth.get(session, principal.user_id)
+    if user is None or user.status != "ACTIVE" or user.role != "CLIENT":
+        raise AppError(401, "UNAUTHENTICATED", "Нужно войти")
+    memberships = tuple(
+        auth.Membership(member.company_id, member.role, frozenset(member.poa_permissions))
+        for member, _ in companies.memberships_of(session, principal.user_id)
+        if member.role in {"DIRECTOR", "ACCOUNTANT"}
+    )
+    return replace(principal, memberships=memberships)
 
 
 def get_for(session: Session, principal: auth.Principal, application_id: UUID) -> Application:
@@ -354,15 +372,8 @@ def add_version(
 def withdraw(session: Session, principal: auth.Principal, application: Application) -> Application:
     from app.modules.applications import client_tasks  # отложенно: client_tasks импортирует service
 
-    # A cached session may still contain a membership whose role/access has been revoked.
-    user = auth.get(session, principal.user_id)
-    if user is None or user.status != "ACTIVE" or user.role != "CLIENT":
-        raise AppError(401, "UNAUTHENTICATED", "Нужно войти")
-    members = companies.memberships_of(session, principal.user_id)
-    if not any(
-        member.company_id == application.company_id and member.role in {"DIRECTOR", "ACCOUNTANT"}
-        for member, _ in members
-    ):
+    principal = company_principal(session, principal)
+    if not principal.can_access(application.company_id):
         raise not_found("Заявка")
 
     transition(
