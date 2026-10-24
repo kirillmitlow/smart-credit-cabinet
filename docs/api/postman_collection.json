@@ -2,7 +2,7 @@
   "info": {
     "name": "Умный кредитный кабинет — проверка жюри",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Снимок main 1114d1c, 24.10.2026. Четыре независимые папки сценариев и проверки моков. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос удаляет демо-заявки этой персоны. Cookie jar включён. Источники: текущие OpenAPI/маршруты, существующий Bruno и браузерные тесты. См. docs/api/README.md для границ проверки. Динамические коды не сохраняйте в экспортируемое окружение."
+    "description": "Снимок main 1114d1c, 24.10.2026. Четыре независимые папки сценариев и проверки моков. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос удаляет демо-заявки этой персоны. Cookie jar включён. Источники: текущие OpenAPI/маршруты, существующий Bruno и браузерные тесты. См. docs/api/README.md для границ проверки. Динамические коды не сохраняйте в экспортируемое окружение.\nФинальная сверка: timeline из #129; Гарипов с готовым файлом, без требования работающего генератора. Каждый сценарий сбрасывает только свою персону."
   },
   "auth": {
     "type": "noauth"
@@ -435,6 +435,34 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "41bf8b42-a3b2-5ee7-9f9f-cc3282e7955f",
+          "name": "Соколова · Проверить таймлайн после решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "pm.test(\"Таймлайн принадлежит заявке\",()=>pm.expect(j.applicationId).to.eql(pm.collectionVariables.get(\"applicationId\")));",
+                  "pm.test(\"Есть курсор событий и реальные проверки\",()=>{pm.expect(j.lastEventId).to.be.a(\"number\");pm.expect(j.steps).to.be.an(\"array\");pm.expect(j.checks.map(x=>x.key)).to.have.members([\"registry\",\"taxes\",\"creditHistory\",\"turnover\"]);});",
+                  "pm.test(\"Проверки завершены\",()=>j.checks.forEach(x=>pm.expect(x.state).to.eql(\"done\")));",
+                  "pm.collectionVariables.set(\"sokolovaApplicationId\", pm.collectionVariables.get(\"applicationId\"));"
                 ]
               }
             }
@@ -1067,6 +1095,33 @@
           "response": []
         },
         {
+          "id": "55620d31-a159-5bfb-87f0-4d0c093fb56f",
+          "name": "СнабКонтракт · Проверить таймлайн после решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "pm.test(\"Таймлайн принадлежит заявке\",()=>pm.expect(j.applicationId).to.eql(pm.collectionVariables.get(\"applicationId\")));",
+                  "pm.test(\"Есть курсор событий и реальные проверки\",()=>{pm.expect(j.lastEventId).to.be.a(\"number\");pm.expect(j.steps).to.be.an(\"array\");pm.expect(j.checks.map(x=>x.key)).to.have.members([\"registry\",\"taxes\",\"creditHistory\",\"turnover\"]);});",
+                  "pm.test(\"Проверки завершены\",()=>j.checks.forEach(x=>pm.expect(x.state).to.eql(\"done\")));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
           "id": "c7a83855-f466-53e8-970c-5143bd03efb8",
           "name": "СнабКонтракт · 16 Получить предложение и выбрать рекомендуемый вариант",
           "request": {
@@ -1685,6 +1740,33 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "22c4812d-e857-5ec1-a67c-1779d37c34c5",
+          "name": "Станкопром · Проверить таймлайн после решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "pm.test(\"Таймлайн принадлежит заявке\",()=>pm.expect(j.applicationId).to.eql(pm.collectionVariables.get(\"applicationId\")));",
+                  "pm.test(\"Есть курсор событий и реальные проверки\",()=>{pm.expect(j.lastEventId).to.be.a(\"number\");pm.expect(j.steps).to.be.an(\"array\");pm.expect(j.checks.map(x=>x.key)).to.have.members([\"registry\",\"taxes\",\"creditHistory\",\"turnover\"]);});",
+                  "pm.test(\"Проверки завершены\",()=>j.checks.forEach(x=>pm.expect(x.state).to.eql(\"done\")));"
                 ]
               }
             }
@@ -2471,8 +2553,969 @@
             }
           ],
           "response": []
+        },
+        {
+          "id": "87297e79-3139-5d8f-9cf4-22bb9f5b251b",
+          "name": "Ромашка · Проверить таймлайн после решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "pm.test(\"Таймлайн принадлежит заявке\",()=>pm.expect(j.applicationId).to.eql(pm.collectionVariables.get(\"applicationId\")));",
+                  "pm.test(\"Есть курсор событий и реальные проверки\",()=>{pm.expect(j.lastEventId).to.be.a(\"number\");pm.expect(j.steps).to.be.an(\"array\");pm.expect(j.checks.map(x=>x.key)).to.have.members([\"registry\",\"taxes\",\"creditHistory\",\"turnover\"]);});",
+                  "pm.test(\"Проверки завершены\",()=>j.checks.forEach(x=>pm.expect(x.state).to.eql(\"done\")));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "90c1f1f6-11b2-582b-be0a-098429807b32",
+          "name": "Ромашка · Чужой таймлайн скрыт",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{sokolovaApplicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get(\"sokolovaApplicationId\")) pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+                  "if (pm.response.code !== 404) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
         }
       ]
+    },
+    {
+      "name": "Гарипов: готовая выписка",
+      "item": [
+        {
+          "id": "a8203d29-1cd9-5354-8f08-bd0de03cfb5a",
+          "name": "Гарипов · 01 Сбросить только эту персону",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/demo/personas/garipov/reset",
+            "description": "Удаляет демо-заявки и кредиты этой компании. При 409 DEMO_RESET_IN_PROGRESS повторите через секунду. Не запускайте на общей демонстрации без согласования."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "[\"applicationId\",\"offerId\",\"variantId\",\"contractId\",\"evaluationRef\",\"decisionActionKey\",\"engineDecisionId\"].forEach(k => pm.collectionVariables.unset(k));",
+                  "pm.collectionVariables.set(\"decisionPolls\", 0);",
+                  "pm.collectionVariables.set(\"disbursementPolls\", 0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "749f8823-2d11-5676-9c52-17962415e216",
+          "name": "Гарипов · 02 Найти компанию и руководителя",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/auth/roles/001298765490",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const person = j.people.find(x => x.role === \"DIRECTOR\");",
+                  "pm.test(\"Найден руководитель\", () => pm.expect(person).to.be.an(\"object\"));",
+                  "if (!person) { pm.execution.setNextRequest(null); throw new Error(\"No director\"); }",
+                  "pm.collectionVariables.set(\"companyId\", j.company.id);",
+                  "pm.collectionVariables.set(\"userId\", person.userId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "1a7f2675-290b-5731-bbd5-57e236cc5e1e",
+          "name": "Гарипов · 03 Получить код входа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/request-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"companyId\": \"{{companyId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"loginRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"loginCode\", j.demoCode);",
+                  "pm.test(\"Код получен от демо-сервера\", () => pm.expect(j.demoCode).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "79db0677-b2eb-5bdb-915f-2111edd6b42e",
+          "name": "Гарипов · 04 Войти, сохранить cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/verify-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{loginRequestId}}\",\n  \"code\": \"{{loginCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"loginCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "e012ee0a-db6a-531c-9386-997c5e57beb9",
+          "name": "Гарипов · 05 Создать черновик",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"productCode\": \"EXPRESS\", \"amountRub\": 1500000, \"termMonths\": 36, \"purposeCode\": \"EQUIPMENT\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationId\", j.id);",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "9b2696f9-a8cb-5572-8761-9f8718575b3b",
+          "name": "Гарипов · 06 Получить нужные согласия",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const items = j.items.filter(x => x.canSign && x.status !== \"SIGNED\").map(x => ({kind:x.kind, subjectInn:x.subjectInn}));",
+                  "pm.test(\"Есть согласия руководителя\", () => pm.expect(items.length).to.be.above(0));",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "bcf202e4-763a-52ae-8b34-2e72309c9567",
+          "name": "Гарипов · 07 Получить код пакета согласий",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\": {{consentItems}}, \"acceptPepRules\": true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consentRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"consentCode\", j.demoCode);",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(j.items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c56f6e9b-7c64-5506-bece-8baac5d3d2b4",
+          "name": "Гарипов · 08 Подписать согласия",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{consentRequestId}}\", \"code\":\"{{consentCode}}\", \"items\": {{consentItems}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Все согласия подписаны\", () => pm.expect(pm.response.json().allSigned).to.eql(true));",
+                  "pm.collectionVariables.unset(\"consentCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "6ba69964-e147-58e8-9706-2aaf407d7378",
+          "name": "Гарипов · 09 Отправить заявку",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "5b49fb2f-f830-5ab9-b3a3-828b9ac9e803",
+          "name": "Гарипов · 10 Дождаться решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": "В Runner задайте задержку 1000 мс. Максимум 60 опросов, затем явная ошибка. При ручном Send повторяйте этот запрос до конечного исхода."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const wanted = \"NEEDS_INFO\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "954f408a-1863-53d4-a0d3-45e113099b6d",
+          "name": "Гарипов · 11 Прочитать объяснение",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/decision",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "bf620e4a-a5c2-5a58-be7b-8d1a8389eb72",
+          "name": "Гарипов: готовая выписка · Проверить таймлайн после решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "pm.test(\"Таймлайн принадлежит заявке\",()=>pm.expect(j.applicationId).to.eql(pm.collectionVariables.get(\"applicationId\")));",
+                  "pm.test(\"Есть курсор событий и реальные проверки\",()=>{pm.expect(j.lastEventId).to.be.a(\"number\");pm.expect(j.steps).to.be.an(\"array\");pm.expect(j.checks.map(x=>x.key)).to.have.members([\"registry\",\"taxes\",\"creditHistory\",\"turnover\"]);});",
+                  "pm.test(\"Проверки завершены\",()=>j.checks.forEach(x=>pm.expect(x.state).to.eql(\"done\")));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "13db483a-8191-5744-87e8-21f7a7049522",
+          "name": "Гарипов · 12 Получить задачу",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/tasks",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const t=pm.response.json().items.find(x=>x.kind===\"DOCUMENT\" && x.status===\"OPEN\");",
+                  "pm.test(\"Запрошен документ\",()=>pm.expect(t).to.be.an(\"object\"));",
+                  "pm.collectionVariables.set(\"taskId\",t.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "28aadc79-314d-5a02-8551-f3c86a0d3790",
+          "name": "Гарипов · 14 Загрузить файл независимого тестового writer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "garipov-upload-check"
+              }
+            ],
+            "url": "{{apiUrl}}/documents",
+            "description": "",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "applicationId",
+                  "value": "{{applicationId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "taskId",
+                  "value": "{{taskId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "kind",
+                  "value": "BANK_STATEMENT_1C",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "docs/test-data/garipov-statement-12-months.txt"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();pm.collectionVariables.set(\"documentId\",j.id);pm.collectionVariables.set(\"documentPolls\",0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "4298f3e2-3b70-5453-a727-48975b137534",
+          "name": "Гарипов · 15 Дождаться разбора",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/documents/{{documentId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "if ([\"PENDING\",\"PROCESSING\"].includes(j.parseStatus)) {",
+                  "const n=Number(pm.collectionVariables.get(\"documentPolls\"))+1;pm.collectionVariables.set(\"documentPolls\",n);",
+                  "if(n>=60){pm.test(\"Разбор завершился\",()=>pm.expect.fail(j.parseStatus));pm.execution.setNextRequest(null);}else pm.execution.setNextRequest(pm.info.requestId);",
+                  "}else{pm.test(\"Выписка разобрана\",()=>pm.expect(j.parseStatus).to.eql(\"PARSED\"));if(j.parseStatus!==\"PARSED\"){pm.execution.setNextRequest(null);throw new Error(j.parseError);}}",
+                  "if(j.parseStatus===\"PARSED\"){",
+                  "const months=j.parsed.months.filter(x=>x.complete);",
+                  "pm.test(\"12 месяцев по 700000/600000\",()=>{pm.expect(months.length).to.eql(12);months.forEach(x=>{pm.expect(x.incomingKopecks).to.eql(70000000);pm.expect(x.outgoingKopecks).to.eql(60000000);});});",
+                  "pm.collectionVariables.set(\"confirmationBody\",JSON.stringify({sha256:j.sha256,acknowledged:true,months:months.map(x=>({month:x.month,businessIncomingKopecks:x.unclassifiedIncomingKopecks}))}));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "bd70bc04-a8d0-5eb0-a652-259ce3b27c62",
+          "name": "Гарипов · 16 Подтвердить поступления",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "garipov-confirm-check"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/documents/{{documentId}}/confirm",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{{confirmationBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Подтверждение сохранено\",()=>pm.expect(pm.response.json().confirmedAt).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "32eb477a-5a6c-5eed-a312-faf0bfc9d517",
+          "name": "Гарипов · 17 Добавить пояснение к файлу",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/tasks/{{taskId}}/answer",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Приложена выписка за 12 полных месяцев. Поступления проверены и подтверждены.\",\n  \"submitRound\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "954c7609-e49d-5275-9d00-a7b4640ed6f9",
+          "name": "Гарипов · 18 Отправить полный раунд",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/tasks/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.set(\"decisionPolls\",0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "d5e71bf8-c03e-5c61-9930-65fd81c21aa4",
+          "name": "Гарипов · 19 Дождаться повторного расчёта",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"APPROVED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "2db72a7b-b29a-58db-a753-1620f2b00169",
+          "name": "Гарипов · 16 Получить предложение и выбрать рекомендуемый вариант",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/offer",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const v = j.variants.find(x => x.recommended) || j.variants[0];",
+                  "pm.test(\"Вариант готов\", () => pm.expect(v).to.be.an(\"object\"));",
+                  "if (!v) { pm.execution.setNextRequest(null); throw new Error(\"No offer variant\"); }",
+                  "pm.collectionVariables.set(\"offerId\", j.id);",
+                  "pm.collectionVariables.set(\"variantId\", v.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "a93dc665-7a67-5d09-aa45-de5e14e97883",
+          "name": "Гарипов · 17 Принять вариант",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/offers/{{offerId}}/accept",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantId\": \"{{variantId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.set(\"contractId\", pm.response.json().contract.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "0ae26392-98d9-516b-a787-4e91008b8db0",
+          "name": "Гарипов · 18 Получить сохранённый договор PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/document",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Есть хеш подписываемого тела\", () => pm.expect(pm.response.headers.get(\"X-Content-SHA256\")).to.match(/^[a-f0-9]{64}$/));",
+                  "pm.test(\"Договор выдаётся как PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"PDF содержит сигнатуру файла\", () => pm.expect(pm.response.text().slice(0, 5)).to.eql(\"%PDF-\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "764decbe-23f3-5976-9924-f72f829fe2e2",
+          "name": "Гарипов · 19 Получить код подписи",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign/request",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agree\": true,\n  \"acceptPepRules\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"signRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"signCode\", j.demoCode);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "2790829b-4cd2-54aa-86e8-03719f392013",
+          "name": "Гарипов · 20 Подписать договор",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/contracts/{{contractId}}/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{signRequestId}}\",\n  \"code\": \"{{signCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"signCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "8748de23-5618-58e7-9fa5-27cc29bce43b",
+          "name": "Гарипов · 21 Дождаться выдачи",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const wanted = \"DISBURSED\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"disbursementPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"disbursementPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "66cca876-3a40-5164-89ef-0be7b99da9b9",
+          "name": "Гарипов · 22 Найти выданный кредит",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const loan = pm.response.json().items.find(x => x.applicationId === pm.collectionVariables.get(\"applicationId\"));",
+                  "pm.test(\"Кредит найден\", () => pm.expect(loan).to.be.an(\"object\"));",
+                  "if (!loan) { pm.execution.setNextRequest(null); throw new Error(\"Loan not found\"); }",
+                  "pm.collectionVariables.set(\"loanId\", loan.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "9ca5d2b4-ecaa-5c73-92bf-59b896412ed6",
+          "name": "Гарипов · 23 Получить график",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/loans/{{loanId}}/schedule",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"График непустой\", () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ],
+      "description": "Синтетический файл из docs/test-data; в Postman выберите его вручную. Newman запускается из корня репозитория. Сброс затрагивает только эту персону."
     },
     {
       "name": "Моки: готовность и предпросмотр",
