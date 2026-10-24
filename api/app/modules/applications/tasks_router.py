@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
-from app.modules.applications import client_tasks
+from app.modules.applications import client_tasks, service
 from app.modules.applications.models import Application, Task
 from app.shared import db
 from app.shared.errors import not_found
@@ -96,19 +96,23 @@ def _list_out(
     session: Session, principal: auth.Principal, application: Application, tasks: list[Task]
 ) -> TaskList:
     ready = client_tasks.document_readiness(session, principal, application, tasks)
+    member = principal.membership(application.company_id)
     current = max((t.round for t in tasks), default=0)
     latest_open = [t for t in tasks if t.round == current and t.status == "OPEN"]
     return TaskList(
         items=[_out(principal, application, t, ready[t.id]) for t in tasks],
         current_round=current,
         rounds_limit=client_tasks.MAX_ROUNDS,
-        can_submit=bool(latest_open)
+        can_submit=member is not None
+        and member.role in {"DIRECTOR", "ACCOUNTANT"}
+        and bool(latest_open)
         and all(t.answer is not None and ready[t.id] for t in latest_open),
     )
 
 
 def _list(principal: auth.Principal, application_id: UUID) -> TaskList:
     with db.transaction() as session:
+        principal = service.task_principal(session, principal)
         application, tasks = client_tasks.list_tasks(session, principal, application_id)
         return _list_out(session, principal, application, tasks)
 
@@ -126,6 +130,7 @@ async def list_tasks(application_id: UUID, principal: auth.ClientPrincipal) -> T
 
 def _answer(principal: auth.Principal, task_id: UUID, body: AnswerBody) -> TaskOut:
     with db.transaction() as session:
+        principal = service.task_principal(session, principal)
         task = client_tasks.save_answer(session, principal, task_id, body.text)
         application = session.get(Application, task.application_id)
         if application is None:
@@ -154,6 +159,7 @@ async def answer_task(task_id: UUID, body: AnswerBody, principal: auth.ClientPri
 
 def _submit(principal: auth.Principal, application_id: UUID) -> TaskList:
     with db.transaction() as session:
+        principal = service.task_principal(session, principal)
         application, _ = client_tasks.submit_round(session, principal, application_id)
         _, tasks = client_tasks.list_tasks(session, principal, application_id)
         return _list_out(session, principal, application, tasks)
