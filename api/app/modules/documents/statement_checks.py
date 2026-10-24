@@ -1,13 +1,20 @@
-"""Ownership, posted movement and exact balance reconciliation before monthly aggregation."""
+"""Reconcile posted movement in exact kopecks before interpreting monthly turnover."""
 
 from __future__ import annotations
 
+from bisect import bisect_right
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal
+from hashlib import sha256
 
-from app.modules.documents.statement_format import PaymentSection, StatementFile
-from app.shared.errors import AppError
+from app.modules.documents.statement_format import (
+    AccountSection,
+    PaymentSection,
+    StatementFile,
+    kopecks,
+    statement_error,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,111 +23,165 @@ class Posting:
     at: date
     incoming: bool
     payment: PaymentSection
+    operation_id: str
     internal: bool
 
 
-def _fail(code: str) -> AppError:
-    return AppError(422, code, "Проверьте ИНН, период и суммы банковской выписки")
+@dataclass(frozen=True, slots=True)
+class AccountTotals:
+    account: str
+    start: date
+    end: date
+    opening_kopecks: int
+    incoming_kopecks: int
+    outgoing_kopecks: int
+    closing_kopecks: int
+    controls_complete: bool
 
 
-def complete_months(statement: StatementFile, *, as_of: date) -> tuple[str, ...]:
-    """Only fully covered months ending before as_of; current partial month never qualifies."""
-    if statement.end > as_of:
-        raise _fail("INVALID_PERIOD")
-    first = statement.start.year * 12 + statement.start.month - 1
-    last = statement.end.year * 12 + statement.end.month - 1
-    months = []
-    for index in range(first, last + 1):
-        year, month0 = divmod(index, 12)
-        start = date(year, month0 + 1, 1)
-        if year == 9999 and month0 == 11:
-            continue
-        next_year, next_month0 = divmod(index + 1, 12)
-        after = date(next_year, next_month0 + 1, 1)
-        if (
-            start >= statement.start
-            and after <= as_of
-            and after.toordinal() - 1 <= statement.end.toordinal()
-        ):
-            months.append(f"{year:04}-{month0 + 1:02}")
-    if len(months) < 3:
-        raise _fail("PERIOD_TOO_SHORT")
-    return tuple(months)
+@dataclass(frozen=True, slots=True)
+class Reconciled:
+    postings: tuple[Posting, ...]
+    accounts: tuple[AccountTotals, ...]
+    coverage_start: date
+    coverage_end: date
+    payment_count: int
+    duplicate_count: int
+    unposted_count: int
 
 
-def reconcile_accounts(statement: StatementFile, expected_inn: str) -> tuple[Posting, ...]:
-    """Deduplicate before totals. Keep actual cash movement separate from revenue semantics."""
-    sections: dict[str, list[tuple[date, date]]] = {}
+def operation_id(payment: PaymentSection) -> str:
+    """Same movement across both own accounts has one stable reference without raw payment fields."""
+    parts = (
+        payment.kind,
+        payment.number,
+        payment.created.isoformat(),
+        format(payment.amount, ".2f"),
+        payment.payer_account,
+        payment.recipient_account,
+    )
+    return sha256("\0".join(parts).encode()).hexdigest()
+
+
+def _same_payment(left: PaymentSection, right: PaymentSection) -> bool:
+    # Dot/comma and omitted zero kopecks are different text representations of equal money.
+    return (
+        left.kind == right.kind
+        and left.amount == right.amount
+        and {key: value for key, value in left.fields.items() if key != "Сумма"}
+        == {key: value for key, value in right.fields.items() if key != "Сумма"}
+    )
+
+
+def reconcile_accounts(statement: StatementFile, expected_inn: str) -> Reconciled:
+    """O(records log sections): never rescan every payment for every account period."""
+    grouped: dict[str, list[AccountSection]] = defaultdict(list)
     for section in statement.accounts:
-        periods = sections.setdefault(section.number, [])
-        if any(section.start <= end and section.end >= start for start, end in periods):
-            raise _fail("OVERLAPPING_PERIODS")
-        periods.append((section.start, section.end))
-    owned = set(sections)
-    if owned != set(statement.declared_accounts):
-        raise _fail("OWNER_UNCONFIRMED")
+        grouped[section.number].append(section)
+    if set(grouped) != set(statement.declared_accounts):
+        raise statement_error("OWNER_UNCONFIRMED")
+    starts: dict[str, list[int]] = {}
+    for account, rows in grouped.items():
+        rows.sort(key=lambda row: row.start)
+        for previous, current in zip(rows, rows[1:], strict=False):
+            if current.start <= previous.end:
+                raise statement_error("OVERLAPPING_PERIODS")
+            if previous.end.toordinal() + 1 != current.start.toordinal():
+                raise statement_error("INCOMPLETE_PERIOD")
+        starts[account] = [row.start.toordinal() for row in rows]
+    owned = set(grouped)
     verified: set[str] = set()
-    seen: dict[tuple[str, str, str, date, Decimal], PaymentSection] = {}
+    seen: dict[str, PaymentSection] = {}
+    keys: dict[tuple[str, bool, str, date, int], PaymentSection] = {}
+    sums: dict[tuple[str, int], list[int]] = defaultdict(lambda: [0, 0])
     postings: list[Posting] = []
+    duplicates = unposted = 0
     for payment in statement.payments:
-        matched = False
-        for side, account, incoming, posted in (
-            ("Плательщик", payment.payer_account, False, payment.debited),
-            ("Получатель", payment.recipient_account, True, payment.credited),
-        ):
-            if account not in owned:
-                continue
-            matched = True
+        sides = [
+            (side, account, incoming, posted)
+            for side, account, incoming, posted in (
+                ("Плательщик", payment.payer_account, False, payment.debited),
+                ("Получатель", payment.recipient_account, True, payment.credited),
+            )
+            if account in owned
+        ]
+        if not sides:
+            raise statement_error("FOREIGN_ACCOUNT")
+        for side, account, _incoming, _posted in sides:
             inn = payment.fields.get(f"{side}ИНН", "")
             if inn:
                 if inn != expected_inn:
-                    raise _fail("INN_MISMATCH")
+                    raise statement_error("INN_MISMATCH")
                 verified.add(account)
+        reference = operation_id(payment)
+        if reference in seen:
+            if not _same_payment(seen[reference], payment):
+                raise statement_error("CONFLICTING_DUPLICATE")
+            duplicates += 1
+            continue
+        seen[reference] = payment
+        if any(posted is None for _, _, _, posted in sides):
+            unposted += 1
+        amount = kopecks(payment.amount)
+        for _side, account, incoming, posted in sides:
             if posted is None:
-                continue  # A payment instruction alone is not proof of movement.
-            if not any(start <= posted <= end for start, end in sections[account]):
-                raise _fail("OPERATION_OUTSIDE_PERIOD")
-            key = (account, payment.kind, payment.number, payment.created, payment.amount)
-            previous = seen.get(key)
-            if previous is not None:
-                if previous != payment:
-                    raise _fail("CONFLICTING_DUPLICATE")
-                continue
-            seen[key] = payment
+                continue  # No own posted date: no movement, even if the instruction has a date.
+            index = bisect_right(starts[account], posted.toordinal()) - 1
+            if index < 0 or posted > grouped[account][index].end:
+                raise statement_error("OPERATION_OUTSIDE_PERIOD")
+            key = (account, incoming, payment.number, payment.created, amount)
+            if key in keys and not _same_payment(keys[key], payment):
+                raise statement_error("CONFLICTING_DUPLICATE")
+            keys[key] = payment
+            sums[(account, index)][0 if incoming else 1] += amount
             postings.append(
                 Posting(
                     account,
                     posted,
                     incoming,
                     payment,
+                    reference,
                     payment.payer_account in owned and payment.recipient_account in owned,
                 )
             )
-        if not matched:
-            raise _fail("FOREIGN_ACCOUNT")
     if verified != owned:
-        raise _fail("OWNER_UNCONFIRMED")
-    for section in statement.accounts:
-        relevant = [
-            posting
-            for posting in postings
-            if posting.account == section.number and section.start <= posting.at <= section.end
-        ]
-        received = sum((p.payment.amount for p in relevant if p.incoming), Decimal(0))
-        spent = sum((p.payment.amount for p in relevant if not p.incoming), Decimal(0))
-        if (
-            section.received is not None
-            and section.received != received
-            or section.spent is not None
-            and section.spent != spent
-            or section.closing is not None
-            and section.opening + received - spent != section.closing
-        ):
-            raise _fail("BALANCE_MISMATCH")
-    for account, periods in sections.items():
-        rows = sorted((s for s in statement.accounts if s.number == account), key=lambda s: s.start)
-        for previous, current in zip(rows, rows[1:], strict=False):
-            if previous.end.toordinal() + 1 == current.start.toordinal():
-                if previous.closing is None or previous.closing != current.opening:
-                    raise _fail("BALANCE_MISMATCH")
-    return tuple(postings)
+        raise statement_error("OWNER_UNCONFIRMED")
+    accounts = []
+    for account in sorted(grouped):
+        previous_closing: int | None = None
+        for index, section in enumerate(grouped[account]):
+            received, spent = sums[(account, index)]
+            opening = kopecks(section.opening)
+            closing = opening + received - spent
+            if (
+                (section.received is not None and kopecks(section.received) != received)
+                or (section.spent is not None and kopecks(section.spent) != spent)
+                or (section.closing is not None and kopecks(section.closing) != closing)
+                or (previous_closing is not None and previous_closing != opening)
+            ):
+                raise statement_error("BALANCE_MISMATCH")
+            accounts.append(
+                AccountTotals(
+                    account,
+                    section.start,
+                    section.end,
+                    opening,
+                    received,
+                    spent,
+                    closing,
+                    all(
+                        value is not None
+                        for value in (section.received, section.spent, section.closing)
+                    ),
+                )
+            )
+            previous_closing = closing
+    return Reconciled(
+        tuple(postings),
+        tuple(accounts),
+        max(rows[0].start for rows in grouped.values()),
+        min(rows[-1].end for rows in grouped.values()),
+        len(seen),
+        duplicates,
+        unposted,
+    )

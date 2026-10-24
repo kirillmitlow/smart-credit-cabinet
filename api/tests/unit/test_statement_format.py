@@ -5,7 +5,8 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from app.modules.documents.statement_format import money, read_statement
 from app.shared.errors import AppError
