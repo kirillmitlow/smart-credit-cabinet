@@ -401,7 +401,8 @@ def test_pipeline_after_answered_rounds_routes_without_a_fourth_request(
         ).all()
         assert event.payload["outcome"] == expected
         if expected == "MANUAL_REVIEW":
-            assert (decision.route, decision.required_level) == ("MANUAL", "L2")
+            # По принятой матрице до 3 млн достаточно L1, в том числе без грейда.
+            assert (decision.route, decision.required_level) == ("MANUAL", "L1")
             assert decision.explain["outcome"] == expected
             assert decision.explain["workflow"] == {
                 "reasonCode": "ROUNDS_LIMIT_REACHED",
