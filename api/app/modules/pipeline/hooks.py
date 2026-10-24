@@ -139,7 +139,7 @@ def after_decision(
 ) -> None:
     if result.outcome in OFFER_OUTCOMES:
         create_offer(session, application, decision, inp, result)
-    # TODO(T-278): outbox — сообщение APPLICATION_DECIDED в БКИ, ключ уведомлений клиенту (та же транзакция)
+    # Событие БКИ уже записал transition в той же транзакции; уведомления — через журнал/SSE.
     if result.outcome == Outcome.NEEDS_INFO and "REVENUE_UNKNOWN" in result.reason_codes:
         create_revenue_task(session, application)
     # TODO(20-03): задача клиенту при `DATA_INCOMPLETE` (поля, согласия) — шаблоны в политике

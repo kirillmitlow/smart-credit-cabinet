@@ -34,7 +34,7 @@ def stand(
     database = db.get_database()
     db.migrate(database.engine)
     with database.transaction() as s:
-        s.execute(text("TRUNCATE applications, company_members, companies, users CASCADE"))
+        s.execute(text("TRUNCATE applications, company_members, companies, users, outbox CASCADE"))
     principals = {}
     with database.transaction() as s:
         for inn, name in (("001234567887", "ИП Соколова"), ("0017654322", "СтанкоПром")):
@@ -138,7 +138,10 @@ async def test_submit_creates_version_event_and_task_once(
     again = await submit(sokolova, app_id)
     assert again.status_code == 409
     assert again.json()["code"] == "INVALID_TRANSITION"
-    assert stand["sent"] == [("pipeline.run", {"application_id": app_id})]
+    assert stand["sent"] == [
+        ("outbox.relay", {}),
+        ("pipeline.run", {"application_id": app_id}),
+    ]
     with db.transaction() as s:
         events = s.execute(
             text("SELECT kind, from_status, to_status FROM application_events")
