@@ -2,18 +2,27 @@
 
 from __future__ import annotations
 
+import secrets
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Body, Depends, Request, Response
+from fastapi import APIRouter, Body, Depends, Query, Request, Response
 from fastapi.responses import JSONResponse
 
 from app.common.auth import require_admin
 from app.common.db import Session
 from app.common.idempotency import OptionalIdempotencyDep
+from app.common.problems import ProblemException
 from app.common.schemas import problem_responses
 from app.roles.scenarios import apply as transfer
 from app.roles.scenarios import reset as reset_module
 from app.roles.scenarios import service
+from app.roles.scenarios.bank_statement import (
+    CONTENT_TYPE,
+    BankStatementRequest,
+    build_statement,
+    valid_inn,
+)
+from app.roles.scenarios.expand import resolved_spec
 from app.roles.scenarios.gateway import Gateway
 from app.roles.scenarios.locking import locked_session
 from app.roles.scenarios.presets import PRESETS
@@ -31,6 +40,86 @@ from app.roles.scenarios.schemas import (
 router = APIRouter(prefix="/api/v1", tags=["сценарии"], dependencies=[Depends(require_admin)])
 ERRORS = problem_responses(401, 403, 404, 409, 422)
 MUTATION_ERRORS = problem_responses(401, 403, 404, 409, 422, 502)
+STATEMENT_RESPONSES = {
+    **problem_responses(400, 401, 403, 404, 422),
+    200: {
+        "description": "Синтетическая выписка 1С, Windows-1251, CRLF; без JSON/meta",
+        "content": {CONTENT_TYPE: {"schema": {"type": "string", "format": "binary"}}},
+        "headers": {
+            "Content-Disposition": {"schema": {"type": "string"}},
+            "X-Mock-Simulated": {"schema": {"type": "string", "const": "true"}},
+        },
+    },
+}
+
+
+def _statement_response(**parameters: Any) -> Response:
+    try:
+        content, filename = build_statement(**parameters)
+    except (ValueError, ArithmeticError) as exc:
+        raise ProblemException(422, "VALIDATION_ERROR", str(exc)) from exc
+    return Response(
+        content,
+        media_type=CONTENT_TYPE,
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Mock-Simulated": "true",
+        },
+    )
+
+
+@router.get(
+    "/scenarios/{code}/documents/bank-statement",
+    operation_id="getScenarioBankStatement",
+    summary="Скачать воспроизводимую демо-выписку 1С для сценария",
+    response_class=Response,
+    responses=STATEMENT_RESPONSES,
+)
+async def scenario_bank_statement(
+    request: Request,
+    code: str,
+    session: Session,
+    months: Annotated[int, Query(ge=1, le=24)] = 12,
+) -> Response:
+    row = await service.get(session, code)
+    spec = resolved_spec(ScenarioSpec.model_validate(row.spec))
+    identity = (row.expanded or {}).get("identity", {})
+    if identity.get("form") == "SELF_EMPLOYED" or not identity or spec.finance is None:
+        raise ProblemException(422, "VALIDATION_ERROR", "У сценария нет расчётного счёта бизнеса")
+    return _statement_response(
+        inn=identity["inn"],
+        holder_name=identity.get("shortName") or identity["name"],
+        okved=identity["okved"],
+        finance=spec.finance,
+        regime=spec.finance.tax_regime or "USN_INCOME",
+        code=code,
+        today=request.app.state.clock.today(),
+        months=months,
+        turnover=(row.expanded or {}).get("bankCore", {}).get("turnover", []),
+    )
+
+
+@router.post(
+    "/documents/bank-statement",
+    operation_id="generateBankStatement",
+    summary="Сгенерировать демо-выписку 1С для ИНН без чтения или сохранения сценария",
+    response_class=Response,
+    responses=STATEMENT_RESPONSES,
+)
+async def generate_bank_statement(request: Request, body: BankStatementRequest) -> Response:
+    if not valid_inn(body.inn):
+        raise ProblemException(400, "INN_INVALID", "Неверный ИНН владельца выписки")
+    seed = str(body.seed) if body.seed is not None else secrets.token_hex(16)
+    return _statement_response(
+        inn=body.inn,
+        holder_name=body.holder_name or f"Демо-владелец {body.inn} (симуляция)",
+        okved=body.okved,
+        finance=body.finance(),
+        regime="OSNO",
+        code=f"statement:{body.inn}:{seed}",
+        today=request.app.state.clock.today(),
+        months=body.months,
+    )
 
 
 @router.get("/presets", operation_id="listPresets", summary="Пресеты и их параметры по умолчанию")
