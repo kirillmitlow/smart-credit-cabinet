@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
 import { Alert, Button, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
-import { useQueries, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
 import {
   getListApplicationTasksQueryOptions,
   useCreateApplication,
-  useListApplications,
+  getListApplicationsQueryKey,
+  listApplications,
 } from '@/api/generated/api';
 import type { ApplicationOut, TaskList } from '@/api/generated/model';
 import { useActionKey } from '@/api/idempotency';
@@ -47,12 +48,34 @@ export function HomePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { canApply, choice } = useActiveCompany();
-  const applications = useListApplications({ limit: 20 });
+  const applications = useInfiniteQuery({
+    queryKey: [...getListApplicationsQueryKey({ limit: 20 }), 'pages', choice?.company.id],
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam, signal }) => {
+      const response = await listApplications(
+        { limit: 20, ...(pageParam ? { cursor: pageParam } : {}) },
+        { signal },
+      );
+      if (response.status !== 200) throw new Error('Unexpected application list response');
+      return response.data;
+    },
+    getNextPageParam: (page) => page.nextCursor ?? undefined,
+  });
   const action = useActionKey();
   const create = useCreateApplication({ request: action.request() });
 
-  const items: ApplicationOut[] =
-    applications.data?.status === 200 ? applications.data.data.items : [];
+  const items: ApplicationOut[] = applications.data
+    ? [
+        ...new Map(
+          applications.data.pages.flatMap((page) => page.items).map((item) => [item.id, item]),
+        ).values(),
+      ]
+    : [];
+  const more = () => void applications.fetchNextPage({ cancelRefetch: false });
+  const retryApplications = () => {
+    if (applications.isFetchNextPageError) more();
+    else void applications.refetch();
+  };
   const hasDraft = items.some((item) => item.status === 'DRAFT');
   // Запросы банка по заявкам, где ждут ответа клиента: по ним строки «Что нужно от вас»
   const respondIds = items
@@ -69,6 +92,11 @@ export function HomePage() {
     if (loaded) tasksByApplication.set(id, loaded);
   });
   const tasks = tasksFrom(items, tasksByApplication);
+  const taskLoadFailed = applications.isError || taskLists.some((query) => query.isError);
+  const retryTasks = () => {
+    if (applications.isError) retryApplications();
+    for (const query of taskLists) if (query.isError) void query.refetch();
+  };
   const inProgressCount = items.filter((item) => isInFlight(item.status)).length;
   const statusText = companyStatusText(choice?.company.status);
 
@@ -119,7 +147,7 @@ export function HomePage() {
       <Section id="home-tasks" title={home.tasks.heading}>
         {applications.isPending ? (
           <Skeleton height={40} radius="md" />
-        ) : tasks.length === 0 ? (
+        ) : tasks.length === 0 && !taskLoadFailed ? (
           <Text>{emptyStates.tasks}</Text>
         ) : (
           <Stack component="ul" gap="xs" p={0} m={0} style={{ listStyle: 'none' }}>
@@ -135,18 +163,23 @@ export function HomePage() {
             ))}
           </Stack>
         )}
+        {taskLoadFailed ? (
+          <Alert color="yellow" role="status">
+            <Stack gap="xs" align="flex-start">
+              <Text>{home.tasks.loadFailed}</Text>
+              <Button variant="light" size="compact-sm" onClick={retryTasks}>
+                {home.tasks.retry}
+              </Button>
+            </Stack>
+          </Alert>
+        ) : null}
       </Section>
 
       <Section id="home-applications" title={home.applications.heading}>
         {applications.isPending ? (
           <ListSkeleton />
-        ) : applications.isError ? (
-          <ProblemAlert
-            error={applications.error}
-            onAction={() => {
-              void applications.refetch();
-            }}
-          />
+        ) : applications.isError && items.length === 0 ? (
+          <ProblemAlert error={applications.error} onAction={retryApplications} />
         ) : items.length === 0 ? (
           <Stack gap="sm" align="flex-start" data-testid="applications-empty">
             <Text>{emptyStates.homeNoApplications.text}</Text>
@@ -167,7 +200,31 @@ export function HomePage() {
             ))}
           </Stack>
         )}
-        {canApply && !hasDraft && inProgressCount === 0 && !applications.isPending ? (
+        {items.length > 0 && applications.error ? (
+          <ProblemAlert error={applications.error} onAction={retryApplications} />
+        ) : null}
+        {applications.hasNextPage ? (
+          <Text size="sm" c="dimmed" role="status">
+            {fill(home.applications.moreShown, { count: items.length })}
+          </Text>
+        ) : null}
+        {applications.hasNextPage ? (
+          <Button
+            variant="light"
+            loading={applications.isFetchingNextPage}
+            disabled={applications.isFetching}
+            onClick={more}
+            w="fit-content"
+          >
+            {home.applications.loadMore}
+          </Button>
+        ) : null}
+        {canApply &&
+        !hasDraft &&
+        inProgressCount === 0 &&
+        !applications.isPending &&
+        !applications.isError &&
+        !applications.hasNextPage ? (
           <Group gap="sm" align="baseline">
             <Button variant="subtle" px={0} onClick={startDirect} loading={create.isPending}>
               {home.startDirect}

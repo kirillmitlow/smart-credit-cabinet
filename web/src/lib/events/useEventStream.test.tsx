@@ -39,6 +39,9 @@ function seed(queryClient: QueryClient) {
     notifications: ['/api/v1/notifications'] as const,
     home: ['/api/v1/home'] as const,
     loans: ['/api/v1/loans'] as const,
+    contracts: ['/contracts/contract-1'] as const,
+    offers: ['/offers/offer-1'] as const,
+    documents: ['/documents'] as const,
   };
   for (const key of Object.values(keys)) queryClient.setQueryData(key, { seeded: true });
   return keys;
@@ -93,7 +96,9 @@ describe('карта событий → сброс кэша', () => {
     expect(invalidated(queryClient, keys.list)).toBe(true);
     expect(invalidated(queryClient, keys.home)).toBe(true);
     expect(invalidated(queryClient, keys.tasks)).toBe(false);
-    expect(invalidated(queryClient, keys.loans)).toBe(false);
+    expect(invalidated(queryClient, keys.loans)).toBe(true);
+    expect(invalidated(queryClient, keys.contracts)).toBe(true);
+    expect(invalidated(queryClient, keys.offers)).toBe(true);
   });
 
   it('step_done делает то же', async () => {
@@ -101,7 +106,8 @@ describe('карта событий → сброс кэша', () => {
     const keys = seed(queryClient);
     act(() => MockEventSource.latest().emit('step_done', { applicationId: 'app-1' }, 2));
     await waitFor(() => expect(invalidated(queryClient, keys.timeline)).toBe(true));
-    expect(invalidated(queryClient, keys.tasks)).toBe(false);
+    expect(invalidated(queryClient, keys.tasks)).toBe(true);
+    expect(invalidated(queryClient, keys.documents)).toBe(true);
   });
 
   it('task_created сбрасывает задачи, уведомления и главную', async () => {

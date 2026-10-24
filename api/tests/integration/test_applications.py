@@ -148,6 +148,24 @@ async def test_submit_creates_version_event_and_task_once(
     assert [v[0] for v in versions] == ["SUBMIT"]
 
 
+@pytest.mark.parametrize("value", [True, -1, 0, "25000000", 1_000_000_001])
+async def test_invalid_collateral_does_not_change_draft(
+    sokolova: httpx.AsyncClient, value: Any
+) -> None:
+    application = (await sokolova.post("/applications", json={})).json()
+    response = await sokolova.patch(
+        f"/applications/{application['id']}/draft",
+        json={
+            "version": application["version"],
+            "answers": {"collateral": {"description": "Линия оборудования", "valueRub": value}},
+        },
+    )
+    assert (response.status_code, response.json()["code"]) == (422, "INVALID_COLLATERAL")
+    current = (await sokolova.get(f"/applications/{application['id']}")).json()
+    assert current["version"] == application["version"]
+    assert "collateral" not in current["draft"]
+
+
 async def test_submit_without_terms_is_422(sokolova: httpx.AsyncClient) -> None:
     app_id = (await sokolova.post("/applications", json={"productCode": "EXPRESS"})).json()["id"]
     response = await submit(sokolova, app_id)
@@ -207,3 +225,69 @@ async def test_journal_cannot_be_changed(sokolova: httpx.AsyncClient) -> None:
     ):
         with pytest.raises(Exception, match="неизменяем"), db.transaction() as s:
             s.execute(text(statement))
+
+
+@pytest.mark.parametrize("change", ["GUARANTOR", "SUSPENDED_MEMBER", "SUSPENDED_USER"])
+async def test_withdraw_uses_current_membership_not_cached_session(
+    sokolova: httpx.AsyncClient, stand: dict[str, Any], change: str
+) -> None:
+    from sqlalchemy import update
+
+    application_id = (await sokolova.post("/applications", json=TERMS)).json()["id"]
+    await submit(sokolova, application_id)
+    principal = stand["principals"]["001234567887"]
+    with db.transaction() as session:
+        if change == "SUSPENDED_USER":
+            session.execute(
+                update(auth.User)
+                .where(auth.User.id == principal.user_id)
+                .values(status="SUSPENDED")
+            )
+        else:
+            values = {"role": "GUARANTOR"} if change == "GUARANTOR" else {"status": "SUSPENDED"}
+            session.execute(
+                update(CompanyMember)
+                .where(CompanyMember.user_id == principal.user_id)
+                .values(**values)
+            )
+    response = await sokolova.post(f"/applications/{application_id}/withdraw")
+    assert response.status_code == (401 if change == "SUSPENDED_USER" else 404)
+    with db.transaction() as session:
+        assert (
+            session.get(Application, __import__("uuid").UUID(application_id)).status == "SUBMITTED"
+        )
+        assert (
+            session.scalar(
+                text("SELECT count(*) FROM application_events WHERE to_status='WITHDRAWN'")
+            )
+            == 0
+        )
+
+
+async def test_accountant_can_withdraw_but_cannot_withdraw_foreign_company(
+    sokolova: httpx.AsyncClient, stranger: httpx.AsyncClient, stand: dict[str, Any]
+) -> None:
+    from sqlalchemy import update
+
+    application_id = (await sokolova.post("/applications", json=TERMS)).json()["id"]
+    await submit(sokolova, application_id)
+    principal = stand["principals"]["001234567887"]
+    with db.transaction() as session:
+        session.execute(
+            update(CompanyMember)
+            .where(CompanyMember.user_id == principal.user_id)
+            .values(role="ACCOUNTANT")
+        )
+    assert (await stranger.post(f"/applications/{application_id}/withdraw")).status_code == 404
+    assert (await sokolova.post(f"/applications/{application_id}/withdraw")).json()[
+        "status"
+    ] == "WITHDRAWN"
+    repeated = await sokolova.post(f"/applications/{application_id}/withdraw")
+    assert repeated.status_code == 409
+    with db.transaction() as session:
+        assert (
+            session.scalar(
+                text("SELECT count(*) FROM application_events WHERE to_status='WITHDRAWN'")
+            )
+            == 1
+        )

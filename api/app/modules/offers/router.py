@@ -8,7 +8,7 @@ from fastapi import APIRouter, Response
 from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
-from app.modules.offers import service, signing, views
+from app.modules.offers import contracts, service, signing, views
 from app.modules.offers.schemas import (
     AcceptedOut,
     AcceptIn,
@@ -113,12 +113,16 @@ async def get_contract(contract_id: UUID, principal: auth.ClientPrincipal) -> Co
 def _document(principal: auth.Principal, contract_id: UUID) -> Response:
     with db.transaction() as session:
         contract, _ = signing.contract_for(session, principal, contract_id)
+        content, mime, digest = contracts.document_content(session, contract)
+        extension = "pdf" if mime == "application/pdf" else "json"
         return Response(
-            content=contract.body.encode("utf-8"),
-            media_type="application/json; charset=utf-8",
+            content=content,
+            media_type=mime,
             headers={
-                "X-Content-SHA256": contract.content_hash,
-                "Content-Disposition": f'inline; filename="contract-{contract.contract_uid}.json"',
+                "X-Content-SHA256": digest,
+                "X-Content-Type-Options": "nosniff",
+                "Cache-Control": "private, no-store",
+                "Content-Disposition": f'inline; filename="contract-{contract.contract_uid}.{extension}"',
             },
         )
 

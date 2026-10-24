@@ -144,7 +144,8 @@ describe('заявка по шагам: Условия и автосохране
     ).toBeInTheDocument();
     expect(window.location.pathname).toBe('/applications/app-1/edit/2');
     await user.click(screen.getByRole('button', { name: f.next }));
-    await user.click(await screen.findByRole('button', { name: f.next }));
+    await screen.findByRole('heading', { level: 1, name: /Шаг 3 из 5/ });
+    await user.click(screen.getByRole('button', { name: f.next }));
     expect(
       await screen.findByRole('heading', { level: 1, name: /Шаг 4 из 5: Согласия/ }),
     ).toBeInTheDocument();

@@ -11,12 +11,15 @@ dependencies = [
     "psycopg[binary]>=3.3.6",
     "pydantic>=2.14.1",
     "pydantic-settings>=2.16.1",
+    "pypdf>=6.0.0",
+    "python-multipart>=0.0.20",
     "pyyaml>=6.0.3",
     "redis>=6.4.0",
     "sqlalchemy>=2.1.5",
     "structlog>=26.1.0",
     "tenacity>=9.2.1",
     "uvicorn>=0.54.0",
+    "weasyprint>=70.0",
 ]
 
 [dependency-groups]

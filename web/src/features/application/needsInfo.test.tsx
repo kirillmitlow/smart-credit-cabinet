@@ -71,6 +71,12 @@ const submitButton = () => screen.getByRole('button', { name: t.submit });
 const draftButton = () => screen.getByRole('button', { name: t.saveDraft });
 
 describe('блок «Нужна информация» (T-424)', () => {
+  it('даёт загрузить выписку в задаче подтверждения выручки', async () => {
+    mockSessions({ client: makeMe() });
+    serveRound([makeTask({ kind: 'CONFIRM_REVENUE' })]);
+    renderApp('/applications/app-1');
+    expect(await screen.findByLabelText('Прикрепить документ')).toBeInTheDocument();
+  });
   it('показывает, что просят, зачем, срок, кто отвечает и номер раунда; без внутренних кодов', async () => {
     mockSessions({ client: makeMe() });
     serveRound([makeTask()]);
@@ -88,9 +94,9 @@ describe('блок «Нужна информация» (T-424)', () => {
     expect(item.getByText(/Выписка → Выгрузка в 1С/)).toBeInTheDocument();
     expect(item.getByText(t.deadlineNone, { exact: false })).toBeInTheDocument();
     expect(item.getByText(t.assignees.any, { exact: false })).toBeInTheDocument();
-    // файлов нет: честно говорим об этом и не рисуем кнопку-пустышку
-    expect(item.getByText(t.fileLater)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /загрузить|выбрать файл/i })).toBeNull();
+    expect(item.queryByText(t.fileLater)).not.toBeInTheDocument();
+    expect(item.getByRole('button', { name: 'Загрузить файл' })).toBeDisabled();
+    expect(item.getByLabelText('Прикрепить документ')).toBeInTheDocument();
     // таймлайн на этом же экране показывает паузу «Нужна ваша помощь»
     expect(screen.getByTestId('timeline')).toHaveTextContent('Нужна ваша помощь');
 

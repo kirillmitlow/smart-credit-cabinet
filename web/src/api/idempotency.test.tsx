@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { delay, http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test/render';
 import { problemResponse } from '@/test/factories';
 import { server } from '@/test/server';
@@ -10,7 +10,7 @@ import { request } from './client';
 import { useActionKey } from './idempotency';
 
 /** Кнопка «Отправить заявку»: ключ создаётся на действие, после успеха сбрасывается */
-function SubmitButton() {
+function SubmitButton({ onFinish }: { onFinish: () => void }) {
   const action = useActionKey();
   const [status, setStatus] = useState('idle');
   return (
@@ -24,7 +24,8 @@ function SubmitButton() {
               action.reset();
               setStatus('done');
             })
-            .catch(() => setStatus('failed'));
+            .catch(() => setStatus('failed'))
+            .finally(onFinish);
         }}
       >
         send
@@ -37,19 +38,29 @@ function SubmitButton() {
 describe('useActionKey', () => {
   it('двойной клик отправляет один и тот же Idempotency-Key', async () => {
     const keys: (string | null)[] = [];
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
     server.use(
       http.post('*/api/v1/applications/1/submit', async ({ request: req }) => {
         keys.push(req.headers.get('Idempotency-Key'));
-        await delay(100); // оба нажатия приходятся на время выполнения первого запроса
+        await gate; // оба запроса завершаются только после проверки общего ключа
         return HttpResponse.json({ status: 'SUBMITTED' });
       }),
     );
-    renderWithProviders(<SubmitButton />);
+    const finished = vi.fn();
+    renderWithProviders(<SubmitButton onFinish={finished} />);
     const user = userEvent.setup();
-    await user.dblClick(screen.getByRole('button', { name: 'send' }));
-    await waitFor(() => expect(keys.length).toBeGreaterThanOrEqual(2));
-    expect(new Set(keys).size).toBe(1);
-    expect(keys[0]).toBeTruthy();
+    try {
+      await user.dblClick(screen.getByRole('button', { name: 'send' }));
+      await waitFor(() => expect(keys).toHaveLength(2));
+      expect(new Set(keys).size).toBe(1);
+      expect(keys[0]).toBeTruthy();
+    } finally {
+      release();
+      await waitFor(() => expect(finished).toHaveBeenCalledTimes(2));
+    }
   });
 
   it('повтор после сбоя сохраняет ключ, после успеха ключ новый', async () => {
@@ -63,7 +74,8 @@ describe('useActionKey', () => {
           : HttpResponse.json({ status: 'SUBMITTED' });
       }),
     );
-    renderWithProviders(<SubmitButton />);
+    const finished = vi.fn();
+    renderWithProviders(<SubmitButton onFinish={finished} />);
     const user = userEvent.setup();
     const button = screen.getByRole('button', { name: 'send' });
 
@@ -80,5 +92,6 @@ describe('useActionKey', () => {
     await user.click(button);
     await waitFor(() => expect(keys).toHaveLength(3));
     expect(keys[2]).not.toBe(keys[0]);
+    await waitFor(() => expect(finished).toHaveBeenCalledTimes(3));
   });
 });

@@ -1,3 +1,4 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { useRef, useState } from 'react';
 import {
   Alert,
@@ -37,6 +38,7 @@ import {
   type RoundView,
 } from './tasksModel';
 import { putTask, putTaskList, useApplicationTasks } from './useTasks';
+import { DocumentFiles } from './DocumentFiles';
 
 const MAX_ANSWER = 4000;
 
@@ -68,6 +70,9 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
   const titleId = `task-title-${task.id}`;
   const text = fieldText(task, edits);
   const saved = isSaved(task, edits);
+  const needsFile = task.kind === 'DOCUMENT' || task.kind === 'CONFIRM_REVENUE';
+  const needsRevenue =
+    task.kind === 'CONFIRM_REVENUE' || task.details?.reasonCode === 'REVENUE_UNKNOWN';
   return (
     <Paper component="section" withBorder p="md" aria-labelledby={titleId} data-testid="info-task">
       <Stack gap="sm">
@@ -98,7 +103,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
           <Stack gap={4}>
             <Textarea
               label={fill(t.answerLabel, { title: task.title })}
-              description={task.kind === 'DOCUMENT' ? t.fileLater : undefined}
+              description={needsFile ? dt.answerHelp : undefined}
               placeholder={t.answerPlaceholder}
               value={text}
               maxLength={MAX_ANSWER}
@@ -109,6 +114,16 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
                 onEdit(task.id, event.currentTarget.value);
               }}
             />
+            {needsFile ? (
+              <DocumentFiles
+                applicationId={task.applicationId}
+                taskId={task.id}
+                disabled={locked}
+                includeUnassignedStatements={needsRevenue}
+                allowDemoStatement={needsRevenue}
+                onUploaded={(file) => onEdit(task.id, dt.uploadedAnswer(file.filename))}
+              />
+            ) : null}
             {saved ? (
               <Text size="sm" c="green.9">
                 {t.draftSaved}
@@ -160,6 +175,7 @@ function SentNotice() {
 
 function submitHint(view: RoundView, ready: boolean): string | null {
   if (ready) return null;
+  if (view.open.some((task) => task.documentReady === false)) return dt.documentsNotReady;
   return view.othersMissing.length > 0 ? t.waitingOthers : t.needAll;
 }
 
@@ -171,7 +187,7 @@ export interface NeedsInfoPanelProps {
 
 /**
  * Блок «Нужна информация» (60-03 №11, 20-03): задачи текущего раунда с полем текста на каждую,
- * черновик и «Отправить ответы». Файлы пока не загружаются (нет хранилища, T-332): ответ только текстом.
+ * черновик, загрузка файлов для DOCUMENT и «Отправить ответы».
  * Двойное нажатие даёт один запрос: пока идёт работа, повторные нажатия игнорируются.
  */
 export function NeedsInfoPanel({ application, onSent }: NeedsInfoPanelProps) {

@@ -17,7 +17,7 @@ from uuid import UUID
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
-from app.modules import auth, companies
+from app.modules import auth, companies, documents
 from app.modules.applications.models import TASK_KINDS, Application, Task
 from app.modules.applications.service import get_for, record_event, transition
 from app.modules.applications.states import Actor, Status
@@ -280,6 +280,52 @@ def save_answer(session: Session, principal: auth.Principal, task_id: UUID, text
     return task
 
 
+def document_readiness(
+    session: Session, principal: auth.Principal, application: Application, tasks: Sequence[Task]
+) -> dict[UUID, bool]:
+    """The read projection and submit guard use the same file/confirmation conditions."""
+    document_tasks = [
+        t for t in tasks if t.status == "OPEN" and t.kind in {"DOCUMENT", "CONFIRM_REVENUE"}
+    ]
+    ready = {t.id: True for t in tasks}
+    if document_tasks:
+        files = documents.list_metadata(
+            session, documents.Access(principal.user_id, (application.company_id,)), application.id
+        )
+        attached_tasks = {f.task_id for f in files if f.cancelled_at is None}
+        revenue_tasks = {
+            t.id
+            for t in document_tasks
+            if t.kind == "CONFIRM_REVENUE" or t.details.get("reasonCode") == "REVENUE_UNKNOWN"
+        }
+        if revenue_tasks:
+            company = companies.by_id(session, application.company_id)
+            source = (
+                documents.confirmed_statement_source(
+                    session, application.id, application.company_id, company.inn
+                )
+                if company is not None
+                else None
+            )
+            # A generic PDF or unconfirmed parsed statement cannot answer a revenue request.
+            attached_tasks -= revenue_tasks
+            if source is not None:
+                attached_tasks |= revenue_tasks
+        for task in document_tasks:
+            ready[task.id] = task.id in attached_tasks
+        unready_tasks = {
+            f.task_id
+            for f in files
+            if f.cancelled_at is None
+            and f.kind == "BANK_STATEMENT_1C"
+            and f.parse_status != "PARSED"
+        }
+        for task in document_tasks:
+            if task.id in unready_tasks:
+                ready[task.id] = False
+    return ready
+
+
 def submit_round(
     session: Session, principal: auth.Principal, application_id: UUID
 ) -> tuple[Application, list[Task]]:
@@ -313,11 +359,13 @@ def submit_round(
         )
     )
     missing = [t for t in open_tasks if t.answer is None]
+    ready = document_readiness(session, principal, application, open_tasks)
+    missing.extend(t for t in open_tasks if not ready[t.id] and t not in missing)
     if missing:
         raise AppError(
             409,
             "ROUND_INCOMPLETE",
-            "Ответьте на все задачи, потом отправляйте",
+            "Ответьте на все задачи, дождитесь разбора выписок и подтвердите поступления от бизнеса",
             errors=[{"taskId": str(t.id)} for t in missing],
         )
     if _recheck is None:

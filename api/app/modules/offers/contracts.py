@@ -1,8 +1,8 @@
 """Договор по принятому варианту: `contract_uid`, номер, тело и его SHA-256 (T-341, 20-04, 50-12).
 
-PDF не делаем (T-336): тело — детерминированный JSON, поэтому одно и то же предложение даёт
-побайтно одинаковый документ и один и тот же хеш. Подписывается именно сохранённое тело, а не
-пересозданное; при проверке подписи хеш пересчитывается (`verify_integrity`).
+Тело JSON сохраняет неизменные расчётные условия и свой SHA-256. Для новых договоров
+сохраняются PDF договора и графика; подпись привязана к исходному PDF. Старые подписанные
+JSON остаются доступны без пересоздания. Проверяются и условия, и байты файла.
 """
 
 from __future__ import annotations
@@ -19,14 +19,14 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.modules import companies
+from app.modules import companies, documents
 from app.modules.applications import BANK_NAME, Actor, Application, record_event
 from app.modules.offers import terms
-from app.modules.offers.models import Contract, Offer, OfferVariant
+from app.modules.offers.models import Contract, Offer, OfferVariant, Signature
 from app.shared import clock
 from app.shared.errors import AppError, not_found
 
-TEMPLATE_VERSION = "credit-agreement-v1"
+TEMPLATE_VERSION = "credit-agreement-pdf-v1"
 DEMO_NOTICE = "ДЕМО. Синтетический документ, юридической силы не имеет"
 _UID_NAMESPACE = uuid.UUID("0b0f6a52-7f3f-4c55-8f55-3a6c5ab1c0de")
 
@@ -165,6 +165,23 @@ def create_contract(
     )
     session.add(contract)
     session.flush()
+    context = documents.UploadContext(application.company_id, application.id)
+    # Accepting and persisting the two originals is atomic. A failed render rolls back acceptance.
+    for kind, suffix, schedule_only in (
+        ("CREDIT_AGREEMENT", "agreement", False),
+        ("PAYMENT_SCHEDULE", "schedule", True),
+    ):
+        document = documents.store_generated(
+            session,
+            context,
+            application.created_by,
+            content=documents.render_credit(body, schedule_only=schedule_only),
+            kind=kind,
+            filename=f"{contract.number}-{suffix}.pdf",
+            template_version=TEMPLATE_VERSION,
+        )
+        if kind == "CREDIT_AGREEMENT":
+            contract.document_id = document.id
     record_event(
         session,
         application,
@@ -189,6 +206,68 @@ def verify_integrity(contract: Contract) -> None:
         )
 
 
+def _verify_signed_hash(session: Session, contract: Contract, digest: str) -> None:
+    if contract.status != "SIGNED":
+        return
+    signatures = list(
+        session.scalars(select(Signature).where(Signature.contract_id == contract.id))
+    )
+    if not any(signature.signer_role == "DIRECTOR" for signature in signatures) or any(
+        signature.content_hash != digest for signature in signatures
+    ):
+        raise AppError(409, "CONTRACT_TAMPERED", "Файл не соответствует сохранённой подписи")
+
+
+def verify_variant(contract: Contract, variant: OfferVariant) -> None:
+    """Mutable links must not change the conditions contained in the signed original."""
+    try:
+        body = json.loads(contract.body)
+        matching = (
+            body["product"]["code"] == variant.product_code
+            and body["amountRub"] == variant.amount_rub
+            and body["termMonths"] == variant.term_months
+            and Decimal(body["ratePercent"]) == variant.rate_percent
+            and body["contractUid"] == contract.contract_uid
+            and body["number"] == contract.number
+        )
+    except (ValueError, KeyError, TypeError):
+        matching = False
+    if not matching:
+        raise AppError(409, "CONTRACT_TAMPERED", "Условия не соответствуют сохранённому договору")
+
+
+def document_content(session: Session, contract: Contract) -> tuple[bytes, str, str]:
+    """Keep legacy signed JSON readable; new contracts sign the saved PDF original."""
+    verify_integrity(contract)
+    if contract.document_id is None:
+        if contract.template_version == TEMPLATE_VERSION:
+            raise AppError(409, "DOCUMENT_NOT_READY", "Документ ещё не готов для подписи")
+        _verify_signed_hash(session, contract, contract.content_hash)
+        return contract.body.encode("utf-8"), "application/json", contract.content_hash
+    application = session.get(Application, contract.application_id)
+    if application is None:
+        raise not_found("Заявка")
+    row, content = documents.verified_content(
+        session,
+        documents.Access(application.created_by, (application.company_id,)),
+        contract.document_id,
+    )
+    if (
+        row.application_id != application.id
+        or row.kind != "CREDIT_AGREEMENT"
+        or row.origin != "SYSTEM_GENERATED"
+        or row.template_version != contract.template_version
+        or documents.credit_source_hash(content) != contract.content_hash
+    ):
+        raise AppError(409, "CONTRACT_TAMPERED", "Файл не соответствует договору")
+    _verify_signed_hash(session, contract, row.sha256)
+    return content, row.mime, row.sha256
+
+
+def signing_hash(session: Session, contract: Contract) -> str:
+    return document_content(session, contract)[2]
+
+
 @dataclass(frozen=True, slots=True)
 class SignedTerms:
     product_code: str
@@ -209,6 +288,7 @@ def signed_terms(session: Session, application_id: UUID) -> SignedTerms | None:
         .where(
             Contract.application_id == application_id,
             Contract.status == "SIGNED",
+            Offer.application_id == Contract.application_id,
             Offer.status == "ACCEPTED",
             Offer.accepted_variant_id == OfferVariant.id,
             OfferVariant.offer_id == Offer.id,
@@ -220,6 +300,8 @@ def signed_terms(session: Session, application_id: UUID) -> SignedTerms | None:
     if contract.signed_at is None:
         return None
     verify_integrity(contract)
+    signing_hash(session, contract)
+    verify_variant(contract, variant)
     return SignedTerms(
         product_code=variant.product_code,
         amount_rub=variant.amount_rub,

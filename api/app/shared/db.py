@@ -12,7 +12,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from alembic import command
@@ -20,7 +20,14 @@ from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from sqlalchemy import DateTime, Engine, MetaData, Uuid, create_engine, event, text
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    Session,
+    SessionTransaction,
+    mapped_column,
+    sessionmaker,
+)
 
 from app.shared import clock
 from app.shared.ids import uuid7
@@ -96,12 +103,48 @@ def transaction() -> Iterator[Session]:
 
 
 def after_commit(session: Session, callback: Callable[[], None]) -> None:
-    """Выполнить действие только после успешного коммита (постановка задач, R10)."""
+    """Run after the outer commit, never after RELEASE SAVEPOINT (R10).
 
-    def _run(_session: Session) -> None:
-        callback()
+    A nested rollback discards its callbacks, including released children; outer rollback
+    or Session.close discards everything. Callers handle external delivery failures: the
+    database is already committed when a callback runs.
+    """
+    owner = session.get_nested_transaction() or session.get_transaction()
+    if owner is None or not owner.is_active:
+        raise ValueError("after_commit requires an active transaction")
+    key = "scc_after_outer_commit"
+    if key not in session.info:
+        pending: list[tuple[SessionTransaction, Callable[[], None]]] = []
+        session.info[key] = pending
 
-    event.listen(session, "after_commit", _run, once=True)
+        def committed(current: Session) -> None:
+            if current.in_nested_transaction():
+                return
+            callbacks = list(pending)
+            pending.clear()  # failure must never resurrect callbacks in a reused Session
+            for _, action in callbacks:
+                action()
+
+        def rolled_back(_current: Session, previous: SessionTransaction) -> None:
+            def belongs_to(transaction: SessionTransaction) -> bool:
+                ancestor: SessionTransaction | None = transaction
+                while ancestor is not None:
+                    if ancestor is previous:
+                        return True
+                    ancestor = ancestor.parent
+                return False
+
+            pending[:] = [(tx, action) for tx, action in pending if not belongs_to(tx)]
+
+        def ended(_current: Session, transaction: SessionTransaction) -> None:
+            if transaction.parent is None:
+                pending.clear()  # also handles close/reset without an explicit rollback
+
+        event.listen(session, "after_commit", committed)
+        event.listen(session, "after_soft_rollback", rolled_back)
+        event.listen(session, "after_transaction_end", ended)
+    queue = cast(list[tuple[SessionTransaction, Callable[[], None]]], session.info[key])
+    queue.append((owner, callback))
 
 
 def alembic_config(url: str | None = None) -> Config:

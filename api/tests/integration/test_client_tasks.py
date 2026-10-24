@@ -107,8 +107,8 @@ def to_manual_review(database: db.Database, case: Case) -> None:
     assert status_of(database, case.application_id) == "MANUAL_REVIEW"
 
 
-def spec(title: str = "Договор поставщика", **kwargs: Any) -> TaskSpec:
-    return TaskSpec(kind="DOCUMENT", title=title, why_text="Нужно для оценки", **kwargs)
+def spec(title: str = "Пояснение по поставке", **kwargs: Any) -> TaskSpec:
+    return TaskSpec(kind="EXPLANATION", title=title, why_text="Нужно для оценки", **kwargs)
 
 
 def ask(

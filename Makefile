@@ -43,14 +43,14 @@ docs-check: ## Ссылки в документах
 
 check: lint docs-check ## Всё, что должно быть зелёным перед PR: линтеры, типы, границы, быстрые тесты
 	$(PY_SCRIPTS) -m pytest -q scripts/tests
-	@for p in $(PY_PROJECTS); do $(MAKE) --no-print-directory -C $$p check; done
+	@for p in $(PY_PROJECTS); do $(MAKE) --no-print-directory -C $$p check || exit $$?; done
 	$(MAKE) --no-print-directory openapi-check
 ifneq ($(HAS_WEB),)
 	$(MAKE) --no-print-directory -C web check
 endif
 
 test: check ## Все тесты (включая медленные)
-	@for p in $(PY_PROJECTS); do $(MAKE) --no-print-directory -C $$p test; done
+	@for p in $(PY_PROJECTS); do $(MAKE) --no-print-directory -C $$p test || exit $$?; done
 ifneq ($(HAS_WEB),)
 	$(MAKE) --no-print-directory -C web test
 endif

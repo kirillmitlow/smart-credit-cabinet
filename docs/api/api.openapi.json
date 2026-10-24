@@ -76,6 +76,81 @@
         }
       }
     },
+    "/events/stream": {
+      "get": {
+        "tags": [
+          "живые статусы"
+        ],
+        "summary": "Stream Events",
+        "operationId": "streamEvents",
+        "parameters": [
+          {
+            "name": "zone",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Zone"
+            }
+          },
+          {
+            "name": "lastEventId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lasteventid"
+            }
+          },
+          {
+            "name": "last-event-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/roles/{inn}": {
       "get": {
         "tags": [
@@ -1798,6 +1873,392 @@
         }
       }
     },
+    "/documents/{document_id}/confirm": {
+      "post": {
+        "tags": [
+          "документы"
+        ],
+        "summary": "Подтвердить поступления от бизнеса по проверенной выписке",
+        "operationId": "confirmStatement",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmStatementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents": {
+      "get": {
+        "tags": [
+          "документы"
+        ],
+        "summary": "List Documents",
+        "operationId": "listDocuments",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Applicationid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentOut"
+                  },
+                  "title": "Response Listdocuments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "документы"
+        ],
+        "summary": "Загрузить исходный файл; содержимое неизменяемо",
+        "operationId": "uploadDocument",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "applicationId",
+                  "kind",
+                  "file"
+                ],
+                "properties": {
+                  "applicationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "taskId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "BANK_STATEMENT_1C",
+                      "FINANCIALS",
+                      "CONTRACT",
+                      "OTHER"
+                    ]
+                  },
+                  "replacesId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "документы"
+        ],
+        "summary": "Get Document",
+        "operationId": "getDocument",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "zone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "client",
+                "bank"
+              ],
+              "type": "string",
+              "default": "client",
+              "title": "Zone"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{document_id}/download": {
+      "get": {
+        "tags": [
+          "документы"
+        ],
+        "summary": "Download Document",
+        "operationId": "downloadDocument",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "preview",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Preview"
+            }
+          },
+          {
+            "name": "zone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "client",
+                "bank"
+              ],
+              "type": "string",
+              "default": "client",
+              "title": "Zone"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/bank-statement": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Сохранить тестовую выписку для открытой задачи своей компании",
+        "description": "Только DEMO_MODE и клиентская сессия. Генератор моков отдаёт исходный файл; дальше действуют обычные лимиты, фоновый разбор и отдельное подтверждение поступлений.",
+        "operationId": "generateDemoStatement",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoStatementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED / FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "409": {
+            "description": "TASK_CLOSED / INVALID_TRANSITION / IDEMPOTENCY_KEY_REUSED / DEMO_RESET_IN_PROGRESS / DEMO_STATEMENT_SCENARIO_REQUIRED / DOCUMENT_REPLACEMENT_CONFLICT"
+          },
+          "413": {
+            "description": "FILE_TOO_LARGE / APPLICATION_FILES_TOO_LARGE"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR / TASK_NOT_DOCUMENT / TOO_MANY_FILES / UNSUPPORTED_FORMAT"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          },
+          "503": {
+            "description": "DEMO_STATEMENT_UNAVAILABLE / DEMO_CONTROL_UNAVAILABLE"
+          }
+        }
+      }
+    },
     "/products": {
       "get": {
         "tags": [
@@ -3489,8 +3950,7 @@
             "anyOf": [
               {
                 "items": {
-                  "additionalProperties": true,
-                  "type": "object"
+                  "$ref": "#/components/schemas/BankDocument"
                 },
                 "type": "array"
               },
@@ -3498,8 +3958,17 @@
                 "type": "null"
               }
             ],
-            "title": "Documents",
-            "description": "null — сервис T-332 не подключён"
+            "title": "Documents"
+          },
+          "collateral": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BankCollateral"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "clientTasks": {
             "items": {
@@ -3678,6 +4147,30 @@
           "createdAt"
         ],
         "title": "BankClientTask"
+      },
+      "BankCollateral": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "valueRub": {
+            "type": "integer",
+            "title": "Valuerub"
+          },
+          "source": {
+            "type": "string",
+            "const": "CLIENT_DECLARED",
+            "title": "Source",
+            "default": "CLIENT_DECLARED"
+          }
+        },
+        "type": "object",
+        "required": [
+          "description",
+          "valueRub"
+        ],
+        "title": "BankCollateral"
       },
       "BankCompany": {
         "properties": {
@@ -4399,6 +4892,110 @@
         "additionalProperties": false,
         "type": "object",
         "title": "BankDemoLoginRequest"
+      },
+      "BankDocument": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "taskId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taskid"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "mime": {
+            "type": "string",
+            "title": "Mime"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "title": "Sizebytes"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "parseStatus": {
+            "type": "string",
+            "title": "Parsestatus"
+          },
+          "parseError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parseerror"
+          },
+          "confirmedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmedat"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "cancelledAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelledat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "taskId",
+          "kind",
+          "origin",
+          "filename",
+          "mime",
+          "sizeBytes",
+          "sha256",
+          "parseStatus",
+          "createdAt",
+          "cancelledAt"
+        ],
+        "title": "BankDocument"
       },
       "BankFactor": {
         "properties": {
@@ -6208,6 +6805,37 @@
         ],
         "title": "CompanyProfile"
       },
+      "ConfirmStatementIn": {
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256"
+          },
+          "acknowledged": {
+            "type": "boolean",
+            "const": true,
+            "title": "Acknowledged"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/StatementMonthConfirmation"
+            },
+            "type": "array",
+            "maxItems": 24,
+            "minItems": 3,
+            "title": "Months"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sha256",
+          "acknowledged",
+          "months"
+        ],
+        "title": "ConfirmStatementIn"
+      },
       "ConsentItemOut": {
         "properties": {
           "kind": {
@@ -6598,6 +7226,168 @@
           "offer"
         ],
         "title": "DeclinedOut"
+      },
+      "DemoStatementIn": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "taskId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Taskid"
+          },
+          "replacesId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replacesid"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "applicationId",
+          "taskId"
+        ],
+        "title": "DemoStatementIn"
+      },
+      "DocumentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Companyid"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "taskId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taskid"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "mime": {
+            "type": "string",
+            "title": "Mime"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "title": "Sizebytes"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "parseStatus": {
+            "type": "string",
+            "title": "Parsestatus"
+          },
+          "parsed": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parsed"
+          },
+          "parseError": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parseerror"
+          },
+          "createdAt": {
+            "type": "string",
+            "title": "Createdat"
+          },
+          "cancelledAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelledat"
+          },
+          "confirmedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmedat"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "companyId",
+          "applicationId",
+          "taskId",
+          "kind",
+          "origin",
+          "filename",
+          "mime",
+          "sizeBytes",
+          "sha256",
+          "parseStatus",
+          "parsed",
+          "parseError",
+          "createdAt",
+          "cancelledAt",
+          "confirmedAt"
+        ],
+        "title": "DocumentOut"
       },
       "DraftPatch": {
         "properties": {
@@ -8560,6 +9350,28 @@
         ],
         "title": "SignerOut"
       },
+      "StatementMonthConfirmation": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "title": "Month"
+          },
+          "businessIncomingKopecks": {
+            "type": "integer",
+            "maximum": 9007199254740991.0,
+            "minimum": 0.0,
+            "title": "Businessincomingkopecks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "month",
+          "businessIncomingKopecks"
+        ],
+        "title": "StatementMonthConfirmation"
+      },
       "Status": {
         "type": "string",
         "enum": [
@@ -8620,7 +9432,7 @@
           "canSubmit": {
             "type": "boolean",
             "title": "Cansubmit",
-            "description": "Раунд открыт и на все его задачи есть ответ"
+            "description": "Раунд открыт, на все задачи есть ответ и обязательные документы готовы"
           }
         },
         "type": "object",
@@ -8732,6 +9544,12 @@
           "canAnswer": {
             "type": "boolean",
             "title": "Cananswer"
+          },
+          "documentReady": {
+            "type": "boolean",
+            "title": "Documentready",
+            "description": "Все требуемые файлы проверены; поступления подтверждены, если нужна выручка",
+            "default": true
           },
           "createdAt": {
             "type": "string",
@@ -9168,6 +9986,14 @@
           "askCollateral"
         ],
         "title": "WizardResult"
+      },
+      "Zone": {
+        "type": "string",
+        "enum": [
+          "client",
+          "bank"
+        ],
+        "title": "Zone"
       }
     }
   }

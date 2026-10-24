@@ -17,10 +17,10 @@ from sqlalchemy import Sequence, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.modules import auth
+from app.modules import auth, companies, notifications
 from app.modules.applications.models import Application, ApplicationEvent, ApplicationVersion
 from app.modules.applications.states import CLIENT_ACTIONS, TERMINAL, Actor, Status, is_allowed
-from app.shared import clock
+from app.shared import clock, db
 from app.shared.errors import AppError, not_found
 from app.shared.tasks import enqueue
 
@@ -65,6 +65,8 @@ def record_event(
     )
     session.add(event)
     session.flush()
+    event_id, company_id = event.id, application.company_id
+    db.after_commit(session, lambda: notifications.publish(event_id, company_id))
     return event
 
 
@@ -195,6 +197,22 @@ def allowed_actions(application: Application, principal: auth.Principal) -> list
 DRAFT_FIELDS = ("product_code", "amount_rub", "term_months", "purpose_code")
 
 
+def validate_collateral(answers: dict[str, Any]) -> None:
+    raw = answers.get("collateral")
+    if raw is None:
+        return
+    if (
+        not isinstance(raw, dict)
+        or not isinstance(raw.get("description"), str)
+        or not 1 <= len(raw["description"].strip()) <= 500
+        or type(raw.get("valueRub")) is not int
+        or not 0 < raw["valueRub"] <= 1_000_000_000
+    ):
+        raise AppError(
+            422, "INVALID_COLLATERAL", "Укажите описание залога и положительную стоимость в рублях"
+        )
+
+
 def update_draft(
     session: Session,
     application: Application,
@@ -216,6 +234,7 @@ def update_draft(
             "Черновик изменён в другой вкладке",
             errors=[{"version": application.version}],
         )
+    validate_collateral(answers)
     values: dict[str, Any] = {k: v for k, v in fields.items() if k in DRAFT_FIELDS}
     values["draft"] = {**application.draft, **answers}
     values["version"] = application.version + 1
@@ -249,6 +268,7 @@ def _snapshot(application: Application) -> dict[str, Any]:
 
 
 def submit(session: Session, principal: auth.Principal, application: Application) -> Application:
+    validate_collateral(application.draft)
     missing = [
         f for f in ("product_code", "amount_rub", "term_months") if getattr(application, f) is None
     ]
@@ -333,6 +353,17 @@ def add_version(
 
 def withdraw(session: Session, principal: auth.Principal, application: Application) -> Application:
     from app.modules.applications import client_tasks  # отложенно: client_tasks импортирует service
+
+    # A cached session may still contain a membership whose role/access has been revoked.
+    user = auth.get(session, principal.user_id)
+    if user is None or user.status != "ACTIVE" or user.role != "CLIENT":
+        raise AppError(401, "UNAUTHENTICATED", "Нужно войти")
+    members = companies.memberships_of(session, principal.user_id)
+    if not any(
+        member.company_id == application.company_id and member.role in {"DIRECTOR", "ACCOUNTANT"}
+        for member, _ in members
+    ):
+        raise not_found("Заявка")
 
     transition(
         session, application, Status.WITHDRAWN, actor=Actor.CLIENT, actor_id=principal.user_id

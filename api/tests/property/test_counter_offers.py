@@ -11,6 +11,7 @@ import os
 import subprocess  # noqa: S404 — запуск того же интерпретатора с другим PYTHONHASHSEED
 import sys
 from collections.abc import Iterator
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -235,10 +236,11 @@ def _amounts(search: counter_offers._Search) -> Iterator[int]:
 
 
 @settings(deadline=None, max_examples=20)
-@given(counter_offer_params())
+@given(counter_offer_params().map(lambda p: replace(p, amount_rub=min(p.amount_rub, 4_000_000))))
 def test_bisection_and_distance_choice_agree_with_a_full_scan(params: RequestParams) -> None:
     """Проходящие суммы связки — отрезок снизу, а ближе всего к запросу — его верхний конец."""
-    assume(params.amount_rub <= 4_000_000)  # полный перебор: до 80 сумм на связку
+    # До 80 сумм на связку задаём конструктивно: отбрасывание больших запросов
+    # вместе с отсутствием запуска поиска превышало лимит фильтрации Hypothesis.
     search = _spied_search(params.to_input())
     for product in (search.app.product, Product.EXPRESS, Product.WORKING_CAPITAL):
         for term in search.terms(product):

@@ -1,10 +1,83 @@
+import { documentTexts as dt } from '@/texts/documents';
 import { Alert, Anchor, Badge, Group, Paper, Stack, Text, Title } from '@mantine/core';
-import type { BankApplicationCard } from '@/api/generated/model';
-import { formatDate, formatDateTime } from '@/lib/format';
+import type { BankApplicationCard, BankDocument } from '@/api/generated/model';
+import { getDownloadDocumentUrl } from '@/api/generated/api';
+import { resolveUrl } from '@/api/client';
+import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { applicationStatusLabels } from '@/texts';
 import { bankCard as t } from '@/texts/bank';
 import { BankSnapshotData } from './BankSnapshotData';
 import { bankLabel } from './bankFormatting';
+
+function BankDocumentItem({ document }: { document: BankDocument }) {
+  const pdf = document.mime === 'application/pdf';
+  const download = resolveUrl(getDownloadDocumentUrl(document.id, { zone: 'bank' }));
+  const preview = pdf
+    ? resolveUrl(getDownloadDocumentUrl(document.id, { zone: 'bank', preview: true }))
+    : download;
+  return (
+    <Paper withBorder p="sm">
+      <Text size="xs" c="dimmed">
+        {dt.kinds[document.kind] ?? dt.kinds.OTHER}
+      </Text>
+      <Anchor
+        href={preview}
+        target={pdf ? '_blank' : undefined}
+        rel="noopener noreferrer"
+        style={{ overflowWrap: 'anywhere' }}
+      >
+        {document.filename}
+      </Anchor>
+      {pdf ? <Text size="xs">{dt.openPdf}</Text> : null}
+      <Text size="sm">
+        {document.origin === 'SYSTEM_GENERATED'
+          ? dt.generated
+          : document.origin === 'DEMO_GENERATED'
+            ? dt.demoGenerated
+            : dt.uploaded}
+        {' · '}
+        {formatDateTime(document.createdAt)}
+        {' · '}
+        {dt.size(document.sizeBytes)}
+      </Text>
+      <Anchor size="sm" href={download} aria-label={`${dt.download}: ${document.filename}`}>
+        {dt.download}
+      </Anchor>
+      {document.cancelledAt ? <Badge color="gray">{dt.replaced}</Badge> : null}
+      {document.kind === 'BANK_STATEMENT_1C' ? (
+        document.parseStatus === 'FAILED' ? (
+          <Text size="sm" c="red.8" role="alert">
+            {dt.parseErrors[document.parseError ?? ''] ?? dt.bankFailed}
+          </Text>
+        ) : document.parseStatus === 'PARSED' ? (
+          <Stack gap={2}>
+            <Text size="sm">{dt.bankParsed}</Text>
+            <Text size="sm">
+              {document.confirmedAt
+                ? `${dt.bankConfirmed}: ${formatDateTime(document.confirmedAt)}`
+                : dt.bankNotConfirmed}
+            </Text>
+          </Stack>
+        ) : ['PENDING', 'PROCESSING'].includes(document.parseStatus) ? (
+          <Text size="sm" role="status">
+            {document.parseStatus === 'PROCESSING' ? dt.processing : dt.pending}
+          </Text>
+        ) : null
+      ) : null}
+      {pdf && document.origin !== 'SYSTEM_GENERATED' ? (
+        <Text size="sm" mt="xs">
+          {dt.pdfReview}
+        </Text>
+      ) : null}
+      <details>
+        <summary>{dt.hash}</summary>
+        <Text size="xs" component="code" style={{ overflowWrap: 'anywhere' }}>
+          {document.sha256}
+        </Text>
+      </details>
+    </Paper>
+  );
+}
 
 export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
   return (
@@ -128,13 +201,33 @@ export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
         <Title order={2} size="h3">
           {t.documents}
         </Title>
-        <Text mt="sm">
-          {card.documents === null
-            ? t.documentsUnavailable
-            : card.documents.length
-              ? t.documentsPreviewUnavailable
-              : t.noDocuments}
-        </Text>
+        {card.documents === null ? (
+          <Text mt="sm">{t.documentsUnavailable}</Text>
+        ) : card.documents.length === 0 ? (
+          <Text mt="sm">{t.noDocuments}</Text>
+        ) : (
+          <Stack gap="sm" mt="sm">
+            {card.documents.map((document) => (
+              <BankDocumentItem key={document.id} document={document} />
+            ))}
+          </Stack>
+        )}
+      </Paper>
+      <Paper withBorder p="md" data-testid="bank-collateral">
+        <Title order={2} size="h3">
+          {dt.collateralTitle}
+        </Title>
+        {card.collateral ? (
+          <Stack gap="xs" mt="sm">
+            <Text>{card.collateral.description}</Text>
+            <Text>{dt.declaredValue(formatMoney(card.collateral.valueRub))}</Text>
+            <Text size="sm" c="dimmed">
+              {dt.collateralSource}
+            </Text>
+          </Stack>
+        ) : (
+          <Text mt="sm">{dt.noCollateral}</Text>
+        )}
       </Paper>
     </>
   );

@@ -4,6 +4,7 @@ import { getGetContractDocumentUrl, useGetApplicationOffer, useGetLoan } from '@
 import type { LoanDetail } from '@/api/generated/model';
 import { isAppError } from '@/api/errors';
 import { resolveUrl } from '@/api/client';
+import { ProblemAlert } from '@/components/ProblemAlert';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { formatDate, formatMoney, formatPercent, formatTermMonths } from '@/lib/format';
 import { usePageHeading } from '@/lib/usePageHeading';
@@ -28,7 +29,24 @@ function ContractLink({ applicationId }: { applicationId: string }) {
     query: { select: (result) => (result.status === 200 ? result.data : undefined) },
   });
   const contractId = offer.data?.contractId;
-  if (!contractId) return null;
+  if (offer.isPending)
+    return (
+      <Text size="sm" role="status">
+        {t.detail.documentLoading}
+      </Text>
+    );
+  if (offer.error && !(isAppError(offer.error) && offer.error.status === 404)) {
+    return <ProblemAlert error={offer.error} onAction={() => void offer.refetch()} />;
+  }
+  if (!contractId)
+    return (
+      <Stack gap="xs" align="flex-start">
+        <Text size="sm">{t.detail.documentMissing}</Text>
+        <Button variant="light" onClick={() => void offer.refetch()}>
+          {t.detail.documentRefresh}
+        </Button>
+      </Stack>
+    );
   return (
     <Anchor
       href={resolveUrl(getGetContractDocumentUrl(contractId))}

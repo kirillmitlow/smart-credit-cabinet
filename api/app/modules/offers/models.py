@@ -100,7 +100,7 @@ class OfferVariant(IdMixin, Base):
 class Contract(IdMixin, Base):
     """Договор по принятому варианту. Тело хранится как есть, подписывается именно оно (20-04).
 
-    PDF (T-336) в прототипе не делаем: `body` — детерминированный JSON, `content_hash` — его SHA-256.
+    `body` — снимок условий JSON, `content_hash` — его SHA-256; document_id указывает на PDF.
     Правка условий = новая `revision`, прежний договор получает `CANCELLED`.
     """
 
@@ -127,7 +127,7 @@ class Contract(IdMixin, Base):
     # УИд договора в формате БКИ: `contractUid` в АБС = `uid` в БКИ (моки, 7.5)
     contract_uid: Mapped[str] = mapped_column(String(40))
     number: Mapped[str] = mapped_column(String(40))
-    # Файла в хранилище пока нет (T-336): ссылка появится вместе с `documents`
+    # NULL только у старых JSON-договоров; новые ссылаются на сохранённый PDF.
     document_id: Mapped[UUID | None] = mapped_column(Uuid)
     template_version: Mapped[str] = mapped_column(String(32))
     body: Mapped[str] = mapped_column(Text)

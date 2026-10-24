@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.modules import auth
 from app.modules.applications import Application
-from app.modules.offers import signing, terms
+from app.modules.offers import contracts, signing, terms
 from app.modules.offers.models import Contract, Offer, OfferVariant
 from app.modules.offers.schemas import (
     ContractOut,
@@ -78,6 +78,8 @@ def contract_out(
     variant = session.get(OfferVariant, contract.variant_id)
     if variant is None:
         raise not_found("Вариант")
+    contracts.verify_integrity(contract)
+    contracts.verify_variant(contract, variant)
     required = signing.signers(session, contract, application)
     member = principal.membership(application.company_id)
     open_for_signing = contract.status == "READY" and application.status == "OFFER_ACCEPTED"
@@ -88,7 +90,7 @@ def contract_out(
         contract_uid=contract.contract_uid,
         number=contract.number,
         status=contract.status,
-        content_hash=contract.content_hash,
+        content_hash=contracts.signing_hash(session, contract),
         template_version=contract.template_version,
         created_at=contract.created_at,
         signed_at=contract.signed_at,

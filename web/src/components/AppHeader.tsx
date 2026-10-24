@@ -60,8 +60,8 @@ export function AppHeader({
           </Text>
         </Box>
       ) : null}
-      <Group justify="space-between" px="md" h={64} wrap="nowrap">
-        <Group gap="xl" wrap="nowrap">
+      <Group justify="space-between" align="center" px="md" py="sm" mih={64} wrap="wrap">
+        <Group gap="xl" wrap="wrap" miw={0}>
           <Anchor component={Link} to={homeHref} fw={700} fz="lg" underline="never" c="dark">
             {shell.productName}
           </Anchor>
@@ -77,10 +77,10 @@ export function AppHeader({
             </Group>
           </Box>
         </Group>
-        <Group gap="md" wrap="nowrap">
+        <Group gap="md" wrap="wrap" miw={0} maw="100%">
           {companyName ? (
-            <Group gap="xs" wrap="nowrap">
-              <Text size="sm" fw={500}>
+            <Group gap="xs" wrap="wrap" miw={0} maw="100%">
+              <Text size="sm" fw={500} style={{ overflowWrap: 'anywhere' }}>
                 {companyName}
               </Text>
               {canSwitchCompany ? (
@@ -92,7 +92,7 @@ export function AppHeader({
           ) : null}
           {notifications}
           {userName ? (
-            <Text size="sm" c="dimmed">
+            <Text size="sm" c="dimmed" style={{ overflowWrap: 'anywhere' }}>
               {fill(shell.user.signedInAs, { name: userName })}
             </Text>
           ) : null}

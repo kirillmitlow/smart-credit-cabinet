@@ -67,6 +67,7 @@ export function canSubmitRound(view: RoundView, edits: Edits): boolean {
   return (
     view.open.length > 0 &&
     view.mine.every((task) => fieldText(task, edits).trim() !== '') &&
-    view.othersMissing.length === 0
+    view.othersMissing.length === 0 &&
+    view.open.every((task) => task.documentReady !== false)
   );
 }

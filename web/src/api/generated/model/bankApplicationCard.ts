@@ -6,11 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { BankApplicant } from './bankApplicant';
-import type { BankApplicationCardDocuments } from './bankApplicationCardDocuments';
 import type { BankApplicationCardDraft } from './bankApplicationCardDraft';
 import type { BankClientTask } from './bankClientTask';
+import type { BankCollateral } from './bankCollateral';
 import type { BankDecision } from './bankDecision';
 import type { BankDecisionSummary } from './bankDecisionSummary';
+import type { BankDocument } from './bankDocument';
 import type { BankHistoryEvent } from './bankHistoryEvent';
 import type { BankRecommendation } from './bankRecommendation';
 import type { BankSourceSnapshot } from './bankSourceSnapshot';
@@ -38,8 +39,8 @@ export interface BankApplicationCard {
   decisions: BankDecisionSummary[];
   sourceSnapshots: BankSourceSnapshot[];
   history: BankHistoryEvent[];
-  /** null — сервис T-332 не подключён */
-  documents: BankApplicationCardDocuments;
+  documents: BankDocument[] | null;
+  collateral?: BankCollateral | null;
   clientTasks?: BankClientTask[];
   /** Последний отправленный клиентом раунд, не черновик */
   latestAnsweredRound?: number | null;
