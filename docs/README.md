@@ -17,6 +17,8 @@
 | Сторонние компоненты, лицензии и пять моков | [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md), [полный реестр](../licenses/README.md) |
 | Проверка требований сдачи | [Чек-лист](plan/80-delivery/05-submission-checklist.md) |
 
+- [Короткий показ жюри](jury-demo-script.md) и [финальная сверка / продолжение](plan/reviews/C-2026-10-24-jury-final-check.md).
+
 ## Требования и принятые решения
 
 - [Текст кейса](case.md) и [уточнения организаторов](plan/10-product/00-organizer-clarifications.md).
