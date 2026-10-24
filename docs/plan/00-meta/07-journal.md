@@ -1075,4 +1075,3 @@ README актуализирован по банковским функциям, 
 **Подсказки следующему.** Своя копия /private/tmp/scc-jury-submission-repo, отдельный draftPR, продолжать тот же остаток. Временная rounds-collection уже подготовлена, но не запускалась; команды/границы — новый jury-final-check. Бесплатныйresetбезпрямойпросьбынеиспользован. Не объявлять финальный пакет завершённым до актуализации послеБКИ.
 
 **Файлы.** README.md, docs/api/README.md и postman_collection.json, docs/README.md, docs/jury-demo-script.md, reviews/C-2026-10-24-jury-final-check.md и jury-final-results.json, строкаC/журнал.
-
