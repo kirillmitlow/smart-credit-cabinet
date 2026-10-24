@@ -83,6 +83,15 @@ def _rounds(session: Session, application_id: UUID) -> tuple[int, int]:
     return last, int(open_count or 0)
 
 
+def information_rounds_exhausted(session: Session, application_id: UUID) -> bool:
+    """Публичный порт для конвейера: после трёх запросов нужен ручной разбор (D-091).
+
+    Вызывающий держит блокировку заявки, как и при создании нового раунда.
+    """
+    last_round, _ = _rounds(session, application_id)
+    return last_round >= MAX_ROUNDS
+
+
 def _validate(session: Session, application: Application, items: Sequence[TaskSpec]) -> None:
     errors: list[dict[str, Any]] = []
     if not 1 <= len(items) <= MAX_TASKS_PER_ROUND:

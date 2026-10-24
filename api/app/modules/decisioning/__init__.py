@@ -18,7 +18,12 @@ from app.modules.decisioning.loan_math import (
 )
 from app.modules.decisioning.policy import Policy, PolicyError, parse_policy
 from app.modules.decisioning.pricing import lowest_rate
-from app.modules.decisioning.products import ProductContext, auto_limit, check_product
+from app.modules.decisioning.products import (
+    ProductContext,
+    authority_level,
+    auto_limit,
+    check_product,
+)
 from app.modules.decisioning.serialization import (
     input_from_json,
     input_to_json,
@@ -66,6 +71,7 @@ __all__ = [
     "ReasonCode",
     "ScheduleRow",
     "add_months",
+    "authority_level",
     "auto_limit",
     "build_schedule",
     "bullet_schedule",

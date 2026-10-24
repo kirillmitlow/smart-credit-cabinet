@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import structlog
 from sqlalchemy.orm import Session
 
 from app.modules import offers
@@ -17,9 +16,6 @@ from app.modules.decisioning import DecisionInput, DecisionResult, UnderwriterTe
 from app.modules.decisioning.types import Outcome, Variant
 from app.modules.offers import VariantDraft
 from app.modules.pipeline.models import Decision
-from app.shared.errors import AppError
-
-log = structlog.get_logger("app.pipeline.hooks")
 
 OFFER_OUTCOMES = frozenset({Outcome.APPROVED, Outcome.COUNTER_OFFER})
 # Подписи карточек (30-10, вариант Г); по виду варианта из ядра
@@ -124,17 +120,14 @@ REVENUE_TASK = TaskSpec(
 
 def create_revenue_task(session: Session, application: Application) -> None:
     """`REVENUE_UNKNOWN` → задача «выписка» (20-03). Заявка уже в `NEEDS_INFO` после решения."""
-    try:
-        request_information(
-            session,
-            application.id,
-            expected_version=application.version,
-            actor=Actor.SYSTEM,
-            items=[REVENUE_TASK],
-            reason_code="REVENUE_UNKNOWN",
-        )
-    except AppError as exc:  # три раунда или прошлый не закрыт: заявка ждёт андеррайтера
-        log.warning("revenue_task_skipped", code=exc.code, application=str(application.id))
+    request_information(
+        session,
+        application.id,
+        expected_version=application.version,
+        actor=Actor.SYSTEM,
+        items=[REVENUE_TASK],
+        reason_code="REVENUE_UNKNOWN",
+    )
 
 
 def after_decision(
