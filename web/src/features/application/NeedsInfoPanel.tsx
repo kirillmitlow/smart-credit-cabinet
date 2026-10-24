@@ -120,6 +120,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
                 taskId={task.id}
                 disabled={locked}
                 includeUnassignedStatements={needsRevenue}
+                allowDemoStatement={needsRevenue}
                 onUploaded={(file) => onEdit(task.id, dt.uploadedAnswer(file.filename))}
               />
             ) : null}

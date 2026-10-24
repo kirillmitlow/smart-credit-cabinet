@@ -4,6 +4,7 @@
 Модули `api` demo не импортирует: они регистрируют свои сбросы в `app.shared.resets`.
 """
 
+from app.modules.demo.control_guard import limit_demo_request
 from app.modules.demo.router import require_demo_mode, router
 
-__all__ = ["require_demo_mode", "router"]
+__all__ = ["require_demo_mode", "limit_demo_request", "router"]

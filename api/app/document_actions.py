@@ -13,10 +13,11 @@ from uuid import UUID
 import structlog
 from sqlalchemy.orm import Session
 
-from app.modules import applications, audit, auth, companies, documents
+from app.modules import applications, audit, auth, companies, documents, integrations
 from app.modules.documents.uploads import Upload
 from app.shared import db, idempotency, tasks
 from app.shared.errors import AppError
+from app.shared.settings import get_settings
 
 
 def file_boundary[**P, T](function: Callable[P, T]) -> Callable[P, T]:
@@ -75,8 +76,9 @@ def upload(principal: auth.Principal, data: Upload, key: str) -> idempotency.Rep
         access = access_for(principal)
 
         def save() -> idempotency.Reply:
-            row = documents.store(
+            return _store_upload(
                 session,
+                principal,
                 access,
                 context,
                 content=bytes(data.content),
@@ -84,29 +86,6 @@ def upload(principal: auth.Principal, data: Upload, key: str) -> idempotency.Rep
                 kind=kind,
                 replaces_id=replaces_id,
             )
-            application = applications.get_for(session, principal, application_id)
-            applications.record_event(
-                session,
-                application,
-                "STEP",
-                actor_type=applications.Actor.CLIENT,
-                actor_id=principal.user_id,
-                step_code="FILE_UPLOADED",
-                payload={"documentId": str(row.id), "kind": kind},
-            )
-            audit.record(
-                session,
-                "FILE_UPLOADED",
-                actor_id=principal.user_id,
-                actor_role=principal.role,
-                object_type="document",
-                object_id=str(row.id),
-                company_id=context.company_id,
-                details={"sha256": row.sha256, "sizeBytes": row.size_bytes, "kind": kind},
-            )
-            if kind == "BANK_STATEMENT_1C":
-                tasks.enqueue(session, "documents.parse_statement", document_id=str(row.id))
-            return idempotency.Reply(201, documents.as_dict(row))
 
         import hashlib
 
@@ -118,6 +97,109 @@ def upload(principal: auth.Principal, data: Upload, key: str) -> idempotency.Rep
                 **data.fields,
                 "filename": data.filename,
                 "sha256": hashlib.sha256(data.content).hexdigest(),
+            },
+            action=save,
+        )
+
+
+def _store_upload(
+    session: Session,
+    principal: auth.Principal,
+    access: documents.Access,
+    context: documents.UploadContext,
+    *,
+    content: bytes,
+    filename: str,
+    kind: str,
+    origin: str = "UPLOADED",
+    replaces_id: UUID | None = None,
+) -> idempotency.Reply:
+    """Both origins use the same storage, limits, task, audit and background parser."""
+    row = documents.store(
+        session,
+        access,
+        context,
+        content=content,
+        filename=filename,
+        kind=kind,
+        origin=origin,
+        replaces_id=replaces_id,
+    )
+    application = applications.get_for(session, principal, context.application_id)
+    applications.record_event(
+        session,
+        application,
+        "STEP",
+        actor_type=applications.Actor.CLIENT,
+        actor_id=principal.user_id,
+        step_code="FILE_UPLOADED",
+        payload={"documentId": str(row.id), "kind": kind, "origin": origin},
+    )
+    audit.record(
+        session,
+        "FILE_UPLOADED",
+        actor_id=principal.user_id,
+        actor_role=principal.role,
+        object_type="document",
+        object_id=str(row.id),
+        company_id=context.company_id,
+        details={"sha256": row.sha256, "sizeBytes": row.size_bytes, "kind": kind, "origin": origin},
+    )
+    if kind == "BANK_STATEMENT_1C":
+        tasks.enqueue(session, "documents.parse_statement", document_id=str(row.id))
+    return idempotency.Reply(201, documents.as_dict(row))
+
+
+@file_boundary
+def generate_demo_statement(
+    principal: auth.Principal,
+    application_id: UUID,
+    task_id: UUID,
+    key: str,
+    replaces_id: UUID | None = None,
+) -> idempotency.Reply:
+    """The scenario is chosen from the authorized company, never from client-supplied INN/code."""
+    if not get_settings().demo_mode:
+        raise AppError(403, "DEMO_MODE_DISABLED")
+    with db.transaction() as session:
+        principal = fresh_principal(session, principal)
+        context = applications.document_upload_context(session, principal, application_id, task_id)
+        company = companies.by_id(session, context.company_id)
+        if company is None or not company.scenario_code:
+            raise AppError(409, "DEMO_STATEMENT_SCENARIO_REQUIRED", "У компании нет демо-сценария")
+        access = access_for(principal)
+        scenario_code, inn = company.scenario_code, company.inn
+
+        def save() -> idempotency.Reply:
+            try:
+                content = integrations.scenarios.bank_statement(
+                    scenario_code,
+                    max_bytes=min(5 * 1024 * 1024, get_settings().upload_max_mb * 1024 * 1024),
+                )
+            except integrations.scenarios.ScenariosUnavailableError:
+                raise AppError(
+                    503, "DEMO_STATEMENT_UNAVAILABLE", "Генератор тестовой выписки недоступен"
+                ) from None
+            return _store_upload(
+                session,
+                principal,
+                access,
+                context,
+                content=content,
+                filename=f"statement_{inn}.txt",
+                kind="BANK_STATEMENT_1C",
+                origin="DEMO_GENERATED",
+                replaces_id=replaces_id,
+            )
+
+        return idempotency.run_once(
+            session,
+            scope=f"demo:statement:{context.company_id}:{application_id}:{principal.user_id}",
+            key=key,
+            request={
+                "taskId": str(task_id),
+                "replacesId": str(replaces_id) if replaces_id else None,
+                "months": 12,
             },
             action=save,
         )

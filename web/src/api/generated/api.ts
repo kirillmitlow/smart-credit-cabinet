@@ -61,6 +61,7 @@ import type {
   ContractSignedOut,
   CreatedScenario,
   DeclinedOut,
+  DemoStatementIn,
   DocumentOut,
   DownloadDocumentParams,
   DraftPatch,
@@ -4930,6 +4931,144 @@ export function useDownloadDocument<TData = Awaited<ReturnType<typeof downloadDo
 
 
 
+
+export type generateDemoStatementResponse201 = {
+  data: DocumentOut
+  status: 201
+}
+
+export type generateDemoStatementResponse403 = {
+  data: void
+  status: 403
+}
+
+export type generateDemoStatementResponse404 = {
+  data: void
+  status: 404
+}
+
+export type generateDemoStatementResponse409 = {
+  data: void
+  status: 409
+}
+
+export type generateDemoStatementResponse413 = {
+  data: void
+  status: 413
+}
+
+export type generateDemoStatementResponse422 = {
+  data: void
+  status: 422
+}
+
+export type generateDemoStatementResponse429 = {
+  data: void
+  status: 429
+}
+
+export type generateDemoStatementResponse503 = {
+  data: void
+  status: 503
+}
+
+export type generateDemoStatementResponseSuccess = (generateDemoStatementResponse201) & {
+  headers: Headers;
+};
+export type generateDemoStatementResponseError = (generateDemoStatementResponse403 | generateDemoStatementResponse404 | generateDemoStatementResponse409 | generateDemoStatementResponse413 | generateDemoStatementResponse422 | generateDemoStatementResponse429 | generateDemoStatementResponse503) & {
+  headers: Headers;
+};
+
+export type generateDemoStatementResponse = (generateDemoStatementResponseSuccess | generateDemoStatementResponseError)
+
+export const getGenerateDemoStatementUrl = () => {
+
+
+
+
+  return `/demo/bank-statement`
+}
+
+/**
+ * Только DEMO_MODE и клиентская сессия. Генератор моков отдаёт исходный файл; дальше действуют обычные лимиты, фоновый разбор и отдельное подтверждение поступлений.
+ * @summary Сохранить тестовую выписку для открытой задачи своей компании
+ */
+export const generateDemoStatement = async (demoStatementIn: DemoStatementIn, options?: Parameters<typeof customFetch>[1]): Promise<generateDemoStatementResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<generateDemoStatementResponse>(getGenerateDemoStatementUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(demoStatementIn)
+  }
+);}
+
+
+
+
+
+export const getGenerateDemoStatementMutationKey = () => ['generateDemoStatement'] as const;
+
+export const getGenerateDemoStatementMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateDemoStatement>>, TError,GenerateDemoStatementMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateDemoStatement>>, TError,GenerateDemoStatementMutationVariables, TContext> => {
+
+const mutationKey = getGenerateDemoStatementMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateDemoStatement>>, GenerateDemoStatementMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateDemoStatement(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateDemoStatementMutationResult = NonNullable<Awaited<ReturnType<typeof generateDemoStatement>>>
+    export type GenerateDemoStatementMutationBody = DemoStatementIn
+    export type GenerateDemoStatementMutationError = void
+    export type GenerateDemoStatementMutationVariables = {data: DemoStatementIn}
+
+    /**
+ * @summary Сохранить тестовую выписку для открытой задачи своей компании
+ */
+export const useGenerateDemoStatement = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateDemoStatement>>, TError,GenerateDemoStatementMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof generateDemoStatement>>,
+        TError,
+        GenerateDemoStatementMutationVariables,
+        TContext
+      > => {
+      return useMutation(getGenerateDemoStatementMutationOptions(options), queryClient);
+    }
 
 export type listProductsResponse200 = {
   data: ProductList

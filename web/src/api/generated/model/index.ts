@@ -107,6 +107,7 @@ export * from './createdScenario';
 export * from './decisionReasonOut';
 export * from './decisionTime';
 export * from './declinedOut';
+export * from './demoStatementIn';
 export * from './documentOut';
 export * from './documentOutParsed';
 export * from './downloadDocumentParams';

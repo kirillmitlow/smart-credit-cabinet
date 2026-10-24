@@ -2118,6 +2118,72 @@
         }
       }
     },
+    "/demo/bank-statement": {
+      "post": {
+        "tags": [
+          "демо"
+        ],
+        "summary": "Сохранить тестовую выписку для открытой задачи своей компании",
+        "description": "Только DEMO_MODE и клиентская сессия. Генератор моков отдаёт исходный файл; дальше действуют обычные лимиты, фоновый разбор и отдельное подтверждение поступлений.",
+        "operationId": "generateDemoStatement",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoStatementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "DEMO_MODE_DISABLED / FORBIDDEN"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          },
+          "409": {
+            "description": "TASK_CLOSED / INVALID_TRANSITION / IDEMPOTENCY_KEY_REUSED / DEMO_RESET_IN_PROGRESS / DEMO_STATEMENT_SCENARIO_REQUIRED / DOCUMENT_REPLACEMENT_CONFLICT"
+          },
+          "413": {
+            "description": "FILE_TOO_LARGE / APPLICATION_FILES_TOO_LARGE"
+          },
+          "422": {
+            "description": "VALIDATION_ERROR / TASK_NOT_DOCUMENT / TOO_MANY_FILES / UNSUPPORTED_FORMAT"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          },
+          "503": {
+            "description": "DEMO_STATEMENT_UNAVAILABLE / DEMO_CONTROL_UNAVAILABLE"
+          }
+        }
+      }
+    },
     "/products": {
       "get": {
         "tags": [
@@ -7062,6 +7128,39 @@
           "offer"
         ],
         "title": "DeclinedOut"
+      },
+      "DemoStatementIn": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "taskId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Taskid"
+          },
+          "replacesId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replacesid"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "applicationId",
+          "taskId"
+        ],
+        "title": "DemoStatementIn"
       },
       "DocumentOut": {
         "properties": {

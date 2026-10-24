@@ -105,6 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(applications.consents_router)
     app.include_router(applications.tasks_router)
     app.include_router(documents_http.router)
+    app.include_router(documents_http.demo_router)
     app.include_router(catalog.router)
     app.include_router(loans.router)
     app.include_router(pipeline.router)
