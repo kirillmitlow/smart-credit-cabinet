@@ -118,6 +118,8 @@ export const applicationPage = {
     confirm: 'Отозвать',
     cancel: 'Не отзывать',
     pending: 'Отзываем…',
+    checkState: 'Проверить состояние заявки',
+    checking: 'Проверяем состояние заявки…',
   },
   closed: {
     expiredNote: 'Срок истёк: заявка закрыта. Можно подать новую',

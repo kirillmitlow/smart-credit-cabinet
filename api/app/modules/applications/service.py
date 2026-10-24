@@ -17,7 +17,7 @@ from sqlalchemy import Sequence, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.modules import auth, notifications
+from app.modules import auth, companies, notifications
 from app.modules.applications.models import Application, ApplicationEvent, ApplicationVersion
 from app.modules.applications.states import CLIENT_ACTIONS, TERMINAL, Actor, Status, is_allowed
 from app.shared import clock, db
@@ -353,6 +353,17 @@ def add_version(
 
 def withdraw(session: Session, principal: auth.Principal, application: Application) -> Application:
     from app.modules.applications import client_tasks  # отложенно: client_tasks импортирует service
+
+    # A cached session may still contain a membership whose role/access has been revoked.
+    user = auth.get(session, principal.user_id)
+    if user is None or user.status != "ACTIVE" or user.role != "CLIENT":
+        raise AppError(401, "UNAUTHENTICATED", "Нужно войти")
+    members = companies.memberships_of(session, principal.user_id)
+    if not any(
+        member.company_id == application.company_id and member.role in {"DIRECTOR", "ACCOUNTANT"}
+        for member, _ in members
+    ):
+        raise not_found("Заявка")
 
     transition(
         session, application, Status.WITHDRAWN, actor=Actor.CLIENT, actor_id=principal.user_id
