@@ -12,7 +12,7 @@
 
 Жюри проверяет по чек-листу со стр. 7 кейса. Здесь каждому его пункту и каждому требованию `RQ-1x` сопоставлены **конкретный файл или путь в репозитории**, задача, которая его создаёт, и способ проверки. Пустая клетка «Где лежит» или «Задача» — дыра в плане. Финальную сверку делают дважды: перед заморозкой ([T-542](tasks/T-542-freeze-regression.md)) и перед тегом ([T-538](tasks/T-538-repo-prep-submission.md)).
 
-Статусы: ⬜ не начато · 🟨 в работе · ✅ готово и проверено · ➖ осознанно не делаем (с причиной). Это живой список: статусы обновляются по доказательствам, а не проценту готовности. Документационный пакет 24.10 — [отчёт C](../reviews/C-2026-10-24-jury-package-check.md); расширенные задачи генерации/CI и финальная репетиция остаются открыты.
+Статусы: ⬜ не начато · 🟨 в работе · ✅ готово и проверено · ➖ осознанно не делаем (с причиной). Это живой список: статусы обновляются по доказательствам, а не проценту готовности. Документационный пакет 24.10 — [отчёт C](../reviews/C-2026-10-24-jury-package-refresh.md); расширенные задачи генерации/CI и финальная репетиция остаются открыты.
 
 ## Пункты чек-листа со стр. 7 кейса
 
@@ -29,7 +29,7 @@
 | 9 | Описание API и OpenAPI/Swagger | 18 | `docs/api/api.openapi.yaml`, пять `docs/api/mock-*.openapi.yaml`, `docs/api/README.md`; Swagger на `/docs` | [T-139](tasks/T-139-mocks-openapi-export.md), [T-543](tasks/T-543-make-openapi-all.md), [T-511](tasks/T-511-ci-contracts-security-notices.md) + OpenAPI `api` | Выгрузка из кода равна закоммиченным файлам; Spectral и `oasdiff` | ⬜ |
 | 10 | Коллекция запросов | 19 | [Postman v2.1](../../api/postman_collection.json), существующий [Bruno](../../api/collection/) | [T-140](tasks/T-140-mocks-bruno-collection.md), [T-544](tasks/T-544-bruno-collection-api.md), [T-512](tasks/T-512-ci-e2e.md) | `bru run` зелёный в CI на чистом стенде | 🟨 (4 пути Newman зелёные; полный Bruno/CI отдельно) |
 | 11 | Диаграмма состояний заявки | 20 | [state_machine.md](../../architecture/state_machine.md), Mermaid | [T-526](tasks/T-526-diagram-states.md) + стейт-машина `api` | Тест «диаграмма = таблица переходов» | 🟨 (29 переходов = код; экспорт/CI отдельно) |
-| 12 | Модель данных | 21 | [data_model.md](../../architecture/data_model.md), Mermaid | [T-527](tasks/T-527-diagram-er.md) + модели `api` | Набор таблиц на диаграмме равен базе после миграций | 🟨 (24 таблицы / 36 FK = чистая БД; экспорт/CI отдельно) |
+| 12 | Модель данных | 21 | [data_model.md](../../architecture/data_model.md), Mermaid | [T-527](tasks/T-527-diagram-er.md) + модели `api` | Набор таблиц на диаграмме равен базе после миграций | 🟨 (26 таблиц / 42 FK = чистая БД; экспорт/CI отдельно) |
 | 13 | Тестовые сценарии | 22 | [test-scenarios.md](../../test-scenarios.md), README, api/tests/personas, web/e2e | [T-528](tasks/T-528-test-scenarios-catalog.md), [T-523](tasks/T-523-check-docs-ts-labels.md), [T-517](tasks/T-517-personas-api-harness.md), [T-518](tasks/T-518-playwright-harness.md) | Сверка меток `check-docs`; хотя бы один человек прошёл ручные сценарии | 🟨 (4 основных пути; полный каталог технических ветвей отдельно) |
 | 14 | *(желательно)* Публикация на внешнем сервере | 12 | Ссылка и дата проверки в `README.md` | [T-507](tasks/T-507-compose-cloud.md), [T-540](tasks/T-540-cloud-stand.md) (ждёт Q-008) | `smoke.sh` против стенда | ⬜ |
 
