@@ -1448,6 +1448,49 @@
         }
       }
     },
+    "/applications/{application_id}/timeline": {
+      "get": {
+        "tags": [
+          "заявки"
+        ],
+        "summary": "Этапы заявки и состояние проверок по журналу событий",
+        "operationId": "getApplicationTimeline",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationTimelineOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/applications/{application_id}/draft": {
       "patch": {
         "tags": [
@@ -3663,6 +3706,64 @@
           "nextCursor"
         ],
         "title": "ApplicationPage"
+      },
+      "ApplicationTimelineOut": {
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Applicationid"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "lastEventId": {
+            "type": "integer",
+            "title": "Lasteventid",
+            "description": "Последнее событие этой заявки; не глобальный курсор SSE"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineStepOut"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineCheckOut"
+            },
+            "type": "array",
+            "title": "Checks"
+          },
+          "noteKey": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "withdrawn",
+                  "expired",
+                  "sourceDelayed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notekey"
+          }
+        },
+        "type": "object",
+        "required": [
+          "applicationId",
+          "version",
+          "lastEventId",
+          "steps",
+          "checks",
+          "noteKey"
+        ],
+        "title": "ApplicationTimelineOut"
       },
       "AppliedSystems": {
         "properties": {
@@ -9589,6 +9690,116 @@
           "answeredAt"
         ],
         "title": "TaskOut"
+      },
+      "TimelineCheckOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "registry",
+              "taxes",
+              "creditHistory",
+              "turnover"
+            ],
+            "title": "Key"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "running",
+              "done",
+              "delayed"
+            ],
+            "title": "State"
+          },
+          "textKey": {
+            "type": "string",
+            "title": "Textkey"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "state",
+          "textKey"
+        ],
+        "title": "TimelineCheckOut"
+      },
+      "TimelineStepOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "checking",
+              "needsHelp",
+              "evaluating",
+              "decision",
+              "signing",
+              "money"
+            ],
+            "title": "Key"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "running",
+              "done"
+            ],
+            "title": "State"
+          },
+          "textKey": {
+            "type": "string",
+            "title": "Textkey"
+          },
+          "params": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Params"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "state",
+          "textKey"
+        ],
+        "title": "TimelineStepOut"
       },
       "ValidationError": {
         "properties": {

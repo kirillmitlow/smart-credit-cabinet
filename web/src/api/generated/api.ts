@@ -32,6 +32,7 @@ import type {
   ApplicationFields,
   ApplicationOut,
   ApplicationPage,
+  ApplicationTimelineOut,
   BankApplicationCard,
   BankDecisionRequest,
   BankDecisionSaved,
@@ -3489,6 +3490,126 @@ export function useGetApplication<TData = Awaited<ReturnType<typeof getApplicati
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetApplicationQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getApplicationTimelineResponse200 = {
+  data: ApplicationTimelineOut
+  status: 200
+}
+
+export type getApplicationTimelineResponse422 = {
+  data: HTTPValidationError
+  status: 422
+}
+
+export type getApplicationTimelineResponseSuccess = (getApplicationTimelineResponse200) & {
+  headers: Headers;
+};
+export type getApplicationTimelineResponseError = (getApplicationTimelineResponse422) & {
+  headers: Headers;
+};
+
+export type getApplicationTimelineResponse = (getApplicationTimelineResponseSuccess | getApplicationTimelineResponseError)
+
+export const getGetApplicationTimelineUrl = (applicationId: string,) => {
+
+
+
+
+  return `/applications/${applicationId}/timeline`
+}
+
+/**
+ * @summary Этапы заявки и состояние проверок по журналу событий
+ */
+export const getApplicationTimeline = async (applicationId: string, options?: Parameters<typeof customFetch>[1]): Promise<getApplicationTimelineResponse> => {
+
+  return customFetch<getApplicationTimelineResponse>(getGetApplicationTimelineUrl(applicationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApplicationTimelineQueryKey = (applicationId: string,) => {
+    return [
+    `/applications/${applicationId}/timeline`
+    ] as const;
+    }
+
+
+export const getGetApplicationTimelineQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationTimeline>>, TError = HTTPValidationError>(applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationTimeline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApplicationTimelineQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicationTimeline>>> = ({ signal }) => getApplicationTimeline(applicationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApplicationTimeline>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApplicationTimelineQueryResult = NonNullable<Awaited<ReturnType<typeof getApplicationTimeline>>>
+export type GetApplicationTimelineQueryError = HTTPValidationError
+
+
+export function useGetApplicationTimeline<TData = Awaited<ReturnType<typeof getApplicationTimeline>>, TError = HTTPValidationError>(
+ applicationId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationTimeline>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationTimeline>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationTimeline<TData = Awaited<ReturnType<typeof getApplicationTimeline>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationTimeline>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationTimeline>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationTimeline<TData = Awaited<ReturnType<typeof getApplicationTimeline>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationTimeline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Этапы заявки и состояние проверок по журналу событий
+ */
+
+export function useGetApplicationTimeline<TData = Awaited<ReturnType<typeof getApplicationTimeline>>, TError = HTTPValidationError>(
+ applicationId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationTimeline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApplicationTimelineQueryOptions(applicationId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
