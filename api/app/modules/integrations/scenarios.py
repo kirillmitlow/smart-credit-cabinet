@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -148,3 +149,26 @@ def create_scenario(spec: dict[str, Any], *, idempotency_key: str) -> dict[str, 
         return view
     except (httpx.HTTPError, ValueError) as exc:
         raise ScenariosUnavailableError("Сервис сценариев не подтвердил создание") from exc
+
+
+def bank_statement(code: str, *, max_bytes: int) -> bytes:
+    """T-130 contract (10.8). Stream a bounded original; never replace an unavailable mock with data."""
+    try:
+        with (
+            _client() as client,
+            client.stream(
+                "GET",
+                f"/api/v1/scenarios/{quote(code, safe='')}/documents/bank-statement",
+                params={"months": 12},
+            ) as response,
+        ):
+            response.raise_for_status()
+            content = bytearray()
+            for chunk in response.iter_bytes(chunk_size=64 * 1024):
+                if len(content) + len(chunk) > max_bytes:
+                    raise ScenariosUnavailableError("Statement exceeds upload limit")
+                content.extend(chunk)
+            return bytes(content)
+    except httpx.HTTPError:
+        # Do not include upstream response bodies/credentials in application logs.
+        raise ScenariosUnavailableError("Statement generator unavailable") from None

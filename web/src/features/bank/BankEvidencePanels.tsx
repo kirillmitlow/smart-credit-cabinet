@@ -149,8 +149,12 @@ export function BankEvidencePanels({ card }: { card: BankApplicationCard }) {
                   {document.filename}
                 </Anchor>
                 <Text size="sm">
-                  {document.origin === 'SYSTEM_GENERATED' ? dt.generated : dt.uploaded} ·{' '}
-                  {formatDateTime(document.createdAt)} · {dt.size(document.sizeBytes)}
+                  {document.origin === 'SYSTEM_GENERATED'
+                    ? dt.generated
+                    : document.origin === 'DEMO_GENERATED'
+                      ? dt.demoGenerated
+                      : dt.uploaded}{' '}
+                  · {formatDateTime(document.createdAt)} · {dt.size(document.sizeBytes)}
                 </Text>
                 {document.cancelledAt ? <Badge color="gray">{dt.replaced}</Badge> : null}
                 {document.parseStatus === 'PENDING' ? <Text size="sm">{dt.unparsed}</Text> : null}

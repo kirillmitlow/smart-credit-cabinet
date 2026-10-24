@@ -163,6 +163,8 @@ export const getGetDocumentResponseMock = (overrideResponse: Partial<Extract<Doc
 
 export const getDownloadDocumentResponseMock = (): Blob => (new Blob([new Uint8Array(faker.number.int({ min: 1, max: 64 }))]))
 
+export const getGenerateDemoStatementResponseMock = (overrideResponse: Partial<Extract<DocumentOut, object>> = {}): DocumentOut => ({id: faker.string.uuid(), companyId: faker.string.uuid(), applicationId: faker.string.uuid(), taskId: faker.helpers.arrayElement([faker.string.uuid(),null,]), kind: faker.string.alpha({length: {min: 10, max: 20}}), origin: faker.string.alpha({length: {min: 10, max: 20}}), filename: faker.string.alpha({length: {min: 10, max: 20}}), mime: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int(), sha256: faker.string.alpha({length: {min: 10, max: 20}}), parseStatus: faker.string.alpha({length: {min: 10, max: 20}}), parsed: faker.helpers.arrayElement([null,]), parseError: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), createdAt: faker.string.alpha({length: {min: 10, max: 20}}), cancelledAt: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), confirmedAt: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
+
 export const getListProductsResponseMock = (overrideResponse: Partial<Extract<ProductList, object>> = {}): ProductList => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), purpose: faker.string.alpha({length: {min: 10, max: 20}}), repayment: faker.string.alpha({length: {min: 10, max: 20}}), amountMinRub: faker.number.int(), amountMaxRub: faker.number.int(), termMinMonths: faker.number.int(), termMaxMonths: faker.number.int(), collateralRequiredAboveRub: faker.helpers.arrayElement([faker.number.int(),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), autoDecisionMode: faker.helpers.arrayElement(Object.values(AutoDecisionMode)), autoDecisionUpToRub: faker.helpers.arrayElement([faker.number.int(),null,]), requiresBankCustomer: faker.datatype.boolean(), requiresContract: faker.datatype.boolean(), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), available: faker.datatype.boolean(), unavailableReasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiresSecurity: faker.datatype.boolean()})), ...overrideResponse})
 
 export const getGetProductResponseMock = (overrideResponse: Partial<Extract<ProductOut, object>> = {}): ProductOut => ({code: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), purpose: faker.string.alpha({length: {min: 10, max: 20}}), repayment: faker.string.alpha({length: {min: 10, max: 20}}), amountMinRub: faker.number.int(), amountMaxRub: faker.number.int(), termMinMonths: faker.number.int(), termMaxMonths: faker.number.int(), collateralRequiredAboveRub: faker.helpers.arrayElement([faker.number.int(),null,]), ratePercentFrom: faker.number.float({fractionDigits: 2}), autoDecisionMode: faker.helpers.arrayElement(Object.values(AutoDecisionMode)), autoDecisionUpToRub: faker.helpers.arrayElement([faker.number.int(),null,]), requiresBankCustomer: faker.datatype.boolean(), requiresContract: faker.datatype.boolean(), documents: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), available: faker.datatype.boolean(), unavailableReasons: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.string.alpha({length: {min: 10, max: 20}}), text: faker.string.alpha({length: {min: 10, max: 20}}), action: faker.string.alpha({length: {min: 10, max: 20}}), availableFrom: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10),null,])})), hint: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), requiresSecurity: faker.datatype.boolean(), ...overrideResponse})
@@ -695,6 +697,18 @@ export const getDownloadDocumentMockHandler = (overrideResponse?: Blob | ((info:
   }, options)
 }
 
+export const getGenerateDemoStatementMockHandler = (overrideResponse?: DocumentOut | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<DocumentOut> | DocumentOut), options?: RequestHandlerOptions) => {
+  return http.post('*/demo/bank-statement', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGenerateDemoStatementResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
 export const getListProductsMockHandler = (overrideResponse?: ProductList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ProductList> | ProductList), options?: RequestHandlerOptions) => {
   return http.get('*/products', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
 
@@ -1010,6 +1024,7 @@ export const getApiMock = () => [
   getUploadDocumentMockHandler(),
   getGetDocumentMockHandler(),
   getDownloadDocumentMockHandler(),
+  getGenerateDemoStatementMockHandler(),
   getListProductsMockHandler(),
   getGetProductMockHandler(),
   getCalculatePaymentMockHandler(),

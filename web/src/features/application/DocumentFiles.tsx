@@ -7,12 +7,14 @@ import {
   getListDocumentsQueryKey,
   useListDocuments,
   useUploadDocument,
+  useGenerateDemoStatement,
 } from '@/api/generated/api';
 import { UploadDocumentBodyKind, type DocumentOut } from '@/api/generated/model';
 import { resolveUrl } from '@/api/client';
 import { useActionKey } from '@/api/idempotency';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { StatementConfirmation } from './StatementConfirmation';
+import { usePublicConfig } from '@/features/auth/session';
 
 const uploadKind = (kind: string) =>
   Object.values(UploadDocumentBodyKind).find((value) => value === kind);
@@ -61,12 +63,14 @@ export function DocumentFiles({
   disabled = false,
   onUploaded,
   includeUnassignedStatements = false,
+  allowDemoStatement = false,
 }: {
   applicationId: string;
   taskId?: string;
   disabled?: boolean;
   onUploaded?: (file: DocumentOut) => void;
   includeUnassignedStatements?: boolean;
+  allowDemoStatement?: boolean;
 }) {
   const client = useQueryClient();
   const query = useListDocuments(
@@ -87,6 +91,10 @@ export function DocumentFiles({
   );
   const action = useActionKey();
   const upload = useUploadDocument({ request: action.request() });
+  const demoAction = useActionKey();
+  const generation = useGenerateDemoStatement<unknown>({ request: demoAction.request() });
+  const demoMode = usePublicConfig().data?.demoMode === true;
+  const working = upload.isPending || generation.isPending;
   const [file, setFile] = useState<File | null>(null);
   const [replacement, setReplacement] = useState<DocumentOut | null>(null);
   const busy = useRef(false);
@@ -133,6 +141,26 @@ export function DocumentFiles({
       busy.current = false;
     }
   };
+  const generate = async () => {
+    if (!taskId || busy.current || disabled) return;
+    busy.current = true;
+    try {
+      const result = await generation.mutateAsync({
+        data: { applicationId, taskId, ...(replacement ? { replacesId: replacement.id } : {}) },
+      });
+      if (result.status === 201) {
+        demoAction.reset();
+        setReplacement(null);
+        setFile(null);
+        await client.invalidateQueries({ queryKey: getListDocumentsQueryKey({ applicationId }) });
+        onUploaded?.(result.data);
+      }
+    } catch {
+      // Preserve the key after a lost response: retry must return the saved original.
+    } finally {
+      busy.current = false;
+    }
+  };
   return (
     <Stack gap="xs">
       {query.isPending ? <Loader size="sm" aria-label={dt.loading} /> : null}
@@ -152,18 +180,21 @@ export function DocumentFiles({
             <Button
               size="compact-xs"
               variant="subtle"
-              disabled={disabled || upload.isPending || !uploadKind(document.kind)}
+              disabled={disabled || working || !uploadKind(document.kind)}
               aria-label={`${dt.replace}: ${document.filename}`}
               onClick={() => {
                 setReplacement(document);
                 setFile(null);
                 action.reset();
                 upload.reset();
+                demoAction.reset();
+                generation.reset();
               }}
             >
               {dt.replace}
             </Button>
           </Group>
+          {document.origin === 'DEMO_GENERATED' ? <Text size="xs">{dt.demoGenerated}</Text> : null}
           <ParseStatus document={document} />
           {document.parseStatus === 'PARSED' && document.kind === 'BANK_STATEMENT_1C' ? (
             <StatementConfirmation document={document} disabled={disabled} />
@@ -176,12 +207,14 @@ export function DocumentFiles({
           <Button
             size="compact-xs"
             variant="subtle"
-            disabled={upload.isPending}
+            disabled={working}
             onClick={() => {
               setReplacement(null);
               setFile(null);
               action.reset();
               upload.reset();
+              demoAction.reset();
+              generation.reset();
             }}
           >
             {dt.cancelReplacement}
@@ -195,7 +228,7 @@ export function DocumentFiles({
           replacement ? (replacement.kind === 'BANK_STATEMENT_1C' ? '.txt' : '.pdf') : '.pdf,.txt'
         }
         value={file}
-        disabled={disabled || upload.isPending}
+        disabled={disabled || working}
         clearable
         onChange={(next) => {
           setFile(next);
@@ -206,12 +239,31 @@ export function DocumentFiles({
       {upload.error ? <ProblemAlert error={upload.error} /> : null}
       <Button
         variant="default"
-        disabled={!file || disabled}
+        disabled={!file || disabled || generation.isPending}
         loading={upload.isPending}
         onClick={() => void send()}
       >
         {dt.upload}
       </Button>
+      {demoMode &&
+      allowDemoStatement &&
+      taskId &&
+      (!replacement || replacement.kind === 'BANK_STATEMENT_1C') ? (
+        <Stack gap={4}>
+          <Text size="xs" c="dimmed">
+            {dt.demoStatementHelp}
+          </Text>
+          {generation.error ? <ProblemAlert error={generation.error} /> : null}
+          <Button
+            variant="light"
+            loading={generation.isPending}
+            disabled={disabled || upload.isPending}
+            onClick={() => void generate()}
+          >
+            {dt.generateStatement}
+          </Button>
+        </Stack>
+      ) : null}
     </Stack>
   );
 }

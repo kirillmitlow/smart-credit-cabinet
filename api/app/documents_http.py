@@ -11,7 +11,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.requests import ClientDisconnect
 
 from app import document_actions
-from app.modules import auth
+from app.modules import auth, demo
 from app.modules.documents.limits import check_upload_limit
 from app.modules.documents.uploads import read_upload
 from app.modules.documents.validation import PDF_LIMIT
@@ -187,4 +187,61 @@ def download_document(
             "X-Content-Type-Options": "nosniff",
             "Cache-Control": "private, no-store",
         },
+    )
+
+
+class DemoStatementIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    applicationId: UUID
+    taskId: UUID
+    replacesId: UUID | None = None
+
+
+demo_router = APIRouter(
+    prefix="/demo",
+    tags=["демо"],
+    dependencies=[Depends(demo.require_demo_mode), Depends(demo.limit_demo_request)],
+)
+
+
+@demo_router.post(
+    "/bank-statement",
+    operation_id="generateDemoStatement",
+    status_code=201,
+    response_model=DocumentOut,
+    summary="Сохранить тестовую выписку для открытой задачи своей компании",
+    description="Только DEMO_MODE и клиентская сессия. Генератор моков отдаёт исходный файл; "
+    "дальше действуют обычные лимиты, фоновый разбор и отдельное подтверждение поступлений.",
+    responses={
+        403: {"description": "DEMO_MODE_DISABLED / FORBIDDEN"},
+        404: {"description": "NOT_FOUND"},
+        409: {
+            "description": "TASK_CLOSED / INVALID_TRANSITION / IDEMPOTENCY_KEY_REUSED / "
+            "DEMO_RESET_IN_PROGRESS / DEMO_STATEMENT_SCENARIO_REQUIRED / DOCUMENT_REPLACEMENT_CONFLICT"
+        },
+        413: {"description": "FILE_TOO_LARGE / APPLICATION_FILES_TOO_LARGE"},
+        422: {
+            "description": "VALIDATION_ERROR / TASK_NOT_DOCUMENT / TOO_MANY_FILES / UNSUPPORTED_FORMAT"
+        },
+        429: {"description": "RATE_LIMITED"},
+        503: {"description": "DEMO_STATEMENT_UNAVAILABLE / DEMO_CONTROL_UNAVAILABLE"},
+    },
+)
+def generate_demo_statement(
+    body: DemoStatementIn,
+    principal: auth.ClientPrincipal,
+    idempotency_key: Annotated[str, Header(min_length=1, max_length=128)],
+) -> JSONResponse:
+    check_upload_limit(principal.session_id or str(principal.user_id))
+    reply = document_actions.generate_demo_statement(
+        principal,
+        body.applicationId,
+        body.taskId,
+        idempotency_key,
+        body.replacesId,
+    )
+    return JSONResponse(
+        reply.body,
+        status_code=reply.status,
+        headers={"Idempotent-Replayed": "true"} if reply.replayed else {},
     )

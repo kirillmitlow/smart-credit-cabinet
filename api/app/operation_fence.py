@@ -105,21 +105,18 @@ def _scope(
 class OperationFenceMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         path = request.url.path
-        tracked = (
-            path.startswith(
-                (
-                    "/applications",
-                    "/offers",
-                    "/contracts",
-                    "/auth",
-                    "/wizard",
-                    "/companies",
-                    "/backoffice",
-                    "/documents",
-                )
+        tracked = path.startswith(
+            (
+                "/applications",
+                "/offers",
+                "/contracts",
+                "/auth",
+                "/wizard",
+                "/companies",
+                "/backoffice",
+                "/documents",
             )
-            or path == "/me/active-company"
-        )
+        ) or path in {"/me/active-company", "/demo/bank-statement"}
         writes = request.method in {"POST", "PUT", "PATCH", "DELETE"} or path.startswith(
             ("/companies/", "/documents")
         )

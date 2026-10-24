@@ -11,7 +11,7 @@ import pytest
 from sqlalchemy import select
 
 from app import document_tasks
-from app.modules import applications, documents, pipeline
+from app.modules import applications, companies, documents, integrations, pipeline
 from app.modules.applications.models import Task
 from app.modules.decisioning import decide, input_from_json
 from app.modules.documents.models import Document
@@ -306,7 +306,10 @@ async def test_unassigned_draft_file_reused_for_revenue_request(stand: dict[str,
     assert replaced.json()["taskId"] == str(stand["a_task"])
 
 
-async def test_garipov_upload_confirmation_recheck_is_reproducible(stand: dict[str, Any]) -> None:
+@pytest.mark.parametrize("origin", ["UPLOADED", "DEMO_GENERATED"])
+async def test_garipov_upload_confirmation_recheck_is_reproducible(
+    stand: dict[str, Any], origin: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     world = pw.World(
         registry={
             INN: {
@@ -352,7 +355,24 @@ async def test_garipov_upload_confirmation_recheck_is_reproducible(stand: dict[s
             ).one()
             stand["a_task"] = task.id
             assert session.get(applications.Application, stand["a_app"]).status == "NEEDS_INFO"
-        item = await parsed(stand)
+        if origin == "UPLOADED":
+            item = await parsed(stand)
+        else:
+            with db.transaction() as session:
+                companies.by_id(session, stand["companies"]["a"]).scenario_code = "garipov"
+            monkeypatch.setattr(
+                integrations.scenarios, "bank_statement", lambda *a, **kw: statement()
+            )
+            async with client_for(stand, "a:d") as client:
+                response = await client.post(
+                    "/demo/bank-statement",
+                    json={"applicationId": str(stand["a_app"]), "taskId": str(stand["a_task"])},
+                    headers={"Idempotency-Key": "garipov-demo-file"},
+                )
+                assert response.status_code == 201, response.text
+                assert document_tasks.run_statement(UUID(response.json()["id"])) == "PARSED"
+                item = (await client.get(f"/documents/{response.json()['id']}")).json()
+                assert item["origin"] == "DEMO_GENERATED"
         assert source(stand) is None
         assert (await confirm(stand, item)).status_code == 200
         async with client_for(stand, "a:d") as client:
