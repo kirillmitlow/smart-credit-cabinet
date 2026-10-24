@@ -1,13 +1,14 @@
 """Права на выданный кредит и график проверяются по БД, а не снимку старой сессии."""
 
 # ruff: noqa: F811 — общий стенд с настоящими Postgres, Redis и клиентскими сессиями
+from collections.abc import Iterator
 from dataclasses import replace
 from decimal import Decimal
 from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from app.modules import auth, loans
 from app.modules.applications import Application
@@ -18,6 +19,20 @@ from tests.integration.test_applications import client_for, stand  # noqa: F401 
 pytestmark = pytest.mark.integration
 OWNER = "001234567887"
 OTHER = "0017654322"
+
+
+@pytest.fixture(autouse=True)
+def _clean_loan_data(stand: dict[str, Any]) -> Iterator[None]:
+    """Общий stand очищает БД только до теста; не оставляем свои роли набору входа."""
+    database = db.get_database()
+    try:
+        yield
+    finally:
+        # Зависимость от stand запускает очистку до закрытия его соединений.
+        with database.transaction() as session:
+            session.execute(
+                text("TRUNCATE applications, company_members, companies, users, outbox CASCADE")
+            )
 
 
 def open_loan(stand: dict[str, Any], owner: str = OWNER) -> UUID:
