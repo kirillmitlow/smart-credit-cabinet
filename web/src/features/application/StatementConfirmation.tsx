@@ -16,25 +16,31 @@ interface ReviewMonth {
 function reviewMonths(document: DocumentOut): ReviewMonth[] {
   const raw = document.parsed?.months;
   if (!Array.isArray(raw)) return [];
-  return raw
-    .filter((row) => row?.complete === true)
-    .flatMap((row) => {
-      const incoming = row.unclassifiedIncomingKopecks;
-      const outgoing = row.outgoingKopecks - row.internalOutgoingKopecks;
-      if (
-        typeof row.month !== 'string' ||
-        !Number.isSafeInteger(incoming) ||
-        incoming < 0 ||
-        !Number.isSafeInteger(row.outgoingKopecks) ||
-        !Number.isSafeInteger(row.internalOutgoingKopecks) ||
-        !Number.isSafeInteger(outgoing) ||
-        outgoing < 0
-      )
-        return [];
-      return [{ month: row.month, incoming, outgoing }];
-    })
-    .sort((a, b) => a.month.localeCompare(b.month))
-    .slice(-24);
+  const values: unknown[] = raw;
+  const rows: ReviewMonth[] = [];
+  for (const value of values) {
+    if (!value || typeof value !== 'object') continue;
+    const row = value as Record<string, unknown>;
+    if (row.complete !== true) continue;
+    const incoming = row.unclassifiedIncomingKopecks;
+    const debit = row.outgoingKopecks;
+    const internal = row.internalOutgoingKopecks;
+    if (
+      typeof row.month !== 'string' ||
+      typeof incoming !== 'number' ||
+      typeof debit !== 'number' ||
+      typeof internal !== 'number' ||
+      !Number.isSafeInteger(incoming) ||
+      incoming < 0 ||
+      !Number.isSafeInteger(debit) ||
+      !Number.isSafeInteger(internal) ||
+      debit < internal ||
+      internal < 0
+    )
+      return [];
+    rows.push({ month: row.month, incoming, outgoing: debit - internal });
+  }
+  return rows.sort((a, b) => a.month.localeCompare(b.month)).slice(-24);
 }
 
 function rubles(cents: number): string {

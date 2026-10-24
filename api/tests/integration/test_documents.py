@@ -128,7 +128,10 @@ async def test_ts007_original_metadata_download_and_idempotency(stand: dict[str,
         assert session.scalar(select(func.count(Document.id))) == 1
         assert session.scalar(select(func.count(DocumentBlob.id))) == 1
         actions = (
-            session.execute(text("SELECT action FROM audit_log WHERE object_type='document'"))
+            session.execute(
+                text("SELECT action FROM audit_log WHERE object_type='document' AND object_id=:id"),
+                {"id": item["id"]},
+            )
             .scalars()
             .all()
         )
