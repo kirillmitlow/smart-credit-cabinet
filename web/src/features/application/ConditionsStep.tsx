@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { Button, Group, NumberInput, Select, Stack, Text, Title } from '@mantine/core';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 import { Link } from 'react-router';
-import { NBSP, formatMoney } from '@/lib/format';
-import { indicativePayment } from '@/lib/finance';
+import { NBSP } from '@/lib/format';
 import { applicationForm, productNames } from '@/texts';
 import { productCodes, validFields, type ConditionsForm } from './conditionsSchema';
 import type { DraftAutosave } from './useDraftAutosave';
+import { PaymentEstimate } from './PaymentEstimate';
 
 const c = applicationForm.conditions;
 
@@ -31,12 +31,6 @@ export function ConditionsStep({
     });
     return () => subscription.unsubscribe();
   }, [watch, schedule]);
-
-  const payment = indicativePayment(
-    values.productCode,
-    typeof values.amountRub === 'number' ? values.amountRub : null,
-    typeof values.termMonths === 'number' ? values.termMonths : null,
-  );
 
   return (
     <Stack gap="md" maw={520}>
@@ -100,19 +94,11 @@ export function ConditionsStep({
           />
         )}
       />
-      <Stack gap={2} aria-live="polite" data-testid="payment">
-        <Text size="sm" c="dimmed">
-          {c.paymentLabel}
-        </Text>
-        <Text fw={700} size="xl">
-          {payment === null ? c.paymentLater : formatMoney(payment)}
-        </Text>
-        {payment === null ? null : (
-          <Text size="sm" c="dimmed">
-            {c.paymentNote}
-          </Text>
-        )}
-      </Stack>
+      <PaymentEstimate
+        productCode={values.productCode}
+        amountRub={values.amountRub}
+        termMonths={values.termMonths}
+      />
       <Group gap="xs" align="baseline">
         <Button component={Link} to="/wizard" variant="subtle" px={0}>
           {c.pickWizard}
