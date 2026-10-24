@@ -3677,6 +3677,621 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Отзыв: подтверждение и повтор",
+      "description": "Сбрасывает только Гарипова; запускать отдельно или после положительного пути. Демонстрационные заявки/кредиты этой персоны будут удалены.",
+      "item": [
+        {
+          "id": "facea980-0b52-5723-a3eb-e6a2a269a52e",
+          "name": "Отзыв Гарипова · 01 Сбросить только эту персону",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/demo/personas/garipov/reset",
+            "description": "Удаляет демо-заявки и кредиты этой компании. При 409 DEMO_RESET_IN_PROGRESS повторите через секунду. Не запускайте на общей демонстрации без согласования."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "[\"applicationId\",\"offerId\",\"variantId\",\"contractId\",\"evaluationRef\",\"decisionActionKey\",\"engineDecisionId\"].forEach(k => pm.collectionVariables.unset(k));",
+                  "pm.collectionVariables.set(\"decisionPolls\", 0);",
+                  "pm.collectionVariables.set(\"disbursementPolls\", 0);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "0f46c029-4363-520e-acd1-fce2e1dd455d",
+          "name": "Отзыв Гарипова · 02 Найти компанию и руководителя",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/auth/roles/001298765490",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const person = j.people.find(x => x.role === \"DIRECTOR\");",
+                  "pm.test(\"Найден руководитель\", () => pm.expect(person).to.be.an(\"object\"));",
+                  "if (!person) { pm.execution.setNextRequest(null); throw new Error(\"No director\"); }",
+                  "pm.collectionVariables.set(\"companyId\", j.company.id);",
+                  "pm.collectionVariables.set(\"userId\", person.userId);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "4087a21e-3ad8-5197-9f9c-e9488274cdc3",
+          "name": "Отзыв Гарипова · 03 Получить код входа",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/request-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"companyId\": \"{{companyId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"loginRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"loginCode\", j.demoCode);",
+                  "pm.test(\"Код получен от демо-сервера\", () => pm.expect(j.demoCode).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "bb675134-516e-53cf-8c84-ea4353981c1d",
+          "name": "Отзыв Гарипова · 04 Войти, сохранить cookie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/auth/verify-code",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{loginRequestId}}\",\n  \"code\": \"{{loginCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.collectionVariables.unset(\"loginCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "f7eab27b-fc69-594d-99fc-872ab98e4e6d",
+          "name": "Отзыв Гарипова · 05 Создать черновик",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"productCode\": \"EXPRESS\", \"amountRub\": 1500000, \"termMonths\": 36, \"purposeCode\": \"EQUIPMENT\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code !== 201) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"applicationId\", j.id);",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "36640d17-6f0f-50c7-af56-efccb21ce74a",
+          "name": "Отзыв Гарипова · 06 Получить нужные согласия",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "const items = j.items.filter(x => x.canSign && x.status !== \"SIGNED\").map(x => ({kind:x.kind, subjectInn:x.subjectInn}));",
+                  "pm.test(\"Есть согласия руководителя\", () => pm.expect(items.length).to.be.above(0));",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "c4f4593e-f496-5259-a277-73466f132a57",
+          "name": "Отзыв Гарипова · 07 Получить код пакета согласий",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\": {{consentItems}}, \"acceptPepRules\": true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"consentRequestId\", j.requestId);",
+                  "pm.collectionVariables.set(\"consentCode\", j.demoCode);",
+                  "pm.collectionVariables.set(\"consentItems\", JSON.stringify(j.items));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "6cd1366b-0cd0-5ada-93c5-0843e0639e73",
+          "name": "Отзыв Гарипова · 08 Подписать согласия",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/consents/sign",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requestId\":\"{{consentRequestId}}\", \"code\":\"{{consentCode}}\", \"items\": {{consentItems}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Все согласия подписаны\", () => pm.expect(pm.response.json().allSigned).to.eql(true));",
+                  "pm.collectionVariables.unset(\"consentCode\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "37bae01d-2b97-5508-ba82-42d492e7adfe",
+          "name": "Отзыв Гарипова · 09 Отправить заявку",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/submit",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "0ae48f1c-5306-5c13-a9ed-ad68fc0c1612",
+          "name": "Отзыв Гарипова · 10 Дождаться решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}",
+            "description": "В Runner задайте задержку 1000 мс. Максимум 60 опросов, затем явная ошибка. При ручном Send повторяйте этот запрос до конечного исхода."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const wanted = \"NEEDS_INFO\";",
+                  "if ([\"SUBMITTED\", \"CHECKING\", \"SIGNED\", \"DISBURSING\"].includes(j.status)) {",
+                  "    const n = Number(pm.collectionVariables.get(\"decisionPolls\")) + 1;",
+                  "    pm.collectionVariables.set(\"decisionPolls\", n);",
+                  "    if (n >= 60) { pm.test(\"Статус изменился за 60 опросов\", () => pm.expect.fail(j.status)); pm.execution.setNextRequest(null); }",
+                  "    else pm.execution.setNextRequest(pm.info.requestId);",
+                  "} else {",
+                  "    pm.test(\"Ожидаемый исход\", () => pm.expect(j.status).to.eql(wanted));",
+                  "    if (j.status !== wanted) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected application status: \" + j.status); }",
+                  "}",
+                  "pm.collectionVariables.set(\"applicationVersion\", j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "2e8d34a5-8c9f-553f-834b-6cf4edefae25",
+          "name": "Отзыв Гарипова · 11 Прочитать объяснение",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/decision",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "ae1b0fae-d179-5da8-b681-0260d189567c",
+          "name": "Отзыв Гарипова: готовая выписка · Проверить таймлайн после решения",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();",
+                  "pm.test(\"Таймлайн принадлежит заявке\",()=>pm.expect(j.applicationId).to.eql(pm.collectionVariables.get(\"applicationId\")));",
+                  "pm.test(\"Есть курсор событий и реальные проверки\",()=>{pm.expect(j.lastEventId).to.be.a(\"number\");pm.expect(j.steps).to.be.an(\"array\");pm.expect(j.checks.map(x=>x.key)).to.have.members([\"registry\",\"taxes\",\"creditHistory\",\"turnover\"]);});",
+                  "pm.test(\"Проверки завершены\",()=>j.checks.forEach(x=>pm.expect(x.state).to.eql(\"done\")));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "b3feb687-bed6-515a-a06b-9f270a1fb34d",
+          "name": "Отзыв · Без тела",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/withdraw",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+                  "if (pm.response.code !== 422) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "86814581-e297-5afc-85d9-bfc95aa8a0bf",
+          "name": "Отзыв · Без confirmed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/withdraw",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+                  "if (pm.response.code !== 422) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "5469a0c9-297a-5fd8-b4e4-a4c2fa3d4dea",
+          "name": "Отзыв · confirmed:false",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/withdraw",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+                  "if (pm.response.code !== 422) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "6cbf0b5e-52ec-568f-b299-73979432e8c5",
+          "name": "Отзыв · Явно подтвердить",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/withdraw",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmed\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();pm.test(\"Отозвана\",()=>pm.expect(j.status).to.eql(\"WITHDRAWN\"));pm.collectionVariables.set(\"withdrawnVersion\",j.version);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "6b629b0e-96ab-546d-ad7b-7e2e81bd82b0",
+          "name": "Отзыв · Повтор возвращает прежнюю версию",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/withdraw",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmed\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "const j=pm.response.json();pm.test(\"Один результат\",()=>{pm.expect(j.status).to.eql(\"WITHDRAWN\");pm.expect(j.version).to.eql(Number(pm.collectionVariables.get(\"withdrawnVersion\")));});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "0a5c5a8a-ab45-5826-ae40-7641826d8a5f",
+          "name": "Отзыв · Задачи закрыты",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/tasks",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Открытых задач нет\",()=>pm.expect(pm.response.json().items.filter(x=>x.status===\"OPEN\")).to.have.lengthOf(0));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "574289d9-be01-5948-bf54-0a3b59d55f9c",
+          "name": "Отзыв · Отметка в таймлайне",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{apiUrl}}/applications/{{applicationId}}/timeline",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
+                  "pm.test(\"Пометка отзыва\",()=>pm.expect(pm.response.json().noteKey).to.eql(\"withdrawn\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
     }
   ]
 }

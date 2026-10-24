@@ -1,0 +1,809 @@
+{
+  "checkedCodeCommit": "91471de0b6e5fc40b7759bf410c1bbf74f2b3b45",
+  "runner": "Newman 6.2.1",
+  "collectionSha256": "3741300a5cfd79a77a8afd211540902e372ea1b8d7e77fe3c2103adecac27977",
+  "requests": {
+    "total": 145,
+    "pending": 0,
+    "failed": 0
+  },
+  "assertions": {
+    "total": 233,
+    "pending": 0,
+    "failed": 0
+  },
+  "failures": 0,
+  "executions": [
+    {
+      "name": "Соколова · 01 Сбросить только эту персону",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 02 Найти компанию и руководителя",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 03 Получить код входа",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 04 Войти, сохранить cookie",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 05 Создать черновик",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 06 Получить нужные согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 07 Получить код пакета согласий",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 08 Подписать согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 09 Отправить заявку",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 11 Прочитать объяснение",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · Проверить таймлайн после решения",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Соколова · 16 Получить предложение и выбрать рекомендуемый вариант",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 17 Принять вариант",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 18 Получить сохранённый договор PDF",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Соколова · 19 Получить код подписи",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 20 Подписать договор",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Соколова · 21 Дождаться выдачи",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 22 Найти выданный кредит",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Соколова · 23 Получить график",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 01 Сбросить только эту персону",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 02 Найти компанию и руководителя",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 03 Получить код входа",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 04 Войти, сохранить cookie",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 05 Создать черновик",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 06 Получить нужные согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 07 Получить код пакета согласий",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 08 Подписать согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 09 Отправить заявку",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 11 Прочитать объяснение",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · Проверить таймлайн после решения",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "СнабКонтракт · 16 Получить предложение и выбрать рекомендуемый вариант",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 17 Принять вариант",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 18 Получить сохранённый договор PDF",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "СнабКонтракт · 19 Получить код подписи",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 20 Подписать договор",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "СнабКонтракт · 21 Дождаться выдачи",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 22 Найти выданный кредит",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "СнабКонтракт · 23 Получить график",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 01 Сбросить только эту персону",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 02 Найти компанию и руководителя",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 03 Получить код входа",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 04 Войти, сохранить cookie",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 05 Создать черновик",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 06 Получить нужные согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 07 Получить код пакета согласий",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 08 Подписать согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 09 Отправить заявку",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 11 Прочитать объяснение",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · Проверить таймлайн после решения",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Станкопром · 12 Войти в отдельную банковскую сессию L2",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 13 Получить версию и ENGINE",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 14 Рассчитать 10 млн на 12 месяцев",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 15 Сохранить проверенное встречное",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 16 Получить предложение и выбрать рекомендуемый вариант",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 17 Принять вариант",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 18 Получить сохранённый договор PDF",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Станкопром · 19 Получить код подписи",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 20 Подписать договор",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Станкопром · 21 Дождаться выдачи",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 22 Найти выданный кредит",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Станкопром · 23 Получить график",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · 01 Сбросить только эту персону",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 02 Найти компанию и руководителя",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · 03 Получить код входа",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · 04 Войти, сохранить cookie",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 05 Создать черновик",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 06 Получить нужные согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · 07 Получить код пакета согласий",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 08 Подписать согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · 09 Отправить заявку",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Ромашка · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · 11 Прочитать объяснение",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Ромашка · Проверить таймлайн после решения",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Ромашка · Чужой таймлайн скрыт",
+      "http": 404,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 01 Сбросить только эту персону",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 02 Найти компанию и руководителя",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 03 Получить код входа",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 04 Войти, сохранить cookie",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 05 Создать черновик",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 06 Получить нужные согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 07 Получить код пакета согласий",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 08 Подписать согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 09 Отправить заявку",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 11 Прочитать объяснение",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов: готовая выписка · Проверить таймлайн после решения",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Гарипов · 12 Получить задачу",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 14 Загрузить файл независимого тестового writer",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 15 Дождаться разбора",
+      "http": 200,
+      "assertions": 3
+    },
+    {
+      "name": "Гарипов · 16 Подтвердить поступления",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 17 Добавить пояснение к файлу",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 18 Отправить полный раунд",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 19 Дождаться повторного расчёта",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 19 Дождаться повторного расчёта",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 16 Получить предложение и выбрать рекомендуемый вариант",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 17 Принять вариант",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 18 Получить сохранённый договор PDF",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Гарипов · 19 Получить код подписи",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 20 Подписать договор",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Гарипов · 21 Дождаться выдачи",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 22 Найти выданный кредит",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Гарипов · 23 Получить график",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Моки · registry ready",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Моки · tax / ЕИС ready",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Моки · credit-bureau ready",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Моки · bank-core ready",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Моки · scenarios ready",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Моки · предпросмотр ООО без сохранения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 01 Сбросить только эту персону",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 02 Найти компанию и руководителя",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв Гарипова · 03 Получить код входа",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв Гарипова · 04 Войти, сохранить cookie",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 05 Создать черновик",
+      "http": 201,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 06 Получить нужные согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв Гарипова · 07 Получить код пакета согласий",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 08 Подписать согласия",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв Гарипова · 09 Отправить заявку",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова · 10 Дождаться решения",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв Гарипова · 11 Прочитать объяснение",
+      "http": 200,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв Гарипова: готовая выписка · Проверить таймлайн после решения",
+      "http": 200,
+      "assertions": 4
+    },
+    {
+      "name": "Отзыв · Без тела",
+      "http": 422,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв · Без confirmed",
+      "http": 422,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв · confirmed:false",
+      "http": 422,
+      "assertions": 1
+    },
+    {
+      "name": "Отзыв · Явно подтвердить",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв · Повтор возвращает прежнюю версию",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв · Задачи закрыты",
+      "http": 200,
+      "assertions": 2
+    },
+    {
+      "name": "Отзыв · Отметка в таймлайне",
+      "http": 200,
+      "assertions": 2
+    }
+  ],
+  "outbox": [
+    {
+      "event_type": "APPLICATION_DECIDED",
+      "status": "SENT",
+      "decision": "APPROVED",
+      "n": 3
+    },
+    {
+      "event_type": "APPLICATION_DECIDED",
+      "status": "SENT",
+      "decision": "REJECTED",
+      "n": 1
+    },
+    {
+      "event_type": "APPLICATION_DECIDED",
+      "status": "SENT",
+      "decision": "WITHDRAWN",
+      "n": 1
+    },
+    {
+      "event_type": "APPLICATION_REGISTERED",
+      "status": "SENT",
+      "decision": null,
+      "n": 5
+    },
+    {
+      "event_type": "OBLIGATION_OPENED",
+      "status": "SENT",
+      "decision": null,
+      "n": 3
+    }
+  ],
+  "bureau": [
+    {
+      "event_type": "APPLICATION_DECIDED",
+      "status": "ACCEPTED",
+      "decision": "APPROVED",
+      "n": 3
+    },
+    {
+      "event_type": "APPLICATION_DECIDED",
+      "status": "ACCEPTED",
+      "decision": "REJECTED",
+      "n": 1
+    },
+    {
+      "event_type": "APPLICATION_DECIDED",
+      "status": "ACCEPTED",
+      "decision": "WITHDRAWN",
+      "n": 1
+    },
+    {
+      "event_type": "APPLICATION_REGISTERED",
+      "status": "ACCEPTED",
+      "decision": null,
+      "n": 5
+    },
+    {
+      "event_type": "OBLIGATION_OPENED",
+      "status": "ACCEPTED",
+      "decision": null,
+      "n": 3
+    }
+  ],
+  "threeRoundIntegration": "4 parameterized cases passed: 2/3 preceding rounds and known/unknown revenue, original test_pipeline_after_answered_rounds_routes_without_a_fourth_request",
+  "threeRoundHttp": "ROUND_INCOMPLETE 409 correctly rejects text without confirmed required statement; not a completed three-round HTTP flow"
+}
