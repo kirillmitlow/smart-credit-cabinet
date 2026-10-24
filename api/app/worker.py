@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 from app import document_tasks
-from app.modules import disbursement
+from app.modules import applications, disbursement
 from app.modules.disbursement import tasks as disbursement_tasks  # noqa: F401 — disbursement.run
 from app.modules.pipeline import tasks as pipeline_tasks  # noqa: F401 — регистрирует pipeline.run
 from app.shared import clock, db, outbox
@@ -25,6 +25,7 @@ db.configure(_settings.sqlalchemy_url)
 configure_celery()
 wire_modules()
 disbursement.register()  # обработчики outbox: выдача в АБС и OBLIGATION_OPENED в БКИ
+applications.register_bureau_handlers()
 outbox.set_dead_letter_hook(disbursement.audit_dead_letter)
 
 HEARTBEAT_EVERY = timedelta(seconds=30)

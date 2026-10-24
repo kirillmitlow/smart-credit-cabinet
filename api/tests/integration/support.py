@@ -56,7 +56,7 @@ def make_stand(
     database = db.get_database()
     db.migrate(database.engine)
     with database.transaction() as s:
-        s.execute(text("TRUNCATE applications, company_members, companies, users CASCADE"))
+        s.execute(text("TRUNCATE applications, company_members, companies, users, outbox CASCADE"))
     principals: dict[str, auth.Principal] = {}
     companies: dict[str, UUID] = {}
     with database.transaction() as s:
