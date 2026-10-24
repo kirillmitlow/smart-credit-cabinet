@@ -38,6 +38,7 @@ from app.modules.applications.operations import scope as operation_scope
 from app.modules.applications.router import router
 from app.modules.applications.service import (
     add_version,
+    company_principal,
     current_version,
     get_for,
     record_event,
@@ -64,6 +65,7 @@ __all__ = [
     "TaskSpec",
     "add_version",
     "bki_consents",
+    "company_principal",
     "consents_router",
     "current_version",
     "document_upload_context",

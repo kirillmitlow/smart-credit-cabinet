@@ -8,6 +8,7 @@ from fastapi import APIRouter, Response
 from starlette.concurrency import run_in_threadpool
 
 from app.modules import auth
+from app.modules.applications import company_principal
 from app.modules.offers import contracts, service, signing, views
 from app.modules.offers.schemas import (
     AcceptedOut,
@@ -33,6 +34,7 @@ router = APIRouter(tags=["предложение и договор"])
 
 def _get_offer(principal: auth.Principal, application_id: UUID) -> OfferOut:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         offer, _ = service.current_for(session, principal, application_id)
         return views.offer_out(session, offer)
 
@@ -50,6 +52,7 @@ async def get_offer(application_id: UUID, principal: auth.ClientPrincipal) -> Of
 
 def _accept(principal: auth.Principal, offer_id: UUID, body: AcceptIn) -> AcceptedOut:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         offer, application, contract = service.accept(session, principal, offer_id, body.variant_id)
         return AcceptedOut(
             application_status=application.status,
@@ -73,6 +76,7 @@ async def accept_offer(
 
 def _decline(principal: auth.Principal, offer_id: UUID) -> DeclinedOut:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         offer, application = service.decline(session, principal, offer_id)
         return DeclinedOut(
             application_status=application.status, offer=views.offer_out(session, offer)
@@ -95,6 +99,7 @@ async def decline_offer(offer_id: UUID, principal: auth.ClientPrincipal) -> Decl
 
 def _get_contract(principal: auth.Principal, contract_id: UUID) -> ContractOut:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         contract, application = signing.contract_for(session, principal, contract_id)
         return views.contract_out(session, principal, contract, application)
 
@@ -112,6 +117,7 @@ async def get_contract(contract_id: UUID, principal: auth.ClientPrincipal) -> Co
 
 def _document(principal: auth.Principal, contract_id: UUID) -> Response:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         contract, _ = signing.contract_for(session, principal, contract_id)
         content, mime, digest = contracts.document_content(session, contract)
         extension = "pdf" if mime == "application/pdf" else "json"
@@ -138,6 +144,7 @@ async def get_contract_document(contract_id: UUID, principal: auth.ClientPrincip
 
 def _pass(principal: auth.Principal, contract_id: UUID) -> PassedOut:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         contract, at, repeated = signing.pass_to_director(session, principal, contract_id)
         return PassedOut(contract_id=contract.id, requested_at=at, repeated=repeated)
 
@@ -162,6 +169,7 @@ def _start(principal: auth.Principal, contract_id: UUID, body: SignStartIn) -> S
             errors=[{"loc": ["body", "agree"], "msg": "Must be true"}],
         )
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         challenge = signing.request_code(
             session, principal, contract_id, accept_pep_rules=body.accept_pep_rules
         )
@@ -187,6 +195,7 @@ async def request_signing_code(
 
 def _sign(principal: auth.Principal, contract_id: UUID, body: SignConfirmIn) -> ContractSignedOut:
     with db.transaction() as session:
+        principal = company_principal(session, principal)
         contract, application, just_signed = signing.sign(
             session, principal, contract_id, body.request_id, body.code
         )
