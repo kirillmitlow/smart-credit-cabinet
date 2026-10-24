@@ -174,6 +174,8 @@ class BankDocument(Camel):
     size_bytes: int
     sha256: str
     parse_status: str
+    parse_error: str | None = None
+    confirmed_at: datetime | None = None
     created_at: datetime
     cancelled_at: datetime | None
 

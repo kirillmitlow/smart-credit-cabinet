@@ -25,6 +25,8 @@ export interface TaskOut {
   /** Отправленный ответ */
   answer: string | null;
   canAnswer: boolean;
+  /** Все требуемые файлы проверены; поступления подтверждены, если нужна выручка */
+  documentReady?: boolean;
   createdAt: string;
   answeredAt: string | null;
 }

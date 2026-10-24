@@ -11,6 +11,6 @@ export interface TaskList {
   items: TaskOut[];
   currentRound: number;
   roundsLimit: number;
-  /** Раунд открыт и на все его задачи есть ответ */
+  /** Раунд открыт, на все задачи есть ответ и обязательные документы готовы */
   canSubmit: boolean;
 }

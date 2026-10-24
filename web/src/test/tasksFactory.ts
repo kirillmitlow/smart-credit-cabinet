@@ -21,6 +21,7 @@ export function makeTask(overrides: Partial<TaskOut> = {}): TaskOut {
     draftAnswer: null,
     answer: null,
     canAnswer: true,
+    documentReady: true, // Файловые условия текстовых сценариев выполнены; ошибки проверяются отдельно.
     createdAt: '2026-10-22T09:00:00Z',
     answeredAt: null,
     ...overrides,
@@ -35,7 +36,9 @@ export function makeTaskList(items: TaskOut[] = [makeTask()], overrides: Partial
     items,
     currentRound,
     roundsLimit: 3,
-    canSubmit: open.length > 0 && open.every((task) => task.draftAnswer !== null),
+    canSubmit:
+      open.length > 0 &&
+      open.every((task) => task.draftAnswer !== null && task.documentReady !== false),
     ...overrides,
   };
   return list;

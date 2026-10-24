@@ -175,6 +175,7 @@ function SentNotice() {
 
 function submitHint(view: RoundView, ready: boolean): string | null {
   if (ready) return null;
+  if (view.open.some((task) => task.documentReady === false)) return dt.documentsNotReady;
   return view.othersMissing.length > 0 ? t.waitingOthers : t.needAll;
 }
 
