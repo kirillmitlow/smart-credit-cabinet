@@ -13,10 +13,18 @@ from app.modules.documents.service import (
     store_generated,
     verified_content,
 )
+from app.modules.documents.statement_parser import (
+    ParsedStatement,
+    parse_statement,
+    validate_statement_set,
+)
 from app.modules.documents.storage import FileStore, PostgresFileStore
 
 __all__ = [
     "Access",
+    "ParsedStatement",
+    "parse_statement",
+    "validate_statement_set",
     "FileStore",
     "PostgresFileStore",
     "UploadContext",

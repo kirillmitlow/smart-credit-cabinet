@@ -34,7 +34,7 @@ def decode_statement(content: bytes) -> str:
             result = content.decode(encoding, errors="strict")
         except UnicodeError:
             continue
-        if "\x00" in result or re.search(r"[\x01-\x08\x0b\x0c\x0e-\x1f]", result):
+        if re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\u2028\u2029]", result):
             continue
         if len(result.splitlines()) > 100_000:
             raise AppError(422, "TOO_MANY_LINES", "В выписке больше 100 000 строк")
