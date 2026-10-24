@@ -42,13 +42,16 @@ def _enqueue_bank_message(session: Session, disbursement: Disbursement) -> None:
     )
 
 
-def start(session: Session, application_id: UUID) -> StartResult:
+def start(session: Session, application_id: UUID, *, skip_locked: bool = False) -> StartResult:
     """Шаги 1–3 из 20-05 без сети: проверка, переход статуса, запись выдачи и сообщения."""
     application = session.scalars(
-        select(Application).where(Application.id == application_id).with_for_update()
+        select(Application)
+        .where(Application.id == application_id)
+        .with_for_update(skip_locked=skip_locked)
     ).first()
     if application is None:
-        log.error("disbursement_application_missing", application=str(application_id))
+        if not skip_locked:
+            log.error("disbursement_application_missing", application=str(application_id))
         return StartResult.SKIPPED
     status = Status(application.status)
     existing = session.scalars(
