@@ -35,6 +35,8 @@ def test_task_is_registered_under_its_name_with_limits() -> None:
     assert tasks.pipeline_run.name == "pipeline.run"
     assert (tasks.pipeline_run.soft_time_limit, tasks.pipeline_run.time_limit) == (60, 90)
     assert tasks.pipeline_run.max_retries == 3
+    assert tasks.pipeline_reaper.name == "pipeline.reaper"
+    assert (tasks.pipeline_reaper.soft_time_limit, tasks.pipeline_reaper.time_limit) == (60, 90)
 
 
 def test_retry_pauses_are_2_10_30_seconds() -> None:

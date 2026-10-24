@@ -41,6 +41,7 @@ def heartbeat() -> None:
 celery_app.conf.beat_schedule = {
     "worker-heartbeat": {"task": "default.heartbeat", "schedule": HEARTBEAT_EVERY},
     "outbox-relay-safety-net": {"task": outbox.RELAY_TASK, "schedule": RELAY_SAFETY_NET_EVERY},
+    "pipeline-recovery": {"task": "pipeline.reaper", "schedule": timedelta(seconds=30)},
     "statement-recovery": {"task": document_tasks.RECOVER_TASK, "schedule": timedelta(seconds=60)},
 }
 

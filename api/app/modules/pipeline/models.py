@@ -34,6 +34,7 @@ from app.shared import clock
 from app.shared.db import Base, IdMixin
 
 RUN_STATUSES = ("QUEUED", "RUNNING", "DONE", "FAILED")
+MAX_RUN_ATTEMPTS = 5  # T-271: после пяти неудачных запусков нужен ручной разбор
 SNAPSHOT_STATUSES = ("OK", "NOT_FOUND", "UNAVAILABLE")
 DECISION_SOURCES = ("ENGINE", "UNDERWRITER")
 DECISION_OUTCOMES = ("APPROVED", "COUNTER_OFFER", "NEEDS_INFO", "MANUAL_REVIEW", "REJECTED")

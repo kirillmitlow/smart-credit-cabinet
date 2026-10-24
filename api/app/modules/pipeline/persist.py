@@ -31,8 +31,18 @@ from app.modules.decisioning import (
     authority_level,
     client_factor_phrases,
     input_to_json,
+    inputs_hash,
+    policy_hash,
+    render,
 )
-from app.modules.decisioning.types import Outcome, Recommendation, Route
+from app.modules.decisioning.types import (
+    Numbers,
+    Outcome,
+    ReasonCode,
+    ReasonKind,
+    Recommendation,
+    Route,
+)
 from app.modules.pipeline import hooks
 from app.modules.pipeline.models import Decision, DecisionReason, PipelineRun
 
@@ -122,6 +132,31 @@ def information_limit_result(inp: DecisionInput, result: DecisionResult) -> Deci
             inp.policy, inp.application.amount_rub, result.numbers.grade
         ),
         recommendation=Recommendation(Outcome.NEEDS_INFO),
+    )
+
+
+def pipeline_error_result(inp: DecisionInput, run_id: UUID, attempts: int) -> DecisionResult:
+    """Технический маршрут без вызова скоринга и без выдуманных финансовых показателей."""
+    reason = ReasonCode(
+        "PIPELINE_ERROR", ReasonKind.FLAG, {"attempts": attempts, "run_id": str(run_id)}
+    )
+    return DecisionResult(
+        outcome=Outcome.MANUAL_REVIEW,
+        route=Route.MANUAL,
+        required_level=authority_level(inp.policy, inp.application.amount_rub, None),
+        reasons=(reason,),
+        numbers=Numbers(),
+        features=None,
+        variants=(),
+        variants_status="NOT_APPLICABLE",
+        recommendation=None,
+        explanations=(render(reason),),
+        trace=(),
+        inputs_hash=inputs_hash(inp),
+        policy_version=inp.policy.meta.version,
+        policy_hash=policy_hash(inp.policy),
+        mode=inp.context.mode,
+        kind="PIPELINE_ERROR",
     )
 
 
