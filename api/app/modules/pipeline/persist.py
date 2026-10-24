@@ -112,6 +112,19 @@ def build_reasons(decision_id: UUID, result: DecisionResult) -> list[DecisionRea
     ]
 
 
+def information_limit_result(inp: DecisionInput, result: DecisionResult) -> DecisionResult:
+    """Маршрут D-091 поверх воспроизводимого результата ядра, без изменения его чисел."""
+    return replace(
+        result,
+        outcome=Outcome.MANUAL_REVIEW,
+        route=Route.MANUAL,
+        required_level=authority_level(
+            inp.policy, inp.application.amount_rub, result.numbers.grade
+        ),
+        recommendation=Recommendation(Outcome.NEEDS_INFO),
+    )
+
+
 def persist_decision(
     session: Session,
     run: PipelineRun,
@@ -135,15 +148,7 @@ def persist_decision(
         session, application.id
     )
     if rounds_exhausted:
-        result = replace(
-            result,
-            outcome=Outcome.MANUAL_REVIEW,
-            route=Route.MANUAL,
-            required_level=authority_level(
-                inp.policy, inp.application.amount_rub, result.numbers.grade
-            ),
-            recommendation=Recommendation(Outcome.NEEDS_INFO),
-        )
+        result = information_limit_result(inp, result)
     decision = build_decision(
         run,
         inp,
