@@ -8,7 +8,6 @@ import { isAppError } from '@/api/errors';
 import { useActionKey } from '@/api/idempotency';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { useActiveCompany } from '@/features/auth/useActiveCompany';
-import { indicativePayment } from '@/lib/finance';
 import { formatMoney, formatTermMonths } from '@/lib/format';
 import { applicationForm, consents as consentTexts, fill, productName } from '@/texts';
 import { missingFields } from './conditionsSchema';
@@ -16,6 +15,7 @@ import { isInFlight } from './statuses';
 import { putApplication } from './useApplication';
 import type { DraftAutosave } from './useDraftAutosave';
 import { useConsents } from './useConsents';
+import { PaymentEstimate } from './PaymentEstimate';
 
 const r = applicationForm.review;
 
@@ -56,11 +56,6 @@ export function ReviewStep({
   const allSigned = consents.data?.allSigned === true && !consents.isError;
   const missing = missingFields(application);
   const canSubmit = application.allowedActions.includes('SUBMIT');
-  const payment = indicativePayment(
-    application.productCode,
-    application.amountRub,
-    application.termMonths,
-  );
   const base = `/applications/${application.id}/edit`;
 
   const onSubmit = async () => {
@@ -136,12 +131,12 @@ export function ReviewStep({
           value={application.termMonths ? formatTermMonths(application.termMonths) : r.notFilled}
           to={`${base}/1`}
         />
-        {payment === null ? null : (
-          <Group justify="space-between" wrap="nowrap">
-            <Text c="dimmed">{r.payment}</Text>
-            <Text fw={600}>{formatMoney(payment)}</Text>
-          </Group>
-        )}
+        <PaymentEstimate
+          compact
+          productCode={application.productCode}
+          amountRub={application.amountRub}
+          termMonths={application.termMonths}
+        />
       </Stack>
 
       {missing.length > 0 ? (

@@ -6,12 +6,17 @@ import {
 } from '@/api/generated/api.msw';
 import { makeCompanyProfile } from './companyProfileFactory';
 import { makePublicConfig, problemResponse } from './factories';
+import { makePayment } from './paymentFactory';
+import type { PaymentRequest } from '@/api/generated/model';
 
 /**
  * Обработчики по умолчанию: пока в api нет входа, `/me` отвечает «не вошли» (401), как и будет без сессии.
  * Обработчики ручек из схемы берутся из сгенерированных файлов `*.msw.ts` и обновляются вместе с клиентом.
  */
 export const defaultHandlers = [
+  http.post('*/api/calculator/payment', async ({ request }) =>
+    Response.json(makePayment((await request.json()) as PaymentRequest)),
+  ),
   http.get('*/api/documents', () => Response.json([])),
   http.get('*/api/demo/personas', () => Response.json([])),
   http.get('*/api/demo/chaos', () => Response.json([])),
