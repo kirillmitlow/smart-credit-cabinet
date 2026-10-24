@@ -5,7 +5,15 @@
  * («то же самое пришло дважды») ничего не дублирует.
  */
 import { formatDateTime, formatMoney } from '@/lib/format';
-import { applicationPage, fillKnown, needsHelpStep, timelineNotes, timelineSteps } from '@/texts';
+import type { ApplicationTimelineOut } from '@/api/generated/model';
+import {
+  applicationPage,
+  fillKnown,
+  needsHelpStep,
+  timelineNotes,
+  timelineProgress,
+  timelineSteps,
+} from '@/texts';
 import type { ClientStepKey } from './statuses';
 
 export type StepState = 'done' | 'running' | 'waiting';
@@ -20,10 +28,60 @@ export interface TimelineStep {
 
 export interface TimelineModel {
   steps: TimelineStep[];
+  checks?: {
+    key: string;
+    title: string;
+    state: 'waiting' | 'running' | 'done' | 'delayed';
+  }[];
   /** Шаг, который «идёт сейчас» (или последний готовый): его читает скринридер */
   current: TimelineStep | null;
   /** Заявка закрыта без решения: пояснение вместо шагов */
   note: string | null;
+}
+
+/** Сервер задаёт положение шагов; клиент только переводит разрешённые ключи в текст. */
+export function timelineFromEvents(data: ApplicationTimelineOut): TimelineModel {
+  const texts: Record<string, string> = {};
+  for (const step of timelineSteps) {
+    texts[`${step.key}.running`] = step.running;
+    texts[`${step.key}.done`] = step.done;
+  }
+  texts['needsHelp.running'] = applicationPage.needsHelpGeneric;
+  texts['decision.approved'] = applicationPage.decisionDone.approved;
+  texts['decision.counter'] = applicationPage.decisionDone.counter;
+  texts['decision.rejected'] = applicationPage.decisionDone.rejected;
+  texts['money.done'] = timelineProgress.moneyDone;
+  texts['checking.delayed'] = timelineProgress.checksDelayed;
+  const steps = data.steps.map((step): TimelineStep => {
+    const template = texts[step.textKey];
+    return {
+      key: step.key,
+      state: step.state,
+      title:
+        step.key === 'needsHelp'
+          ? needsHelpStep.title
+          : (timelineSteps.find((s) => s.key === step.key)?.title ?? ''),
+      text:
+        step.state === 'waiting' || !template
+          ? null
+          : fillKnown(template, {
+              date: typeof step.params?.date === 'string' ? formatDateTime(step.params.date) : null,
+            }),
+    };
+  });
+  return {
+    steps,
+    checks: data.checks.map((check) => ({
+      key: check.key,
+      title: timelineProgress.checks[check.key],
+      state: check.state,
+    })),
+    current:
+      steps.find((step) => step.state === 'running') ??
+      [...steps].reverse().find((step) => step.state === 'done') ??
+      null,
+    note: data.noteKey ? timelineNotes[data.noteKey] : null,
+  };
 }
 
 export interface TimelineInput {

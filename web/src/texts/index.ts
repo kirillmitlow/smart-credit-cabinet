@@ -16,7 +16,13 @@ export {
 } from './errors';
 export type { ErrorText, KnownErrorCode } from './errors';
 export { shell, guards, loginPlaceholder, placeholders } from './shell';
-export { timelineSteps, needsHelpStep, timelineNotes, applicationStatusLabels } from './timeline';
+export {
+  timelineSteps,
+  needsHelpStep,
+  timelineNotes,
+  timelineProgress,
+  applicationStatusLabels,
+} from './timeline';
 export type { ApplicationStatus } from './timeline';
 export { emptyStates, termHints, demoMarks } from './content';
 export { login, companyChoice, logout } from './login';

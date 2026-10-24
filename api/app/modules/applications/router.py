@@ -14,6 +14,7 @@ from starlette.concurrency import run_in_threadpool
 from app.modules import auth
 from app.modules.applications import service
 from app.modules.applications.models import Application
+from app.modules.applications.timeline import ApplicationTimelineOut, client_timeline
 from app.shared import db
 
 router = APIRouter(prefix="/applications", tags=["заявки"])
@@ -138,6 +139,24 @@ def _get(principal: auth.Principal, application_id: UUID) -> ApplicationOut:
 )
 async def get_application(application_id: UUID, principal: auth.ClientPrincipal) -> ApplicationOut:
     return await run_in_threadpool(_get, principal, application_id)
+
+
+def _timeline(principal: auth.Principal, application_id: UUID) -> ApplicationTimelineOut:
+    with db.transaction() as session:
+        return client_timeline(session, principal, application_id)
+
+
+@router.get(
+    "/{application_id}/timeline",
+    operation_id="getApplicationTimeline",
+    summary="Этапы заявки и состояние проверок по журналу событий",
+    response_model=ApplicationTimelineOut,
+    response_model_by_alias=True,
+)
+async def get_timeline(
+    application_id: UUID, principal: auth.ClientPrincipal
+) -> ApplicationTimelineOut:
+    return await run_in_threadpool(_timeline, principal, application_id)
 
 
 def _patch(principal: auth.Principal, application_id: UUID, body: DraftPatch) -> ApplicationOut:

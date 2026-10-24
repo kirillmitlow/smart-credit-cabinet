@@ -1,5 +1,5 @@
 import { Box, Group, Loader, Stack, Text, ThemeIcon, VisuallyHidden } from '@mantine/core';
-import { applicationPage } from '@/texts';
+import { applicationPage, timelineProgress } from '@/texts';
 import type { StepState, TimelineModel, TimelineStep } from './timelineModel';
 
 function Marker({ state, index }: { state: StepState; index: number }) {
@@ -24,7 +24,15 @@ function Marker({ state, index }: { state: StepState; index: number }) {
   );
 }
 
-function StepItem({ step, index }: { step: TimelineStep; index: number }) {
+function StepItem({
+  step,
+  index,
+  checks,
+}: {
+  step: TimelineStep;
+  index: number;
+  checks: TimelineModel['checks'];
+}) {
   const running = step.state === 'running';
   return (
     <li aria-current={running ? 'step' : undefined} data-step={step.key} data-state={step.state}>
@@ -40,17 +48,32 @@ function StepItem({ step, index }: { step: TimelineStep; index: number }) {
               {step.text}
             </Text>
           ) : null}
-          {running && step.key === 'checking' ? (
+          {step.key === 'checking' && (running || (checks && step.state !== 'waiting')) ? (
             <Box mt={4}>
               <Text size="sm" fw={500}>
                 {applicationPage.checksHeading}
               </Text>
               <Stack component="ul" gap={2} m={0} pl="md">
-                {applicationPage.checks.map((check) => (
-                  <Text component="li" size="sm" c="dimmed" key={check}>
-                    {check}
-                  </Text>
-                ))}
+                {checks
+                  ? checks.map((check) => (
+                      <Text
+                        component="li"
+                        size="sm"
+                        key={check.key}
+                        data-check={check.key}
+                        data-state={check.state}
+                      >
+                        <span aria-hidden="true">
+                          {check.state === 'done' ? '✓ ' : check.state === 'delayed' ? '! ' : ''}
+                        </span>
+                        {check.title}: {timelineProgress.checkState[check.state]}
+                      </Text>
+                    ))
+                  : applicationPage.checks.map((check) => (
+                      <Text component="li" size="sm" c="dimmed" key={check}>
+                        {check}
+                      </Text>
+                    ))}
               </Stack>
             </Box>
           ) : null}
@@ -62,8 +85,7 @@ function StepItem({ step, index }: { step: TimelineStep; index: number }) {
 
 /**
  * Вертикальный таймлайн (60-03 №8). Список с номерами шагов; текущий шаг помечен `aria-current`.
- * Подшаги проверки (реестр, налоговая, кредитная история) пока показаны перечнем без галочек:
- * галочки придут с ручкой `GET …/timeline` (T-255).
+ * Состояния проверок приходят из журнала. До загрузки — перечень без галочек.
  */
 export function Timeline({ model }: { model: TimelineModel }) {
   if (model.steps.length === 0) return null;
@@ -78,7 +100,7 @@ export function Timeline({ model }: { model: TimelineModel }) {
       data-testid="timeline"
     >
       {model.steps.map((step, index) => (
-        <StepItem key={step.key} step={step} index={index} />
+        <StepItem key={step.key} step={step} index={index} checks={model.checks} />
       ))}
     </Stack>
   );

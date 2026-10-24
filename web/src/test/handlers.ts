@@ -26,6 +26,9 @@ export const defaultHandlers = [
   http.get('*/api/me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
   http.get('*/api/auth/bank-me', () => problemResponse({ status: 401, code: 'UNAUTHENTICATED' })),
   http.get('*/api/applications', () => Response.json({ items: [], nextCursor: null })),
+  http.get('*/api/applications/:id/timeline', () =>
+    problemResponse({ status: 503, code: 'SERVICE_UNAVAILABLE' }),
+  ),
   http.get('*/api/backoffice/queue', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/backoffice/outbox', () => Response.json({ items: [], nextCursor: null })),
   http.get('*/api/backoffice/applications/:id', () =>

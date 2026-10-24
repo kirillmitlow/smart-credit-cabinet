@@ -33,6 +33,7 @@ import type {
   AcceptedOut,
   ApplicationOut,
   ApplicationPage,
+  ApplicationTimelineOut,
   BankApplicationCard,
   BankDecisionSaved,
   BankInfoRequested,
@@ -136,6 +137,10 @@ export const getCreateApplicationResponseMock = (overrideResponse: Partial<Extra
 export const getListApplicationsResponseMock = (overrideResponse: Partial<Extract<ApplicationPage, object>> = {}): ApplicationPage => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), companyId: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}})))})), nextCursor: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), ...overrideResponse})
 
 export const getGetApplicationResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), companyId: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getGetApplicationTimelineResponseMock = (overrideResponse: Partial<Extract<ApplicationTimelineOut, object>> = {}): ApplicationTimelineOut => ({applicationId: faker.string.uuid(), version: faker.number.int(), lastEventId: faker.number.int(), steps: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({key: faker.helpers.arrayElement(['submitted','checking','needsHelp','evaluating','decision','signing','money'] as const), state: faker.helpers.arrayElement(['waiting','running','done'] as const), textKey: faker.string.alpha({length: {min: 10, max: 20}}), params: faker.helpers.arrayElement([{
+        [faker.string.alphanumeric(5)]: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),faker.number.int(),])
+      }, undefined]), at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), checks: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({key: faker.helpers.arrayElement(['registry','taxes','creditHistory','turnover'] as const), state: faker.helpers.arrayElement(['waiting','running','done','delayed'] as const), textKey: faker.string.alpha({length: {min: 10, max: 20}}), at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,])})), noteKey: faker.helpers.arrayElement([faker.helpers.arrayElement(['withdrawn','expired','sourceDelayed'] as const),null,]), ...overrideResponse})
 
 export const getPatchApplicationDraftResponseMock = (overrideResponse: Partial<Extract<ApplicationOut, object>> = {}): ApplicationOut => ({id: faker.string.uuid(), companyId: faker.string.uuid(), number: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), productCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), amountRub: faker.helpers.arrayElement([faker.number.int(),null,]), termMonths: faker.helpers.arrayElement([faker.number.int(),null,]), purposeCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), draft: {}, version: faker.number.int(), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', submittedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), allowedActions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
@@ -538,6 +543,18 @@ export const getGetApplicationMockHandler = (overrideResponse?: ApplicationOut |
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getGetApplicationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApplicationTimelineMockHandler = (overrideResponse?: ApplicationTimelineOut | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApplicationTimelineOut> | ApplicationTimelineOut), options?: RequestHandlerOptions) => {
+  return http.get('*/applications/:applicationId/timeline', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(0);
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApplicationTimelineResponseMock(),
       { status: 200
       })
   }, options)
@@ -1026,6 +1043,7 @@ export const getApiMock = () => [
   getCreateApplicationMockHandler(),
   getListApplicationsMockHandler(),
   getGetApplicationMockHandler(),
+  getGetApplicationTimelineMockHandler(),
   getPatchApplicationDraftMockHandler(),
   getSubmitApplicationMockHandler(),
   getWithdrawApplicationMockHandler(),

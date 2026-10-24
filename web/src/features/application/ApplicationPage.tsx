@@ -6,12 +6,22 @@ import { ErrorScreen } from '@/components/ErrorScreen';
 import { NotFoundScreen } from '@/app/screens';
 import { formatMoney, formatTermMonths } from '@/lib/format';
 import { usePageHeading } from '@/lib/usePageHeading';
-import { applicationPage, clientTasks, errorView, fill, guards, productName, shell } from '@/texts';
+import {
+  applicationPage,
+  clientTasks,
+  errorView,
+  fill,
+  guards,
+  productName,
+  shell,
+  timelineProgress,
+} from '@/texts';
 import { OutcomeBlock } from './OutcomeBlock';
 import { isInFlight } from './statuses';
 import { Timeline } from './Timeline';
-import { buildTimeline } from './timelineModel';
+import { buildTimeline, timelineFromEvents } from './timelineModel';
 import { useApplication } from './useApplication';
+import { useTimeline } from './useTimeline';
 import { WithdrawButton } from './WithdrawButton';
 
 /**
@@ -22,6 +32,7 @@ export function ApplicationPage() {
   const { id = '' } = useParams();
   const query = useApplication(id);
   const application = query.data;
+  const timelineQuery = useTimeline(application);
   const number = application?.number ?? '';
   // Клиент только что отправил ответы банку: пока идёт новая проверка, говорим об этом прямо
   const [answersSent, setAnswersSent] = useState(false);
@@ -61,11 +72,14 @@ export function ApplicationPage() {
     return <Navigate to={`/applications/${application.id}/edit/1`} replace />;
   }
 
-  const timeline = buildTimeline({
-    status: application.status,
-    submittedAt: application.submittedAt,
-    amountRub: application.amountRub,
-  });
+  const timeline =
+    timelineQuery.data?.version === application.version
+      ? timelineFromEvents(timelineQuery.data)
+      : buildTimeline({
+          status: application.status,
+          submittedAt: application.submittedAt,
+          amountRub: application.amountRub,
+        });
   const product = productName(application.productCode);
   const summary =
     application.amountRub !== null && application.termMonths !== null
@@ -130,6 +144,20 @@ export function ApplicationPage() {
 
       <Grid gap="xl">
         <Grid.Col span={{ base: 12, md: wide ? 12 : 6 }}>
+          {timelineQuery.isError ? (
+            <Alert color="yellow" role="status" mb="md" data-testid="timeline-unavailable">
+              <Stack gap="xs">
+                <Text size="sm">{timelineProgress.unavailable}</Text>
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  onClick={() => void timelineQuery.refetch()}
+                >
+                  {shell.common.retry}
+                </Button>
+              </Stack>
+            </Alert>
+          ) : null}
           <Timeline model={timeline} />
           {closed ? (
             <Group mt="md">
