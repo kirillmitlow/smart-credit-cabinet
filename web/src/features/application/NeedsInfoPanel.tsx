@@ -70,6 +70,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
   const titleId = `task-title-${task.id}`;
   const text = fieldText(task, edits);
   const saved = isSaved(task, edits);
+  const needsFile = task.kind === 'DOCUMENT' || task.kind === 'CONFIRM_REVENUE';
   return (
     <Paper component="section" withBorder p="md" aria-labelledby={titleId} data-testid="info-task">
       <Stack gap="sm">
@@ -100,7 +101,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
           <Stack gap={4}>
             <Textarea
               label={fill(t.answerLabel, { title: task.title })}
-              description={task.kind === 'DOCUMENT' ? dt.answerHelp : undefined}
+              description={needsFile ? dt.answerHelp : undefined}
               placeholder={t.answerPlaceholder}
               value={text}
               maxLength={MAX_ANSWER}
@@ -111,7 +112,7 @@ function TaskItem({ task, edits, locked, onEdit }: TaskItemProps) {
                 onEdit(task.id, event.currentTarget.value);
               }}
             />
-            {task.kind === 'DOCUMENT' ? (
+            {needsFile ? (
               <DocumentFiles
                 applicationId={task.applicationId}
                 taskId={task.id}

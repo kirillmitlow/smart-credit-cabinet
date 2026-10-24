@@ -71,6 +71,12 @@ const submitButton = () => screen.getByRole('button', { name: t.submit });
 const draftButton = () => screen.getByRole('button', { name: t.saveDraft });
 
 describe('блок «Нужна информация» (T-424)', () => {
+  it('даёт загрузить выписку в задаче подтверждения выручки', async () => {
+    mockSessions({ client: makeMe() });
+    serveRound([makeTask({ kind: 'CONFIRM_REVENUE' })]);
+    renderApp('/applications/app-1');
+    expect(await screen.findByLabelText('Прикрепить документ')).toBeInTheDocument();
+  });
   it('показывает, что просят, зачем, срок, кто отвечает и номер раунда; без внутренних кодов', async () => {
     mockSessions({ client: makeMe() });
     serveRound([makeTask()]);

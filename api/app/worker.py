@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from app import document_tasks
 from app.modules import disbursement
 from app.modules.disbursement import tasks as disbursement_tasks  # noqa: F401 — disbursement.run
 from app.modules.pipeline import tasks as pipeline_tasks  # noqa: F401 — регистрирует pipeline.run
@@ -39,6 +40,7 @@ def heartbeat() -> None:
 celery_app.conf.beat_schedule = {
     "worker-heartbeat": {"task": "default.heartbeat", "schedule": HEARTBEAT_EVERY},
     "outbox-relay-safety-net": {"task": outbox.RELAY_TASK, "schedule": RELAY_SAFETY_NET_EVERY},
+    "statement-recovery": {"task": document_tasks.RECOVER_TASK, "schedule": timedelta(seconds=60)},
 }
 
 app = celery_app
