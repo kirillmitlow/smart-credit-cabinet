@@ -433,3 +433,25 @@ async def test_pubsub_disconnect_closes_old_stream_and_recovers_after_subscribe_
         assert f"id: {event_id}" in await recovered.frame()
     finally:
         await recovered.close()
+
+
+async def test_slow_socket_releases_lease_without_waiting_for_heartbeat(
+    world: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(event_stream, "SEND_TIMEOUT", 0.02)
+    hub = world["hubs"][0]
+    p = world["clients"][0]
+    sid = auth.sessions.create(p)
+    stream = await hub.open(frozenset({p.active_company_id}), bank=False, session="slow")
+    response = event_stream.EventResponse(hub, stream, replace(p, session_id=sid), None)
+
+    async def blocked_send(_message: Any) -> None:
+        await asyncio.sleep(1)
+
+    async def receive() -> Any:
+        await asyncio.sleep(1)
+        return {"type": "http.disconnect"}
+
+    await response({"type": "http", "asgi": {"spec_version": "2.4"}}, receive, blocked_send)
+    assert stream.id not in hub.streams
+    assert await hub.redis.zcard(stream.keys[0]) == 0

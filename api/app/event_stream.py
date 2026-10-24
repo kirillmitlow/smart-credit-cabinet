@@ -15,6 +15,7 @@ import redis
 from anyio import CancelScope
 from fastapi import APIRouter, Header, Query, Request
 from starlette.concurrency import run_in_threadpool
+from starlette.requests import ClientDisconnect
 from starlette.responses import StreamingResponse
 from starlette.types import Message, Receive, Scope, Send
 
@@ -25,6 +26,7 @@ from app.shared.errors import AppError
 router = APIRouter(tags=["живые статусы"])
 AUTH_INTERVAL = 60
 RENEW_INTERVAL = 15
+SEND_TIMEOUT = 10
 
 
 def principal_for(zone: auth.Zone, sid: str) -> auth.Principal:
@@ -175,11 +177,11 @@ class EventResponse(StreamingResponse):
         )
 
         async def bounded_send(message: Message) -> None:
-            async with asyncio.timeout(10):
+            async with asyncio.timeout(SEND_TIMEOUT):
                 await send(message)
 
         try:
-            with contextlib.suppress(TimeoutError):
+            with contextlib.suppress(TimeoutError, ClientDisconnect):
                 await super().__call__(scope, receive, bounded_send)
         finally:
             with CancelScope(shield=True):
