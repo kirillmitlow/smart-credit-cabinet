@@ -10,9 +10,8 @@
 Шаги (нумерация 30-01 / 50-05): COMPLETENESS (1), SOURCES (2), BUREAU (3–4), DECISION (5–6).
 Расчёт целиком в `decisioning`; здесь нет формул.
 
-TODO(T-271): сторож `pipeline.reaper` — перепостановка запусков с истёкшей арендой, лимит 5
-перезапусков. TODO(T-277): повторные запуски по `INFO_PROVIDED` / `COLLATERAL_ADDED` и пометка
-«правила обновлены». TODO(T-278): outbox в шаге DECISION (см. `hooks.after_decision`).
+Сторож `pipeline.reaper` возвращает потерянные задачи и ограничивает число неудачных запусков.
+Результат и сообщения БКИ сохраняются одной транзакцией.
 """
 
 from __future__ import annotations
@@ -42,7 +41,7 @@ from app.modules.decisioning.types import Context, Product
 from app.modules.integrations import Integrations, get_integrations
 from app.modules.pipeline import bureau, facts, persist, sources
 from app.modules.pipeline.consents import CONSENT_LABELS, load_bki_consents, valid_consent
-from app.modules.pipeline.models import PipelineRun
+from app.modules.pipeline.models import MAX_RUN_ATTEMPTS, PipelineRun
 from app.modules.pipeline.policy_registry import policy_by_id, register_current
 from app.modules.pipeline.snapshots import (
     Collected,
@@ -145,7 +144,12 @@ def claim_run(application_id: UUID) -> Claimed | None:
             .where(
                 PipelineRun.run_key == run_key,
                 PipelineRun.status.in_(("QUEUED", "RUNNING")),
-                or_(PipelineRun.locked_until.is_(None), PipelineRun.locked_until < now),
+                PipelineRun.attempts < MAX_RUN_ATTEMPTS,
+                or_(
+                    PipelineRun.status == "QUEUED",
+                    PipelineRun.locked_until.is_(None),
+                    PipelineRun.locked_until < now,
+                ),
             )
             .values(
                 status="RUNNING",
@@ -207,6 +211,10 @@ def _run(session: Session, claim: Claimed) -> PipelineRun:
 def _info(session: Session, claim: Claimed) -> Info:
     application = _application(session, claim)
     run = _run(session, claim)
+    return _version_info(session, application, run)
+
+
+def _version_info(session: Session, application: Application, run: PipelineRun) -> Info:
     version = session.get(ApplicationVersion, run.version_id)
     company = companies.by_id(session, application.company_id)
     if version is None or company is None:
@@ -315,35 +323,44 @@ def _bki_subjects(info: Info, records: facts.Records) -> list[facts.Subject]:
     return facts.bki_subjects(info.applicant_inn, card, facts.guarantor_inn(info.version_data))
 
 
+def decision_input(
+    session: Session, run: PipelineRun, application_row: Application
+) -> tuple[DecisionInput, list[UUID]]:
+    """Собрать неизменяемый вход из версии, политики и снимков, не вызывая ядро."""
+    info = _version_info(session, application_row, run)
+    records = load_records(session, run.id, application_row.id)
+    subjects = _bki_subjects(info, records)
+    consents = load_bki_consents(session, application_row.id)
+    no_consent = bureau.inns_without_consent(records, subjects)
+    unsigned = [CONSENT_LABELS[s.role.value] for s in subjects if s.inn in no_consent]
+    guarantor = facts.guarantor_inn(info.version_data)
+    application = facts.build_application(
+        str(application_row.id),
+        info.version_data,
+        unsigned_consents=unsigned,
+        guarantor_consent_signed=bool(guarantor and valid_consent(consents, guarantor)),
+    )
+    snapshot = facts.build_snapshot(
+        records,
+        applicant_inn=info.applicant_inn,
+        product=info.product,
+        bki_no_consent=no_consent,
+        bki_subject_list=subjects,
+    )
+    if run.policy_version_id is None:
+        raise ValueError("Версия политики не закреплена за запуском")
+    policy = policy_by_id(session, run.policy_version_id)
+    inp = DecisionInput(application, snapshot, Context(app_today=clock.today()), policy)
+    return inp, [UUID(r.snapshot_id) for r in records.all() if r.snapshot_id]
+
+
 def step_decision(claim: Claimed) -> int:
     """Шаги 5–6: `decide()` и запись решения, перехода и событий одной транзакцией."""
     with db.transaction() as session:
         run = _run(session, claim)
         _checkpoint(session, claim, "DECISION")
-        info = _info(session, claim)
-        records = load_records(session, claim.run_id, claim.application_id)
-        subjects = _bki_subjects(info, records)
-        consents = load_bki_consents(session, claim.application_id)
-        no_consent = bureau.inns_without_consent(records, subjects)
-        unsigned = [CONSENT_LABELS[s.role.value] for s in subjects if s.inn in no_consent]
-        guarantor = facts.guarantor_inn(info.version_data)
-        application = facts.build_application(
-            str(claim.application_id),
-            info.version_data,
-            unsigned_consents=unsigned,
-            guarantor_consent_signed=bool(guarantor and valid_consent(consents, guarantor)),
-        )
-        snapshot = facts.build_snapshot(
-            records,
-            applicant_inn=info.applicant_inn,
-            product=info.product,
-            bki_no_consent=no_consent,
-            bki_subject_list=subjects,
-        )
-        policy = policy_by_id(session, claim.policy_version_id)
-        inp = DecisionInput(application, snapshot, Context(app_today=clock.today()), policy)
+        inp, snapshot_ids = decision_input(session, run, _application(session, claim))
         result = decide(inp)
-        snapshot_ids = [UUID(r.snapshot_id) for r in records.all() if r.snapshot_id]
         persist.persist_decision(
             session,
             run,

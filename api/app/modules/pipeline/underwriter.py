@@ -37,13 +37,16 @@ from app.modules.decisioning import (
     UnderwriterEvaluation,
     UnderwriterTerms,
     ViolationKind,
+    authority_level,
     decide,
     evaluate_underwriter_decision,
     input_from_json,
+    inputs_hash,
+    policy_hash,
 )
-from app.modules.decisioning.types import Level, Outcome
+from app.modules.decisioning.types import Level, Numbers, Outcome, Route
 from app.modules.pipeline import hooks
-from app.modules.pipeline.models import Decision, DecisionReason
+from app.modules.pipeline.models import MAX_RUN_ATTEMPTS, Decision, DecisionReason, PipelineRun
 from app.modules.pipeline.persist import information_limit_result
 from app.shared.errors import AppError, not_found
 
@@ -124,6 +127,41 @@ def _load_basis(
         raise _fail(
             409, "ENGINE_SNAPSHOT_INCOMPATIBLE", "Снимок ядра не читается текущей схемой"
         ) from exc
+    if row.explain.get("kind") == "PIPELINE_ERROR":
+        # Сторож не выдаёт этот исход за результат скоринга: проверяем технический снимок,
+        # закреплённые входы и исчерпанный запуск, без повторного вызова сломанного ядра.
+        try:
+            result = TypeAdapter(DecisionResult).validate_python(row.explain)
+        except ValueError as exc:
+            raise _fail(
+                409, "ENGINE_SNAPSHOT_INCOMPATIBLE", "Технический снимок не читается"
+            ) from exc
+        run = session.get(PipelineRun, row.run_id) if row.run_id else None
+        valid = (
+            run is not None
+            and run.status == "FAILED"
+            and run.attempts >= MAX_RUN_ATTEMPTS
+            and run.last_error == "PIPELINE_ERROR"
+            and run.application_id == application.id
+            and run.version_id == application.current_version_id
+            and run.policy_version_id == row.policy_version_id
+            and result.outcome == Outcome.MANUAL_REVIEW
+            and row.outcome == Outcome.MANUAL_REVIEW
+            and result.route == Route.MANUAL
+            and result.features is None
+            and result.numbers == Numbers()
+            and result.reason_codes == ("PIPELINE_ERROR",)
+            and result.reasons[0].params == {"attempts": run.attempts, "run_id": str(run.id)}
+            and result.inputs_hash == row.inputs_hash == inputs_hash(inputs)
+            and result.policy_hash == policy_hash(inputs.policy)
+            and result.required_level
+            == authority_level(inputs.policy, inputs.application.amount_rub, None)
+        )
+        if not valid:
+            raise _fail(
+                409, "ENGINE_SNAPSHOT_MISMATCH", "Технический снимок не подтверждён запуском"
+            )
+        return EngineBasis(row, inputs, result)
     result = decide(inputs)
     workflow = row.explain.get("workflow") or {}
     information_limit = (

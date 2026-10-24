@@ -15,6 +15,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from redis.exceptions import RedisError
 from sqlalchemy.exc import DBAPIError
 
+from app.modules.pipeline.recovery import reap
 from app.modules.pipeline.runner import run_pipeline
 from app.shared.tasks import celery_app
 
@@ -45,3 +46,8 @@ def pipeline_run(self: Any, application_id: str) -> str:
         retries = int(self.request.retries)
         log.warning("pipeline_infrastructure_error", error=type(exc).__name__, retries=retries)
         raise self.retry(exc=exc, countdown=retry_pause(retries)) from exc
+
+
+@celery_app.task(name="pipeline.reaper", soft_time_limit=60, time_limit=90)  # type: ignore[untyped-decorator]
+def pipeline_reaper() -> dict[str, int]:
+    return reap()
