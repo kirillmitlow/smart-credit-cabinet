@@ -23,7 +23,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules import offers
-from app.modules.applications import Actor, Application, Status, record_event, transition
+from app.modules.applications import (
+    Actor,
+    Application,
+    Status,
+    information_rounds_exhausted,
+    record_event,
+    transition,
+)
 from app.modules.decisioning import (
     DecisionInput,
     DecisionResult,
@@ -37,6 +44,7 @@ from app.modules.decisioning import (
 from app.modules.decisioning.types import Level, Outcome
 from app.modules.pipeline import hooks
 from app.modules.pipeline.models import Decision, DecisionReason
+from app.modules.pipeline.persist import information_limit_result
 from app.shared.errors import AppError, not_found
 
 _EVALUATION = TypeAdapter(UnderwriterEvaluation)
@@ -117,8 +125,19 @@ def _load_basis(
             409, "ENGINE_SNAPSHOT_INCOMPATIBLE", "Снимок ядра не читается текущей схемой"
         ) from exc
     result = decide(inputs)
-    if result.inputs_hash != row.inputs_hash or result.outcome.value != row.outcome:
+    workflow = row.explain.get("workflow") or {}
+    information_limit = (
+        row.outcome == Outcome.MANUAL_REVIEW
+        and workflow.get("reasonCode") == "ROUNDS_LIMIT_REACHED"
+        and workflow.get("engineOutcome") == Outcome.NEEDS_INFO
+        and result.outcome == Outcome.NEEDS_INFO
+        and information_rounds_exhausted(session, application.id)
+    )
+    expected = Outcome.NEEDS_INFO if information_limit else row.outcome
+    if result.inputs_hash != row.inputs_hash or result.outcome.value != expected:
         raise _fail(409, "ENGINE_SNAPSHOT_MISMATCH", "Решение ядра не воспроизводится по снимку")
+    if information_limit:
+        result = information_limit_result(inputs, result)
     return EngineBasis(row, inputs, result)
 
 

@@ -304,6 +304,69 @@ async def test_source_recovery_via_http_and_bureau_snapshot_reuse(
     assert world.count("credit_bureau:report") == before + (failure == "credit_bureau:report")
 
 
+async def test_bank_can_finish_round_limit_review_but_cannot_approve_unknown_revenue(
+    bank: httpx.AsyncClient,
+) -> None:
+    world = pw.sokolova_world()
+    world.turnover[pw.SOKOLOVA_INN] = None
+    world.financials[pw.SOKOLOVA_INN] = None
+    pipeline.set_consents_provider(consents_for((pw.SOKOLOVA_INN, "COMPANY")))
+    case = make_application(
+        db.get_database(),
+        world,
+        inn=pw.SOKOLOVA_INN,
+        kind="IP",
+        product="EXPRESS",
+        amount=500_000,
+        term=12,
+    )
+    with db.transaction() as session:
+        for number in range(1, 4):
+            session.add(
+                Task(
+                    application_id=case.application_id,
+                    round=number,
+                    kind="DOCUMENT",
+                    title="Выписка",
+                    why_text="Подтвердить выручку",
+                    status="ANSWERED",
+                    created_by_actor="SYSTEM",
+                )
+            )
+    pipeline.run_pipeline(case.application_id, integrations=case.integrations)
+    assert state(case.application_id)[0] == "MANUAL_REVIEW"
+    version = state(case.application_id)[1]
+    comment = "После трёх запросов подтверждение выручки не получено. Принимаем решение по имеющимся данным."
+    denied = await post(
+        bank,
+        case.application_id,
+        "decision",
+        {
+            "expectedVersion": version,
+            "outcome": "APPROVED",
+            "reasonCode": "UW_DOCUMENT_ISSUE",
+            "comment": comment,
+            "terms": {"productCode": "EXPRESS", "amountRub": 500_000, "termMonths": 12},
+        },
+        key="no-unverified-approval",
+    )
+    assert (denied.status_code, denied.json()["code"]) == (422, "UNDERWRITER_DECISION_INVALID")
+    final = await post(
+        bank,
+        case.application_id,
+        "decision",
+        {
+            "expectedVersion": version,
+            "outcome": "REJECTED",
+            "reasonCode": "UW_DOCUMENT_ISSUE",
+            "comment": comment,
+        },
+        key="round-limit-reject",
+    )
+    assert final.status_code == 200, final.text
+    assert state(case.application_id)[0] == "REJECTED"
+
+
 async def test_stankoprom_request_answer_recheck_manual_approval_without_second_bki(
     bank: httpx.AsyncClient,
 ) -> None:

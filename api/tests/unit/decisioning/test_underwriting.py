@@ -16,8 +16,10 @@ from app.modules.decisioning import (
     decide,
     evaluate_underwriter_decision,
 )
-from app.modules.decisioning.types import Level, Outcome, Product
+from app.modules.decisioning.types import Level, Outcome, Product, Recommendation, Route
 from tests.fixtures import core_personas as cases
+
+pytestmark = pytest.mark.unit
 
 L1, L2 = Level.L1, Level.L2
 LONG = "Пересмотрели условия вручную после разговора с клиентом и проверки данных."  # > 50 знаков
@@ -277,6 +279,37 @@ def test_non_manual_engine_result_is_refused() -> None:
     assert result.outcome != Outcome.MANUAL_REVIEW
     ev = evaluate_underwriter_decision(inp, result, Outcome.REJECTED, None, L2, "UW_OTHER", LONG)
     assert ev.violation_codes == ("ENGINE_NOT_MANUAL_REVIEW",)
+
+
+def test_manual_without_financial_assessment_can_only_reject_with_reason_and_authority() -> None:
+    inp, result = basis(cases.garipov)
+    assert result.outcome == Outcome.NEEDS_INFO
+    assert result.features is None
+    manual = replace(
+        result,
+        outcome=Outcome.MANUAL_REVIEW,
+        route=Route.MANUAL,
+        required_level=L2,
+        recommendation=Recommendation(Outcome.NEEDS_INFO),
+    )
+    assert evaluate_underwriter_decision(
+        inp, manual, Outcome.REJECTED, None, L2, "UW_DOCUMENT_ISSUE", LONG
+    ).allowed
+    missing_reason = evaluate_underwriter_decision(
+        inp, manual, Outcome.REJECTED, None, L2, None, None
+    )
+    assert {"REASON_REQUIRED", "COMMENT_TOO_SHORT"} <= codes(missing_reason)
+    assert "AUTHORITY_LEVEL_TOO_LOW" in codes(
+        evaluate_underwriter_decision(
+            inp, manual, Outcome.REJECTED, None, L1, "UW_DOCUMENT_ISSUE", LONG
+        )
+    )
+    for outcome in (Outcome.APPROVED, Outcome.COUNTER_OFFER):
+        denied = evaluate_underwriter_decision(
+            inp, manual, outcome, same_terms(inp), L2, "UW_DOCUMENT_ISSUE", LONG
+        )
+        assert not denied.allowed
+        assert "ENGINE_NOT_MANUAL_REVIEW" in codes(denied)
 
 
 def test_mismatched_inputs_are_refused() -> None:

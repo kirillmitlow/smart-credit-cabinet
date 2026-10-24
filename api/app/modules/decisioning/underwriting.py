@@ -168,7 +168,10 @@ def evaluate_underwriter_decision(  # noqa: PLR0912, PLR0913, PLR0914, PLR0915 �
         fatal.append(UwViolation("OUTCOME_NOT_ALLOWED", ViolationKind.INPUT))
     if actor_level not in (Level.L1, Level.L2):
         fatal.append(UwViolation("ACTOR_LEVEL_INVALID", ViolationKind.INPUT))
-    if engine_result.outcome != Outcome.MANUAL_REVIEW or feats is None or grade is None:
+    missing_assessment = feats is None or grade is None
+    if engine_result.outcome != Outcome.MANUAL_REVIEW or (
+        missing_assessment and outcome != Outcome.REJECTED
+    ):
         fatal.append(UwViolation("ENGINE_NOT_MANUAL_REVIEW", ViolationKind.INPUT))
     elif (
         inputs_hash(inputs) != engine_result.inputs_hash
@@ -177,7 +180,7 @@ def evaluate_underwriter_decision(  # noqa: PLR0912, PLR0913, PLR0914, PLR0915 �
         fatal.append(UwViolation("ENGINE_RESULT_MISMATCH", ViolationKind.INPUT))
     if outcome == Outcome.REJECTED and terms is not None:
         fatal.append(UwViolation("TERMS_NOT_ALLOWED", ViolationKind.INPUT))
-    if fatal or feats is None or grade is None:
+    if fatal:
         return _rejected_early(
             inputs, engine_result, outcome, actor_level, reason_code, application_version, fatal
         )
@@ -198,7 +201,8 @@ def evaluate_underwriter_decision(  # noqa: PLR0912, PLR0913, PLR0914, PLR0915 �
     waived: list[str] = []
     exception = False
 
-    if outcome != Outcome.REJECTED:
+    # Отказ возможен без оценки выручки; для выдачи полноту проверили выше.
+    if outcome != Outcome.REJECTED and feats is not None and grade is not None:
         if terms is None:
             violations.append(UwViolation("TERMS_REQUIRED", ViolationKind.INPUT))
         else:
