@@ -291,3 +291,78 @@ async def test_accountant_can_withdraw_but_cannot_withdraw_foreign_company(
             )
             == 1
         )
+
+
+@pytest.mark.parametrize("change", ["GUARANTOR", "SUSPENDED_MEMBER", "SUSPENDED_USER"])
+async def test_full_company_application_endpoints_recheck_access(
+    sokolova: httpx.AsyncClient, stand: dict[str, Any], change: str
+) -> None:
+    from sqlalchemy import update
+
+    application_id = (await sokolova.post("/applications", json=TERMS)).json()["id"]
+    principal = stand["principals"]["001234567887"]
+    with db.transaction() as session:
+        if change == "SUSPENDED_USER":
+            session.execute(
+                update(auth.User)
+                .where(auth.User.id == principal.user_id)
+                .values(status="SUSPENDED")
+            )
+        else:
+            values = {"role": "GUARANTOR"} if change == "GUARANTOR" else {"status": "SUSPENDED"}
+            session.execute(
+                update(CompanyMember)
+                .where(CompanyMember.user_id == principal.user_id)
+                .values(**values)
+            )
+    expected = 401 if change == "SUSPENDED_USER" else 404
+    assert (await sokolova.get(f"/applications/{application_id}")).status_code == expected
+    assert (
+        await sokolova.patch(
+            f"/applications/{application_id}/draft", json={"version": 1, "amountRub": 600000}
+        )
+    ).status_code == expected
+    assert (await sokolova.post(f"/applications/{application_id}/submit")).status_code == expected
+    assert (await sokolova.post("/applications", json={})).status_code == expected
+    listed = await sokolova.get("/applications")
+    if change == "SUSPENDED_USER":
+        assert listed.status_code == 401
+    else:
+        assert listed.json() == {"items": [], "nextCursor": None}
+    with db.transaction() as session:
+        record = session.get(Application, __import__("uuid").UUID(application_id))
+        assert record.status == "DRAFT"
+        assert record.version == 1
+        assert record.amount_rub == TERMS["amountRub"]
+
+
+async def test_director_in_one_company_and_guarantor_in_another_has_separate_access(
+    sokolova: httpx.AsyncClient, stranger: httpx.AsyncClient, stand: dict[str, Any]
+) -> None:
+    from uuid import UUID
+
+    own = (await sokolova.post("/applications", json=TERMS)).json()["id"]
+    other = (await stranger.post("/applications", json=TERMS)).json()["id"]
+    p = stand["principals"]["001234567887"]
+    company = stand["principals"]["0017654322"].active_company_id
+    with db.transaction() as session:
+        session.add(
+            CompanyMember(
+                company_id=company,
+                user_id=p.user_id,
+                role="GUARANTOR",
+                status="ACTIVE",
+                can_sign=False,
+                poa_permissions=[],
+            )
+        )
+    assert (await sokolova.get(f"/applications/{own}")).status_code == 200
+    assert (await sokolova.get(f"/applications/{other}")).status_code == 404
+    assert [row["id"] for row in (await sokolova.get("/applications")).json()["items"]] == [own]
+    with db.transaction() as session:
+        # Internal personal endpoints keep their own task/consent checks; not the general draft ACL.
+        from app.modules.applications import service
+
+        current = service.company_principal(session, p)
+        assert current.membership(UUID(str(company))) is None
+        assert current.membership(p.active_company_id).role == "DIRECTOR"
