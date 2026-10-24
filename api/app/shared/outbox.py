@@ -9,7 +9,8 @@
 Ретранслятор берёт запись с `SELECT … FOR UPDATE SKIP LOCKED`, ставит аренду (`lease_until`) и
 коммитит. Сеть вызывается вне транзакции. Умерший воркер не держит запись: аренда истекает, и её
 подберёт другой. Два ретранслятора одновременно одну запись не возьмут. Порядок: запись берётся,
-только если по тому же `aggregate_id` нет более ранней неотправленной (`PENDING`). Доставка «хотя бы
+только если по той же заявке и получателю нет более ранней незавершённой (`PENDING` или `FAILED`). Сбой БКИ
+не задерживает независимую выдачу в АБС. Доставка «хотя бы
 раз»; «ровно один раз по результату» дают ключи идемпотентности у получателя.
 
 Shared не знает модулей: обработчики регистрируют они сами (`register_handler`). Время здесь
@@ -210,8 +211,9 @@ def _claim(session: Session) -> OutboxItem | None:
             ~select(earlier.id)
             .where(
                 earlier.aggregate_id == OutboxMessage.aggregate_id,
+                earlier.target_system == OutboxMessage.target_system,
                 earlier.id < OutboxMessage.id,
-                earlier.status == PENDING,
+                earlier.status.in_((PENDING, FAILED)),
             )
             .exists(),
         )

@@ -19,6 +19,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.modules import auth, companies, notifications
+from app.modules.applications import bureau_lifecycle
 from app.modules.applications.models import Application, ApplicationEvent, ApplicationVersion
 from app.modules.applications.states import CLIENT_ACTIONS, TERMINAL, Actor, Status, is_allowed
 from app.shared import clock, db
@@ -130,6 +131,7 @@ def transition(
         reason_code=reason_code,
         payload=payload,
     )
+    bureau_lifecycle.on_transition(session, application, source, target)
     return application
 
 

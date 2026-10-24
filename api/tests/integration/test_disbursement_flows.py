@@ -298,6 +298,36 @@ def test_signed_application_without_signed_contract_does_not_issue(world: dict[s
     assert world["bank"].disburse_calls == 0
 
 
+def test_pending_bureau_message_does_not_prevent_actual_disbursement(world: dict[str, Any]) -> None:
+    bank: FakeBank = world["bank"]
+    bank.accounts = [account()]
+    bank.disburse_answers = [disbursed()]
+    with db.transaction() as session:
+        outbox.enqueue_outbox(
+            session,
+            aggregate_id=str(world["application_id"]),
+            event_type="APPLICATION_REGISTERED",
+            target="BKI",
+            payload={},
+            idempotency_key="registration-down",
+        )
+    outbox.register_handler("BKI", "APPLICATION_REGISTERED", lambda _: outbox.Retry("BKI_DOWN"))
+    assert disbursement.run(world["application_id"]) == "STARTED"
+    assert outbox.relay(budget_s=2).retried == 1
+    assert status_of(world["application_id"]) == "DISBURSED"
+    assert world["bank"].disburse_calls == 1
+    with db.transaction() as session:
+        assert session.scalars(select(Loan)).one().principal_rub == 500_000
+        assert (
+            session.scalars(
+                select(OutboxMessage).where(OutboxMessage.idempotency_key == "registration-down")
+            )
+            .one()
+            .status
+            == "PENDING"
+        )
+
+
 @pytest.mark.parametrize(
     ("field", "value"), [("amount_rub", 400_000), ("settlement_account", "other")]
 )

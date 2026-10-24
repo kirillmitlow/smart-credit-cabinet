@@ -2,6 +2,7 @@
 
 from app.modules.applications import reset  # noqa: F401 — регистрирует сброс демо-данных (T-371)
 from app.modules.applications import wizard_draft as _wizard_draft  # noqa: F401  (регистрирует слушателя)
+from app.modules.applications.bureau_lifecycle import register_bureau_handlers
 from app.modules.applications.client_tasks import (
     InfoRequestReceipt,
     TaskSpec,
@@ -78,6 +79,7 @@ __all__ = [
     "proof_for",
     "record_event",
     "register_recheck",
+    "register_bureau_handlers",
     "register_submit_check",
     "request_information",
     "router",
