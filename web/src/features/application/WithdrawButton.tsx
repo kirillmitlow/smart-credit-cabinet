@@ -33,7 +33,10 @@ export function WithdrawButton({ application, asDecline = false }: WithdrawButto
     submitting.current = true;
     let succeeded = false;
     try {
-      const response = await withdraw.mutateAsync({ applicationId: application.id });
+      const response = await withdraw.mutateAsync({
+        applicationId: application.id,
+        data: { confirmed: true },
+      });
       if (response.status !== 200) return;
       succeeded = true;
       setCompleted(true);

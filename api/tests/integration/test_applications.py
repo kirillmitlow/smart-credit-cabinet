@@ -181,7 +181,7 @@ async def test_second_application_in_progress_is_duplicate(sokolova: httpx.Async
     assert response.status_code == 409
     assert response.json()["code"] == "DUPLICATE_APPLICATION"
     assert (await sokolova.get(f"/applications/{second}")).json()["status"] == "DRAFT"
-    withdrawn = await sokolova.post(f"/applications/{first}/withdraw")
+    withdrawn = await sokolova.post(f"/applications/{first}/withdraw", json={"confirmed": True})
     assert withdrawn.json()["status"] == "WITHDRAWN"
     assert (await submit(sokolova, second)).status_code == 200
 
@@ -250,7 +250,9 @@ async def test_withdraw_uses_current_membership_not_cached_session(
                 .where(CompanyMember.user_id == principal.user_id)
                 .values(**values)
             )
-    response = await sokolova.post(f"/applications/{application_id}/withdraw")
+    response = await sokolova.post(
+        f"/applications/{application_id}/withdraw", json={"confirmed": True}
+    )
     assert response.status_code == (401 if change == "SUSPENDED_USER" else 404)
     with db.transaction() as session:
         assert (
@@ -278,12 +280,17 @@ async def test_accountant_can_withdraw_but_cannot_withdraw_foreign_company(
             .where(CompanyMember.user_id == principal.user_id)
             .values(role="ACCOUNTANT")
         )
-    assert (await stranger.post(f"/applications/{application_id}/withdraw")).status_code == 404
-    assert (await sokolova.post(f"/applications/{application_id}/withdraw")).json()[
-        "status"
-    ] == "WITHDRAWN"
-    repeated = await sokolova.post(f"/applications/{application_id}/withdraw")
-    assert repeated.status_code == 409
+    assert (
+        await stranger.post(f"/applications/{application_id}/withdraw", json={"confirmed": True})
+    ).status_code == 404
+    assert (
+        await sokolova.post(f"/applications/{application_id}/withdraw", json={"confirmed": True})
+    ).json()["status"] == "WITHDRAWN"
+    repeated = await sokolova.post(
+        f"/applications/{application_id}/withdraw", json={"confirmed": True}
+    )
+    assert repeated.status_code == 200
+    assert repeated.json()["status"] == "WITHDRAWN"
     with db.transaction() as session:
         assert (
             session.scalar(

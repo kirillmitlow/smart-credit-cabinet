@@ -170,9 +170,11 @@ describe('блоки исхода', () => {
     mockSessions({ client: makeMe() });
     serve(sent('APPROVED', { allowedActions: ['ACCEPT_OFFER', 'WITHDRAW'] }));
     let withdrawKey: string | null = null;
+    let withdrawBody: unknown;
     server.use(
-      http.post('*/api/applications/app-1/withdraw', ({ request }) => {
+      http.post('*/api/applications/app-1/withdraw', async ({ request }) => {
         withdrawKey = request.headers.get('Idempotency-Key');
+        withdrawBody = await request.json();
         return Response.json(sent('WITHDRAWN', { allowedActions: [] }));
       }),
     );
@@ -192,6 +194,7 @@ describe('блоки исхода', () => {
     );
     expect(await screen.findByText('Заявка отозвана вами')).toBeInTheDocument();
     expect(withdrawKey).toBeTruthy();
+    expect(withdrawBody).toEqual({ confirmed: true });
     expect(
       screen.queryByRole('button', { name: applicationPage.withdraw.decline }),
     ).not.toBeInTheDocument();
