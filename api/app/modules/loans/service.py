@@ -15,11 +15,11 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.modules import auth
+from app.modules import auth, companies
 from app.modules.decisioning import build_schedule, bullet_schedule
 from app.modules.decisioning.loan_math import payment_dates
 from app.modules.loans.models import Loan, PaymentScheduleRow
-from app.shared.errors import not_found
+from app.shared.errors import AppError, not_found
 
 _PERCENT = Decimal(100)
 
@@ -115,15 +115,22 @@ def open_loan(session: Session, new: NewLoan) -> Loan:
 # --- чтение ---------------------------------------------------------------------------------------
 
 
-def _visible_companies(principal: auth.Principal) -> list[UUID]:
-    """Руководитель и сотрудник видят кредиты компании; поручитель — нет (его поручительство позже)."""
-    return [m.company_id for m in principal.memberships if m.role != "GUARANTOR"]
+def _visible_companies(session: Session, principal: auth.Principal) -> list[UUID]:
+    """Отзыв членства и смена роли действуют сразу, даже при старой сессии Redis (D-096)."""
+    user = auth.get(session, principal.user_id)
+    if user is None or user.status != "ACTIVE" or user.role != "CLIENT":
+        raise AppError(401, "UNAUTHENTICATED", "Нужно войти")
+    return [
+        member.company_id
+        for member, _ in companies.memberships_of(session, principal.user_id)
+        if member.role in {"DIRECTOR", "ACCOUNTANT"}
+    ]
 
 
 def list_for(
     session: Session, principal: auth.Principal, limit: int, cursor: str | None
 ) -> tuple[list[Loan], str | None]:
-    query = select(Loan).where(Loan.company_id.in_(_visible_companies(principal)))
+    query = select(Loan).where(Loan.company_id.in_(_visible_companies(session, principal)))
     if cursor:
         query = query.where(Loan.id < UUID(cursor))
     rows = list(session.scalars(query.order_by(Loan.id.desc()).limit(limit + 1)))
@@ -134,7 +141,8 @@ def list_for(
 def get_for(session: Session, principal: auth.Principal, loan_id: UUID) -> Loan:
     """Чужой и несуществующий кредит неразличимы: 404 (R11)."""
     loan = session.get(Loan, loan_id)
-    if loan is None or loan.company_id not in _visible_companies(principal):
+    visible = _visible_companies(session, principal)
+    if loan is None or loan.company_id not in visible:
         raise not_found("Кредит")
     return loan
 
