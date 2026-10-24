@@ -1,6 +1,6 @@
 # Полный перечень пакетов из lock-файлов
 
-Снимок main `78fda5e`, 24.10.2026. См. [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md). Включены прямые, транзитивные, тестовые и платформенные пакеты; присутствие в lock не означает включение в браузерный bundle. `UNKNOWN` означает отсутствие проверенных метаданных именно этой версии. Это не разрешение использовать пакет и не вывод о его лицензии.
+Снимок main `1114d1c`, 24.10.2026. См. [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md). Прямые, транзитивные, тестовые и платформенные пакеты; наличие в lock не означает включение в браузерный bundle. Неоднозначное обозначение лицензии сохранено как в metadata. UNKNOWN не является разрешением использовать пакет.
 
 | Экосистема / компонент | Версия | Лицензия из метаданных | Источник |
 |---|---|---|---|
@@ -575,8 +575,11 @@
 | pypi: ast-serialize | 0.13.1 | MIT | [метаданные](https://pypi.org/pypi/ast-serialize/0.13.1/json) |
 | pypi: asyncpg | 0.32.0 | Apache-2.0 | [метаданные](https://pypi.org/pypi/asyncpg/0.32.0/json) |
 | pypi: billiard | 4.3.1 | BSD | [метаданные](https://pypi.org/pypi/billiard/4.3.1/json) |
+| pypi: brotli | 1.2.1 | MIT | [метаданные](https://pypi.org/pypi/brotli/1.2.1/json) |
+| pypi: brotlicffi | 1.2.1.0 | MIT | [метаданные](https://pypi.org/pypi/brotlicffi/1.2.1.0/json) |
 | pypi: celery | 5.6.3 | BSD-3-Clause | [метаданные](https://pypi.org/pypi/celery/5.6.3/json) |
 | pypi: certifi | 2026.10.19 | MPL-2.0 | [метаданные](https://pypi.org/pypi/certifi/2026.10.19/json) |
+| pypi: cffi | 2.1.1 | MIT-0 | [метаданные](https://pypi.org/pypi/cffi/2.1.1/json) |
 | pypi: charset-normalizer | 3.5.2 | MIT | [метаданные](https://pypi.org/pypi/charset-normalizer/3.5.2/json) |
 | pypi: click | 8.5.0 | BSD-3-Clause | [метаданные](https://pypi.org/pypi/click/8.5.0/json) |
 | pypi: click-didyoumean | 0.3.1 | MIT | [метаданные](https://pypi.org/pypi/click-didyoumean/0.3.1/json) |
@@ -584,8 +587,10 @@
 | pypi: click-repl | 0.4.1 | MIT | [метаданные](https://pypi.org/pypi/click-repl/0.4.1/json) |
 | pypi: colorama | 0.4.6 | BSD License | [метаданные](https://pypi.org/pypi/colorama/0.4.6/json) |
 | pypi: coverage | 7.16.2 | Apache-2.0 | [метаданные](https://pypi.org/pypi/coverage/7.16.2/json) |
+| pypi: cssselect2 | 0.10.1 | BSD License | [метаданные](https://pypi.org/pypi/cssselect2/0.10.1/json) |
 | pypi: docker | 7.2.0 | Apache-2.0 | [метаданные](https://pypi.org/pypi/docker/7.2.0/json) |
 | pypi: fastapi | 0.157.0 | MIT | [метаданные](https://pypi.org/pypi/fastapi/0.157.0/json) |
+| pypi: fonttools | 4.67.0 | MIT | [метаданные](https://pypi.org/pypi/fonttools/4.67.0/json) |
 | pypi: greenlet | 3.5.6 | MIT AND PSF-2.0 | [метаданные](https://pypi.org/pypi/greenlet/3.5.6/json) |
 | pypi: grimp | 3.17 | BSD 2-Clause License | [метаданные](https://pypi.org/pypi/grimp/3.17/json) |
 | pypi: h11 | 0.16.0 | MIT | [метаданные](https://pypi.org/pypi/h11/0.16.0/json) |
@@ -606,19 +611,25 @@
 | pypi: opentelemetry-api | 1.45.1 | Apache-2.0 | [метаданные](https://pypi.org/pypi/opentelemetry-api/1.45.1/json) |
 | pypi: packaging | 26.3 | Apache-2.0 OR BSD-2-Clause | [метаданные](https://pypi.org/pypi/packaging/26.3/json) |
 | pypi: pathspec | 1.1.1 | Mozilla Public License 2.0 (MPL 2.0) | [метаданные](https://pypi.org/pypi/pathspec/1.1.1/json) |
+| pypi: pillow | 13.0.0 | MIT-CMU | [метаданные](https://pypi.org/pypi/pillow/13.0.0/json) |
 | pypi: pluggy | 1.7.0 | MIT | [метаданные](https://pypi.org/pypi/pluggy/1.7.0/json) |
 | pypi: prompt-toolkit | 3.0.53 | BSD License | [метаданные](https://pypi.org/pypi/prompt-toolkit/3.0.53/json) |
 | pypi: psycopg | 3.3.6 | LGPL-3.0-only | [метаданные](https://pypi.org/pypi/psycopg/3.3.6/json) |
 | pypi: psycopg-binary | 3.3.6 | LGPL-3.0-only | [метаданные](https://pypi.org/pypi/psycopg-binary/3.3.6/json) |
+| pypi: pycparser | 3.12 | BSD-3-Clause | [метаданные](https://pypi.org/pypi/pycparser/3.12/json) |
 | pypi: pydantic | 2.14.1 | MIT | [метаданные](https://pypi.org/pypi/pydantic/2.14.1/json) |
 | pypi: pydantic-core | 2.50.1 | MIT | [метаданные](https://pypi.org/pypi/pydantic-core/2.50.1/json) |
 | pypi: pydantic-settings | 2.16.1 | MIT | [метаданные](https://pypi.org/pypi/pydantic-settings/2.16.1/json) |
+| pypi: pydyf | 0.13.0 | BSD License | [метаданные](https://pypi.org/pypi/pydyf/0.13.0/json) |
 | pypi: pygments | 2.21.0 | BSD-2-Clause | [метаданные](https://pypi.org/pypi/pygments/2.21.0/json) |
+| pypi: pypdf | 6.21.2 | BSD-3-Clause | [метаданные](https://pypi.org/pypi/pypdf/6.21.2/json) |
+| pypi: pyphen | 0.18.1 | GNU General Public License v2 or later (GPLv2+); GNU Lesser General Public License v2 or later (LGPLv2+); Mozilla Public License 1.1 (MPL 1.1) | [метаданные](https://pypi.org/pypi/pyphen/0.18.1/json) |
 | pypi: pytest | 9.1.1 | MIT | [метаданные](https://pypi.org/pypi/pytest/9.1.1/json) |
 | pypi: pytest-asyncio | 1.4.0 | Apache-2.0 | [метаданные](https://pypi.org/pypi/pytest-asyncio/1.4.0/json) |
 | pypi: pytest-cov | 7.1.0 | MIT | [метаданные](https://pypi.org/pypi/pytest-cov/7.1.0/json) |
 | pypi: python-dateutil | 2.9.0.post0 | Dual License | [метаданные](https://pypi.org/pypi/python-dateutil/2.9.0.post0/json) |
 | pypi: python-dotenv | 1.2.4 | BSD-3-Clause | [метаданные](https://pypi.org/pypi/python-dotenv/1.2.4/json) |
+| pypi: python-multipart | 0.0.32 | Apache-2.0 | [метаданные](https://pypi.org/pypi/python-multipart/0.0.32/json) |
 | pypi: pywin32 | 312 | PSF | [метаданные](https://pypi.org/pypi/pywin32/312/json) |
 | pypi: pyyaml | 6.0.3 | MIT | [метаданные](https://pypi.org/pypi/pyyaml/6.0.3/json) |
 | pypi: redis | 8.1.0 | MIT | [метаданные](https://pypi.org/pypi/redis/8.1.0/json) |
@@ -633,6 +644,8 @@
 | pypi: structlog | 26.1.0 | MIT OR Apache-2.0 | [метаданные](https://pypi.org/pypi/structlog/26.1.0/json) |
 | pypi: tenacity | 9.2.1 | Apache-2.0 | [метаданные](https://pypi.org/pypi/tenacity/9.2.1/json) |
 | pypi: testcontainers | 4.15.0 | Apache-2.0 | [метаданные](https://pypi.org/pypi/testcontainers/4.15.0/json) |
+| pypi: tinycss2 | 1.5.1 | BSD License | [метаданные](https://pypi.org/pypi/tinycss2/1.5.1/json) |
+| pypi: tinyhtml5 | 2.1.0 | MIT License | [метаданные](https://pypi.org/pypi/tinyhtml5/2.1.0/json) |
 | pypi: types-pyyaml | 6.0.12.20260906 | Apache-2.0 | [метаданные](https://pypi.org/pypi/types-pyyaml/6.0.12.20260906/json) |
 | pypi: typing-extensions | 4.16.0 | PSF-2.0 | [метаданные](https://pypi.org/pypi/typing-extensions/4.16.0/json) |
 | pypi: typing-inspection | 0.4.4 | MIT | [метаданные](https://pypi.org/pypi/typing-inspection/0.4.4/json) |
@@ -642,8 +655,11 @@
 | pypi: uvicorn | 0.54.0 | BSD-3-Clause | [метаданные](https://pypi.org/pypi/uvicorn/0.54.0/json) |
 | pypi: vine | 5.1.0 | BSD | [метаданные](https://pypi.org/pypi/vine/5.1.0/json) |
 | pypi: wcwidth | 0.9.3 | MIT License | [метаданные](https://pypi.org/pypi/wcwidth/0.9.3/json) |
+| pypi: weasyprint | 70.0 | BSD License | [метаданные](https://pypi.org/pypi/weasyprint/70.0/json) |
+| pypi: webencodings | 0.6.1 | BSD License | [метаданные](https://pypi.org/pypi/webencodings/0.6.1/json) |
 | pypi: wrapt | 2.5.1 | BSD-2-Clause | [метаданные](https://pypi.org/pypi/wrapt/2.5.1/json) |
+| pypi: zopfli | 0.4.3 | Apache-2.0 | [метаданные](https://pypi.org/pypi/zopfli/0.4.3/json) |
 
-Машинный перечень и связь с полными текстами: [inventory.json](inventory.json). Локальные тексты копируются из установленных пакетов той же версии и сгруппированы по SHA-256; тексты сохранены с нормализацией переводов строк и завершающих пробелов, одинаковые тексты не дублируются. Если текста в пакете нет, ссылка на метаданные не подменяется придуманным текстом.
+Машинный перечень и ссылки на полные тексты: [inventory.json](inventory.json). Тексты нормализованы по переводам строк и завершающим пробелам, одинаковые тексты не дублируются. JSON texts[].text сохраняет полное содержание; SHA-256 относится к UTF-8 значению text, не к JSON-контейнеру. Пустой licenseTexts означает, что локальный текст не включён, первичные metadata остаются источником.
 
-Полные тексты упакованы в JSON (`texts[].text`), чтобы разделители исходных лицензий не принимались Git за маркеры конфликтов. SHA-256 относится к нормализованному UTF-8 значению `text`, не к JSON-контейнеру.
+PDF-шрифты PT Sans, точные версии/хеши и OFL: [pdf-fonts.json](pdf-fonts.json).

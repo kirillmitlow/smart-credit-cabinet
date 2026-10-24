@@ -1,5 +1,5 @@
 {
-  "codeReference": "78fda5e",
+  "codeReference": "1114d1c",
   "checkedOn": "2026-10-24",
   "scope": "All third-party package/version entries in api/uv.lock, mocks/uv.lock and both documents of web/pnpm-lock.yaml. Metadata matched only by exact name/version; UNKNOWN is not approval. OS packages in base images excluded.",
   "components": [
@@ -10880,6 +10880,37 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "brotli",
+      "version": "1.2.1",
+      "usedBy": [
+        "api"
+      ],
+      "license": "MIT",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/brotli/1.2.1/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "brotlicffi",
+      "version": "1.2.1.0",
+      "usedBy": [
+        "api"
+      ],
+      "license": "MIT",
+      "evidence": "official PyPI metadata of exact locked version, fetched 2026-10-24",
+      "metadataUrl": "https://pypi.org/pypi/brotlicffi/1.2.1.0/json",
+      "projectUrls": [],
+      "licenseTexts": []
+    },
+    {
+      "ecosystem": "pypi",
       "name": "celery",
       "version": "5.6.3",
       "usedBy": [
@@ -10920,6 +10951,24 @@
         {
           "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7",
           "file": "licenses/third-party-texts-02.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "cffi",
+      "version": "2.1.1",
+      "usedBy": [
+        "api"
+      ],
+      "license": "MIT-0",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/cffi/2.1.1/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "ebb618637439262c8f3afd1837f7c69a2d13a69033caaf0e5cf534b260eed804",
+          "file": "licenses/third-party-texts-04.json"
         }
       ]
     },
@@ -11077,6 +11126,24 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "cssselect2",
+      "version": "0.10.1",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD License",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/cssselect2/0.10.1/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "6fd97229a1d1b0f6a8b41e109f413426dbc0874b1e03746d66cc33282601c2c2",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
       "name": "docker",
       "version": "7.2.0",
       "usedBy": [
@@ -11122,6 +11189,28 @@
         {
           "sha256": "4ec89ffc81485b97fec584b2d4a961032eeffe834453894fd9c1274906cc744e",
           "file": "licenses/third-party-texts-01.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "fonttools",
+      "version": "4.67.0",
+      "usedBy": [
+        "api"
+      ],
+      "license": "MIT",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/fonttools/4.67.0/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383",
+          "file": "licenses/third-party-texts-04.json"
+        },
+        {
+          "sha256": "94a83aaee0729a0f302d34acc4acecbd9d58366f262429075fe557e4a54b2e69",
+          "file": "licenses/third-party-texts-04.json"
         }
       ]
     },
@@ -11597,6 +11686,24 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "pillow",
+      "version": "13.0.0",
+      "usedBy": [
+        "api"
+      ],
+      "license": "MIT-CMU",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/pillow/13.0.0/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "dda12a98c1979cf3d94df1cff45d27a4cb3f04a60c76f76902ac54cac03ec0ce",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
       "name": "pluggy",
       "version": "1.7.0",
       "usedBy": [
@@ -11698,6 +11805,24 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "pycparser",
+      "version": "3.12",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD-3-Clause",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/pycparser/3.12/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "5be5ebd3dece39db29ac8d217fa9c4007da6afd676779a0b815bc9ffcdd2818d",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
       "name": "pydantic",
       "version": "2.14.1",
       "usedBy": [
@@ -11771,6 +11896,24 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "pydyf",
+      "version": "0.13.0",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD License",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/pydyf/0.13.0/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "75461e438973e1ba0f93a7de9e3fe5b2f49e1ab49251d392878a9cdae8ce7e47",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
       "name": "pygments",
       "version": "2.21.0",
       "usedBy": [
@@ -11795,6 +11938,54 @@
         {
           "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17",
           "file": "licenses/third-party-texts-02.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "pypdf",
+      "version": "6.21.2",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD-3-Clause",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/pypdf/6.21.2/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "a97ac230e5f33ef10a5367a850eb01f91f1a0b064e34742c7794d2294557f524",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "pyphen",
+      "version": "0.18.1",
+      "usedBy": [
+        "api"
+      ],
+      "license": "GNU General Public License v2 or later (GPLv2+); GNU Lesser General Public License v2 or later (LGPLv2+); Mozilla Public License 1.1 (MPL 1.1)",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/pyphen/0.18.1/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "79f913d4281dac55fae9b016df722ee2fe6acd39e6103d56a7fd29aa8f3b1503",
+          "file": "licenses/third-party-texts-04.json"
+        },
+        {
+          "sha256": "9a0ba47c469399ba9a2c5560d54721c82e055a6d52a9477216dd072a45219134",
+          "file": "licenses/third-party-texts-04.json"
+        },
+        {
+          "sha256": "ad192a67649aa23ac9681939840f4f241643a98da9cd8aec8de28c3b8c6ee854",
+          "file": "licenses/third-party-texts-04.json"
+        },
+        {
+          "sha256": "4fd1c78fcec632bc872ba7b42ba04be330029cfffa411039b48a4f2262bb8240",
+          "file": "licenses/third-party-texts-04.json"
         }
       ]
     },
@@ -11916,6 +12107,24 @@
         {
           "sha256": "80619b7049f08c81683ad0e01f08f257a840652dd71ee83146d36658c7d2c2b9",
           "file": "licenses/third-party-texts-01.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "python-multipart",
+      "version": "0.0.32",
+      "usedBy": [
+        "api"
+      ],
+      "license": "Apache-2.0",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/python-multipart/0.0.32/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "file": "licenses/third-party-texts-02.json"
         }
       ]
     },
@@ -12256,6 +12465,42 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "tinycss2",
+      "version": "1.5.1",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD License",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/tinycss2/1.5.1/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "6b94acee20ec9f2709333134f3ba70322535fb420af0ce8c1455d9cbe297f1d5",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "tinyhtml5",
+      "version": "2.1.0",
+      "usedBy": [
+        "api"
+      ],
+      "license": "MIT License",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/tinyhtml5/2.1.0/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "16a39991619e92f18680932da2a9199fdf7d95df3ecaedc52ea06218aabafd6f",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
       "name": "types-pyyaml",
       "version": "6.0.12.20260906",
       "usedBy": [
@@ -12465,6 +12710,42 @@
     },
     {
       "ecosystem": "pypi",
+      "name": "weasyprint",
+      "version": "70.0",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD License",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/weasyprint/70.0/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "bfd14eccfa6100575460e685556b183399d4bd335904e3c9521b0116d21c54da",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "webencodings",
+      "version": "0.6.1",
+      "usedBy": [
+        "api"
+      ],
+      "license": "BSD License",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/webencodings/0.6.1/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "e06ef33485e7498ad592887c41fa79cc8a7fecde576c7210e11bfdddef58040e",
+          "file": "licenses/third-party-texts-04.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
       "name": "wrapt",
       "version": "2.5.1",
       "usedBy": [
@@ -12484,6 +12765,24 @@
         {
           "sha256": "d4f66854a24dda2f2a5282912aedebe6b18186b86284510a433d78fadcd88e5d",
           "file": "licenses/third-party-texts-02.json"
+        }
+      ]
+    },
+    {
+      "ecosystem": "pypi",
+      "name": "zopfli",
+      "version": "0.4.3",
+      "usedBy": [
+        "api"
+      ],
+      "license": "Apache-2.0",
+      "evidence": "wheel METADATA for exact locked version in built api image 1114d1c",
+      "metadataUrl": "https://pypi.org/pypi/zopfli/0.4.3/json",
+      "projectUrls": [],
+      "licenseTexts": [
+        {
+          "sha256": "018b1cb87efdf7a04c2fcc13d57ed63f62149113fb207b27ea13430d64f13513",
+          "file": "licenses/third-party-texts-04.json"
         }
       ]
     }

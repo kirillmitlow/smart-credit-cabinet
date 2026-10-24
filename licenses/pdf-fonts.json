@@ -1,0 +1,21 @@
+{
+  "codeReference": "1114d1c",
+  "family": "PT Sans",
+  "source": "api/app/modules/documents/fonts/",
+  "notice": {
+    "sha256": "fc209b64de0bfc41ce3fd323afee1f6f3bd3dade9f7d2a6e7d6e5035bebdcc08",
+    "file": "licenses/third-party-texts-04.json"
+  },
+  "files": {
+    "PTSans-Regular.ttf": {
+      "sha256": "9cc831490532009bae2b3ce0d39c62adfc889060beb421593bfd9d2396d0f10a",
+      "version": "2.003W OFL",
+      "license": "OFL-1.1"
+    },
+    "PTSans-Bold.ttf": {
+      "sha256": "3128bd5ecf01816e59a23d54c57a7a6b14615b07db53ff277c77376010265b05",
+      "version": "2.003W OFL",
+      "license": "OFL-1.1"
+    }
+  }
+}
