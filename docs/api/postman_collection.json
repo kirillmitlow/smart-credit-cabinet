@@ -2,7 +2,7 @@
   "info": {
     "name": "Умный кредитный кабинет — проверка жюри",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Снимок main 1114d1c, 24.10.2026. Четыре независимые папки сценариев и проверки моков. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос удаляет демо-заявки этой персоны. Cookie jar включён. Источники: текущие OpenAPI/маршруты, существующий Bruno и браузерные тесты. См. docs/api/README.md для границ проверки. Динамические коды не сохраняйте в экспортируемое окружение.\nФинальная сверка: timeline из #129; Гарипов с готовым файлом, без требования работающего генератора. Каждый сценарий сбрасывает только свою персону."
+    "description": "Проверенная кодовая база main 8ff58fc5cc889f76f0ad3949a8169102310a714d, 25.10.2026. Пять независимых папок персон и отдельные примеры генератора выписки 1С. Запускайте по одной папке с задержкой Runner 1000 мс; первый запрос персоны удаляет только её демо-заявки. Cookie jar включён. Гарипов с готовым файлом сохраняет независимую проверку загрузки; генератор теперь реализован. Все коды и UUID извлекаются из ответов. Границы проверки: docs/api/README.md."
   },
   "auth": {
     "type": "noauth"
@@ -4285,6 +4285,83 @@
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code !== 200) { pm.execution.setNextRequest(null); throw new Error(\"Unexpected HTTP status\"); }",
                   "pm.test(\"Пометка отзыва\",()=>pm.expect(pm.response.json().noteKey).to.eql(\"withdrawn\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Генератор выписки 1С: примеры",
+      "description": "Два самостоятельных запроса к mock-scenarios; не создают заявку и не подтверждают бизнес-происхождение поступлений. Для кабинета используйте POST /demo/bank-statement с клиентской cookie, applicationId/taskId и Idempotency-Key: см. API README.",
+      "item": [
+        {
+          "id": "e541ca1d-22f1-57bd-bbe6-b2c7bfca824e",
+          "name": "Генератор · GET Гарипов, 12 полных месяцев",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Admin-Key",
+                "value": "{{mockAdminKey}}"
+              }
+            ],
+            "url": "{{scenariosUrl}}/api/v1/scenarios/garipov/documents/bank-statement?months=12"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Файл 1С\", () => pm.expect(pm.response.text()).to.match(/^1CClientBankExchange\\r\\n/));",
+                  "pm.test(\"Windows-1251\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"windows-1251\"));",
+                  "pm.test(\"Скачивание и симуляция\", () => { pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment;\"); pm.expect(pm.response.headers.get(\"X-Mock-Simulated\")).to.eql(\"true\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "id": "bd1ec01b-723b-5ca9-926b-d0db7fdd1efe",
+          "name": "Генератор · POST произвольный ИНН",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Admin-Key",
+                "value": "{{mockAdminKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{scenariosUrl}}/api/v1/documents/bank-statement",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inn\": \"001298765490\",\n  \"months\": 12,\n  \"avgMonthlyRevenueRub\": 700000,\n  \"netMarginPercent\": 14.2857,\n  \"minMonthlySurplusRub\": 100000,\n  \"seed\": 130\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Файл 1С\", () => pm.expect(pm.response.text()).to.match(/^1CClientBankExchange\\r\\n/));",
+                  "pm.test(\"Windows-1251\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"windows-1251\"));",
+                  "pm.test(\"Скачивание и симуляция\", () => { pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment;\"); pm.expect(pm.response.headers.get(\"X-Mock-Simulated\")).to.eql(\"true\"); });"
                 ]
               }
             }

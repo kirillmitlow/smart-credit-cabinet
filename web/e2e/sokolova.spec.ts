@@ -161,7 +161,7 @@ test('TS-001: Соколова проходит путь от входа до «
   await test.step('Деньги зачислены: 500 000 ₽', async () => {
     await waitForStatus(
       page,
-      page.getByText(fill(applicationPage.moneyDone, { amount: '' }).trim()).first(),
+      page.getByText(contractTexts.issued, { exact: true }),
       'Деньги зачислены',
       DISBURSEMENT_TIMEOUT_MS,
     );

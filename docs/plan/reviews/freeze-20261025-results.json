@@ -1,0 +1,649 @@
+{
+  "checkedOn": "2026-10-25",
+  "codeCommit": "8ff58fc5cc889f76f0ad3949a8169102310a714d",
+  "appToday": "2026-10-21",
+  "composeProject": "scc-bank-actions",
+  "baseUrl": "http://127.0.0.1:8090",
+  "imageTag": "freeze-20261025",
+  "services": [
+    {
+      "Service": "api",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "beat",
+      "State": "running",
+      "Health": "",
+      "ExitCode": 0
+    },
+    {
+      "Service": "db-init",
+      "State": "exited",
+      "Health": "",
+      "ExitCode": 0
+    },
+    {
+      "Service": "mock-bank-core",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "mock-credit-bureau",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "mock-registry",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "mock-scenarios",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "mock-tax",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "postgres",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "redis",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "web",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    },
+    {
+      "Service": "worker",
+      "State": "running",
+      "Health": "healthy",
+      "ExitCode": 0
+    }
+  ],
+  "readiness": [
+    {
+      "port": 8100,
+      "status": 200,
+      "openapiMatchesSaved": true
+    },
+    {
+      "port": 8101,
+      "status": 200,
+      "openapiMatchesSaved": true
+    },
+    {
+      "port": 8102,
+      "status": 200,
+      "openapiMatchesSaved": true
+    },
+    {
+      "port": 8103,
+      "status": 200,
+      "openapiMatchesSaved": true
+    },
+    {
+      "port": 8104,
+      "status": 200,
+      "openapiMatchesSaved": true
+    },
+    {
+      "port": 8105,
+      "status": 200,
+      "openapiMatchesSaved": true
+    }
+  ],
+  "openapi": {
+    "makeOpenapiRuns": 1,
+    "sixSchemasAndTypescriptClientUnchanged": true
+  },
+  "browserRuns": [
+    {
+      "report": "browser-results",
+      "stats": {
+        "expected": 0,
+        "unexpected": 5,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "Freeze: Соколова — каталог и калькулятор",
+          "status": "failed",
+          "durationMs": 16048
+        },
+        {
+          "title": "Freeze: СнабКонтракт — 8 млн/12 → 8 млн/36 → выдача и график",
+          "status": "failed",
+          "durationMs": 16516
+        },
+        {
+          "title": "Freeze: Станкопром — оборотные 15 млн/12 → банк 10 млн/12 → выдача и график",
+          "status": "failed",
+          "durationMs": 16451
+        },
+        {
+          "title": "Freeze: Ромашка — 3 млн/6 → отказ с причинами",
+          "status": "failed",
+          "durationMs": 16416
+        },
+        {
+          "title": "TS-001: Соколова проходит путь от входа до «Мои кредиты» без перезагрузки страницы",
+          "status": "failed",
+          "durationMs": 73188
+        }
+      ]
+    },
+    {
+      "report": "browser-additional-results",
+      "stats": {
+        "expected": 2,
+        "unexpected": 2,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "Freeze: Соколова — каталог и калькулятор",
+          "status": "passed",
+          "durationMs": 647
+        },
+        {
+          "title": "Freeze: СнабКонтракт — 8 млн/12 → 8 млн/36 → выдача и график",
+          "status": "failed",
+          "durationMs": 11665
+        },
+        {
+          "title": "Freeze: Станкопром — оборотные 15 млн/12 → банк 10 млн/12 → выдача и график",
+          "status": "failed",
+          "durationMs": 101662
+        },
+        {
+          "title": "Freeze: Ромашка — 3 млн/6 → отказ с причинами",
+          "status": "passed",
+          "durationMs": 4789
+        }
+      ]
+    },
+    {
+      "report": "browser-targeted-results",
+      "stats": {
+        "expected": 1,
+        "unexpected": 2,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "Freeze: СнабКонтракт — 8 млн/12 → 8 млн/36 → выдача и график",
+          "status": "failed",
+          "durationMs": 98967
+        },
+        {
+          "title": "Freeze: Станкопром — график уже выданных через интерфейс 10 млн/12",
+          "status": "failed",
+          "durationMs": 16336
+        },
+        {
+          "title": "TS-001: Соколова проходит путь от входа до «Мои кредиты» без перезагрузки страницы",
+          "status": "passed",
+          "durationMs": 9842
+        }
+      ]
+    },
+    {
+      "report": "browser-completed-results",
+      "stats": {
+        "expected": 2,
+        "unexpected": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "Freeze: СнабКонтракт — 8 млн/12 → 8 млн/36 → выдача и график",
+          "status": "passed",
+          "durationMs": 7221
+        },
+        {
+          "title": "Freeze: Станкопром — график уже выданных через интерфейс 10 млн/12",
+          "status": "passed",
+          "durationMs": 712
+        }
+      ]
+    }
+  ],
+  "fourScenarioResults": [
+    {
+      "persona": "sokolova",
+      "request": {
+        "product": "EXPRESS",
+        "amountRub": 500000,
+        "termMonths": 12
+      },
+      "outcome": "DISBURSED",
+      "scheduleRows": 12,
+      "verification": "browser",
+      "notes": "TS-001 passed after replacing its stale disbursement text selector; catalog/calculator separately passed."
+    },
+    {
+      "persona": "snabkontrakt",
+      "request": {
+        "product": "WORKING_CAPITAL",
+        "amountRub": 8000000,
+        "termMonths": 12
+      },
+      "outcome": "COUNTER_OFFER → DISBURSED",
+      "acceptedAmountRub": 8000000,
+      "acceptedTermMonths": 36,
+      "scheduleRows": 36,
+      "verification": "browser"
+    },
+    {
+      "persona": "stankoprom",
+      "request": {
+        "product": "WORKING_CAPITAL",
+        "amountRub": 15000000,
+        "termMonths": 12
+      },
+      "outcome": "MANUAL_REVIEW → COUNTER_OFFER → DISBURSED",
+      "acceptedAmountRub": 10000000,
+      "acceptedTermMonths": 12,
+      "scheduleRows": 12,
+      "verification": "browser",
+      "notes": "Application, bank calculation, signing and disbursement via UI; schedule checked in a separate UI visit after the stale text selector stopped the runner."
+    },
+    {
+      "persona": "romashka",
+      "request": {
+        "product": "WORKING_CAPITAL",
+        "amountRub": 3000000,
+        "termMonths": 6
+      },
+      "outcome": "REJECTED",
+      "reasonsVerified": [
+        "tax debt",
+        "overdue credit"
+      ],
+      "verification": "browser"
+    }
+  ],
+  "newman": {
+    "generatedGaripov": {
+      "requests": 30,
+      "assertions": 51,
+      "failures": 0,
+      "responses": [
+        {
+          "name": "Гарипов · 01 Сбросить только эту персону",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 02 Найти компанию и руководителя",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 03 Получить код входа",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 04 Войти, сохранить cookie",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 05 Создать черновик",
+          "status": 201
+        },
+        {
+          "name": "Гарипов · 06 Получить нужные согласия",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 07 Получить код пакета согласий",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 08 Подписать согласия",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 09 Отправить заявку",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 10 Дождаться решения",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 10 Дождаться решения",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 10 Дождаться решения",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 11 Прочитать объяснение",
+          "status": 200
+        },
+        {
+          "name": "Гарипов: готовая выписка · Проверить таймлайн после решения",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 12 Получить задачу",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 14 Загрузить файл независимого тестового writer",
+          "status": 201
+        },
+        {
+          "name": "Гарипов · 15 Дождаться разбора",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 16 Подтвердить поступления",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 17 Добавить пояснение к файлу",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 18 Отправить полный раунд",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 19 Дождаться повторного расчёта",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 19 Дождаться повторного расчёта",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 16 Получить предложение и выбрать рекомендуемый вариант",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 17 Принять вариант",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 18 Получить сохранённый договор PDF",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 19 Получить код подписи",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 20 Подписать договор",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 21 Дождаться выдачи",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 22 Найти выданный кредит",
+          "status": 200
+        },
+        {
+          "name": "Гарипов · 23 Получить график",
+          "status": 200
+        }
+      ]
+    },
+    "generatorExamples": {
+      "requests": 2,
+      "assertions": 8,
+      "failures": 0,
+      "responses": [
+        {
+          "name": "Генератор · GET Гарипов, 12 полных месяцев",
+          "status": 200
+        },
+        {
+          "name": "Генератор · POST произвольный ИНН",
+          "status": 200
+        }
+      ]
+    }
+  },
+  "statement": {
+    "sourceCommit": "8ff58fc5cc889f76f0ad3949a8169102310a714d",
+    "httpStatus": 200,
+    "unauthenticatedStatus": 401,
+    "deterministic": true,
+    "bytes": 335671,
+    "sha256": "4f44b423281c86ef61dc429eb252a0b48065cf3467a248a3d5ccbfb5175ee8fc",
+    "downloadHeaders": {
+      "content-disposition": "attachment; filename=\"statement_001298765490_2025-10_2026-09.txt\"",
+      "content-type": "text/plain; charset=windows-1251"
+    },
+    "months": [
+      {
+        "month": "2025-10",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2025-11",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2025-12",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-01",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-02",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-03",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-04",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-05",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-06",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-07",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-08",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      },
+      {
+        "month": "2026-09",
+        "complete": true,
+        "incomingRub": 700000,
+        "outgoingRub": 600000,
+        "internalIncomingRub": 0,
+        "internalOutgoingRub": 0,
+        "unclassifiedIncomingRub": 700000,
+        "incomingKopecks": 70000000,
+        "outgoingKopecks": 60000000,
+        "internalIncomingKopecks": 0,
+        "internalOutgoingKopecks": 0,
+        "unclassifiedIncomingKopecks": 70000000
+      }
+    ],
+    "warnings": [
+      "UNCLASSIFIED_RECEIPTS"
+    ],
+    "simulatedHeader": "true"
+  },
+  "schemaModel": {
+    "tables": 26,
+    "foreignKeys": 42,
+    "statuses": 14,
+    "transitions": 29,
+    "stateEdgesMatchedCode": true,
+    "tablesMatchedCode": true
+  },
+  "dependencies": {
+    "lockHashes": {
+      "api/uv.lock": "fa20b75f89dd78d0527ccad4f031353e14b177e4bb6d0d1c3530b38ee01c457a",
+      "mocks/uv.lock": "341076b50b671b72de3e9f53f520436ec38d50c78872a8dac8166309179e6523",
+      "web/pnpm-lock.yaml": "38e641dbdc65356a4fb6d43920de2b478509054c5af3f24796e6eaa355993c3a"
+    },
+    "unchangedSinceInventoryCommit": true,
+    "inventoryComponents": 655,
+    "verifiedLicenseTextHashes": 344
+  },
+  "targetedChecks": {
+    "relativeLinks": "passed",
+    "postmanRequests": 131,
+    "postmanScriptsParsed": 134,
+    "uniqueRequestIds": 131,
+    "bashExamplesParsed": 14,
+    "eslintSokolova": "passed",
+    "prettierSokolova": "passed",
+    "fullPytestLocalRun": false,
+    "fullBrowserSuiteRun": false,
+    "localMakeCheckRun": false
+  }
+}
