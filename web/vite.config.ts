@@ -11,7 +11,14 @@ export default defineConfig({
   server: {
     port: 5173,
     // Разработка без nginx: /api идёт в api на хосте (docker-compose.override.yml, 127.0.0.1:8100)
-    proxy: { '/api': { target: 'http://127.0.0.1:8100', changeOrigin: false } },
+    // Как в nginx: префикс /api (и /api/v1) срезается, api слушает пути без него
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8100',
+        changeOrigin: false,
+        rewrite: (path) => path.replace(/^\/api\/(v1\/)?/, '/'),
+      },
+    },
   },
   // Зона банка и демо подгружаются отдельно (React.lazy в app/router.tsx): отдельные чанки сборки
   build: { sourcemap: false },

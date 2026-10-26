@@ -1,7 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
-import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/onest/wght.css';
+import '@fontsource-variable/unbounded/wght.css';
 import '@mantine/core/styles.css';
 import './styles.css';
 import { createQueryClient } from '@/api/query-client';

@@ -44,8 +44,21 @@ describe('контраст темы (WCAG AA, 4,5:1)', () => {
     );
   });
 
-  it('приглушённый текст на белом', () => {
+  it('приглушённый текст на белом и на сером фоне страницы', () => {
     expect(contrast(tokens.dimmedText, '#ffffff')).toBeGreaterThanOrEqual(AA);
+    expect(contrast(tokens.dimmedText, tokens.pageBackground)).toBeGreaterThanOrEqual(AA);
+  });
+
+  it('тёмная шапка: белый и приглушённый текст', () => {
+    expect(contrast(tokens.header.color, tokens.header.background)).toBeGreaterThanOrEqual(AA);
+    expect(contrast(tokens.header.muted, tokens.header.background)).toBeGreaterThanOrEqual(AA);
+    expect(contrast(tokens.accentOnDark, tokens.header.background)).toBeGreaterThanOrEqual(AA);
+  });
+
+  it('метки состояний', () => {
+    for (const pair of Object.values(tokens.status)) {
+      expect(contrast(pair.color, pair.background)).toBeGreaterThanOrEqual(AA);
+    }
   });
 });
 
@@ -58,6 +71,7 @@ describe('тема', () => {
   });
 
   it('шрифт подключён локально (без CDN)', () => {
-    expect(theme.fontFamily).toContain('Inter Variable');
+    expect(theme.fontFamily).toContain('Onest Variable');
+    expect(theme.headings?.fontFamily).toContain('Unbounded Variable');
   });
 });

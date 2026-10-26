@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Accordion, Alert, Anchor, Box, Button, Drawer, Group, Stack, Text } from '@mantine/core';
+import { Accordion, Alert, Anchor, Box, Button, Drawer, Stack, Text } from '@mantine/core';
 import { Link, useLocation } from 'react-router';
 import { useGetApplication } from '@/api/generated/api';
 import { appErrorFromResponse } from '@/api/errors';
@@ -32,7 +32,15 @@ function ExpectedHint({ id }: { id: string }) {
   );
   if (!p) return null;
   return (
-    <Box px="md" pb="xs" data-testid="demo-expected-hint">
+    <Box
+      pos="fixed"
+      left={16}
+      bottom={16}
+      w={380}
+      bg="white"
+      data-testid="demo-expected-hint"
+      style={{ zIndex: 150, borderRadius: 16, boxShadow: '0 8px 24px rgba(23,23,26,0.18)' }}
+    >
       <Accordion>
         <Accordion.Item value={id}>
           <Accordion.Control>{t.hint}</Accordion.Control>
@@ -75,11 +83,11 @@ export default function DemoTools() {
         </Alert>
       ) : null}
       {location.pathname !== '/demo' ? (
-        <Group justify="flex-end" px="md" py={4}>
-          <Button variant="subtle" size="compact-sm" onClick={() => setOpened(true)}>
+        <Box pos="fixed" right={16} bottom={16} style={{ zIndex: 150 }}>
+          <Button color="dark" size="sm" onClick={() => setOpened(true)}>
             {t.open}
           </Button>
-        </Group>
+        </Box>
       ) : null}
       {match?.[1] ? <ExpectedHint key={match[1]} id={match[1]} /> : null}
       <Drawer

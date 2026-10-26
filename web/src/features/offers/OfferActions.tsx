@@ -19,6 +19,10 @@ export interface OfferActionsProps {
   onPendingChange?: (pending: boolean) => void;
   /** Что описывает кнопка для скринридера (id заголовка карточки) */
   describedBy?: string;
+  /** Второстепенный вариант: кнопка с обводкой, а не красная (D-113) */
+  secondary?: boolean;
+  /** Кнопка во всю ширину карточки варианта */
+  fullWidth?: boolean;
 }
 
 /** Выбранные условия сервер переносит в договор; фронт их не пересчитывает. */
@@ -29,6 +33,8 @@ export function OfferActions({
   disabled = false,
   onPendingChange,
   describedBy,
+  secondary = false,
+  fullWidth = false,
 }: OfferActionsProps) {
   const client = useQueryClient();
   const action = useActionKey();
@@ -70,6 +76,10 @@ export function OfferActions({
       ) : (
         <div>
           <Button
+            fullWidth={fullWidth}
+            size="md"
+            variant={secondary ? 'outline' : 'filled'}
+            color={secondary ? 'dark' : undefined}
             disabled={!ready || disabled}
             loading={pending}
             aria-describedby={describedBy}

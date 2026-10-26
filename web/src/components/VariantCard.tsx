@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
-import { Badge, Card, Group, List, Stack, Text, Title } from '@mantine/core';
+import type { CSSProperties, ReactNode } from 'react';
+import { Badge, Box, Card, Group, List, Stack, Text, Title } from '@mantine/core';
+import { brandPalette, fonts, graphitePalette, tokens } from '@/app/theme';
 import type { ComfortableOption } from '@/api/generated/model';
 import { DecisionTime, PaymentKind } from '@/api/generated/model';
 import { TermHint } from '@/components/TermHint';
@@ -45,16 +46,32 @@ export interface VariantCardProps {
 
 function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
-    <Group justify="space-between" wrap="nowrap" align="baseline" gap="md">
+    <Group
+      justify="space-between"
+      wrap="nowrap"
+      align="baseline"
+      gap="md"
+      py={10}
+      style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}
+    >
       <Text component="dt" c="dimmed">
         {label}
       </Text>
-      <Text component="dd" m={0} fw={600} ta="right">
+      <Text component="dd" m={0} fw={600} ta="right" className="scc-num">
         {children}
       </Text>
     </Group>
   );
 }
+
+/** Рекомендуемая карточка тёмная (D-113): переопределяем переменные цвета внутри неё */
+const darkCardVars = {
+  '--mantine-color-text': '#ffffff',
+  '--mantine-color-dimmed': tokens.header.muted,
+  '--mantine-color-default-border': graphitePalette[7],
+  '--mantine-color-anchor': tokens.accentOnDark,
+  '--mantine-color-body': graphitePalette[9],
+} as CSSProperties;
 
 /**
  * Карточка варианта (60-03 «Заметки»): один компонент на подборе, в каталоге и во встречных
@@ -93,23 +110,59 @@ export function VariantCard({
 
   return (
     <Card
-      withBorder
-      padding="lg"
+      padding={28}
       component="article"
       aria-labelledby={headingId}
       data-testid="variant-card"
+      data-recommended={recommended || undefined}
+      h="100%"
+      bg={recommended ? 'graphite.9' : undefined}
+      c={recommended ? 'white' : undefined}
+      style={
+        recommended
+          ? { ...darkCardVars, boxShadow: `inset 0 0 0 3px ${brandPalette[6]}` }
+          : undefined
+      }
     >
-      <Stack gap="md">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Title order={headingLevel} size="h3" id={headingId}>
-            {title}
-          </Title>
-          {recommended ? (
-            <Badge size="lg" variant="filled">
-              {t.recommendedBadge}
-            </Badge>
-          ) : null}
-        </Group>
+      <Stack gap="md" h="100%">
+        {recommended ? (
+          <Badge
+            size="lg"
+            radius="xl"
+            tt="none"
+            variant="filled"
+            style={{ alignSelf: 'flex-start' }}
+          >
+            {t.recommendedBadge}
+          </Badge>
+        ) : null}
+        <Title order={headingLevel} size="h3" id={headingId} c="inherit">
+          {title}
+        </Title>
+        {amountRub != null ? (
+          <Stack gap={4}>
+            <Text ff={fonts.display} fw={700} fz={30} lh={1.15} className="scc-num" c="inherit">
+              {formatMoney(amountRub)}
+            </Text>
+            {paymentRub != null ? (
+              <Stack gap={0}>
+                <Text size="sm" c="dimmed">
+                  <TermHint hint={termHints.payment} label={t.payment} />
+                  {interestOnly ? ` (${t.paymentInterestOnly})` : ''}
+                </Text>
+                <Text
+                  ff={fonts.display}
+                  fw={700}
+                  fz={20}
+                  className="scc-num"
+                  style={{ color: recommended ? tokens.accentOnDark : undefined }}
+                >
+                  {formatMoney(paymentRub)}
+                </Text>
+              </Stack>
+            ) : null}
+          </Stack>
+        ) : null}
 
         {why ? (
           <Text>
@@ -120,19 +173,20 @@ export function VariantCard({
           </Text>
         ) : null}
 
-        <Stack component="dl" gap="xs" m={0}>
-          {amountRub != null ? <Row label={t.amount}>{formatMoney(amountRub)}</Row> : null}
+        <Stack component="dl" gap={0} m={0}>
           {termMonths != null ? <Row label={t.term}>{formatTermMonths(termMonths)}</Row> : null}
-          <Row
-            label={
-              <>
-                <TermHint hint={termHints.payment} label={t.payment} />
-                {interestOnly ? ` (${t.paymentInterestOnly})` : ''}
-              </>
-            }
-          >
-            {paymentRub != null ? formatMoney(paymentRub) : t.paymentLater}
-          </Row>
+          {amountRub == null || paymentRub == null ? (
+            <Row
+              label={
+                <>
+                  <TermHint hint={termHints.payment} label={t.payment} />
+                  {interestOnly ? ` (${t.paymentInterestOnly})` : ''}
+                </>
+              }
+            >
+              {paymentRub != null ? formatMoney(paymentRub) : t.paymentLater}
+            </Row>
+          ) : null}
           {overpaymentRub != null ? (
             <Row label={<TermHint hint={termHints.overpayment} />}>
               {formatMoney(overpaymentRub)}
@@ -195,7 +249,7 @@ export function VariantCard({
         ) : null}
 
         {note}
-        {actions}
+        {actions ? <Box mt="auto">{actions}</Box> : null}
       </Stack>
     </Card>
   );

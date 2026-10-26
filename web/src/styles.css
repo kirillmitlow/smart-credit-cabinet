@@ -4,6 +4,17 @@ body {
   margin: 0;
 }
 
+/* Фон страницы серый, карточки на нём белые (D-113). Селектор сильнее глобального стиля Mantine */
+html body {
+  background-color: var(--scc-page-bg);
+}
+
+/* Крупные суммы и цифры в таблицах не прыгают по ширине */
+.scc-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .desktop-hint {
   display: none;
 }
@@ -23,10 +34,38 @@ body {
   padding: 8px 12px;
   background: #fff;
   color: #1a1b1e;
-  border: 2px solid #c22b21;
+  border: 2px solid #d7262e;
   border-radius: 4px;
 }
 
 .skip-link:focus {
   top: 8px;
+}
+
+/* Меню в тёмной шапке: «таблетки», текущий раздел — белый (D-113) */
+.scc-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  color: #d4d4d8;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.scc-nav a:hover {
+  color: #ffffff;
+  background: #27272a;
+}
+
+.scc-nav a[aria-current='page'] {
+  background: #ffffff;
+  color: #17171a;
+}
+
+.scc-nav a:focus-visible {
+  outline: 2px solid #ff8a8d;
+  outline-offset: 2px;
 }
