@@ -69,3 +69,34 @@ html body {
   outline: 2px solid #ff8a8d;
   outline-offset: 2px;
 }
+
+/* Карточка ответа в мастере: белая, при выборе — красная рамка (D-113) */
+.scc-choice {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  text-align: left;
+  color: #17171a;
+}
+
+.scc-choice:hover:not(:disabled) {
+  border-color: #a1a1aa;
+}
+
+.scc-choice[aria-pressed='true'] {
+  border-color: #d7262e;
+}
+
+.scc-choice:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Заголовок страницы получает фокус программно при переходе (для скринридера): рамка не нужна */
+h1[tabindex='-1']:focus {
+  outline: none;
+}

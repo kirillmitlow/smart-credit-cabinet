@@ -1,11 +1,13 @@
 import {
   Button,
+  defaultVariantColorsResolver,
   Card,
   createTheme,
   Input,
   Paper,
   type CSSVariablesResolver,
   type MantineColorsTuple,
+  type VariantColorsResolver,
 } from '@mantine/core';
 
 /**
@@ -84,7 +86,27 @@ export const fonts = {
   display: '"Unbounded Variable", "Onest Variable", system-ui, sans-serif',
 } as const;
 
+/**
+ * Вариант `light` у основного цвета — серый, а не бледно-розовый (D-113): красным остаётся только
+ * главное действие экрана. Остальные цвета и варианты — как в Mantine.
+ */
+const variantColorResolver: VariantColorsResolver = (input) => {
+  const defaults = defaultVariantColorsResolver(input);
+  const isPrimary = input.color === undefined || input.color === 'brand';
+  if (input.variant === 'light' && isPrimary) {
+    return {
+      ...defaults,
+      background: graphite[1],
+      hover: graphite[2],
+      color: graphite[9],
+      border: 'none',
+    };
+  }
+  return defaults;
+};
+
 export const theme = createTheme({
+  variantColorResolver,
   primaryColor: 'brand',
   primaryShade: 6,
   colors: { brand, graphite, bank, dark: graphite },

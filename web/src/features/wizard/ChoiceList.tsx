@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Badge, Button, Group, Stack, Text } from '@mantine/core';
+import { Badge, Button, Group, SimpleGrid, Stack, Text, UnstyledButton } from '@mantine/core';
+import { fonts, tokens } from '@/app/theme';
 import { wizard } from '@/texts';
 
 export interface Choice {
@@ -34,48 +35,48 @@ export function ChoiceList({
   children?: ReactNode;
 }) {
   return (
-    <Stack gap="sm" maw={640}>
-      <Stack gap="sm" role="group" aria-label={wizard.choicesLabel}>
+    <Stack gap="md" maw={960}>
+      <SimpleGrid
+        cols={{ base: 1, sm: 2 }}
+        spacing="md"
+        role="group"
+        aria-label={wizard.choicesLabel}
+      >
         {choices.map((choice) => {
           const isSelected = choice.value === selected;
           return (
-            <Button
+            <UnstyledButton
               key={choice.value}
-              variant={isSelected ? 'light' : 'default'}
-              size="md"
-              fullWidth
-              h="auto"
-              py="md"
-              px="lg"
-              justify="flex-start"
               disabled={disabled}
               aria-pressed={isSelected}
               data-choice={choice.value}
-              styles={{ label: { whiteSpace: 'normal', textAlign: 'left' } }}
+              className="scc-choice"
               onClick={() => onSelect(choice.value)}
             >
-              <Stack gap={2}>
-                <Group gap="xs">
-                  <Text fw={600}>{choice.title}</Text>
+              <Stack gap={6}>
+                <Group gap="xs" wrap="wrap">
+                  <Text ff={fonts.display} fw={700} fz={16} lh={1.3}>
+                    {choice.title}
+                  </Text>
                   {choice.badge ? (
-                    <Badge variant="light" color="green">
+                    <Badge radius="xl" tt="none" styles={{ root: tokens.status.success }}>
                       {choice.badge}
                     </Badge>
                   ) : null}
                 </Group>
                 {choice.description ? (
-                  <Text size="sm" c="dimmed" fw={400}>
+                  <Text size="sm" c="dimmed">
                     {choice.description}
                   </Text>
                 ) : null}
               </Stack>
-            </Button>
+            </UnstyledButton>
           );
         })}
-      </Stack>
+      </SimpleGrid>
       {onUnknown ? (
         <div>
-          <Button variant="subtle" px={0} disabled={disabled} onClick={onUnknown}>
+          <Button variant="outline" color="dark" disabled={disabled} onClick={onUnknown}>
             {unknownLabel}
           </Button>
         </div>

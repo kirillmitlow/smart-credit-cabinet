@@ -203,6 +203,8 @@ export function CounterOfferPanel({ application }: { application: ApplicationOut
                       variantId={variant.id}
                       label={t.choose}
                       describedBy={`variant-${variant.id}-title`}
+                      secondary={!variant.recommended}
+                      fullWidth
                       disabled={pendingId !== null && pendingId !== variant.id}
                       onPendingChange={(pending) => {
                         setPendingId((current) =>
