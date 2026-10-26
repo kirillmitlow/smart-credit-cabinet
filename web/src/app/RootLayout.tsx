@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { usePublicConfig } from '@/features/auth/session';
 import { Outlet } from 'react-router';
-import { DemoBanner } from '@/components/DemoBanner';
 import { DesktopHint } from '@/components/DesktopHint';
 import { OfflineBar } from '@/components/OfflineBar';
 import { shell } from '@/texts';
@@ -21,7 +20,6 @@ export function RootLayout() {
         {shell.skipToContent}
       </a>
       <OfflineBar />
-      <DemoBanner />
       <DesktopHint />
       {demoEnabled ? (
         <Suspense fallback={null}>

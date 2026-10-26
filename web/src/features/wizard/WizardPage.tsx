@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Button, Group, Loader, Progress, Stack, Text, Title } from '@mantine/core';
+import { Box, Button, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { brandPalette } from '@/app/theme';
 import { useLocation, useNavigate } from 'react-router';
 import { useRecommendProduct } from '@/api/generated/api';
 import type {
@@ -184,13 +185,24 @@ export function WizardPage() {
         <Text size="sm" fw={600} aria-live="polite">
           {fill(wizard.progress, { current: index + 1, total })}
         </Text>
-        <Progress
-          value={((index + 1) / total) * 100}
-          size="sm"
-          maw={640}
+        <SimpleGrid
+          cols={total}
+          spacing={6}
+          maw={960}
           aria-hidden="true"
           data-testid="wizard-progress"
-        />
+        >
+          {Array.from({ length: total }, (_, step) => (
+            <Box
+              key={step}
+              h={6}
+              style={{
+                borderRadius: 3,
+                background: step < index ? '#17171a' : step === index ? brandPalette[6] : '#d4d4d8',
+              }}
+            />
+          ))}
+        </SimpleGrid>
       </Stack>
 
       <Stack gap={4}>

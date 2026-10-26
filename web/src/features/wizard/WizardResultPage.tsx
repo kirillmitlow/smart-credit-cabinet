@@ -1,5 +1,5 @@
 import { useRef, useState, type RefObject } from 'react';
-import { Alert, Button, Card, Group, List, Stack, Text, Title } from '@mantine/core';
+import { Alert, Button, Card, Group, List, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate } from 'react-router';
 import {
@@ -99,7 +99,10 @@ function RecommendedCard({
       actions={
         <div>
           <Button
-            variant={primary ? 'filled' : 'default'}
+            fullWidth
+            size="md"
+            variant={primary ? 'filled' : 'outline'}
+            color={primary ? undefined : 'dark'}
             loading={applying}
             onClick={() => onApply(rec, primary)}
           >
@@ -232,7 +235,7 @@ function ResultView({
       ) : null}
 
       {hasVariants && result.primary ? (
-        <Stack gap="lg">
+        <SimpleGrid cols={{ base: 1, md: result.alternative ? 2 : 1 }} spacing="lg">
           <Stack gap="sm" component="section" aria-labelledby="wizard-primary">
             <Title order={2} size="h3" id="wizard-primary">
               {t.primaryHeading}
@@ -259,7 +262,7 @@ function ResultView({
               />
             </Stack>
           ) : null}
-        </Stack>
+        </SimpleGrid>
       ) : (
         <Stack gap="sm" maw={640} data-testid="catalog-hint">
           {result.hint ? <Text size="lg">{result.hint}</Text> : null}

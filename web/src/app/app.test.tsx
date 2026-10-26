@@ -21,22 +21,22 @@ import {
   shell,
 } from '@/texts';
 
-const banner = () => screen.getByTestId('demo-banner');
-
 async function expectNoBlockingViolations(container: HTMLElement) {
   expect(await blockingA11yViolations(container)).toEqual([]);
 }
 
 describe('оболочка клиента', () => {
-  it('показывает шапку, постоянную демо-плашку, меню, компанию и подвал', async () => {
+  it('показывает шапку без демо-плашки, меню, компанию и подвал', async () => {
     mockSessions({ client: makeMe() });
     const { container } = renderApp('/');
 
     expect(
       await screen.findByRole('heading', { level: 1, name: homeText.title }),
     ).toBeInTheDocument();
-    expect(banner()).toHaveTextContent(shell.demoBanner);
-    expect(screen.getByRole('link', { name: shell.productName })).toBeInTheDocument();
+    expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: new RegExp(`^${shell.productName}`) }),
+    ).toBeInTheDocument();
     const nav = screen.getByRole('navigation', { name: shell.mainNavLabel });
     expect(within(nav).getByRole('link', { name: shell.nav.loans })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: shell.nav.products })).toHaveAttribute(
@@ -113,7 +113,6 @@ describe('вход и защита маршрутов', () => {
     ).toBeInTheDocument();
     expect(window.location.pathname).toBe('/login');
     expect(new URLSearchParams(window.location.search).get('next')).toBe('/loans');
-    expect(banner()).toBeInTheDocument();
   });
 
   it('401 или 404 от /me — просто «не вошли», без экрана ошибки', async () => {
@@ -135,7 +134,6 @@ describe('вход и защита маршрутов', () => {
     expect(screen.getByText(guards.bankOnly.body)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: shell.common.back })).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: loginPlaceholder.bankLink })).toBeInTheDocument();
-    expect(banner()).toBeInTheDocument();
   });
 
   it('без сессий на /bank ведёт на вход банка', async () => {
@@ -180,7 +178,6 @@ describe('вход и защита маршрутов', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: guards.pageNotFound.title }),
     ).toBeInTheDocument();
-    expect(banner()).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: shell.mainNavLabel })).toBeInTheDocument();
   });
 
@@ -251,7 +248,7 @@ describe('зона банка', () => {
     ).toBeInTheDocument();
     const strip = screen.getByTestId('zone-strip');
     expect(strip).toHaveTextContent(shell.bankZoneLabel);
-    expect(banner()).toHaveTextContent(shell.demoBanner);
+    expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
     expect(
       screen.getByText(fill(shell.user.signedInAs, { name: 'Ольга Петрова' })),
     ).toBeInTheDocument();
@@ -287,7 +284,6 @@ describe('демо', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: guards.demoNotFound.title }),
     ).toBeInTheDocument();
-    expect(banner()).toBeInTheDocument();
     demo.unmount();
   });
 
@@ -319,7 +315,7 @@ describe('плашка «Демо-прототип» везде', () => {
   ])('%s', async (_name, route) => {
     renderApp(route);
     await screen.findByRole('heading', { level: 1 });
-    expect(banner()).toHaveTextContent(shell.demoBanner);
+    expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 });
 

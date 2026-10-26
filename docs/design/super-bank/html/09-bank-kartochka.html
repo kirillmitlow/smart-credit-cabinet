@@ -1,0 +1,155 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Onest:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEF0}
+a{color:#B8141B;text-underline-offset:3px}a:hover{color:#8A0F14}
+.b-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;border:2px solid transparent;font:600 15px Onest,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap;box-sizing:border-box}
+.b-h{font-family:Unbounded,sans-serif;font-weight:700;letter-spacing:-0.01em}
+.b-card{background:#FFFFFF;border-radius:14px;padding:22px 24px;box-sizing:border-box}
+.b-ct{margin:0 0 12px;font:700 15px Unbounded,sans-serif;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.b-ct small{font:600 13px Onest,sans-serif;color:#52525B}
+.b-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:9px 0;border-top:1px solid #F0F0F2;font-size:14px;align-items:baseline}
+.b-row>span:first-child{color:#52525B}
+.b-row>span:last-child{text-align:right}
+.b-chk{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;padding:9px 0;border-top:1px solid #F0F0F2;font-size:14px;align-items:center}
+.b-mono{font-family:'JetBrains Mono',monospace;font-size:13px}
+.b-ok{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;background:#E6F4EA;color:#14532D}
+.b-f{display:grid;grid-template-columns:180px minmax(0,1fr) 52px;gap:12px;align-items:center;font-size:14px;padding:5px 0}
+.b-track{height:8px;border-radius:4px;background:#EEEEF0;overflow:hidden;display:block}
+.b-src{display:grid;grid-template-columns:150px minmax(0,1fr) 84px;gap:12px;padding:9px 0;border-top:1px solid #F0F0F2;font-size:14px;align-items:baseline}
+.b-ev{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;font-size:14px}
+</style>
+<style>html,body{height:auto!important}</style></head><body>
+<div style="min-height:100vh;font-family:Onest,system-ui,sans-serif;color:#17171A;background:#EEEEF0">
+  <div style="background:#0B0B0D;color:#D4D4D8;font-size:13px;text-align:center;padding:7px 16px"><span style="background:#D7262E;color:#FFFFFF;border-radius:4px;padding:1px 6px;font-weight:700;font-size:11px;letter-spacing:.06em;margin-right:8px">ДЕМО</span>Демо-прототип. Все данные синтетические</div>
+  <header style="background:#17171A;color:#FFFFFF">
+    <div style="max-width:1320px;margin:0 auto;padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:28px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="width:40px;height:40px;border-radius:12px;background:#D7262E;display:flex;align-items:center;justify-content:center;font:700 20px Unbounded,sans-serif" aria-hidden="true">S</span>
+        <span style="line-height:1.25"><span class="b-h" style="display:block;font-size:18px">Super-Bank</span><span style="display:block;font-size:13px;color:#B4B4BB">Кредитный отдел</span></span>
+      </div>
+      <nav style="display:flex;gap:4px;font-size:15px;font-weight:600" aria-label="Разделы">
+        <a href="#" style="padding:10px 16px;border-radius:999px;background:#FFFFFF;color:#17171A;text-decoration:none">Очередь заявок <span style="background:#D7262E;color:#FFFFFF;border-radius:999px;padding:1px 8px;font-size:12px;margin-left:4px">4</span></a>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:16px">
+        <div style="text-align:right;line-height:1.35"><div style="font-weight:700;font-size:14px">Андеррайтер</div><div style="font-size:13px;color:#B4B4BB">полномочия до уровня L2</div></div>
+        <a href="Bold-Login.dc.html" class="b-btn" style="min-height:44px;padding:0 18px;background:transparent;color:#FFFFFF;border-color:#52525B">Выйти</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="background:#FFFFFF;border-bottom:1px solid #E4E4E7">
+    <div style="max-width:1320px;margin:0 auto;padding:16px 24px 22px;display:flex;flex-direction:column;gap:14px">
+      <a href="#" style="display:inline-flex;align-items:center;gap:8px;min-height:40px;font-weight:600;font-size:15px;text-decoration:none;color:#17171A;align-self:flex-start">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>К очереди</a>
+      <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+        <div style="min-width:0">
+          <div style="font-size:14px;color:#52525B">Заявка № 1051 · от 21.10, 10:40 · ООО «СтанкоПром», ИНН <span class="b-mono">0017654322</span></div>
+          <h1 class="b-h" style="margin:8px 0 10px;font-size:26px">Инвестиционный кредит · <span style="white-space:nowrap">15 000 000 ₽ на 60 мес.</span></h1>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:700">
+            <span style="background:#FFF1D6;color:#7A4300;border-radius:999px;padding:4px 12px">Ручной разбор</span>
+            <span style="background:#EEEEF0;border-radius:999px;padding:4px 12px">Нужен уровень L1 — у вас есть</span>
+            <span style="background:#17171A;color:#FFFFFF;border-radius:999px;padding:4px 12px">Грейд A · 90 из 100</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <button class="b-btn" style="background:#D7262E;color:#FFFFFF">Запросить информацию</button>
+          <button class="b-btn" style="background:#FFFFFF;color:#17171A;border-color:#17171A">Одобрить</button>
+          <button class="b-btn" style="background:#FFFFFF;color:#17171A;border-color:#D4D4D8">Другие условия</button>
+          <button class="b-btn" style="background:#FFFFFF;color:#B8141B;border-color:#F3C4C6">Отказать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main style="max-width:1320px;margin:0 auto;padding:20px 24px 64px;display:flex;flex-direction:column;gap:16px">
+    <section style="background:#17171A;color:#FFFFFF;border-radius:14px;padding:22px 24px;display:flex;flex-wrap:wrap;gap:24px;align-items:center" aria-labelledby="rec">
+      <div style="flex:1 1 520px;min-width:0">
+        <div style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#FF8A8D">Рекомендация ядра</div>
+        <h2 id="rec" class="b-h" style="margin:8px 0 8px;font-size:20px">Запросить договор или счёт продавца оборудования</h2>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:#D4D4D8">Риск низкий, платёж посилен. Но инвестиционный кредит всегда смотрит человек, а залог — покупаемая линия: её стоимость нужно подтвердить документом.</p>
+      </div>
+      <div style="flex:0 1 400px;display:flex;flex-direction:column;gap:10px;background:#27272A;border-radius:12px;padding:16px">
+        <div style="font-size:13px;color:#B4B4BB">Почему не автоматически</div>
+        <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span class="b-mono" style="background:#3F3F46;border-radius:6px;padding:2px 8px">AMOUNT_ABOVE_AUTO_LIMIT</span><span style="font-size:14px">сумма выше автолимита</span></div>
+        <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span class="b-mono" style="background:#3F3F46;border-radius:6px;padding:2px 8px">COLLATERAL_REVIEW</span><span style="font-size:14px">нужна проверка залога</span></div>
+        <div style="font-size:13px;color:#B4B4BB">Стоп-факторов нет · правила <span class="b-mono">policy v1</span></div>
+      </div>
+    </section>
+
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+      <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px">
+        <section class="b-card" aria-labelledby="dscr">
+          <h2 id="dscr" class="b-ct">Платёж и устойчивость</h2>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px">
+            <div style="background:#F6F6F7;border-radius:10px;padding:12px 14px"><div style="font-size:13px;color:#52525B">Платёж в месяц</div><div class="b-h" style="font-size:20px;margin-top:4px">393 247 ₽</div></div>
+            <div style="background:#F6F6F7;border-radius:10px;padding:12px 14px"><div style="font-size:13px;color:#52525B">Покрытие (DSCR)</div><div class="b-h" style="font-size:20px;margin-top:4px">6,91</div></div>
+            <div style="background:#F6F6F7;border-radius:10px;padding:12px 14px"><div style="font-size:13px;color:#52525B">Если выручка −20%</div><div class="b-h" style="font-size:20px;margin-top:4px">5,53</div></div>
+          </div>
+          <div class="b-chk"><span>Покрытие платежа</span><span class="b-mono" style="color:#52525B">6,91 ≥ 1,25</span><span class="b-ok">проходит</span></div>
+          <div class="b-chk"><span>Стресс-тест</span><span class="b-mono" style="color:#52525B">5,53 ≥ 1,00</span><span class="b-ok">проходит</span></div>
+          <div class="b-chk"><span>Весь долг к годовой выручке</span><span class="b-mono" style="color:#52525B">3,6%</span><span class="b-ok">проходит</span></div>
+          <div class="b-chk"><span>Залог: 70% от 25 млн ₽ покрывает кредит</span><span class="b-mono" style="color:#52525B">17,5 ≥ 15 млн</span><span class="b-ok">проходит</span></div>
+        </section>
+
+        <section class="b-card" aria-labelledby="req">
+          <h2 id="req" class="b-ct">Запрос и компания</h2>
+          <div class="b-row"><span>Продукт</span><span>Инвестиционный кредит</span></div>
+          <div class="b-row"><span>Сумма и срок</span><span>15 000 000 ₽ · 60 мес.</span></div>
+          <div class="b-row"><span>Залог</span><span>покупаемая линия</span></div>
+          <div class="b-row"><span>Оценка залога</span><span>25 000 000 ₽, со слов клиента</span></div>
+          <div class="b-row"><span>Компания</span><span>с 14.03.2017 · ОКВЭД <span class="b-mono">25.62</span> · ОСНО</span></div>
+          <div class="b-row"><span>Клиент банка</span><span>нет</span></div>
+          <div class="b-row"><span>Подал</span><span>Кузнецов И. П., руководитель</span></div>
+        </section>
+
+        <section class="b-card" aria-labelledby="rate">
+          <h2 id="rate" class="b-ct">Ставка <small>итог 19,5% годовых</small></h2>
+          <div class="b-row"><span>Стоимость денег для банка</span><span>15,00 п.п.</span></div>
+          <div class="b-row"><span>Ожидаемые потери (с учётом залога)</span><span>0,35 п.п.</span></div>
+          <div class="b-row"><span>Расходы банка</span><span>2,00 п.п.</span></div>
+          <div class="b-row"><span>Плата за капитал</span><span>2,00 п.п.</span></div>
+          <div class="b-row" style="font-weight:700"><span style="color:#17171A">Сумма 19,35% → округление до 0,5</span><span>19,5%</span></div>
+        </section>
+      </div>
+
+      <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px">
+        <section class="b-card" aria-labelledby="score">
+          <h2 id="score" class="b-ct">Баллы по факторам <small>90 из 100 · грейд A</small></h2>
+          <div class="b-f"><span>Возраст бизнеса</span><span class="b-track"><span style="display:block;height:8px;width:100%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">12/12</span></div>
+          <div class="b-f"><span>Кредитная история</span><span class="b-track"><span style="display:block;height:8px;width:100%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">24/24</span></div>
+          <div class="b-f"><span>Запросы в БКИ</span><span class="b-track"><span style="display:block;height:8px;width:100%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">8/8</span></div>
+          <div class="b-f"><span>Долговая нагрузка</span><span class="b-track"><span style="display:block;height:8px;width:100%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">16/16</span></div>
+          <div class="b-f"><span>Рост выручки, +8,2%</span><span class="b-track"><span style="display:block;height:8px;width:80%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">8/10</span></div>
+          <div class="b-f"><span>Колебания выручки</span><span class="b-track"><span style="display:block;height:8px;width:50%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">4/8</span></div>
+          <div class="b-f"><span>Налоги</span><span class="b-track"><span style="display:block;height:8px;width:100%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">8/8</span></div>
+          <div class="b-f"><span>Клиент банка</span><span class="b-track"><span style="display:block;height:8px;width:33%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">2/6</span></div>
+          <div class="b-f"><span>Покрытие платежей</span><span class="b-track"><span style="display:block;height:8px;width:100%;background:#17171A"></span></span><span class="b-mono" style="text-align:right">8/8</span></div>
+          <p style="margin:10px 0 0;font-size:13px;color:#52525B">Колебания: помесячной выручки нет, взята осторожная оценка. Клиент банка: компания пока не обслуживается в Super-Bank.</p>
+        </section>
+
+        <section class="b-card" aria-labelledby="src">
+          <h2 id="src" class="b-ct">Источники <small>запрошены 21.10, 10:41</small></h2>
+          <div class="b-src"><span>Реестр компаний</span><span>действует</span><span class="b-ok" style="justify-self:end">получено</span></div>
+          <div class="b-src"><span>Бухотчётность</span><span>выручка 2025 — 420 млн ₽, 2024 — 388 млн ₽</span><span class="b-ok" style="justify-self:end">получено</span></div>
+          <div class="b-src"><span>ФНС</span><span>налоговых долгов нет</span><span class="b-ok" style="justify-self:end">получено</span></div>
+          <div class="b-src"><span>ЕФРСБ</span><span>сведений о банкротстве нет</span><span class="b-ok" style="justify-self:end">получено</span></div>
+          <div class="b-src"><span>БКИ</span><span>2 закрытых кредита, активных нет</span><span class="b-ok" style="justify-self:end">получено</span></div>
+          <button class="b-btn" style="margin-top:12px;min-height:44px;background:#FFFFFF;color:#17171A;border-color:#D4D4D8">Перезапросить источники</button>
+        </section>
+
+        <section class="b-card" aria-labelledby="hist">
+          <h2 id="hist" class="b-ct">История</h2>
+          <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+            <li class="b-ev"><span class="b-mono" style="color:#52525B">21.10 10:40</span><span>Заявку подал Кузнецов И. П.</span></li>
+            <li class="b-ev"><span class="b-mono" style="color:#52525B">21.10 10:41</span><span>Получены данные из 5 источников</span></li>
+            <li class="b-ev"><span class="b-mono" style="color:#52525B">21.10 10:41</span><span>Ядро: ручной разбор, рекомендация — запросить документ</span></li>
+          </ol>
+          <div style="margin-top:12px;font-size:14px;color:#52525B">Документов от клиента пока нет.</div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</body></html>

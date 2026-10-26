@@ -2,7 +2,7 @@ import { expect, test } from './fixtures';
 import { checkAccessibility } from './support/axe';
 import { submitApplicationRequest } from './support/bank-case';
 import { expectNoReload, markPageSession } from './support/waits';
-import { applicationPage, contractTexts, fill, money } from './support/text';
+import { contractTexts, fill, money } from './support/text';
 import { bankActions as t, bankManual as m } from '../src/texts/bankActions';
 import { counterOffer } from '../src/texts/counterOffer';
 
@@ -76,9 +76,10 @@ for (const scenario of [
     expect(code).toBeTruthy();
     await client.getByLabel(contractTexts.code).fill(code!);
     await client.getByRole('button', { name: contractTexts.sign }).click();
-    await expect(
-      client.getByText(fill(applicationPage.moneyDone, { amount: '' }).trim()).first(),
-    ).toBeVisible({ timeout: 60_000 });
+    // Шаг «Деньги на счёте» завершён: текст шага зависит от того, пришёл ли уже журнал событий
+    await expect(client.locator('[data-step="money"][data-state="done"]')).toBeVisible({
+      timeout: 60_000,
+    });
     await expect(client.locator('main')).toContainText(money(10_000_000));
     await expectNoReload(client);
   });

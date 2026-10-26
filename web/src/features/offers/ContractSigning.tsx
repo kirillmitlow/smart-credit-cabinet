@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
-  Anchor,
   Badge,
+  Box,
   Button,
   Checkbox,
   Group,
   Loader,
+  Paper,
   Stack,
   Text,
   Title,
@@ -27,6 +28,7 @@ import type { ContractOut, SignChallengeOut } from '@/api/generated/model';
 import { isAppError } from '@/api/errors';
 import { resolveUrl } from '@/api/client';
 import { useActionKey } from '@/api/idempotency';
+import { fonts, tokens } from '@/app/theme';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { formatMoney, formatPercent, formatTermMonths } from '@/lib/format';
 import { fill } from '@/texts';
@@ -36,7 +38,11 @@ import { ContractCodeForm } from './ContractCodeForm';
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <Group justify="space-between">
+    <Group
+      justify="space-between"
+      py={10}
+      style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}
+    >
       <Text c="dimmed">{label}</Text>
       <Text fw={600}>{value}</Text>
     </Group>
@@ -198,79 +204,117 @@ function ContractView({
   const delivery =
     status === 'DISBURSED' ? t.issued : status === 'DISBURSING' ? t.issuing : t.signedNotice;
   return (
-    <Stack gap="md" maw={720}>
-      <Title order={2} size="h3">
-        {signed ? t.signedHeading : t.heading}
-      </Title>
-      <Text fw={600}>{fill(t.number, { number: contract.number })}</Text>
-      <Fact label={isLimit ? t.limit : t.amount} value={formatMoney(contract.amountRub)} />
-      <Fact label={t.term} value={formatTermMonths(contract.termMonths)} />
-      <Fact label={t.rate} value={formatPercent(contract.ratePercent)} />
-      {!isLimit ? <Fact label={t.payment} value={formatMoney(contract.paymentRub)} /> : null}
-      <Anchor
-        href={resolveUrl(getGetContractDocumentUrl(contract.id))}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {t.document}
-      </Anchor>
-      <Text size="sm" c="dimmed">
-        {t.demo}
-      </Text>
-      <Text role="status">{fill(t.progress, { ...contract.progress })}</Text>
-      {contract.signers.map((signer, index) => (
-        <Group key={`${signer.role}:${index}`} justify="space-between">
-          <Text>{signer.name}</Text>
-          <Badge color={signer.signed ? 'green' : 'gray'}>
-            {signer.signed ? t.signed : t.waitingSignature}
-          </Badge>
-        </Group>
-      ))}
-      {query.isError ? (
-        <ProblemAlert error={query.error} onAction={() => void query.refetch()} />
-      ) : null}
-      {signed ? (
-        <Alert color={status === 'DISBURSED' ? 'green' : 'blue'} role="status">
-          {delivery}
-        </Alert>
-      ) : null}
-      {status === 'DISBURSED' ? (
-        <Button component={Link} to="/loans" variant="light" w="fit-content">
-          {t.openLoans}
-        </Button>
-      ) : null}
-      {contract.canSign ? (
-        <SigningForm
-          key={contract.id}
-          contract={contract}
-          onSigned={onSigned}
-          refresh={() => void query.refetch()}
-        />
-      ) : null}
-      {!signed && !contract.canSign ? <Text size="sm">{t.cannotSign}</Text> : null}
-      {contract.canPassToDirector ? (
-        <>
-          {pass.error ? <ProblemAlert error={pass.error} /> : null}
-          {passed ? (
-            <Alert color="green">{t.passed}</Alert>
-          ) : (
-            <div>
-              <Button
-                variant="light"
-                loading={pass.isPending}
-                onClick={() => void passToDirector()}
-              >
-                {t.pass}
-              </Button>
-            </div>
-          )}
-        </>
-      ) : null}
-    </Stack>
+    <Box style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' }}>
+      <Paper p={28} style={{ flex: '3 1 520px', minWidth: 0 }}>
+        <Stack gap="md">
+          <Title order={2} size="h3">
+            {signed ? t.signedHeading : t.heading}
+          </Title>
+          <Text fw={600}>{fill(t.number, { number: contract.number })}</Text>
+          <Stack gap={0}>
+            <Fact label={t.term} value={formatTermMonths(contract.termMonths)} />
+            <Fact label={t.rate} value={formatPercent(contract.ratePercent)} />
+          </Stack>
+          <Group gap="md" align="center">
+            <Button
+              component="a"
+              href={resolveUrl(getGetContractDocumentUrl(contract.id))}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outline"
+              color="dark"
+            >
+              {t.document}
+            </Button>
+            <Text size="sm" c="dimmed">
+              {t.demo}
+            </Text>
+          </Group>
+          <Stack gap="xs">
+            <Text role="status" fw={600}>
+              {fill(t.progress, { ...contract.progress })}
+            </Text>
+            {contract.signers.map((signer, index) => (
+              <Group key={`${signer.role}:${index}`} justify="space-between">
+                <Text>{signer.name}</Text>
+                <Badge
+                  radius="xl"
+                  tt="none"
+                  size="lg"
+                  styles={{
+                    root: signer.signed ? tokens.status.success : tokens.status.waiting,
+                  }}
+                >
+                  {signer.signed ? t.signed : t.waitingSignature}
+                </Badge>
+              </Group>
+            ))}
+          </Stack>
+        </Stack>
+      </Paper>
+
+      <Paper style={{ flex: '2 1 380px', minWidth: 0, overflow: 'hidden' }}>
+        <Stack gap={6} p={28} bg="graphite.9" c="white">
+          <Text fw={600} style={{ color: tokens.header.muted }}>
+            {isLimit ? t.limit : t.amount}
+          </Text>
+          <Text ff={fonts.display} fw={700} fz={34} lh={1.1} className="scc-num" c="inherit">
+            {formatMoney(contract.amountRub)}
+          </Text>
+          {!isLimit ? (
+            <Group gap={8} align="baseline">
+              <Text fz={16} style={{ color: tokens.header.muted }}>
+                {t.payment}
+              </Text>
+              <Text fz={20} fw={700} className="scc-num" style={{ color: tokens.accentOnDark }}>
+                {formatMoney(contract.paymentRub)}
+              </Text>
+            </Group>
+          ) : null}
+        </Stack>
+        <Stack gap="md" p={28}>
+          {query.isError ? (
+            <ProblemAlert error={query.error} onAction={() => void query.refetch()} />
+          ) : null}
+          {signed ? (
+            <Alert color={status === 'DISBURSED' ? 'green' : 'blue'} role="status">
+              {delivery}
+            </Alert>
+          ) : null}
+          {status === 'DISBURSED' ? (
+            <Button component={Link} to="/loans" w="fit-content">
+              {t.openLoans}
+            </Button>
+          ) : null}
+          {contract.canSign ? (
+            <SigningForm
+              key={contract.id}
+              contract={contract}
+              onSigned={onSigned}
+              refresh={() => void query.refetch()}
+            />
+          ) : null}
+          {!signed && !contract.canSign ? <Text size="sm">{t.cannotSign}</Text> : null}
+          {contract.canPassToDirector ? (
+            <>
+              {pass.error ? <ProblemAlert error={pass.error} /> : null}
+              {passed ? (
+                <Alert color="green">{t.passed}</Alert>
+              ) : (
+                <div>
+                  <Button loading={pass.isPending} onClick={() => void passToDirector()}>
+                    {t.pass}
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : null}
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
 
-/** После перезагрузки находим сохранённый договор через предложение, без локального состояния. */
 export function ContractSigning({ applicationId }: { applicationId: string }) {
   const query = useGetApplicationOffer(applicationId, {
     query: { select: (result) => (result.status === 200 ? result.data : undefined) },

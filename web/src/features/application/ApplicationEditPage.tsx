@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Center, Loader, Stack, Stepper, Text, Title } from '@mantine/core';
+import { Button, Center, Group, Loader, Paper, Stack, Stepper, Text, Title } from '@mantine/core';
 import { useForm, type Resolver } from 'react-hook-form';
 import { Navigate, useNavigate, useParams } from 'react-router';
 import { NotFoundScreen } from '@/app/screens';
@@ -99,71 +99,79 @@ function EditForm({
         </Text>
       </Stack>
 
-      <nav aria-label={applicationForm.stepsLabel}>
-        <Stepper
-          active={step - 1}
-          onStepClick={(index) => goToStep(index + 1)}
-          allowNextStepsSelect
-          size="sm"
-        >
-          {stepTitles.map((label) => (
-            <Stepper.Step key={label} label={label} />
-          ))}
-        </Stepper>
-      </nav>
+      <Paper p={32}>
+        <Stack gap="lg">
+          <nav aria-label={applicationForm.stepsLabel}>
+            <Stepper
+              active={step - 1}
+              onStepClick={(index) => goToStep(index + 1)}
+              allowNextStepsSelect
+              size="sm"
+            >
+              {stepTitles.map((label) => (
+                <Stepper.Step key={label} label={label} />
+              ))}
+            </Stepper>
+          </nav>
 
-      {autosave.state.kind === 'conflict' ? (
-        <ProblemAlert error={conflictError} onAction={onRefresh} />
-      ) : null}
+          {autosave.state.kind === 'conflict' ? (
+            <ProblemAlert error={conflictError} onAction={onRefresh} />
+          ) : null}
 
-      {step === 1 ? <ConditionsStep form={form} autosave={autosave} /> : null}
-      {step === 2 ? (
-        <CompanyDataStep
-          key={`${application.id}:${formRevision.revision}`}
-          application={
-            formRevision.snapshot.version > application.version
-              ? formRevision.snapshot
-              : application
-          }
-          autosave={autosave}
-        />
-      ) : null}
-      {step === 3 ? (
-        <ProductStep
-          key={`${application.id}:${formRevision.revision}`}
-          application={
-            formRevision.snapshot.version > application.version
-              ? formRevision.snapshot
-              : application
-          }
-          autosave={autosave}
-          onValidityChange={setProductValid}
-        />
-      ) : null}
-      {step === 4 ? <ConsentsStep key={application.id} applicationId={application.id} /> : null}
-      {step === 5 ? (
-        <ReviewStep application={application} autosave={autosave} onGoToStep={goToStep} />
-      ) : null}
+          {step === 1 ? <ConditionsStep form={form} autosave={autosave} /> : null}
+          {step === 2 ? (
+            <CompanyDataStep
+              key={`${application.id}:${formRevision.revision}`}
+              application={
+                formRevision.snapshot.version > application.version
+                  ? formRevision.snapshot
+                  : application
+              }
+              autosave={autosave}
+            />
+          ) : null}
+          {step === 3 ? (
+            <ProductStep
+              key={`${application.id}:${formRevision.revision}`}
+              application={
+                formRevision.snapshot.version > application.version
+                  ? formRevision.snapshot
+                  : application
+              }
+              autosave={autosave}
+              onValidityChange={setProductValid}
+            />
+          ) : null}
+          {step === 4 ? <ConsentsStep key={application.id} applicationId={application.id} /> : null}
+          {step === 5 ? (
+            <ReviewStep application={application} autosave={autosave} onGoToStep={goToStep} />
+          ) : null}
 
-      <SaveStatusLine
-        state={autosave.state}
-        onRetry={() => {
-          void flush();
-        }}
-      />
+          <SaveStatusLine
+            state={autosave.state}
+            onRetry={() => {
+              void flush();
+            }}
+          />
 
-      <div>
-        {step > 1 ? (
-          <Button variant="default" mr="sm" onClick={() => goToStep(step - 1)}>
-            {applicationForm.back}
-          </Button>
-        ) : null}
-        {step < STEP_COUNT ? (
-          <Button disabled={step === 3 && !productValid} onClick={() => goToStep(step + 1)}>
-            {applicationForm.next}
-          </Button>
-        ) : null}
-      </div>
+          <Group
+            gap="sm"
+            pt="md"
+            style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}
+          >
+            {step > 1 ? (
+              <Button variant="outline" color="dark" onClick={() => goToStep(step - 1)}>
+                {applicationForm.back}
+              </Button>
+            ) : null}
+            {step < STEP_COUNT ? (
+              <Button disabled={step === 3 && !productValid} onClick={() => goToStep(step + 1)}>
+                {applicationForm.next}
+              </Button>
+            ) : null}
+          </Group>
+        </Stack>
+      </Paper>
     </Stack>
   );
 }

@@ -35,7 +35,8 @@
 | pypdf / python-multipart | 6.21.2 / 0.0.32 | Проверка PDF / потоковая загрузка | BSD-3-Clause / Apache-2.0 |
 | WeasyPrint | 70.0 | Генерация PDF договора и графика | BSD (точное объявление и текст в inventory) |
 | PT Sans Regular / Bold | 2.003W OFL | Встроенная кириллица в PDF | OFL-1.1, [хеши и уведомление](licenses/pdf-fonts.json) |
-| Inter (`@fontsource-variable/inter`) | 5.3.0 | Локально поставляемый шрифт | OFL-1.1 |
+| Unbounded (`@fontsource-variable/unbounded`) | 5.3.0 | Локально поставляемый шрифт заголовков (D-113) | OFL-1.1 |
+| Onest (`@fontsource-variable/onest`) | 5.3.1 | Локально поставляемый шрифт текста (D-113) | OFL-1.1 |
 
 Таблица сокращённая; версии и первичные metadata-ссылки **всех** зависимостей, включая dev, — в [licenses/README.md](licenses/README.md). В частности, LGPL у psycopg не подменяется MIT: [лицензия автора](https://github.com/psycopg/psycopg/blob/master/LICENSE.txt); binary-вариант включает библиотеки, что отдельно описано в [документации установки](https://www.psycopg.org/psycopg3/docs/basic/install.html#binary-installation). Metadata и доступные тексты включены в комплект.
 

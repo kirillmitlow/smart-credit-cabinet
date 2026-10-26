@@ -1,8 +1,10 @@
-import { Alert, Button, Center, Grid, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Button, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router';
 import { isAppError } from '@/api/errors';
+import { tokens } from '@/app/theme';
 import { ErrorScreen } from '@/components/ErrorScreen';
+import { PageHero } from '@/components/PageHero';
 import { NotFoundScreen } from '@/app/screens';
 import { formatMoney, formatTermMonths } from '@/lib/format';
 import { usePageHeading } from '@/lib/usePageHeading';
@@ -91,23 +93,67 @@ export function ApplicationPage() {
       : applicationPage.summaryEmpty;
   const canWithdraw = application.allowedActions.includes('WITHDRAW');
   const isOffer = application.status === 'APPROVED' || application.status === 'COUNTER_OFFER';
-  // Три карточки встречного предложения не помещаются в половину страницы
-  const wide = application.status === 'COUNTER_OFFER';
   const closed = application.status === 'WITHDRAWN' || application.status === 'EXPIRED';
+
+  const muted = tokens.header.muted;
 
   return (
     <Stack gap="lg">
-      <Stack gap={4}>
-        <Title order={1} ref={headingRef} tabIndex={-1}>
-          {fill(applicationPage.title, { number })}
-        </Title>
-        <Text size="lg">{summary}</Text>
-        {isInFlight(application.status) ? (
-          <Text size="sm" c="dimmed">
-            {applicationPage.autoUpdate}
-          </Text>
-        ) : null}
-      </Stack>
+      <PageHero>
+        <Stack gap="lg">
+          <Anchor
+            component={Link}
+            to="/"
+            fw={600}
+            underline="never"
+            style={{ color: tokens.header.color, alignSelf: 'flex-start' }}
+          >
+            <span aria-hidden="true">← </span>
+            {shell.common.toHome}
+          </Anchor>
+          <Stack gap={6}>
+            <Title order={1} ref={headingRef} tabIndex={-1} c="inherit">
+              {fill(applicationPage.title, { number })}
+            </Title>
+            <Text fz={18} className="scc-num" style={{ color: '#e4e4e7', whiteSpace: 'normal' }}>
+              {summary}
+            </Text>
+            {isInFlight(application.status) ? (
+              <Text size="sm" style={{ color: muted }}>
+                {applicationPage.autoUpdate}
+              </Text>
+            ) : null}
+          </Stack>
+          <div role="status" aria-live="polite" data-testid="timeline-live">
+            {timeline.current ? (
+              <Text fw={600} style={{ color: tokens.accentOnDark }}>
+                {applicationPage.nowLabel}: {timeline.current.title}
+                {timeline.current.text ? `. ${timeline.current.text}` : ''}
+              </Text>
+            ) : null}
+            {timeline.note ? (
+              <Text fw={600} c="inherit">
+                {timeline.note}
+              </Text>
+            ) : null}
+          </div>
+          {timelineQuery.isError ? (
+            <Alert color="yellow" role="status" data-testid="timeline-unavailable">
+              <Group justify="space-between">
+                <Text size="sm">{timelineProgress.unavailable}</Text>
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  onClick={() => void timelineQuery.refetch()}
+                >
+                  {shell.common.retry}
+                </Button>
+              </Group>
+            </Alert>
+          ) : null}
+          <Timeline model={timeline} />
+        </Stack>
+      </PageHero>
 
       {query.isError ? (
         <Alert color="yellow" role="status" data-testid="lost-connection">
@@ -132,53 +178,23 @@ export function ApplicationPage() {
         </Alert>
       ) : null}
 
-      <div role="status" aria-live="polite" data-testid="timeline-live">
-        {timeline.current ? (
-          <Text fw={600}>
-            {applicationPage.nowLabel}: {timeline.current.title}
-            {timeline.current.text ? `. ${timeline.current.text}` : ''}
-          </Text>
-        ) : null}
-        {timeline.note ? <Text fw={600}>{timeline.note}</Text> : null}
-      </div>
+      <OutcomeBlock
+        application={application}
+        onTasksSent={() => {
+          setAnswersSent(true);
+        }}
+      />
 
-      <Grid gap="xl">
-        <Grid.Col span={{ base: 12, md: wide ? 12 : 6 }}>
-          {timelineQuery.isError ? (
-            <Alert color="yellow" role="status" mb="md" data-testid="timeline-unavailable">
-              <Stack gap="xs">
-                <Text size="sm">{timelineProgress.unavailable}</Text>
-                <Button
-                  size="compact-sm"
-                  variant="light"
-                  onClick={() => void timelineQuery.refetch()}
-                >
-                  {shell.common.retry}
-                </Button>
-              </Stack>
-            </Alert>
-          ) : null}
-          <Timeline model={timeline} />
-          {closed ? (
-            <Group mt="md">
-              <Button component={Link} to="/wizard">
-                {applicationPage.closed.newApplication}
-              </Button>
-            </Group>
-          ) : null}
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: wide ? 12 : 6 }}>
-          <OutcomeBlock
-            application={application}
-            onTasksSent={() => {
-              setAnswersSent(true);
-            }}
-          />
-        </Grid.Col>
-      </Grid>
+      {closed ? (
+        <Group>
+          <Button component={Link} to="/wizard">
+            {applicationPage.closed.newApplication}
+          </Button>
+        </Group>
+      ) : null}
 
       {canWithdraw ? (
-        <Group>
+        <Group justify="flex-end">
           <WithdrawButton application={application} asDecline={isOffer} />
         </Group>
       ) : null}
