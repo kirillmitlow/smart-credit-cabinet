@@ -1,0 +1,101 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Onest:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEF0}
+a{color:#B8141B;text-underline-offset:3px}a:hover{color:#8A0F14}
+.b-h{font-family:Unbounded,sans-serif;font-weight:700;letter-spacing:-0.01em}
+.b-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border-radius:999px;border:2px solid transparent;font:600 16px Onest,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap;box-sizing:border-box}
+.b-tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700}
+.b-nav a{padding:10px 16px;border-radius:999px;color:#D4D4D8;text-decoration:none;font-weight:600;font-size:15px}
+.b-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-weight:600;font-size:15px;text-decoration:none;color:#17171A}
+.b-opt{position:relative;display:flex;flex-direction:column;gap:12px;text-align:left;padding:24px;border-radius:16px;border:2px solid #FFFFFF;background:#FFFFFF;font:16px Onest,sans-serif;color:#17171A;cursor:pointer;min-height:190px;box-sizing:border-box}
+.b-opt:hover{border-color:#A1A1AA}
+.b-ico{width:48px;height:48px;border-radius:12px;background:#EEEEF0;display:flex;align-items:center;justify-content:center}
+</style>
+<style>html,body{height:auto!important}</style></head><body>
+<div style="min-height:100vh;font-family:Onest,system-ui,sans-serif;color:#17171A;background:#EEEEF0">
+  <div style="background:#0B0B0D;color:#D4D4D8;font-size:13px;text-align:center;padding:7px 16px"><span style="background:#D7262E;color:#FFFFFF;border-radius:4px;padding:1px 6px;font-weight:700;font-size:11px;letter-spacing:.06em;margin-right:8px">ДЕМО</span>Демо-прототип. Все данные синтетические</div>
+  <header style="background:#17171A;color:#FFFFFF">
+    <div style="max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:28px">
+      <a href="Bold-Home.dc.html" style="display:flex;align-items:center;gap:12px;color:#FFFFFF;text-decoration:none">
+        <span style="width:40px;height:40px;border-radius:12px;background:#D7262E;display:flex;align-items:center;justify-content:center;font:700 20px Unbounded,sans-serif" aria-hidden="true">S</span>
+        <span style="line-height:1.25"><span class="b-h" style="display:block;font-size:18px">Super-Bank</span><span style="display:block;font-size:13px;color:#B4B4BB">Умный кредитный кабинет</span></span>
+      </a>
+      <nav class="b-nav" style="display:flex;gap:4px;flex-wrap:wrap" aria-label="Разделы">
+        <a href="Bold-Home.dc.html">Главная</a>
+        <a href="Bold-Application.dc.html">Заявки</a>
+        <a href="#">Мои кредиты</a>
+        <a href="#">Компания</a>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:16px">
+        <div style="text-align:right;line-height:1.35"><div style="font-weight:700;font-size:14px">ООО «СнабКонтракт»</div><div style="font-size:13px;color:#B4B4BB">ИНН 0012345673 · руководитель</div></div>
+        <a href="Bold-Login.dc.html" class="b-btn" style="min-height:44px;padding:0 18px;background:transparent;color:#FFFFFF;border-color:#52525B;font-size:15px">Выйти</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1040px;margin:0 auto;padding:28px 24px 64px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
+        <span style="font-size:14px;font-weight:700;color:#52525B">Подбор кредита · шаг 2 из 5</span>
+        <a href="Bold-Home.dc.html" class="b-back" style="font-weight:500;color:#52525B">Выйти из подбора</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px" aria-hidden="true">
+        <span style="height:6px;border-radius:3px;background:#17171A"></span><span style="height:6px;border-radius:3px;background:#D7262E"></span><span style="height:6px;border-radius:3px;background:#D4D4D8"></span><span style="height:6px;border-radius:3px;background:#D4D4D8"></span><span style="height:6px;border-radius:3px;background:#D4D4D8"></span>
+      </div>
+    </div>
+
+    <div>
+      <h1 class="b-h" style="margin:0 0 8px;font-size:36px;line-height:1.15">Для чего нужны деньги?</h1>
+      <p style="margin:0;font-size:17px;color:#52525B">Опишите своими словами или выберите самое близкое</p>
+    </div>
+
+    <section style="background:#FFFFFF;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:12px" aria-label="Описание своими словами">
+      <label for="own-text" style="font-size:15px;font-weight:600">Своими словами</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <input id="own-text" type="text" value="Выиграли госконтракт на 12 млн, нужно закупить товар, заказчик заплатит через 3 месяца" style="flex:1 1 420px;min-width:0;min-height:52px;border-radius:12px;border:2px solid #17171A;padding:0 18px;font:16px Onest,sans-serif;color:#17171A">
+        <button class="b-btn" style="background:#FFFFFF;color:#17171A;border-color:#17171A">Разобрать</button>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;font-size:15px;color:#3F3F46">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D7262E" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12l3 3 5-6"></path></svg>
+        Мы отметили подходящий вариант ниже. Проверьте его — если не так, выберите другой.
+      </div>
+    </section>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px" role="radiogroup" aria-label="Цель кредита">
+      <button class="b-opt" role="radio" aria-checked="false">
+        <span class="b-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17171A" stroke-width="2" aria-hidden="true"><path d="M3 7h18l-2 11H5z"></path><path d="M8 7V5a4 4 0 0 1 8 0v2"></path></svg></span>
+        <span class="b-h" style="font-size:16px;line-height:1.3">Закупить товар или сырьё</span>
+        <span style="font-size:14px;line-height:1.45;color:#52525B">Пополнить склад, подготовиться к сезону</span>
+      </button>
+      <button class="b-opt" role="radio" aria-checked="true" style="border-color:#D7262E">
+        <span class="b-tag" style="position:absolute;top:-12px;left:20px;background:#D7262E;color:#FFFFFF;font-size:12px">По вашему описанию</span>
+        <span class="b-ico" style="background:#D7262E"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg></span>
+        <span class="b-h" style="font-size:16px;line-height:1.3">Выполнить заказ, оплата позже</span>
+        <span style="font-size:14px;line-height:1.45;color:#52525B">Госконтракт или договор с отсрочкой платежа</span>
+      </button>
+      <button class="b-opt" role="radio" aria-checked="false">
+        <span class="b-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17171A" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="8" rx="1"></rect><path d="M7 11V7h6l3 4"></path><circle cx="7" cy="19" r="1.5"></circle><circle cx="17" cy="19" r="1.5"></circle></svg></span>
+        <span class="b-h" style="font-size:16px;line-height:1.3">Купить оборудование</span>
+        <span style="font-size:14px;line-height:1.45;color:#52525B">Станки, транспорт, технику</span>
+      </button>
+      <button class="b-opt" role="radio" aria-checked="false">
+        <span class="b-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17171A" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+        <span class="b-h" style="font-size:16px;line-height:1.3">Закрыть кассовый разрыв</span>
+        <span style="font-size:14px;line-height:1.45;color:#52525B">Платить сейчас, пока деньги от клиентов в пути</span>
+      </button>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-top:1px solid #D4D4D8;padding-top:20px">
+      <a href="#" class="b-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Назад</a>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="b-btn" style="background:transparent;color:#17171A;border-color:#A1A1AA">Не знаю</button>
+        <a href="Bold-Result.dc.html" class="b-btn" style="background:#17171A;color:#FFFFFF">Дальше
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      </div>
+    </div>
+  </main>
+</div>
+</body></html>
