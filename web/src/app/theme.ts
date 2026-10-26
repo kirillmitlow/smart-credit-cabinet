@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   defaultVariantColorsResolver,
   Card,
@@ -132,6 +133,11 @@ export const theme = createTheme({
       styles: { label: { fontWeight: 600 } },
     }),
     Paper: Paper.extend({ defaultProps: { radius: 'lg' } }),
+    /** Метки строчными буквами, как в макете: капслок читается хуже */
+    Badge: Badge.extend({
+      defaultProps: { radius: 'xl' },
+      styles: { root: { textTransform: 'none', fontWeight: 700 } },
+    }),
     Card: Card.extend({ defaultProps: { radius: 'lg' } }),
     Input: Input.extend({ defaultProps: { radius: 'md' } }),
   },

@@ -14,6 +14,8 @@ import {
 import { Link, useParams, useSearchParams } from 'react-router';
 import { isAppError } from '@/api/errors';
 import { useGetBackofficeApplication } from '@/api/generated/api';
+import { tokens } from '@/app/theme';
+import { PageHero } from '@/components/PageHero';
 import { ProblemAlert } from '@/components/ProblemAlert';
 import { formatDate, formatMoney, formatTermMonths } from '@/lib/format';
 import { usePageHeading } from '@/lib/usePageHeading';
@@ -63,17 +65,38 @@ function BankApplication({ id, expected }: { id: string; expected: number | unde
   const age = decision?.features?.business_age_months;
   return (
     <Stack gap="md">
-      <Anchor component={Link} to="/bank">
-        {t.back}
-      </Anchor>
-      <Group justify="space-between">
-        <Title order={1} ref={heading} tabIndex={-1}>
-          {card ? fill(t.title, { number: card.number }) : t.titleLoading}
-        </Title>
-        <Button variant="light" loading={query.isFetching} onClick={refresh}>
-          {t.refresh}
-        </Button>
-      </Group>
+      <PageHero>
+        <Stack gap="md">
+          <Anchor
+            component={Link}
+            to="/bank"
+            fw={600}
+            underline="never"
+            style={{ color: tokens.header.color, alignSelf: 'flex-start' }}
+          >
+            <span aria-hidden="true">← </span>
+            {t.back}
+          </Anchor>
+          <Group justify="space-between" align="flex-end">
+            <Stack gap={6}>
+              <Title order={1} ref={heading} tabIndex={-1} c="inherit">
+                {card ? fill(t.title, { number: card.number }) : t.titleLoading}
+              </Title>
+            </Stack>
+            <Button
+              variant="outline"
+              color="gray"
+              loading={query.isFetching}
+              onClick={refresh}
+              styles={{
+                root: { color: tokens.header.color, borderColor: tokens.header.border },
+              }}
+            >
+              {t.refresh}
+            </Button>
+          </Group>
+        </Stack>
+      </PageHero>
       {query.isPending ? (
         <Stack role="status" aria-label={t.loading}>
           <Skeleton height={150} />
