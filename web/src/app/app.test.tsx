@@ -36,7 +36,9 @@ describe('оболочка клиента', () => {
       await screen.findByRole('heading', { level: 1, name: homeText.title }),
     ).toBeInTheDocument();
     expect(banner()).toHaveTextContent(shell.demoBanner);
-    expect(screen.getByRole('link', { name: shell.productName })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: new RegExp(`^${shell.productName}`) }),
+    ).toBeInTheDocument();
     const nav = screen.getByRole('navigation', { name: shell.mainNavLabel });
     expect(within(nav).getByRole('link', { name: shell.nav.loans })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: shell.nav.products })).toHaveAttribute(

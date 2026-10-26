@@ -59,8 +59,8 @@ describe('контраст темы (WCAG AA, 4,5:1)', () => {
   });
 
   it('красная светлая кнопка', () => {
-    expect(contrast(brandPalette[8]!, brandPalette[0]!)).toBeGreaterThanOrEqual(AA);
-    expect(contrast(brandPalette[8]!, brandPalette[1]!)).toBeGreaterThanOrEqual(AA);
+    expect(contrast(brandPalette[8], brandPalette[0])).toBeGreaterThanOrEqual(AA);
+    expect(contrast(brandPalette[8], brandPalette[1])).toBeGreaterThanOrEqual(AA);
   });
 
   it('метки состояний', () => {
