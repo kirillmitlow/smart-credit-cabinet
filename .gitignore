@@ -29,3 +29,14 @@ web/test-results/
 .vscode/
 .DS_Store
 reports/
+
+# Материалы организаторов: PDF кейса не публикуем (D-001)
+docs/Альфа_Хак_*.pdf
+
+# Личные исследования и временные файлы
+research/
+*.log
+.claude/
+web/.shots.mjs
+playwright-report/
+test-results/
