@@ -84,14 +84,14 @@ describe('ErrorScreen', () => {
 });
 
 describe('AppErrorBoundary', () => {
-  it('ловит ошибку отрисовки: демо-плашка, общий экран, «Повторить»', () => {
+  it('ловит ошибку отрисовки: общий экран, «Повторить»', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     renderWithProviders(
       <AppErrorBoundary>
         <Boom />
       </AppErrorBoundary>,
     );
-    expect(screen.getByTestId('demo-banner')).toHaveTextContent(shell.demoBanner);
+    expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 1, name: guards.generalError.title }),
     ).toBeInTheDocument();

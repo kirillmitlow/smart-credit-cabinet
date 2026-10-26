@@ -1,5 +1,4 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { DemoBanner } from '@/components/DemoBanner';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { toAppError } from '@/api/errors';
 import { errorView, guards } from '@/texts';
@@ -37,15 +36,12 @@ export class AppErrorBoundary extends Component<Props, State> {
     if (!this.state.failed) return this.props.children;
     const view = errorView(toAppError(this.state.error));
     return (
-      <>
-        <DemoBanner />
-        <ErrorScreen
-          title={guards.generalError.title}
-          body={view.text}
-          requestId={view.requestId}
-          onRetry={this.retry}
-        />
-      </>
+      <ErrorScreen
+        title={guards.generalError.title}
+        body={view.text}
+        requestId={view.requestId}
+        onRetry={this.retry}
+      />
     );
   }
 }

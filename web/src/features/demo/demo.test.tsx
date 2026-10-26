@@ -253,7 +253,7 @@ describe('демо-панель', () => {
   it('демо выключено: управляющих элементов нет', async () => {
     mockSessions({ config: { demoMode: false } });
     renderApp('/login');
-    await screen.findByTestId('demo-banner');
+    await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByRole('button', { name: t.open })).not.toBeInTheDocument();
   });
   it('банк открывается отдельно; клиентская сессия остаётся в кэше', async () => {

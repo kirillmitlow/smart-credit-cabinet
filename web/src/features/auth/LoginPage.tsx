@@ -72,7 +72,7 @@ export function LoginPage() {
   const headingRef = usePageHeading(title);
 
   return (
-    <Box style={{ display: 'flex', flexWrap: 'wrap', minHeight: 'calc(100vh - 34px)' }}>
+    <Box style={{ display: 'flex', flexWrap: 'wrap', minHeight: '100vh' }}>
       <LoginHero />
       <Box
         component="main"

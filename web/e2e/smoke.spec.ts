@@ -10,7 +10,7 @@ test('вход Соколовой по ИНН и коду с экрана пок
   await loginAsClient(page, personas.sokolova.inn);
 
   await expect(page.getByRole('heading', { level: 1, name: home.title })).toBeVisible();
-  await expect(page.getByText(shell.demoBanner)).toBeVisible();
+  await expect(page.getByTestId('app-footer')).toContainText(shell.footer);
   await expect(page.getByRole('link', { name: shell.nav.wizard }).first()).toBeVisible();
   await checkAccessibility(page, 'Главная');
 });

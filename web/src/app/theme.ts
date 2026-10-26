@@ -64,8 +64,8 @@ export const tokens = {
   pageBackground: graphite[1],
   /** Шапка и тёмные блоки */
   header: { background: graphite[9], color: '#ffffff', muted: '#b4b4bb', border: graphite[6] },
-  /** Плашка «Демо-прототип»: светлый текст на почти чёрном и красная метка «ДЕМО» */
-  demoBanner: { background: '#0b0b0d', color: graphite[3], badge: brand[6] },
+  /** Знак бренда в шапке и на входе */
+  brandMark: brand[6],
   /** Подпись зоны банка под шапкой */
   bankStrip: { background: bank[8], color: '#ffffff' },
   /** Служебный вид демо-панели */

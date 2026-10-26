@@ -29,12 +29,6 @@ describe('контраст темы (WCAG AA, 4,5:1)', () => {
     expect(contrast(tokens.link, '#f1f3f5')).toBeGreaterThanOrEqual(AA);
   });
 
-  it('демо-плашка: тёмно-красный текст на светло-красном фоне', () => {
-    expect(contrast(tokens.demoBanner.color, tokens.demoBanner.background)).toBeGreaterThanOrEqual(
-      AA,
-    );
-  });
-
   it('полоса зоны банка: белый текст на синем', () => {
     expect(contrast(tokens.bankStrip.color, tokens.bankStrip.background)).toBeGreaterThanOrEqual(
       AA,
@@ -75,7 +69,7 @@ describe('тема', () => {
     expect(theme.primaryColor).toBe('brand');
     expect(brandPalette).toHaveLength(10);
     expect(bankPalette).toHaveLength(10);
-    expect(tokens.bankStrip.background).not.toBe(tokens.demoBanner.background);
+    expect(tokens.bankStrip.background).not.toBe(tokens.header.background);
   });
 
   it('шрифт подключён локально (без CDN)', () => {

@@ -42,7 +42,7 @@ export function BrandMark({ size = 40 }: { size?: number }) {
       style={{
         flex: 'none',
         borderRadius: size * 0.3,
-        background: tokens.demoBanner.badge,
+        background: tokens.brandMark,
         color: '#ffffff',
         display: 'flex',
         alignItems: 'center',
