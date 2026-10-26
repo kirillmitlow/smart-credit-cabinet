@@ -87,24 +87,23 @@ export function AppHeader({
       <Container size="xl">
         <Group justify="space-between" align="center" py="sm" mih={72} wrap="wrap" gap="lg">
           <Group gap="xl" wrap="wrap" miw={0}>
-            <Anchor
-              component={Link}
-              to={homeHref}
-              aria-label={shell.productName}
-              underline="never"
-              c="inherit"
-              style={{ display: 'flex', alignItems: 'center', gap: 12 }}
-            >
-              <BrandMark />
-              <Stack gap={0}>
-                <Text ff={fonts.display} fw={700} fz={18} lh={1.25} c="inherit">
+            <Group gap={12} wrap="nowrap">
+              <Anchor
+                component={Link}
+                to={homeHref}
+                underline="never"
+                c="inherit"
+                style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+              >
+                <BrandMark />
+                <Text component="span" ff={fonts.display} fw={700} fz={18} c="inherit">
                   {shell.productName}
                 </Text>
-                <Text fz={13} lh={1.3} style={{ color: header.muted }}>
-                  {zoneTagline[zone]}
-                </Text>
-              </Stack>
-            </Anchor>
+              </Anchor>
+              <Text fz={13} lh={1.3} maw={120} style={{ color: header.muted }}>
+                {zoneTagline[zone]}
+              </Text>
+            </Group>
             {nav.length > 0 ? (
               <Box component="nav" aria-label={shell.mainNavLabel} className="scc-nav">
                 <Group gap={4} component="ul" p={0} m={0} style={{ listStyle: 'none' }}>

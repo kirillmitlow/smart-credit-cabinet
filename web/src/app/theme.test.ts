@@ -22,8 +22,11 @@ describe('контраст темы (WCAG AA, 4,5:1)', () => {
     expect(contrast('#ffffff', primary)).toBeGreaterThanOrEqual(AA);
   });
 
-  it('красная ссылка на белом фоне', () => {
+  it('красная ссылка на белом и на сером фоне', () => {
     expect(contrast(primary, '#ffffff')).toBeGreaterThanOrEqual(AA);
+    expect(contrast(tokens.link, '#ffffff')).toBeGreaterThanOrEqual(AA);
+    expect(contrast(tokens.link, tokens.pageBackground)).toBeGreaterThanOrEqual(AA);
+    expect(contrast(tokens.link, '#f1f3f5')).toBeGreaterThanOrEqual(AA);
   });
 
   it('демо-плашка: тёмно-красный текст на светло-красном фоне', () => {
@@ -53,6 +56,11 @@ describe('контраст темы (WCAG AA, 4,5:1)', () => {
     expect(contrast(tokens.header.color, tokens.header.background)).toBeGreaterThanOrEqual(AA);
     expect(contrast(tokens.header.muted, tokens.header.background)).toBeGreaterThanOrEqual(AA);
     expect(contrast(tokens.accentOnDark, tokens.header.background)).toBeGreaterThanOrEqual(AA);
+  });
+
+  it('красная светлая кнопка', () => {
+    expect(contrast(brandPalette[8]!, brandPalette[0]!)).toBeGreaterThanOrEqual(AA);
+    expect(contrast(brandPalette[8]!, brandPalette[1]!)).toBeGreaterThanOrEqual(AA);
   });
 
   it('метки состояний', () => {

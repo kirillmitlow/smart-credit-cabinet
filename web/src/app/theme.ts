@@ -72,6 +72,8 @@ export const tokens = {
   demoStrip: { background: graphite[7], color: '#ffffff' },
   /** Приглушённый текст: контраст не ниже 4,5:1 и на белом, и на сером фоне */
   dimmedText: graphite[6],
+  /** Ссылки: темнее акцента, чтобы на сером фоне контраст был не ниже 4,5:1 */
+  link: brand[7],
   /** Светлый акцент на тёмном фоне (сумма в рекомендуемой карточке) */
   accentOnDark: '#ff8a8d',
   /** Метки состояний */
@@ -100,6 +102,16 @@ const variantColorResolver: VariantColorsResolver = (input) => {
       background: graphite[1],
       hover: graphite[2],
       color: graphite[9],
+      border: 'none',
+    };
+  }
+  // Красная светлая кнопка («Сбросить демо», «Отказать»): тёмно-красный текст на бледном фоне, ≥ 4,5:1
+  if (input.variant === 'light' && input.color === 'red') {
+    return {
+      ...defaults,
+      background: brand[0],
+      hover: brand[1],
+      color: brand[8],
       border: 'none',
     };
   }
@@ -152,6 +164,7 @@ export const cssVariablesResolver: CSSVariablesResolver = () => ({
   variables: { '--scc-page-bg': tokens.pageBackground },
   light: {
     '--mantine-color-dimmed': tokens.dimmedText,
+    '--mantine-color-anchor': tokens.link,
     '--mantine-color-default-border': graphite[2],
   },
   dark: {},
