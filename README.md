@@ -10,7 +10,7 @@
 
 | | |
 |---|---|
-| Версия комплекта сдачи | Git-тег `submission-20261026`; точный SHA — `git rev-parse 'submission-20261026^{commit}'` и [docs/submission.md](docs/submission.md) |
+| Версия комплекта сдачи | Git-тег `submission-20261026-2`; точный SHA — `git rev-parse 'submission-20261026-2^{commit}'` и [docs/submission.md](docs/submission.md) |
 | Последняя проверка | 26.10.2026: CI (линтеры, типы, тесты `api`, `mocks`, `web`), 19 браузерных e2e-тестов на свежем стенде, четыре сценария жюри |
 | Прошлые отчёты | [Предсдаточная проверка 25.10](docs/plan/reviews/B-2026-10-25-freeze-verification.md) |
 
@@ -323,7 +323,7 @@ E2E_BASE_URL=http://localhost:8080 make -C web e2e
 
 | Пункт кейса | Где | Состояние |
 |---|---|---|
-| Репозиторий, история коммитов, хэш | этот репозиторий; тег `submission-20261026` | точный SHA — в [docs/submission.md](docs/submission.md) |
+| Репозиторий, история коммитов, хэш | этот репозиторий; тег `submission-20261026-2` | точный SHA — в [docs/submission.md](docs/submission.md) |
 | Docker-конфигурация и запуск | [docker-compose.yml](docker-compose.yml), [docker-compose.override.yml](docker-compose.override.yml), `Dockerfile` в `api/`, `mocks/`, `web/` | есть, проверено |
 | Lock-файлы и версии | `api/uv.lock`, `mocks/uv.lock`, `web/pnpm-lock.yaml`, `.python-version`, `.nvmrc` | есть |
 | README с запуском и проверкой | этот файл | есть |
